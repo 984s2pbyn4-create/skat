@@ -1,11 +1,11 @@
-const V = 'skat-2.1';
+const V = 'skat-2.2';
 const APP = 'skat-app-' + V, LIB = 'skat-lib', TILES = 'skat-tiles';
 const SHELL = ['./', './index.html'];
 const LIBS = ['https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'];
 const TILE_HOSTS = ['maps.yandex.net', 'opentopomap.org', 'arcgisonline.com', 'tile.openstreetmap.org', 'elevation-tiles-prod'];
-const MAX_TILES = 20000;
+const MAX_TILES = 80000;
 self.addEventListener('install', e => {
 e.waitUntil((async () => {
 const a = await caches.open(APP); await Promise.all(SHELL.map(u => a.add(u).catch(() => {})));

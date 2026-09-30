@@ -69,6 +69,13 @@ body.picking #cross i{background:var(--signal)}
 #sheet{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:8px 14px calc(var(--safe-b) + var(--badge));max-height:55vh;overflow:auto;box-shadow:0 160px 0 0 var(--panel),0 -8px 28px rgba(0,0,0,.4)}
 #sheet::before{content:"";display:block;width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin:0 auto 10px}
 #sheet.hidden{display:none}
+#sheet.mini{padding-top:6px}
+.minibar{display:flex;align-items:center;gap:6px}
+.minibar .mt{flex:1;min-width:0;line-height:1.2}
+.minibar .mt b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.minibar .mt small{color:var(--mute);font-size:12px;white-space:nowrap}
+.minibar button{min-height:42px;padding:6px 11px;flex:none}
+#xpand{font-size:18px}
 #sheet h2{margin:0 0 8px;font-size:17px;font-weight:700;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 #sheet h2 small{color:var(--mute);font-weight:500;font-size:13px;white-space:nowrap}
 .eye{width:36px;min-height:36px;padding:0;background:transparent;display:grid;place-items:center;color:var(--ink);flex:none}
@@ -133,7 +140,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 .ax{position:relative}
 .ax .tr{position:absolute;left:-8px;top:-20px;width:16px;height:20px;filter:drop-shadow(0 0 1px rgba(0,0,0,.8))}
 .ax .tr svg{width:100%;height:100%;display:block}
-.ax .lb{position:absolute;left:10px;top:-16px;white-space:nowrap;font:italic 600 12px/1 "IBM Plex Sans Condensed",sans-serif;color:#1d2621;background:rgba(255,255,255,.72);padding:2px 4px;border-radius:3px}
+.ax .lb{position:absolute;left:11px;top:-11px;white-space:nowrap;font:italic 600 10.5px/1 "IBM Plex Sans Condensed",sans-serif;color:#fff;opacity:.92;text-shadow:0 0 2px #000,0 0 2px #000,0 0 3px #000;pointer-events:none}
 .ax.noicon .lb{left:0;top:0;transform:translate(-50%,-50%)}
 .ax.edit .tr{width:24px;height:30px;left:-12px;top:-30px}.ax.edit .lb{left:14px;top:-22px}
 .plc{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font:700 13px/1 "IBM Plex Sans Condensed",sans-serif;color:#fff;letter-spacing:.03em;text-shadow:0 0 2px #000,0 0 2px #000,0 0 4px #000,0 1px 6px rgba(0,0,0,.9)}
@@ -156,7 +163,6 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 </div>
 <div id="banner"></div>
 <div id="netmsg"></div>
-<div id="vbar"><div class="vt" id="vtext"></div><button class="ghost" id="vMore" title="Дописать ещё">＋</button><button class="ok" id="vDone">Готово</button><button class="ghost" id="vCancel">✕</button></div>
 <div id="rail">
 <button class="rb accent" id="newArrBtn" title="Новый слой"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Слой</button>
 <button class="rb" id="layBtn" title="Слои"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>Слои</button>
@@ -202,12 +208,23 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="row"><button id="sesSave">Выгрузить сессию</button><button id="sesLoad">Загрузить сессию</button></div>
 <p class="status" style="margin-top:10px">Сессия — файл со всеми слоями и палитрой. Сохраните его в «Файлы», а потом загрузите, чтобы продолжить работу с того же места. CSV ориентиров: в строке название и координаты X;Y в СК-42 (5 или 7 цифр) или широта;долгота.</p>
 <div class="sub-h">Населённые пункты</div>
-<div class="row"><button id="pdbBtn">Скачать 100 км вокруг центра карты</button><button class="ghost" id="pdbClr">Очистить базу</button></div>
+<div class="row"><button id="pdbBtn">Н.п. в радиусе 100 км</button><button id="mapDlBtn">Сохранить карту района</button></div>
+<div class="row" style="margin-top:8px"><button class="ghost" id="pdbClr">Очистить базу н.п.</button></div>
 <p class="status" id="pdbInfo" style="margin-top:10px"></p>
 <p class="status" id="offInfo"></p>
 <div class="row"><button class="ghost" data-close>Закрыть</button></div>
 <input type="file" id="csvIn" accept=".csv,.txt,text/csv,text/plain" style="display:none">
 <input type="file" id="sesIn" accept=".json,application/json,text/plain" style="display:none">
+</div></div>
+<div class="modal" id="dlModal"><div class="card big">
+<h3>Сохранить карту района</h3>
+<p class="status" id="dlLayer"></p>
+<div class="two"><label class="f">Радиус, км<input id="dlKm" inputmode="decimal" value="10"></label><label class="f">Масштаб с<select id="dlZ0"></select></label><label class="f">по<select id="dlZ1"></select></label></div>
+<label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="dlDem" checked style="width:22px;min-height:22px;margin:0"> Сохранить и высоты (H без интернета)</label>
+<p class="status" id="dlEst"></p>
+<p class="status" id="dlProg"></p>
+<div class="row"><button class="ghost" data-close>Закрыть</button><button class="danger" id="dlStop" style="display:none">Стоп</button><button class="primary" id="dlGo">Скачать</button></div>
+<p class="status" style="margin-top:10px">Центр — перекрестие карты. Каждый следующий масштаб даёт в 4 раза больше тайлов: для обзора хватает 10–14, для работы по месту — 15–17 на небольшом радиусе. Скачивайте по Wi‑Fi и не блокируйте экран. Уже сохранённое повторно не качается.</p>
 </div></div>
 <div class="modal" id="tblModal"><div class="card big">
 <h3 id="tblTitle"></h3>
@@ -265,7 +282,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 2.1';
+const VERSION = 'версия 2.2';
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
 document.documentElement.style.setProperty('--badge', framed ? '64px' : '10px');
 document.documentElement.style.setProperty('--ext', framed ? '0px' : '110px');
@@ -622,10 +639,12 @@ const S = b.getSouth(), N = b.getNorth(), Wd = b.getWest(), Ed = b.getEast();
 let labels = 0;
 const lbl = (t, x, y, italic, center) => {
 if (labels >= 300) return; labels++;
-ctx2.font = `${italic ? 'italic ' : ''}600 12px "IBM Plex Sans Condensed", sans-serif`;
+ctx2.font = `${italic ? 'italic 600 10.5px' : '600 12px'} "IBM Plex Sans Condensed", sans-serif`;
 const w = ctx2.measureText(t).width, lx = center ? x - w/2 : x;
-ctx2.fillStyle = italic ? 'rgba(255,255,255,.75)' : 'rgba(255,255,255,.88)'; ctx2.fillRect(lx-3, y-11, w+6, 15);
-ctx2.fillStyle = '#111'; ctx2.textBaseline = 'alphabetic'; ctx2.fillText(t, lx, y);
+ctx2.textBaseline = 'alphabetic';
+if (italic){ ctx2.lineJoin = 'round'; ctx2.lineWidth = 3; ctx2.strokeStyle = 'rgba(0,0,0,.85)'; ctx2.strokeText(t, lx, y); ctx2.fillStyle = '#fff'; ctx2.fillText(t, lx, y); return; }
+ctx2.fillStyle = 'rgba(255,255,255,.88)'; ctx2.fillRect(lx-3, y-11, w+6, 15);
+ctx2.fillStyle = '#111'; ctx2.fillText(t, lx, y);
 };
 state.arrays.forEach(a => {
 if (!a.opt || a.hidden || (session && session.arrId === a.id) || z < (a.minZ || 0)) return;
@@ -644,7 +663,7 @@ if (!a.noIcon){
 ctx2.beginPath(); TREE_PTS.forEach(([dx,dy],k) => k ? ctx2.lineTo(q.x+dx, q.y+dy) : ctx2.moveTo(q.x+dx, q.y+dy)); ctx2.closePath();
 ctx2.fillStyle = a.style.color; ctx2.fill(); ctx2.strokeStyle = '#fff'; ctx2.lineWidth = 1.2; ctx2.stroke();
 ctx2.fillStyle = '#fff'; ctx2.fillRect(q.x-1, q.y-2, 2, 3);
-if (showLb) lbl(p.name, q.x+10, q.y-6, true, false);
+if (showLb) lbl(p.name, q.x+11, q.y-3, true, false);
 } else lbl(p.name, q.x, q.y+4, true, true);
 return;
 }
@@ -809,75 +828,10 @@ if (p.placeManual) return Promise.resolve();
 return nearestPlace(p.lat, p.lng).then(n => { if (!p.placeManual){ p.place = n; persist(); sheetSoon(); } })
 .catch(() => { if (!placeWarned){ placeWarned = true; toast('Населённые пункты не получены: нет связи с OpenStreetMap. Можно вписать вручную.'); } });
 }
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let voiceWarned = false, curRec = null, vFinish = null, vCancel = null, vMore = null;
-function voiceUI(mode, t, d){
-const bar = $('vbar');
-if (mode === null){ bar.style.display = 'none'; return; }
-bar.style.display = 'flex'; bar.classList.toggle('wait', mode === 'wait');
-const main = t ? `«${escapeHtml(t)}»` : (mode === 'wait' ? 'Включаю микрофон…' : '🎤 Говорите');
-const hint = mode === 'wait' ? 'подождите' : t ? 'пауза — сохраню, «＋» — дописать' : 'после паузы текст сохранится';
-$('vtext').innerHTML = `${main}<small>${hint}${d ? ' · ' + escapeHtml(d) : ''}</small>`;
-}
-function killRec(){ if (curRec){ const r = curRec; curRec = null; r.onresult = r.onerror = r.onend = r.onaudiostart = r.onstart = null; try { r.abort(); } catch(e){} } }
-function listen(ok, fail){
-if (!SR){ fail && fail('nosupport'); return; }
-if (vCancel) vCancel(true);
-killRec();
-let finished = false, acc = '', cur = '', autoRe = 0, silT = 0, maxT = 0, idleT = 0, diag = '';
-const full = () => (acc + ' ' + cur).replace(/\s+/g, ' ').trim();
-const arm = ms => { clearTimeout(silT); silT = setTimeout(finish, ms); };
-const end = () => { finished = true; clearTimeout(silT); clearTimeout(maxT); clearTimeout(idleT); vFinish = vCancel = vMore = null; voiceUI(null); killRec(); };
-function finish(){ if (finished) return; const t = full(); end(); t ? ok(t) : (fail && fail('nospeech')); }
-const cancel = silent => { if (finished) return; end(); if (!silent) fail && fail('cancel'); };
-const start = () => {
-if (finished) return;
-let r;
-try { r = new SR(); } catch(e){ end(); fail && fail('nosupport'); return; }
-curRec = r; r.lang = 'ru-RU'; r.continuous = true; r.interimResults = true; r.maxAlternatives = 1;
-r.onstart = () => { diag = 'старт'; };
-r.onaudiostart = () => { if (finished) return; diag = 'микрофон'; voiceUI('live', full(), diag); try { navigator.vibrate && navigator.vibrate(30); } catch(e){} };
-r.onresult = e => {
-if (finished) return;
-let s = ''; for (let i = 0; i < e.results.length; i++) s += e.results[i][0].transcript;
-cur = s.trim(); diag = 'распознаю';
-if (full()) clearTimeout(idleT);
-voiceUI('live', full(), diag); arm(2200);
-};
-r.onerror = e => {
-if (finished) return;
-diag = 'iOS: ' + (e.error || '?'); voiceUI(full() ? 'live' : 'wait', full(), diag);
-if ((e.error === 'not-allowed' || e.error === 'service-not-allowed') && !full() && autoRe === 0){ end(); fail && fail(e.error); }
-};
-r.onend = () => {
-if (finished) return;
-curRec = null;
-if (cur){ acc = full(); cur = ''; }
-if (!diag.startsWith('iOS')) diag = 'пауза';
-if (full()){ voiceUI('live', full(), diag); arm(3000); }
-else if (autoRe++ < 1) setTimeout(start, 150);
-else finish();
-};
-try { r.start(); } catch(e){ curRec = null; diag = 'не запустилось'; voiceUI('wait', full(), diag); if (!full()) setTimeout(finish, 1500); }
-};
-vFinish = finish; vCancel = cancel;
-vMore = () => { if (finished) return; clearTimeout(silT); if (cur){ acc = full(); cur = ''; } killRec(); diag = 'дописываю'; clearTimeout(maxT); maxT = setTimeout(finish, 30000); voiceUI('wait', full(), diag); start(); };
-voiceUI('wait', '', '');
-maxT = setTimeout(finish, 30000);
-idleT = setTimeout(() => { if (!full()) finish(); }, 8000);
-start();
-}
-$('vMore').onclick = () => { vMore && vMore(); };
-$('vDone').onclick = () => { vFinish && vFinish(); };
-$('vCancel').onclick = () => { vCancel && vCancel(false); };
-function voiceWarn(err){
-if (err === 'cancel') return;
-if (err === 'nospeech' || err === 'no-speech' || err === 'aborted'){ toast('Не расслышал — введите вручную'); return; }
-if (!voiceWarned){ voiceWarned = true; toast('Голосовой ввод здесь недоступен. Используйте диктовку на клавиатуре (значок микрофона).'); }
-}
+let vCancel = null;
 function startSession(id, mode, isNew=false){
 const a = arrById(id); a.hidden = false;
-session = {arrId:id, mode, snap:JSON.stringify(a.points), isNew, style:null};
+session = {arrId:id, mode, snap:JSON.stringify(a.points), isNew, style:null, mini:true};
 document.body.classList.toggle('picking', mode==='pick');
 map.doubleClickZoom.disable();
 closeModals(); renderMarkers(); renderSheet();
@@ -903,18 +857,16 @@ persist(); renderMarkers(); renderSheet(); return true;
 }
 function addPoint(ll){
 const a = arrById(session.arrId);
-if (a.kind === 'aux' || namedKind(a)){
-if (state.voice) listen(t => { if (createNamed(a, ll, t)) toast('Записано: ' + t); else openAux(a, null, ll); }, err => { if (err === 'cancel') return; voiceWarn(err); openAux(a, null, ll); });
-else openAux(a, null, ll);
-return;
-}
+if (a.kind === 'aux' || namedKind(a)){ openAux(a, null, ll); return; }
 const p = {lat:ll.lat, lng:ll.lng, h:null, place:''};
 if (session.style && !sameSt(session.style, a.style)) p.style = copySt(session.style);
 a.points.push(p); fillHeight(p); fillPlace(p); persist(); renderMarkers(); renderSheet();
-if (state.voice) listen(t => { p.comment = t; persist(); toast('Комментарий: ' + t); }, voiceWarn);
 }
 map.on('click', e => { if (session && session.mode === 'pick') addPoint(e.latlng); });
 const sheet = $('sheet');
+{ let sy = 0; sheet.addEventListener('touchstart', e => { sy = e.touches[0].clientY; }, {passive:true});
+sheet.addEventListener('touchend', e => { if (!session) return; const dy = e.changedTouches[0].clientY - sy;
+if (dy > 40 && !session.mini && sheet.scrollTop <= 0){ session.mini = true; renderSheet(); } else if (dy < -40 && session.mini){ session.mini = false; renderSheet(); } }); }
 const EYE_ON = '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYE_OFF = '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7c2.2 0 4 .8 5.5 1.8M22 12s-3.6 7-10 7c-2.2 0-4-.8-5.5-1.8"/><path d="M3 3l18 18"/></svg>';
 function renderLayers(){
@@ -944,15 +896,24 @@ if ($('layModal').classList.contains('open')) renderLayers();
 if (!session){ sheet.classList.add('hidden'); sheet.innerHTML = ''; }
 else {
 sheet.classList.remove('hidden');
+const a0 = arrById(session.arrId);
+if (session.mini){
+const pk = session.mode === 'pick', n0 = a0.points.length, nx = pk && a0.kind !== 'aux' && !namedKind(a0) ? ` · след. ${escapeHtml(labelOf(a0,n0))}` : '';
+sheet.classList.add('mini');
+sheet.innerHTML = `<div class="minibar"><button class="ghost" id="xpand" title="Развернуть">⌃</button><div class="mt"><b>${escapeHtml(a0.name)}</b><small>${pk ? 'ставлю' : 'правлю'} · ${n0}${nx}</small></div>${pk ? `<button id="undo" ${n0?'':'disabled'} title="Убрать последнюю">↶</button><button id="atCross">⊕ В прицел</button>` : ''}<button class="ok" id="commit" title="Подтвердить">✓</button></div>`;
+$('xpand').onclick = () => { session.mini = false; renderSheet(); };
+if (pk){ $('undo').onclick = () => { a0.points.pop(); persist(); renderMarkers(); renderSheet(); }; $('atCross').onclick = () => addPoint(map.getCenter()); }
+$('commit').onclick = () => endSession(true);
+} else {
+sheet.classList.remove('mini');
 const a = arrById(session.arrId), n = a.points.length, pick = session.mode === 'pick', aux = a.kind === 'aux', route = a.kind === 'route', named = namedKind(a);
 const status = aux
-? (pick ? `Коснитесь карты или нажмите «Точка в прицел» и ${state.voice ? 'назовите' : 'введите название'} ориентира.` : `Перетаскивайте ориентиры. Коснитесь ориентира, чтобы переименовать или удалить.`)
-: named ? (pick ? `Коснитесь карты или нажмите «Точка в прицел» и ${state.voice ? 'назовите' : 'введите название'} точки.` : `Перетаскивайте точки. Коснитесь точки, чтобы изменить название, цвет, высоту или удалить.`)
+? (pick ? `Коснитесь карты или нажмите «Точка в прицел» и введите название ориентира.` : `Перетаскивайте ориентиры. Коснитесь ориентира, чтобы переименовать или удалить.`)
+: named ? (pick ? `Коснитесь карты или нажмите «Точка в прицел» и введите название точки.` : `Перетаскивайте точки. Коснитесь точки, чтобы изменить название, цвет, высоту или удалить.`)
 : route ? (pick ? `Ставьте точки по порядку, они соединяются линией. Следующая: <b>${escapeHtml(labelOf(a,n))}</b>.` : `Перетаскивайте точки маршрута, линия пересчитается. Коснитесь точки, чтобы изменить её или удалить.`)
-: (pick ? `Касайтесь карты или ставьте в прицел. Следующая: <b>${escapeHtml(labelOf(a,n))}</b>.${state.voice ? ' Голосом — комментарий.' : ''}` : `Перетаскивайте точки. Коснитесь точки, чтобы изменить цвет, высоту, населённый пункт, комментарий или удалить.`);
-sheet.innerHTML = `<h2>${escapeHtml(a.name)}<small>${aux ? 'ориентиров' : 'точек'}: ${n}</small></h2>
+: (pick ? `Касайтесь карты или ставьте в прицел. Следующая: <b>${escapeHtml(labelOf(a,n))}</b>.` : `Перетаскивайте точки. Коснитесь точки, чтобы изменить цвет, высоту, населённый пункт, комментарий или удалить.`);
+sheet.innerHTML = `<h2>${escapeHtml(a.name)}<small>${aux ? 'ориентиров' : 'точек'}: ${n} <button class="ghost" id="xcol" style="min-height:30px;padding:2px 10px;margin-left:6px">⌄ свернуть</button></small></h2>
 <div class="seg"><button id="mPick" class="${pick?'on':''}">Ставить</button><button id="mEdit" class="${pick?'':'on'}" ${n?'':'disabled'}>Двигать и править</button></div>
-${pick ? `<div class="seg" id="inSeg"><button data-v="0" class="${state.voice?'':'on'}">Ввод вручную</button><button data-v="1" class="${state.voice?'on':''}">🎤 Голосом</button></div>` : ''}
 <p class="status">${status}</p>
 ${pick && !aux ? `<div class="flabel">Цвет новых точек</div><div class="colors strip" id="newCol"></div>` : ''}
 ${pick ? `<div class="row" style="margin-bottom:8px"><button id="undo" ${n?'':'disabled'}>Убрать последнюю</button><button id="atCross">Точка в прицел</button></div>` : ''}
@@ -960,7 +921,6 @@ ${pick ? `<div class="row" style="margin-bottom:8px"><button id="undo" ${n?'':'d
 $('mPick').onclick = () => setMode('pick');
 $('mEdit').onclick = () => setMode('edit');
 if (pick){
-$('inSeg').querySelectorAll('button').forEach(b => b.onclick = () => { state.voice = b.dataset.v === '1'; persist(); renderSheet(); });
 $('undo').onclick = () => { a.points.pop(); persist(); renderMarkers(); renderSheet(); };
 $('atCross').onclick = () => addPoint(map.getCenter());
 if (!aux){ const pickSt = st => { session.style = st; renderPalette($('newCol'), session.style || null, pickSt, {same:true}); }; renderPalette($('newCol'), session.style || null, pickSt, {same:true}); }
@@ -971,6 +931,8 @@ if (!changed) endSession(false);
 else askConfirm(session.isNew ? 'Удалить новый слой со всеми точками?' : 'Отменить все изменения в этом сеансе?', session.isNew ? 'Удалить' : 'Отменить изменения', () => endSession(false));
 };
 $('commit').onclick = () => endSession(true);
+$('xcol').onclick = () => { session.mini = true; renderSheet(); };
+}
 }
 $('newArrBtn').disabled = !!session; $('layBtn').disabled = !!session;
 $('expBtn').disabled = !!session || !state.arrays.some(a => a.points.length);
@@ -1273,6 +1235,62 @@ persistNow(); renderMarkers(); renderSheet();
 map.fitBounds(L.latLngBounds(pts.map(p => [p.lat,p.lng])).pad(0.2), {maxZoom:16});
 toast(`Импортировано ориентиров: ${pts.length}` + (bad ? `, пропущено строк: ${bad}` : ''));
 }
+const DL_CAP = 40000;
+function dlBox(km){ const c = map.getCenter(), dl = km/111.2, dn = km/(111.3*Math.cos(c.lat*Math.PI/180)); return {s:c.lat-dl, n:c.lat+dl, w:c.lng-dn, e:c.lng+dn}; }
+function dlRange(crs, B, z){ const a = crs.latLngToPoint(L.latLng(B.n, B.w), z).divideBy(256).floor(), b = crs.latLngToPoint(L.latLng(B.s, B.e), z).divideBy(256).floor(); return [a, b]; }
+function* dlTiles(km, z0, z1, dem){
+const def = LAYERS[state.layer], crs = crsOf(state.layer), B = dlBox(km);
+for (let z = z0; z <= Math.min(z1, def.max); z++){ const [a, b] = dlRange(crs, B, z);
+for (let x = a.x; x <= b.x; x++) for (let y = a.y; y <= b.y; y++) for (const u of def.urls) yield u.replace('{s}', 'abc'[(x+y)%3]).replace('{x}', x).replace('{y}', y).replace('{z}', z); }
+if (dem){ const [a, b] = dlRange(L.CRS.EPSG3857, B, DEM_Z); for (let x = a.x; x <= b.x; x++) for (let y = a.y; y <= b.y; y++) yield `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${DEM_Z}/${x}/${y}.png`; }
+}
+function dlCount(km, z0, z1, dem){
+const def = LAYERS[state.layer], crs = crsOf(state.layer), B = dlBox(km); let n = 0;
+for (let z = z0; z <= Math.min(z1, def.max); z++){ const [a, b] = dlRange(crs, B, z); n += (b.x-a.x+1)*(b.y-a.y+1)*def.urls.length; }
+if (dem){ const [a, b] = dlRange(L.CRS.EPSG3857, B, DEM_Z); n += (b.x-a.x+1)*(b.y-a.y+1); }
+return n;
+}
+let dlBusy = false, dlStopF = false;
+function dlParams(){ return {km:Math.min(200, Math.max(0.5, parseFloat(($('dlKm').value||'').replace(',', '.')) || 0)), z0:+$('dlZ0').value, z1:+$('dlZ1').value, dem:$('dlDem').checked}; }
+function dlUpdate(){
+if (dlBusy) return;
+const P = dlParams(), osm = state.layer === 'osm', sw = !framed && navigator.serviceWorker && navigator.serviceWorker.controller;
+const n = P.z1 >= P.z0 ? dlCount(P.km, P.z0, P.z1, P.dem) : 0, mb = Math.round(n * (LAYERS[state.layer].dark ? 22 : 12) / 1024);
+let msg = `Тайлов: <b>${n.toLocaleString('ru-RU')}</b>, примерно <b>${mb} МБ</b>.`, ok = n > 0;
+if (framed){ msg = 'Сохранение карты работает только в версии на GitHub.'; ok = false; }
+else if (!sw){ msg = 'Офлайн‑режим ещё не включился — закройте и снова откройте приложение с интернетом.'; ok = false; }
+else if (osm){ msg = 'Правила OpenStreetMap запрещают массовое скачивание. Выберите другую подложку.'; ok = false; }
+else if (P.z1 < P.z0){ msg = 'Масштаб «по» должен быть не меньше «с».'; ok = false; }
+else if (n > DL_CAP){ msg += ` Это больше лимита ${DL_CAP.toLocaleString('ru-RU')} за раз — уменьшите радиус или верхний масштаб.`; ok = false; }
+$('dlEst').innerHTML = msg; $('dlGo').disabled = !ok;
+}
+function openDl(){
+closeModals();
+const z = Math.round(map.getZoom()), mx = LAYERS[state.layer].max;
+fillZSel2($('dlZ0'), Math.max(8, Math.min(z, 14)), mx); fillZSel2($('dlZ1'), Math.min(mx, Math.max(z + 2, 15)), mx);
+$('dlLayer').innerHTML = `Подложка: <b>${LAYERS[state.layer].name}</b> (другую выберите кнопкой вверху справа).`;
+if (!dlBusy) $('dlProg').textContent = '';
+dlUpdate(); openModal('dlModal');
+}
+function fillZSel2(el, v, mx){ let h = ''; for (let z = 6; z <= mx; z++) h += `<option value="${z}"${z===v?' selected':''}>${z}</option>`; el.innerHTML = h; }
+['dlKm','dlZ0','dlZ1','dlDem'].forEach(id => { $(id).addEventListener('input', dlUpdate); $(id).addEventListener('change', dlUpdate); });
+$('mapDlBtn').onclick = openDl;
+$('dlStop').onclick = () => { dlStopF = true; };
+$('dlGo').onclick = async () => {
+if (dlBusy) return;
+const P = dlParams(), total = dlCount(P.km, P.z0, P.z1, P.dem), it = dlTiles(P.km, P.z0, P.z1, P.dem);
+dlBusy = true; dlStopF = false; $('dlGo').disabled = true; $('dlStop').style.display = '';
+let done = 0, err = 0;
+const show = () => { const t = `Сохранено ${done.toLocaleString('ru-RU')} из ${total.toLocaleString('ru-RU')}${err ? `, ошибок ${err}` : ''}`; $('dlProg').textContent = t; netMsg('🗺 ' + t); };
+const worker = async () => { for (;;){ if (dlStopF) return; const n = it.next(); if (n.done) return;
+try { await fetch(n.value, {mode: n.value.includes('elevation-tiles') ? 'cors' : 'no-cors'}); } catch(e){ err++; }
+done++; if (done % 25 === 0) show(); } };
+show();
+await Promise.all(Array.from({length:6}, worker));
+dlBusy = false; $('dlStop').style.display = 'none'; netMsg('');
+toast(dlStopF ? `Остановлено: сохранено ${done} тайлов` : `Карта района сохранена: ${done} тайлов${err ? `, ошибок ${err}` : ''}`);
+show(); netMsg(''); dlUpdate();
+};
 $('layBtn').onclick = () => { openModal('layModal'); renderLayers(); pdbInfo(); };
 $('layNew').onclick = () => { closeModals(); openArrModal(); };
 $('impBtn').onclick = () => $('csvIn').click();
