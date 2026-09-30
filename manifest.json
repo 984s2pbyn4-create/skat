@@ -1,0 +1,14 @@
+{
+"name": "СКАТ — СК-42 Автоматизированный Топопланшет",
+"short_name": "СКАТ",
+"start_url": "./",
+"scope": "./",
+"display": "fullscreen",
+"orientation": "any",
+"background_color": "#141a17",
+"theme_color": "#141a17",
+"icons": [
+{"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+{"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+]
+}
