@@ -1,0 +1,63 @@
+name: Build APK
+on:
+  workflow_dispatch: {}
+  push:
+    paths: ['index.html', 'sw.js', 'manifest.json', 'icon-512.png', '.github/workflows/apk.yml']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Prepare web files (all libraries inside)
+        run: |
+          mkdir -p app/www/lib
+          cp index.html app/www/index.html
+          cp sw.js app/www/sw.js
+          cp manifest.json icon-192.png icon-512.png app/www/ 2>/dev/null || true
+          cd app/www
+          curl -sfL -o lib/leaflet.min.css https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css
+          curl -sfL -o lib/leaflet.min.js https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js
+          curl -sfL -o lib/xlsx.full.min.js https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js
+          sed -i 's#https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/#lib/#g' index.html
+          grep -c 'lib/leaflet.min.js' index.html
+      - name: Capacitor Android project
+        working-directory: app
+        run: |
+          npm init -y > /dev/null
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/filesystem@6 @capacitor/share@6
+          echo '{"appId":"ru.skat.planshet","appName":"СКАТ","webDir":"www"}' > capacitor.config.json
+          npx cap add android
+          npx cap sync android
+      - name: App icon
+        working-directory: app/android/app/src/main/res
+        run: |
+          sudo apt-get install -y -qq imagemagick > /dev/null
+          rm -rf mipmap-anydpi-v26
+          for d in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+            n=${d%%:*}; z=${d##*:}; mkdir -p mipmap-$n
+            convert $GITHUB_WORKSPACE/icon-512.png -resize ${z}x${z} mipmap-$n/ic_launcher.png
+            cp mipmap-$n/ic_launcher.png mipmap-$n/ic_launcher_round.png
+            cp mipmap-$n/ic_launcher.png mipmap-$n/ic_launcher_foreground.png
+          done
+      - name: Signing key (constant, from secret SKAT_KEYSTORE)
+        env:
+          KS: ${{ secrets.SKAT_KEYSTORE }}
+        run: |
+          if [ -n "$KS" ]; then mkdir -p ~/.android; echo "$KS" | base64 -d > ~/.android/debug.keystore; echo "Постоянный ключ подключён"; else echo "::warning::Секрет SKAT_KEYSTORE не задан — APK подписан временным ключом"; fi
+      - name: Build APK
+        working-directory: app/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk ../../SKAT.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SKAT-apk
+          path: SKAT.apk
