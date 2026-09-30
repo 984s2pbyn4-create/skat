@@ -1,4 +1,4 @@
-const V = 'skat-2.2';
+const V = 'skat-2.4';
 const APP = 'skat-app-' + V, LIB = 'skat-lib', TILES = 'skat-tiles';
 const SHELL = ['./', './index.html'];
 const LIBS = ['https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
@@ -15,7 +15,9 @@ self.skipWaiting();
 });
 self.addEventListener('activate', e => {
 e.waitUntil((async () => {
-for (const k of await caches.keys()) if (k.startsWith('skat-app-') && k !== APP) await caches.delete(k);
+const old = (await caches.keys()).filter(k => k.startsWith('skat-app-') && k !== APP);
+if (old.length){ const n = await caches.open(APP); if (!(await n.match('./index.html'))) for (const k of old){ const m = await (await caches.open(k)).match('./index.html'); if (m){ await n.put('./index.html', m); break; } } }
+for (const k of old) await caches.delete(k);
 await self.clients.claim();
 })());
 });
@@ -26,26 +28,25 @@ if (keys.length > MAX_TILES) for (const k of keys.slice(0, keys.length - MAX_TIL
 }
 async function cacheFirst(req, name){
 const c = await caches.open(name), hit = await c.match(req);
-if (hit) return hit;
+if (hit && !(req.mode === 'cors' && hit.type === 'opaque')) return hit;
 try {
 const res = await fetch(req);
 if (res && (res.ok || res.type === 'opaque')){ c.put(req, res.clone()).catch(() => {}); if (name === TILES && ++puts % 500 === 0) trim(); }
 return res;
 } catch(err){ return hit || Response.error(); }
 }
-async function networkFirst(req){
+async function appFirst(req, e){
 const c = await caches.open(APP);
-try {
-const res = await Promise.race([fetch(req), new Promise((_, rej) => setTimeout(() => rej(0), 4000))]);
-if (res && res.ok) c.put('./index.html', res.clone()).catch(() => {});
-return res;
-} catch(err){ return (await c.match('./index.html')) || (await c.match('./')) || Response.error(); }
+const hit = (await c.match('./index.html')) || (await c.match('./'));
+const upd = fetch(req, {cache:'no-cache'}).then(res => { if (res && res.ok) return c.put('./index.html', res.clone()).then(() => res); return res; });
+if (hit){ e.waitUntil(upd.catch(() => {})); return hit; }
+try { return await upd; } catch(err){ return Response.error(); }
 }
 self.addEventListener('fetch', e => {
 const req = e.request;
 if (req.method !== 'GET') return;
 const u = new URL(req.url);
-if (req.mode === 'navigate') { e.respondWith(networkFirst(req)); return; }
+if (req.mode === 'navigate') { e.respondWith(appFirst(req, e)); return; }
 if (TILE_HOSTS.some(h => u.hostname.includes(h) || u.pathname.includes(h))) { e.respondWith(cacheFirst(req, TILES)); return; }
 if (u.hostname === 'cdnjs.cloudflare.com' || u.hostname.includes('fonts.g')) { e.respondWith(cacheFirst(req, LIB)); return; }
 });
