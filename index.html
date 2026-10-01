@@ -65,6 +65,14 @@ button:disabled{opacity:.35}
 .rad-c{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--signal);color:#1d1206;font-size:18px;font-weight:800;padding:0;min-height:0;box-shadow:var(--shadow)}
 .rad-t{position:absolute;transform:translate(-50%,0);color:#fff;font-size:13px;font-weight:700;text-shadow:0 0 3px #000,0 0 3px #000;white-space:nowrap;pointer-events:none}
 @keyframes radIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+#symStyle{flex-wrap:wrap}#symStyle button{flex:1 0 45%}
+.colors button.symb{width:44px;height:44px;border-radius:10px;background:#f2f2ec;padding:4px;box-shadow:none}
+.colors button.symb.on{box-shadow:0 0 0 3px var(--signal)}
+.symb svg,.symb .symimg,.symico svg,.symico .symimg{width:100%;height:100%;display:block}
+.symico{width:30px;height:30px;flex:none;display:block;background:#f2f2ec;border-radius:6px;padding:2px}
+.symimg{display:block;width:26px;height:26px;background:currentColor;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center}
+.pt .sym .symimg{width:100%;height:100%}
+.clb{transform:translate(-50%,-50%);min-width:32px;height:32px;padding:0 7px;border-radius:16px;display:inline-grid;place-items:center;color:#fff;font:800 13px/1 "IBM Plex Sans Condensed",sans-serif;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.4)}
 #compass{position:fixed;left:10px;bottom:calc(max(var(--sheet-h,0px), calc(var(--safe-b) + var(--badge))) + 12px);z-index:1000;width:48px;height:48px;min-height:0;padding:0;border-radius:50%;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center}
 #compass svg{width:30px;height:30px}
 #cross{position:fixed;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;z-index:460;pointer-events:none}
@@ -219,6 +227,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <h3 id="arrTitle">Новый слой</h3>
 <div class="seg" id="kindSeg"><button data-k="main" class="on">Массив</button><button data-k="pts">Точки</button><button data-k="aux">Ориентиры</button><button data-k="route">Маршрут</button><button data-k="desc">Описание</button></div>
 <p class="status" id="kindHint"></p>
+<div id="symFields"><div class="flabel">Тактический знак (необязательно)</div><div class="seg" id="symSideSeg"><button data-s="">Нет</button><button data-s="r">Красные</button><button data-s="b">Синие</button></div><div class="colors" id="symGrid" style="display:none"></div></div>
 <div id="descFields" style="display:none"><div class="seg" id="descSeg"><button data-m="auto" class="on">Нумерация как массив</button><button data-m="manual">Названия как точки</button></div></div>
 <label class="f">Название слоя<input id="fName" autocomplete="off"></label>
 <div id="mainFields">
@@ -255,6 +264,14 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <h3>Настройки <small id="ver2"></small></h3>
 <div class="sub-h">Данные</div>
 <div class="row"><button id="expBtn">Excel: все слои</button><button id="impBtn">Импорт ориентиров CSV</button></div>
+<div class="sub-h">Тактические знаки</div>
+<div class="row" style="margin-bottom:8px"><button id="symAdd">Добавить знак</button><button class="ghost" id="symFavAll">Все в избранное</button></div>
+<p class="status">★ — избранное: в круговом меню показываются только эти знаки. Касание строки — изменить название, значок и оформление.</p>
+<div id="symList" style="max-height:46vh;overflow:auto"></div>
+<div class="sub-h">Кластеризация точек</div>
+<label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="clOn" style="width:22px;min-height:22px;margin:0"> Объединять близкие точки в кружок с числом</label>
+<div class="duo"><label class="f">Объединять до масштаба<select id="clZ"></select></label><label class="f">Радиус объединения, пикс.<select id="clR"><option value="40">40</option><option value="60">60</option><option value="80">80</option><option value="110">110</option></select></label></div>
+<p class="status">Касание кружка приближает карту к этим точкам. Слой, который вы сейчас ставите или правите, не объединяется.</p>
 <div class="sub-h">Рельеф и поворот</div>
 <div class="seg" id="relSeg"><button data-r="off">Выкл</button><button data-r="shade">Отмывка</button><button data-r="color">Цвет высот</button><button data-r="both">Оба</button></div>
 <label class="f">Прозрачность рельефа: <span id="relOpV"></span><input type="range" id="relOp" min="10" max="100" step="5" style="width:100%"></label>
@@ -280,6 +297,25 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <p class="status" id="pdbInfo" style="margin-top:10px"></p>
 <p class="status" id="offInfo"></p>
 <div class="row"><button class="ghost" data-close>Закрыть</button></div>
+</div></div>
+<div class="modal" id="askModal"><div class="card">
+<h3 id="askTitle"></h3>
+<p class="status" id="askHint"></p>
+<div class="row" style="margin-bottom:8px"><button class="primary" id="askAuto">Автоматически</button><button id="askManual">Вручную</button></div>
+<div class="row"><button class="ghost" data-close>Отмена</button></div>
+</div></div>
+<div class="modal" id="symModal"><div class="card big">
+<h3 id="symTitle">Знак</h3>
+<div class="seg" id="symType"><button data-t="pt">Точечный</button><button data-t="line">Линия</button><button data-t="area">Зона</button></div>
+<div class="duo"><label class="f">Название<input id="symN" autocomplete="off"></label><label class="f">Сокращение (для номера)<input id="symAb" maxlength="4" autocomplete="off"></label></div>
+<div id="symPtEd"><div class="flabel">Значок: рисуйте пальцем в квадрате или загрузите картинку</div>
+<canvas id="symCv" width="256" height="256" style="width:200px;height:200px;background:#fff;border-radius:12px;touch-action:none;display:block;margin:0 auto 8px"></canvas>
+<div class="row" style="margin-bottom:8px"><button id="symUndo">↶ Штрих</button><button id="symClr">Очистить</button><button id="symImg">Картинка…</button></div>
+<input type="file" id="symImgIn" accept="image/*" style="display:none"></div>
+<div id="symLnEd"><div class="flabel">Оформление</div><div class="seg" id="symStyle"></div></div>
+<label class="f" style="display:flex;align-items:center;gap:10px" id="symSclL"><input type="checkbox" id="symScl" style="width:22px;min-height:22px;margin:0"> Масштабировать с картой (по умолчанию для новых линий и зон этого знака)</label>
+<label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="symFav" style="width:22px;min-height:22px;margin:0"> В избранном</label>
+<div class="row"><button class="danger" id="symDel">Удалить</button><button class="ghost" data-close>Отмена</button><button class="ok" id="symSave">Сохранить</button></div>
 </div></div>
 <div class="modal" id="dlModal"><div class="card big">
 <h3>Сохранить карту района</h3>
@@ -358,7 +394,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 3.1';
+const VERSION = 'версия 3.2';
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
 document.documentElement.style.setProperty('--badge', framed ? '64px' : '10px');
@@ -558,7 +594,7 @@ ctx.fillStyle = txt; ctx.fillText(t, x+4, y-4);
 }
 let raf = 0;
 const redraw = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; updateReadout(); }); };
-const redrawAll = () => { drawGrid(); drawOpt(); updateReadout(); };
+const redrawAll = () => { drawGrid(); updateCluster(); drawOpt(); updateReadout(); };
 map.on('moveend viewreset', redrawAll);
 map.on('move zoom viewreset', redraw);
 map.on('zoomanim', () => { cv.style.opacity = 0; cv2.style.opacity = 0; });
@@ -705,6 +741,7 @@ const TREE_BTN = '<svg viewBox="0 0 24 24"><path d="M12 2l5 7h-3l4 6h-3.5L19 20H
 const BOLT = '<svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>';
 function renderMarkers(){
 markers.clearLayers();
+updateCluster();
 const z = map.getZoom(), vb = map.getBounds().pad(0.5);
 const S = vb.getSouth(), N = vb.getNorth(), Wd = vb.getWest(), Ed = vb.getEast();
 state.arrays.forEach(a => {
@@ -718,6 +755,7 @@ const showLb = editing || active || z >= (a.lblZ ?? DEF_LBLZ);
 if (a.kind === 'route' && a.points.length > 1){ const pl = L.polyline(a.points.map(p => [p.lat,p.lng]), {color:a.style.color, weight:3.5, opacity:0.9*op, interactive:false}); pl._rtId = a.id; markers.addLayer(pl); }
 a.points.forEach((p,i) => {
 if (!active && (p.lat < S || p.lat > N || p.lng < Wd || p.lng > Ed)) return;
+if (!active && curCl && curCl.skip.has(a.id + ':' + i)) return;
 let html;
 if (a.kind === 'aux'){
 const icon = editing || active || !a.noIcon;
@@ -739,6 +777,8 @@ m.on('click', () => a.kind === 'aux' ? openAux(a, i) : openPoint(a, i));
 markers.addLayer(m);
 });
 });
+if (curCl) curCl.bub.forEach(bb => { const m = L.marker(bb.ll, {keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="clb" style="background:${bb.col}">${bb.n}</div>`})});
+m.on('click', () => map.fitBounds(bb.b.pad(0.4), {maxZoom:Math.min(18, clCfg.z + 1)})); markers.addLayer(m); });
 drawOpt();
 }
 let rmT = 0;
@@ -769,6 +809,7 @@ ctx2.strokeStyle = a.style.color; ctx2.lineWidth = 3.5; ctx2.stroke();
 }
 a.points.forEach((p,i) => {
 if (p.lat < S || p.lat > N || p.lng < Wd || p.lng > Ed) return;
+if (curCl && curCl.skip.has(a.id + ':' + i)) return;
 const q = map.latLngToLayerPoint([p.lat,p.lng]).subtract(BX.o);
 if (a.kind === 'aux'){
 if (!a.noIcon){
@@ -788,6 +829,10 @@ if (showLb) lbl(labelOf(a,i), q.x+r+3, q.y-r-2, false, false);
 });
 });
 ctx2.globalAlpha = 1;
+state.arrays.forEach(a => { if (a.kind !== 'shapes' || a.hidden || z < (a.minZ || 0)) return;
+(a.shapes || []).forEach(sh => { const sy = sh.sym && SYM_BY[sh.sym]; if (!sy || !DECOR[sy.style]) return;
+const P = sh.pts.map(p => map.latLngToLayerPoint(LL(p)).subtract(BX.o)); if (sy.type === 'area' && P.length > 2) P.push(P[0]);
+DECOR[sy.style](ctx2, P, sh.color || a.style.color, shK(sh)); }); });
 }
 function routeLive(a){ markers.eachLayer(l => { if (l instanceof L.Polyline && l._rtId === a.id) l.setLatLngs(a.points.map(p => [p.lat,p.lng])); }); }
 let shRaf = 0;
@@ -1174,6 +1219,7 @@ const numbered = k === 'main' || k === 'route' || (k === 'desc' && descMode === 
 $('mainFields').style.display = k === 'aux' ? 'none' : '';
 $('numFields').style.display = numbered ? '' : 'none';
 $('descFields').style.display = k === 'desc' ? '' : 'none';
+$('symFields').style.display = k === 'aux' ? 'none' : '';
 $('auxFields').style.display = k === 'aux' ? '' : 'none';
 if (!arrEditId){
 const n = state.arrays.length + 1;
@@ -1202,6 +1248,7 @@ fillZSel($('fMinZ'), a ? a.minZ || 0 : 0);
 fillZSel($('fLblZ'), a ? (a.lblZ ?? DEF_LBLZ) : DEF_LBLZ);
 $('zHint').textContent = `Сейчас масштаб карты: ${map.getZoom()}. Чем больше число, тем крупнее масштаб (ближе).`;
 pickStyle = a ? copySt(a.style) : copySt(state.palette.length ? state.palette[0] : DEFAULT_PAL[0]);
+mSide = (a && a.symSide) || ''; mSym = (a && a.sym) || null; renderSymPick();
 setKind(a ? a.kind : 'main');
 $('kindHint').style.display = a ? 'none' : '';
 renderColors(); updPreview(); openModal('arrModal');
@@ -1217,9 +1264,11 @@ const f = arrKind === 'aux' ? {auxPrefix:$('fAuxPre').value.trim()} : named ? {i
 if (f.ident === '') f.ident = name;
 if (arrKind === 'desc') f.numMode = descMode;
 f.minZ = +$('fMinZ').value; f.lblZ = +$('fLblZ').value;
-if (arrEditId){ Object.assign(arrById(arrEditId), f, {name, style:pickStyle}); persist(); renderMarkers(); renderSheet(); closeModals(); openTable(arrEditId); return; }
+f.symSide = mSide || null; f.sym = mSide ? mSym : null;
+const stl = mSide ? {color:SIDES[mSide].color, name:SIDES[mSide].name, glyph:''} : pickStyle;
+if (arrEditId){ Object.assign(arrById(arrEditId), f, {name, style:stl}); persist(); renderMarkers(); renderSheet(); closeModals(); openTable(arrEditId); return; }
 const id = Date.now();
-state.arrays.push({id, kind:arrKind, name, style:pickStyle, ...f, points:[]});
+state.arrays.push({id, kind:arrKind, name, style:stl, ...f, points:[]});
 startSession(id, 'pick', true);
 };
 let tblId = null;
@@ -1330,7 +1379,7 @@ a.points.forEach(p => { const s = GEO.toSK(p.lat, p.lng); lines.push(`${String(p
 deliverFile(new Blob(['\uFEFF' + lines.join('\r\n')], {type:'text/csv'}), `${safeName(a.name)}.csv`, 'CSV с ориентирами готов');
 }
 function exportSession(){
-const data = {app:'skat', ver:1, saved:new Date().toISOString(), palette:state.palette, palVer:PAL_VER, arrays:state.arrays, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice};
+const data = {app:'skat', ver:1, saved:new Date().toISOString(), palette:state.palette, palVer:PAL_VER, arrays:state.arrays, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice, syms:SYMS};
 deliverFile(new Blob([JSON.stringify(data)], {type:'application/json'}), `СКАТ_сессия_${stamp()}.json`, 'Сессия готова — сохраните её в «Файлы»');
 }
 function importSession(text){
@@ -1339,6 +1388,7 @@ try { d = JSON.parse(text); } catch(e){ toast('Это не файл сессии
 if (!d || !Array.isArray(d.arrays)){ toast('В файле нет данных сессии'); return; }
 askConfirm(`Загрузить сессию (${d.arrays.length} слоёв)? Текущие данные будут заменены.`, 'Загрузить', () => {
 state.arrays = d.arrays.map(normArr);
+if (Array.isArray(d.syms) && d.syms.length){ SYMS = d.syms; saveSyms(); }
 if (Array.isArray(d.palette) && d.palette.length) state.palette = d.palette;
 if (typeof d.grid === 'boolean'){ state.grid = d.grid; $('gridBtn').classList.toggle('on', state.grid); }
 persistNow(); closeModals(); renderMarkers(); renderSheet(); drawGrid();
@@ -1667,7 +1717,7 @@ return sh.type === 'circle' ? L.circle(pts[0], Object.assign(o, {radius:sh.r})) 
 }
 function drawShapes(a, lbl){
 (a.shapes || []).forEach(sh => {
-markers.addLayer(shapeLayer(sh, sh.color || a.style.color, (sh.op ?? 35) / 100));
+markers.addLayer(shapeLayer(sh, sh.color || a.style.color, (sh.op ?? 35) / 100, symExtra(sh)));
 if (lbl && sh.name){ const c = shapeGeo(sh).c; markers.addLayer(L.marker(c, {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="shl">${escapeHtml(sh.name)}</div>`})})); }
 });
 }
@@ -1704,6 +1754,7 @@ if (line && sh){ const g = shapeGeo(sh); segs = g.segs.map((x, i) => `${i+1}) ${
 el.innerHTML = `<h2>Инструменты <span><button class="ghost" id="tX" style="min-height:32px;padding:2px 10px">⌄ свернуть</button> <button class="ghost" id="tClose" style="min-height:32px;padding:2px 10px">✕</button></span></h2>
 <div class="seg" id="tSeg">${Object.entries(MODE_NAMES).map(([k, v]) => `<button data-m="${k}" class="${k === m ? 'on' : ''}">${v}</button>`).join('')}</div>
 <p class="res">${toolSummary()}</p>
+${tool.sym && SYM_BY[tool.sym] ? `<p class="status">Знак: <b>${escapeHtml(SYM_BY[tool.sym].n)}</b></p><label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="tScl" ${tool.scl ? 'checked' : ''} style="width:22px;min-height:22px;margin:0"> Масштабировать с картой</label>` : ''}
 ${segs ? `<div class="segs">${segs}</div>` : ''}
 ${m === 'circle' && tool.pts.length ? `<label class="f">Радиус, м<input id="tR" inputmode="decimal" value="${tool.r ? Math.round(tool.r) : ''}" placeholder="например, 500"></label>` : ''}
 <div class="row" style="margin-bottom:8px"><button id="tUndo" ${tool.pts.length ? '' : 'disabled'}>↶ Убрать</button><button id="tCross">⊕ В прицел</button><button class="ghost" id="tClear" ${tool.pts.length ? '' : 'disabled'}>Сброс</button>${line ? `<button id="tProf" ${sh ? '' : 'disabled'}>Профиль высот</button>` : ''}</div>
@@ -1711,7 +1762,8 @@ ${m === 'circle' && tool.pts.length ? `<label class="f">Радиус, м<input i
 ${line ? '' : `<label class="f">Прозрачность заливки: <span id="tOpV">${tool.op}%</span><input type="range" id="tOp" min="0" max="90" step="5" value="${tool.op}"></label>`}
 <label class="f">Подпись фигуры<input id="tName" autocomplete="off" placeholder="необязательно"></label>
 <div class="row"><button class="ok" id="tSave" ${sh ? '' : 'disabled'}>Сохранить фигуру в слой</button></div>`;
-$('tSeg').querySelectorAll('button').forEach(b => b.onclick = () => { tool.mode = b.dataset.m; tool.pts = []; tool.r = 0; drawTool(); renderTool(); });
+if ($('tScl')) $('tScl').onchange = e => { tool.scl = e.target.checked; };
+$('tSeg').querySelectorAll('button').forEach(b => b.onclick = () => { tool.sym = null; tool.mode = b.dataset.m; tool.pts = []; tool.r = 0; drawTool(); renderTool(); });
 const pickC = st => { tool.color = st; renderPalette($('tCol'), tool.color, pickC); drawTool(); };
 renderPalette($('tCol'), tool.color, pickC);
 if ($('tOp')) $('tOp').oninput = e => { tool.op = +e.target.value; $('tOpV').textContent = tool.op + '%'; drawTool(); };
@@ -1734,7 +1786,7 @@ if (!tool.color) tool.color = copySt(state.palette.find(p => p.name === 'Ора�
 document.body.classList.add('picking'); map.doubleClickZoom.disable();
 drawTool(); renderTool();
 }
-function closeTools(){ tool.on = false; tool.pts = []; tool.r = 0; toolLayer.clearLayers(); document.body.classList.remove('picking'); map.doubleClickZoom.enable(); renderTool(); }
+function closeTools(){ tool.sym = null; tool.on = false; tool.pts = []; tool.r = 0; toolLayer.clearLayers(); document.body.classList.remove('picking'); map.doubleClickZoom.enable(); renderTool(); }
 function toolAdd(ll){
 const m = tool.mode;
 if (m === 'circle'){ if (!tool.pts.length || tool.r){ tool.pts = [ll]; tool.r = 0; } else tool.r = distM(tool.pts[0], ll); }
@@ -1747,7 +1799,7 @@ const sh = curShape(); if (!sh) return;
 let a = (tool.target && arrById(tool.target)) || state.arrays.find(x => x.kind === 'shapes');
 if (!a || a.kind !== 'shapes'){ a = normArr({id:Date.now(), kind:'shapes', name:'Фигуры', ident:'Фигуры', style:copySt(tool.color), points:[], shapes:[]}); state.arrays.push(a); }
 const nm = ($('tName') && $('tName').value.trim()) || '';
-a.shapes.push({type:sh.type, pts:sh.pts.map(p => [+p.lat.toFixed(6), +p.lng.toFixed(6)]), r:sh.r || 0, color:tool.color.color, op:tool.op, name:nm, t:Date.now()});
+a.shapes.push({type:sh.type, pts:sh.pts.map(p => [+p.lat.toFixed(6), +p.lng.toFixed(6)]), r:sh.r || 0, color:tool.color.color, op:tool.op, name:nm || (tool.sym && SYM_BY[tool.sym] ? SYM_BY[tool.sym].n : ''), t:Date.now(), sym:tool.sym || undefined, scl:tool.scl ? 1 : 0, z0:map.getZoom()});
 tool.target = a.id; tool.pts = []; tool.r = 0;
 persistNow(); renderMarkers(); drawTool(); renderTool(); toast(`Сохранено в слой «${a.name}»`);
 }
@@ -1941,7 +1993,7 @@ $('v3base').onchange = e => { if (!v3) return; const k = e.target.value; try { v
 $('v3ex').oninput = e => { $('v3exv').textContent = e.target.value; if (v3) try { v3.setTerrain({source:'dem', exaggeration:+e.target.value}); } catch(_){} };
 // ======== ТАКТИЧЕСКИЕ ЗНАКИ ========
 const CIRC = (x, y, r) => `M${x-r} ${y}a${r} ${r} 0 1 0 ${2*r} 0a${r} ${r} 0 1 0 ${-2*r} 0`;
-const SYMS = [
+const SYM_DEF = [
 {id:'kp', n:'КНП', ab:'КП', d:['M9 29V4', 'M9 4h15l-4 5 4 5H9']},
 {id:'nab', n:'Набл. пункт', ab:'НП', d:['M16 5L28 27H4Z'], f:[CIRC(16, 19, 2.6)]},
 {id:'op', n:'Опорный пункт', ab:'ОП', d:['M4 25C4 7 28 7 28 25']},
@@ -1955,18 +2007,182 @@ const SYMS = [
 {id:'bpla', n:'БпЛА', ab:'БП', d:['M16 5v22', 'M4 15l12-4 12 4', 'M11 26h10']},
 {id:'mina', n:'Мины', ab:'МП', d:[CIRC(7, 16, 3.2), CIRC(16, 16, 3.2), CIRC(25, 16, 3.2)]},
 {id:'sklad', n:'Склад', ab:'СК', d:['M5 10h22v15H5Z', 'M5 10l11 8 11-8']},
-{id:'rls', n:'РЛС / РЭБ', ab:'РЛ', d:['M9 27l7-9', 'M5 12a13 13 0 0 0 15 11', 'M16 18l7-7', 'M21 7l4 4']}];
-const SYM_BY = Object.fromEntries(SYMS.map(x => [x.id, x]));
+{id:'rls', n:'РЛС / РЭБ', ab:'РЛ', d:['M9 27l7-9', 'M5 12a13 13 0 0 0 15 11', 'M16 18l7-7', 'M21 7l4 4']},
+{id:'l_rub', n:'Рубеж обороны', ab:'РБ', type:'line', style:'ticks'},
+{id:'l_trench', n:'Траншея', ab:'ТР', type:'line', style:'teeth'},
+{id:'l_fire', n:'Рубеж открытия огня', ab:'РО', type:'line', style:'dash'},
+{id:'l_border', n:'Граница полосы', ab:'ГП', type:'line', style:'dashdot'},
+{id:'l_route', n:'Маршрут движения', ab:'МД', type:'line', style:'arrow'},
+{id:'l_dir', n:'Направление действий', ab:'НД', type:'line', style:'double'},
+{id:'l_wire', n:'Проволочное заграждение', ab:'ПЗ', type:'line', style:'cross'},
+{id:'a_zone', n:'Район (зона)', ab:'РН', type:'area', style:'zone'},
+{id:'a_area', n:'Занятый район', ab:'ЗР', type:'area', style:'solid'},
+{id:'a_mine', n:'Минное поле', ab:'МП', type:'area', style:'hatch'}];
+const LSTYLES = {plain:'Сплошная', dash:'Пунктир', dashdot:'Штрихпунктир', ticks:'Засечки', teeth:'Зубцы', cross:'Крестики', arrow:'Со стрелкой', double:'Двойная со стрелкой'};
+const ASTYLES = {zone:'Пунктир с заливкой', solid:'Сплошная с заливкой', hatch:'Штриховка'};
 const SIDES = {r:{name:'Красные', color:'#e0302a', pre:'К'}, b:{name:'Синие', color:'#1f5fe0', pre:'С'}};
-let pendSym = null;
-function symSvg(sid){ const s = SYM_BY[sid]; return `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">${s.d.map(x => `<path d="${x}"/>`).join('')}${(s.f || []).map(x => `<path d="${x}" fill="currentColor" stroke="none"/>`).join('')}</svg>`; }
-const symPaths = {};
+let SYMS = [], SYM_BY = {}, pendSym = null;
+const symPaths = {}, symImgs = {};
+function defSym(x){ return Object.assign({type:'pt', fav:true, d:[], f:[]}, JSON.parse(JSON.stringify(x))); }
+function loadSyms(){
+const st = lsGet('skat_syms', null), del = lsGet('skat_syms_del', []);
+if (Array.isArray(st) && st.length){ const has = new Set(st.map(x => x.id)); SYMS = st.concat(SYM_DEF.filter(x => !has.has(x.id) && !del.includes(x.id)).map(defSym)); }
+else SYMS = SYM_DEF.map(defSym);
+SYMS.forEach(x => { if (!x.type) x.type = 'pt'; if (x.fav === undefined) x.fav = true; if (!x.d) x.d = []; if (!x.f) x.f = []; });
+SYM_BY = Object.fromEntries(SYMS.map(x => [x.id, x]));
+}
+function saveSyms(){ lsSet('skat_syms', SYMS); SYM_BY = Object.fromEntries(SYMS.map(x => [x.id, x])); Object.keys(symPaths).forEach(k => delete symPaths[k]); Object.keys(symImgs).forEach(k => delete symImgs[k]); }
+loadSyms();
+const SVGH = '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">';
+const LPREV = {plain:'<path d="M3 24L29 8"/>', dash:'<path d="M3 24L29 8" stroke-dasharray="5 4"/>', dashdot:'<path d="M3 24L29 8" stroke-dasharray="8 3 1.5 3"/>',
+ticks:'<path d="M3 24L29 8"/><path d="M8 21l-2.5-4M14 17.3l-2.5-4M20 13.6l-2.5-4M26 9.9l-2.5-4"/>', teeth:'<path d="M3 24L29 8"/><path d="M7 21.5l-2-3.5M11 19l2 3.5M15 16.6l-2-3.5M19 14.1l2 3.5M23 11.7l-2-3.5M27 9.2l2 3.5"/>',
+cross:'<path d="M3 24L29 8"/><path d="M8 18l4 4M12 18l-4 4M19 11l4 4M23 11l-4 4"/>', arrow:'<path d="M3 24L25 10.5"/><path d="M29 8l-8.5 1 4.5 6.5z" fill="currentColor"/>',
+double:'<path d="M3 26L24 13M3 20L22 8"/><path d="M29 8l-8 0 4 7z" fill="currentColor"/>'};
+const APREV = {zone:'<path d="M5 7h22v18H5z" fill="currentColor" fill-opacity=".22" stroke-dasharray="4 3"/>', solid:'<path d="M5 7h22v18H5z" fill="currentColor" fill-opacity=".3"/>',
+hatch:'<path d="M5 7h22v18H5z"/><path d="M5 15l8-8M5 23l16-16M11 25l16-16M19 25l8-8" stroke-width="1.6"/>'};
+function symSvg(sid){
+const s = SYM_BY[sid]; if (!s) return '';
+if (s.img) return `<span class="symimg" style="-webkit-mask-image:url(${s.img});mask-image:url(${s.img})"></span>`;
+if (s.type === 'line') return SVGH + (LPREV[s.style] || LPREV.plain) + '</svg>';
+if (s.type === 'area') return SVGH + (APREV[s.style] || APREV.zone) + '</svg>';
+return SVGH + s.d.map(x => `<path d="${x}"/>`).join('') + (s.f || []).map(x => `<path d="${x}" fill="currentColor" stroke="none"/>`).join('') + '</svg>';
+}
+function symImgCanvas(s, color){
+const key = s.id + '|' + color; let c = symImgs[key]; if (c) return c.ready ? c.cv : null;
+c = symImgs[key] = {ready:false, cv:document.createElement('canvas')}; c.cv.width = c.cv.height = 64;
+const im = new Image(); im.onload = () => { const g = c.cv.getContext('2d'); g.drawImage(im, 0, 0, 64, 64); g.globalCompositeOperation = 'source-in'; g.fillStyle = color; g.fillRect(0, 0, 64, 64); c.ready = true; drawOpt(); }; im.src = s.img;
+return null;
+}
 function drawSym(g, sid, x, y, color){
-const s = SYM_BY[sid]; if (!symPaths[sid]) symPaths[sid] = {d:s.d.map(v => new Path2D(v)), f:(s.f || []).map(v => new Path2D(v))};
+const s = SYM_BY[sid]; if (!s) return;
+if (s.img){ const cv = symImgCanvas(s, color); if (cv) g.drawImage(cv, x - 16, y - 16, 32, 32); return; }
+if (!symPaths[sid]) symPaths[sid] = {d:s.d.map(v => new Path2D(v)), f:(s.f || []).map(v => new Path2D(v))};
 const P = symPaths[sid]; g.save(); g.translate(x - 16, y - 16); g.lineCap = 'round'; g.lineJoin = 'round';
-g.strokeStyle = '#fff'; g.lineWidth = 6; P.d.forEach(v => g.stroke(v)); g.fillStyle = '#fff'; P.f.forEach(v => { g.stroke(v); });
+g.strokeStyle = '#fff'; g.lineWidth = 6; P.d.forEach(v => g.stroke(v)); P.f.forEach(v => g.stroke(v));
 g.strokeStyle = color; g.lineWidth = 2.6; P.d.forEach(v => g.stroke(v)); g.fillStyle = color; P.f.forEach(v => g.fill(v)); g.restore();
 }
+// ---- линейные и площадные знаки
+function shK(sh){ return sh.scl ? Math.max(.25, Math.min(8, Math.pow(2, map.getZoom() - (sh.z0 ?? map.getZoom())))) : 1; }
+function symExtra(sh){
+const sy = sh.sym && SYM_BY[sh.sym]; if (!sy) return null;
+const k = shK(sh), st = sy.style, o = {weight:Math.max(1.5, Math.min(16, 3 * k))};
+if (st === 'dash') o.dashArray = `${10*k} ${7*k}`; else if (st === 'dashdot') o.dashArray = `${16*k} ${6*k} ${2*k} ${6*k}`; else if (st === 'zone') o.dashArray = `${9*k} ${6*k}`;
+if (sy.type === 'area') o.fillOpacity = st === 'hatch' ? 0.04 : (sh.op ?? 25) / 100;
+return o;
+}
+function walkLine(P, step, cb){ let acc = step / 2;
+for (let i = 1; i < P.length; i++){ const a = P[i-1], b = P[i], dx = b.x - a.x, dy = b.y - a.y, L0 = Math.hypot(dx, dy); if (!L0) continue; const ux = dx / L0, uy = dy / L0;
+while (acc <= L0){ cb(a.x + ux * acc, a.y + uy * acc, ux, uy); acc += step; } acc -= L0; } }
+function arrowHead(g, P, c, k){ if (P.length < 2) return; const b = P[P.length-1], a = P[P.length-2], L0 = Math.hypot(b.x - a.x, b.y - a.y) || 1, ux = (b.x - a.x) / L0, uy = (b.y - a.y) / L0, s = 16 * k;
+g.fillStyle = c; g.beginPath(); g.moveTo(b.x + ux * 4 * k, b.y + uy * 4 * k); g.lineTo(b.x - ux * s + uy * s * .5, b.y - uy * s - ux * s * .5); g.lineTo(b.x - ux * s - uy * s * .5, b.y - uy * s + ux * s * .5); g.closePath(); g.fill(); }
+const DECOR = {
+ticks:(g, P, c, k) => { g.strokeStyle = c; g.lineWidth = 2 * k; g.lineCap = 'round'; g.beginPath(); walkLine(P, 14 * k, (x, y, ux, uy) => { g.moveTo(x, y); g.lineTo(x + uy * 8 * k, y - ux * 8 * k); }); g.stroke(); },
+teeth:(g, P, c, k) => { g.strokeStyle = c; g.lineWidth = 2 * k; g.lineCap = 'round'; g.beginPath(); let sg = 1; walkLine(P, 9 * k, (x, y, ux, uy) => { g.moveTo(x, y); g.lineTo(x + uy * 6 * k * sg, y - ux * 6 * k * sg); sg = -sg; }); g.stroke(); },
+cross:(g, P, c, k) => { g.strokeStyle = c; g.lineWidth = 2 * k; g.beginPath(); walkLine(P, 16 * k, (x, y) => { const d = 4 * k; g.moveTo(x - d, y - d); g.lineTo(x + d, y + d); g.moveTo(x + d, y - d); g.lineTo(x - d, y + d); }); g.stroke(); },
+arrow:(g, P, c, k) => arrowHead(g, P, c, k),
+double:(g, P, c, k) => { g.strokeStyle = c; g.lineWidth = 2.4 * k; g.beginPath();
+for (let i = 1; i < P.length; i++){ const a = P[i-1], b = P[i], L0 = Math.hypot(b.x - a.x, b.y - a.y) || 1, nx = (b.y - a.y) / L0 * 8 * k, ny = -(b.x - a.x) / L0 * 8 * k; g.moveTo(a.x + nx, a.y + ny); g.lineTo(b.x + nx, b.y + ny); }
+g.stroke(); arrowHead(g, P, c, k * 1.4); },
+hatch:(g, P, c, k) => { if (P.length < 4) return; g.save(); g.beginPath(); P.forEach((q, i) => i ? g.lineTo(q.x, q.y) : g.moveTo(q.x, q.y)); g.closePath(); g.clip();
+let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity; P.forEach(q => { x0 = Math.min(x0, q.x); x1 = Math.max(x1, q.x); y0 = Math.min(y0, q.y); y1 = Math.max(y1, q.y); });
+g.strokeStyle = c; g.lineWidth = 1.5 * k; g.beginPath(); const st = 10 * k, h = y1 - y0; for (let x = x0 - h; x < x1; x += st){ g.moveTo(x, y1); g.lineTo(x + h, y0); } g.stroke(); g.restore(); }};
+// ---- кластеризация
+const clCfg = Object.assign({on:false, z:13, r:60}, lsGet('skat_cl', {}));
+let curCl = null;
+function updateCluster(){
+curCl = null; const z = map.getZoom(); if (!clCfg.on || z >= clCfg.z) return;
+const cells = new Map(), R = clCfg.r, b = map.getBounds().pad(0.3);
+state.arrays.forEach(a => { if (a.hidden || a.kind === 'aux' || a.kind === 'shapes' || (session && session.arrId === a.id) || z < (a.minZ || 0)) return;
+a.points.forEach((p, i) => { if (!b.contains([p.lat, p.lng])) return; const q = map.latLngToContainerPoint([p.lat, p.lng]), key = Math.floor(q.x / R) + ',' + Math.floor(q.y / R);
+let c = cells.get(key); if (!c){ c = {m:[], lat:0, lng:0, col:{}, pts:[]}; cells.set(key, c); }
+c.m.push(a.id + ':' + i); c.lat += p.lat; c.lng += p.lng; c.pts.push([p.lat, p.lng]); const col = styleOf(a, p).color; c.col[col] = (c.col[col] || 0) + 1; }); });
+const skip = new Set(), bub = [];
+cells.forEach(c => { if (c.m.length < 2) return; c.m.forEach(k => skip.add(k)); bub.push({ll:[c.lat / c.m.length, c.lng / c.m.length], n:c.m.length, col:Object.entries(c.col).sort((x, y) => y[1] - x[1])[0][0], b:L.latLngBounds(c.pts)}); });
+curCl = {skip, bub};
+}
+function renderClUI(){ $('clOn').checked = clCfg.on; fillZSel2($('clZ'), clCfg.z, 18); $('clR').value = String(clCfg.r); }
+$('clOn').onchange = e => { clCfg.on = e.target.checked; lsSet('skat_cl', clCfg); renderMarkers(); };
+$('clZ').onchange = e => { clCfg.z = +e.target.value; lsSet('skat_cl', clCfg); renderMarkers(); };
+$('clR').onchange = e => { clCfg.r = +e.target.value; lsSet('skat_cl', clCfg); renderMarkers(); };
+// ---- список и редактор знаков
+const TYPE_N = {pt:'точечный', line:'линейный', area:'площадной'};
+function renderSymList(){
+const el = $('symList'); if (!el) return;
+el.innerHTML = SYMS.map(s => `<div class="arr" data-id="${s.id}"><span class="symico" style="color:#c0282a">${symSvg(s.id)}</span><div class="nm"><div>${escapeHtml(s.n)}</div><div>${TYPE_N[s.type] || ''}${s.ab ? ' · ' + escapeHtml(s.ab) : ''}</div></div><button class="eye ${s.fav ? 'lit' : 'dim'}" data-act="fav" title="Избранное" style="font-size:20px">★</button></div>`).join('');
+el.querySelectorAll('.arr').forEach(r => { const s = SYM_BY[r.dataset.id];
+r.querySelector('[data-act=fav]').onclick = e => { e.stopPropagation(); s.fav = !s.fav; saveSyms(); renderSymList(); };
+r.onclick = () => openSymEd(s.id); });
+}
+$('symAdd').onclick = () => openSymEd(null);
+$('symFavAll').onclick = () => { SYMS.forEach(s => s.fav = true); saveSyms(); renderSymList(); toast('Все знаки в избранном'); };
+let symEd = null;
+function openSymEd(id){
+const s = id ? SYM_BY[id] : null;
+symEd = s ? JSON.parse(JSON.stringify(s)) : {id:'u' + Date.now(), n:'', ab:'', type:'pt', d:[], f:[], fav:true, style:'plain', custom:true};
+$('symTitle').textContent = s ? 'Изменить знак' : 'Новый знак';
+$('symN').value = symEd.n; $('symAb').value = symEd.ab || ''; $('symFav').checked = symEd.fav !== false; $('symScl').checked = !!symEd.scl;
+const builtin = SYM_DEF.some(x => x.id === symEd.id);
+$('symDel').textContent = builtin ? 'Сбросить' : 'Удалить'; $('symDel').style.display = s ? '' : 'none';
+closeModals(); renderSymEd(); openModal('symModal');
+}
+function renderSymEd(){
+const t = symEd.type;
+$('symType').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+$('symPtEd').style.display = t === 'pt' ? '' : 'none'; $('symLnEd').style.display = t === 'pt' ? 'none' : ''; $('symSclL').style.display = t === 'pt' ? 'none' : '';
+const ST = t === 'area' ? ASTYLES : LSTYLES; if (t !== 'pt' && !ST[symEd.style]) symEd.style = Object.keys(ST)[0];
+$('symStyle').innerHTML = t === 'pt' ? '' : Object.entries(ST).map(([k, v]) => `<button data-st="${k}" class="${k === symEd.style ? 'on' : ''}">${v}</button>`).join('');
+$('symStyle').querySelectorAll('button').forEach(b => b.onclick = () => { symEd.style = b.dataset.st; renderSymEd(); });
+drawSymEd();
+}
+$('symType').querySelectorAll('button').forEach(b => b.onclick = () => { symEd.type = b.dataset.t; renderSymEd(); });
+function drawSymEd(){
+const c = $('symCv'), g = c.getContext('2d');
+g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#fff'; g.fillRect(0, 0, 256, 256);
+g.strokeStyle = 'rgba(0,0,0,.08)'; g.lineWidth = 1; for (let i = 32; i < 256; i += 32){ g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 256); g.moveTo(0, i); g.lineTo(256, i); g.stroke(); }
+if (symEd.img){ const im = new Image(); im.onload = () => { g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(im, 0, 0, 256, 256); }; im.src = symEd.img; }
+g.setTransform(8, 0, 0, 8, 0, 0); g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = '#c0282a'; g.lineWidth = 2.6;
+(symEd.d || []).forEach(v => g.stroke(new Path2D(v))); g.fillStyle = '#c0282a'; (symEd.f || []).forEach(v => g.fill(new Path2D(v)));
+}
+{ const c = $('symCv'); let st = null;
+const pos = e => { const r = c.getBoundingClientRect(), t = e.touches ? e.touches[0] : e; return [Math.max(0, Math.min(32, (t.clientX - r.left) / r.width * 32)), Math.max(0, Math.min(32, (t.clientY - r.top) / r.height * 32))]; };
+const down = e => { e.preventDefault(); st = [pos(e)]; };
+const mv = e => { if (!st) return; e.preventDefault(); const q = pos(e), l = st[st.length-1];
+if (Math.hypot(q[0] - l[0], q[1] - l[1]) > 0.5){ st.push(q); const g = c.getContext('2d'); g.setTransform(8, 0, 0, 8, 0, 0); g.strokeStyle = '#c0282a'; g.lineWidth = 2.6; g.lineCap = 'round'; g.beginPath(); g.moveTo(l[0], l[1]); g.lineTo(q[0], q[1]); g.stroke(); } };
+const up = () => { if (!st) return; const P = st.map(([x, y]) => x.toFixed(1) + ' ' + y.toFixed(1)); symEd.d.push(P.length === 1 ? `M${P[0]}h0.1` : 'M' + P[0] + 'L' + P.slice(1).join('L')); st = null; drawSymEd(); };
+c.addEventListener('touchstart', down, {passive:false}); c.addEventListener('touchmove', mv, {passive:false}); c.addEventListener('touchend', up);
+c.addEventListener('mousedown', down); c.addEventListener('mousemove', mv); addEventListener('mouseup', up); }
+$('symUndo').onclick = () => { if (symEd.d.length) symEd.d.pop(); else if ((symEd.f || []).length) symEd.f.pop(); else delete symEd.img; drawSymEd(); };
+$('symClr').onclick = () => { symEd.d = []; symEd.f = []; delete symEd.img; drawSymEd(); };
+$('symImg').onclick = () => $('symImgIn').click();
+$('symImgIn').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+const im = new Image(), u = URL.createObjectURL(f);
+im.onload = () => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), sc = Math.min(64 / im.width, 64 / im.height), w = im.width * sc, h = im.height * sc;
+g.drawImage(im, (64 - w) / 2, (64 - h) / 2, w, h); const d = g.getImageData(0, 0, 64, 64), px = d.data;
+for (let i = 0; i < px.length; i += 4){ const lum = .3 * px[i] + .59 * px[i+1] + .11 * px[i+2]; px[i+3] = Math.round(Math.max(0, Math.min(255, (235 - lum) * 3)) * px[i+3] / 255); px[i] = px[i+1] = px[i+2] = 0; }
+g.putImageData(d, 0, 0); symEd.img = c.toDataURL('image/png'); symEd.d = []; symEd.f = []; URL.revokeObjectURL(u); drawSymEd(); };
+im.src = u; };
+$('symSave').onclick = () => {
+const n = $('symN').value.trim(); if (!n){ $('symN').focus(); return; }
+symEd.n = n; symEd.ab = $('symAb').value.trim() || n.slice(0, 2).toUpperCase(); symEd.fav = $('symFav').checked; symEd.scl = $('symScl').checked;
+if (symEd.type === 'pt' && !symEd.d.length && !(symEd.f || []).length && !symEd.img){ toast('Нарисуйте значок или загрузите картинку'); return; }
+const i = SYMS.findIndex(x => x.id === symEd.id); if (i >= 0) SYMS[i] = symEd; else SYMS.push(symEd);
+saveSyms(); closeModals(); renderMarkers(); toast('Знак сохранён'); renderSymList(); openModal('setModal');
+};
+$('symDel').onclick = () => {
+const def = SYM_DEF.find(x => x.id === symEd.id);
+if (def){ const i = SYMS.findIndex(x => x.id === symEd.id); SYMS[i] = defSym(def); saveSyms(); closeModals(); renderMarkers(); renderSymList(); openModal('setModal'); toast('Знак сброшен к исходному'); return; }
+askConfirm(`Удалить знак «${symEd.n}»? Уже нанесённые объекты останутся обычными точками.`, 'Удалить', () => { SYMS = SYMS.filter(x => x.id !== symEd.id); saveSyms(); renderMarkers(); renderSymList(); openModal('setModal'); });
+};
+// ---- выбор знака в «Новый слой»
+let mSide = '', mSym = null;
+function renderSymPick(){
+$('symSideSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.s === mSide));
+const g = $('symGrid'); g.style.display = mSide ? 'flex' : 'none'; if (!mSide) return;
+const col = SIDES[mSide].color, list = SYMS.filter(s => s.type === 'pt').sort((a, b) => (b.fav ? 1 : 0) - (a.fav ? 1 : 0));
+g.innerHTML = list.map(s => `<button class="symb${s.id === mSym ? ' on' : ''}" data-id="${s.id}" title="${escapeHtml(s.n)}" style="color:${col}">${symSvg(s.id)}</button>`).join('');
+g.querySelectorAll('button').forEach(b => b.onclick = () => { mSym = b.dataset.id; renderSymPick(); toast(SYM_BY[mSym].n); });
+}
+$('symSideSeg').querySelectorAll('button').forEach(b => b.onclick = () => { mSide = b.dataset.s; if (mSide && !mSym) mSym = (SYMS.find(s => s.type === 'pt' && s.fav) || SYMS.find(s => s.type === 'pt')).id; renderSymPick(); });
 // ======== КРУГОВОЕ МЕНЮ ПО УДЕРЖАНИЮ ========
 const IC = {
 obj:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4h11l-3 4 3 4H5"/></svg>',
@@ -1974,6 +2190,8 @@ shape:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="
 route:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/><path d="M7 18c6-1 3-8 10-11"/></svg>',
 pt:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="currentColor"/></svg>',
 arr:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="3"/><circle cx="12" cy="12" r="3"/><circle cx="19" cy="12" r="3"/></svg>',
+lsym:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 18L21 6"/><path d="M7 15.5l-2-3M12 12l-2-3M17 9l-2-3"/></svg>',
+asym:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l9-2 7 6-3 10-12-2z" fill="currentColor" fill-opacity=".25" stroke-dasharray="3 2"/></svg>',
 circle:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/></svg>',
 rect:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12"/></svg>',
 poly:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9l7-5 9 5-3 11H7z"/></svg>',
@@ -1982,10 +2200,10 @@ side:c => `<svg viewBox="0 0 24 24"><path d="M5 21V4h11l-3 4 3 4H5" fill="${c}" 
 let radStack = [], radPos = null;
 function radRender(){
 const el = $('radial'), lv = radStack[radStack.length-1], n = lv.items.length;
-const inner = Math.min(n, 8), outer = n - inner, R1 = n <= 4 ? 88 : n <= 6 ? 98 : 104, R2 = 170, small = n > 6;
+const inner = Math.min(n, 8), outer = Math.min(n - inner, 14), R1 = n <= 4 ? 88 : n <= 6 ? 98 : 104, R2 = 172, small = n > 6;
 const need = (outer ? R2 : R1) + 36, cx = Math.max(need, Math.min(innerWidth - need, radPos.x)), cy = Math.max(need + 20, Math.min(innerHeight - need, radPos.y));
-let h = `<div class="rad-t" style="left:${cx}px;top:${cy - (outer ? R2 : R1) - 62}px">${escapeHtml(lv.title)}</div><button class="rad-c" id="radC" style="left:${cx}px;top:${cy}px">${radStack.length > 1 ? '←' : '✕'}</button>`;
-lv.items.forEach((it, i) => { const ring = i < inner ? 0 : 1, k = ring ? i - inner : i, m = ring ? outer : inner, R = ring ? R2 : R1;
+let h = `<div class="rad-t" style="left:${cx}px;top:${cy - (outer ? R2 : R1) - 62}px">${escapeHtml(lv.title)}${n > 22 ? ' (первые 22 из избранного)' : ''}</div><button class="rad-c" id="radC" style="left:${cx}px;top:${cy}px">${radStack.length > 1 ? '←' : '✕'}</button>`;
+lv.items.slice(0, inner + outer).forEach((it, i) => { const ring = i < inner ? 0 : 1, k = ring ? i - inner : i, m = ring ? outer : inner, R = ring ? R2 : R1;
 const ang = (-90 + k * 360 / m + (ring ? 180 / m : 0)) * Math.PI / 180;
 h += `<button class="rad-it${small ? ' sm' : ''}" data-i="${i}" style="left:${cx + R * Math.cos(ang)}px;top:${cy + R * Math.sin(ang)}px${it.color ? `;color:${it.color}` : ''}">${it.ic || ''}<span${it.color ? ' style="color:var(--ink)"' : ''}>${escapeHtml(it.t)}</span></button>`; });
 el.innerHTML = h;
@@ -2010,23 +2228,48 @@ radPush('Нанести', [
 {t:'Маршрут', ic:IC.route, go:() => toolAt('line')}]);
 }
 function radKind(side){ const S = SIDES[side];
-radPush(S.name, [{t:'Точка', ic:IC.pt, color:S.color, go:() => radSym(side, 'pt')}, {t:'Массив', ic:IC.arr, color:S.color, go:() => radSym(side, 'arr')}]); }
-function radSym(side, kind){ const S = SIDES[side];
-radPush(`${S.name} · ${kind === 'pt' ? 'точка' : 'массив'}`, SYMS.map(sy => ({t:sy.n, ic:symSvg(sy.id), color:S.color, go:() => placeSym(side, kind, sy.id)}))); }
-function placeSym(side, kind, sid){
-const ll = radPos.ll, S = SIDES[side], sy = SYM_BY[sid], st = {color:S.color, name:S.name, glyph:''};
-closeRadial();
-if (kind === 'pt'){
-let a = state.arrays.find(x => x.symSide === side && x.kind === 'pts');
-if (!a){ a = normArr({id:Date.now(), kind:'pts', name:`${S.name}: объекты`, ident:S.name, style:st, symSide:side, points:[]}); state.arrays.push(a); }
-pendSym = {aid:a.id, sid}; openAux(a, null, ll);
-$('auxTitle').textContent = `${S.name}: ${sy.n}`; $('auxName').placeholder = `название (пусто — ${sy.n})`;
-return;
+radPush(S.name, [{t:'Точка', ic:IC.pt, color:S.color, go:() => radSym(side, 'pt')}, {t:'Массив', ic:IC.arr, color:S.color, go:() => radSym(side, 'arr')},
+{t:'Линия, рубеж', ic:IC.lsym, color:S.color, go:() => radSym(side, 'line')}, {t:'Зона, район', ic:IC.asym, color:S.color, go:() => radSym(side, 'area')}]); }
+function radSym(side, kind){
+const S = SIDES[side], types = kind === 'line' ? ['line'] : kind === 'area' ? ['area'] : ['pt'];
+const list = SYMS.filter(s => s.fav && types.includes(s.type));
+if (!list.length){ toast('В избранном нет знаков этого типа — отметьте их ★ в ⚙ Настр.'); return; }
+radPush(`${S.name} · ${{pt:'точка', arr:'массив', line:'линия', area:'зона'}[kind]}`, list.map(sy => ({t:sy.n, ic:symSvg(sy.id), color:S.color, go:() => pickSym(side, kind, sy.id)})));
 }
-let a = state.arrays.find(x => x.symSide === side && x.kind === 'main' && x.sym === sid);
-if (!a){ a = normArr({id:Date.now(), kind:'main', name:`${S.name}: ${sy.n}`, ident:`${S.name} ${sy.n}`, prefix:S.pre + sy.ab, start:'1', step:1, style:st, symSide:side, sym:sid, points:[]}); state.arrays.push(a); }
-const p = {lat:ll.lat, lng:ll.lng, h:null, place:''}; a.points.push(p); fillHeight(p); fillPlace(p);
-persist(); renderMarkers(); toast(`${labelOf(a, a.points.length-1)} — ${S.name.toLowerCase()}, ${sy.n}`);
+function sideStyle(side){ const S = SIDES[side]; return {color:S.color, name:S.name, glyph:''}; }
+function pickSym(side, kind, sid){
+if (kind === 'line' || kind === 'area') return startLineSym(side, sid, kind);
+const S = SIDES[side], sy = SYM_BY[sid], ll = radPos.ll; closeRadial();
+let autoA = state.arrays.find(x => x.symSide === side && x.kind === 'main' && x.sym === sid);
+$('askTitle').textContent = `${S.name}: ${sy.n}${kind === 'arr' ? ' — массив' : ''}`;
+$('askHint').innerHTML = kind === 'arr'
+? `<b>Автоматически</b> — номера по порядку: ${escapeHtml(autoA ? labelOf(autoA, autoA.points.length) : S.pre + sy.ab + '1')}, … (префикс и шаг можно поменять в «Настройках» слоя).<br><b>Вручную</b> — для каждой точки введёте название и номер сами.<br>Первая точка — в месте удержания, дальше касайтесь карты, в конце ✓.`
+: `<b>Автоматически</b> — название «${escapeHtml(sy.n)} N».<br><b>Вручную</b> — введёте название сами.`;
+$('askAuto').onclick = () => { closeModals();
+if (kind === 'pt'){ const a = symObjLayer(side); const cnt = a.points.filter(p => p.sym === sid).length;
+const p = {lat:ll.lat, lng:ll.lng, h:null, place:'', name:`${sy.n} ${cnt + 1}`, sym:sid}; a.points.push(p); fillHeight(p); fillPlace(p); persist(); renderMarkers(); toast(`${S.name}: ${p.name}`); return; }
+if (!autoA){ autoA = normArr({id:Date.now(), kind:'main', name:`${S.name}: ${sy.n}`, ident:`${S.name} ${sy.n}`, prefix:S.pre + sy.ab, start:'1', step:1, style:sideStyle(side), symSide:side, sym:sid, points:[]}); state.arrays.push(autoA); }
+startSession(autoA.id, 'pick'); addPoint(ll); toast('Ставьте следующие точки касанием, в конце ✓');
+};
+$('askManual').onclick = () => { closeModals();
+if (kind === 'pt'){ const a = symObjLayer(side); pendSym = {aid:a.id, sid}; openAux(a, null, ll); $('auxTitle').textContent = `${S.name}: ${sy.n}`; $('auxName').placeholder = `название и номер (пусто — ${sy.n})`; return; }
+let a = state.arrays.find(x => x.symSide === side && x.kind === 'pts' && x.sym === sid);
+if (!a){ a = normArr({id:Date.now(), kind:'pts', name:`${S.name}: ${sy.n} (подписи)`, ident:`${S.name} ${sy.n}`, style:sideStyle(side), symSide:side, sym:sid, points:[]}); state.arrays.push(a); }
+startSession(a.id, 'pick'); addPoint(ll);
+};
+openModal('askModal');
+}
+function symObjLayer(side){
+let a = state.arrays.find(x => x.symSide === side && x.kind === 'pts' && !x.sym);
+if (!a){ const S = SIDES[side]; a = normArr({id:Date.now(), kind:'pts', name:`${S.name}: объекты`, ident:S.name, style:sideStyle(side), symSide:side, points:[]}); state.arrays.push(a); }
+return a;
+}
+function startLineSym(side, sid, kind){
+const S = SIDES[side], sy = SYM_BY[sid], ll = radPos.ll; closeRadial();
+let a = state.arrays.find(x => x.symSide === side && x.kind === 'shapes');
+if (!a){ a = normArr({id:Date.now(), kind:'shapes', name:`${S.name}: линии и зоны`, ident:S.name, style:sideStyle(side), symSide:side, points:[], shapes:[]}); state.arrays.push(a); persist(); }
+openTools(a.id); tool.mode = kind === 'area' ? 'poly' : 'line'; tool.sym = sid; tool.scl = !!sy.scl; tool.color = sideStyle(side); tool.op = sy.style === 'hatch' ? 0 : 25; tool.pts = []; tool.r = 0;
+toolAdd(ll); toast(`${sy.n}: ставьте точки линии, затем «Сохранить»`);
 }
 function placeAuxAt(){
 const ll = radPos.ll; closeRadial();
@@ -2065,7 +2308,7 @@ const endG = e => { if (g2 && e.touches.length < 2){ if (g2.mode === 'rot'){ set
 mc.addEventListener('touchend', endG, {capture:true}); mc.addEventListener('touchcancel', endG, {capture:true});
 }
 $('layBtn').onclick = () => { openModal('layModal'); renderLayers(); };
-$('setBtn').onclick = () => { openModal('setModal'); $('ver2').textContent = VERSION; pdbInfo(); renderRelUI(); };
+$('setBtn').onclick = () => { renderSymList(); renderClUI(); openModal('setModal'); $('ver2').textContent = VERSION; pdbInfo(); renderRelUI(); };
 $('layNew').onclick = () => { closeModals(); openArrModal(); };
 $('impBtn').onclick = () => $('csvIn').click();
 $('csvIn').onchange = async e => {
