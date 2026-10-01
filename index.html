@@ -56,6 +56,15 @@ button:disabled{opacity:.35}
 #v3exl input{width:110px}
 #v3msg{position:absolute;left:10px;right:10px;bottom:calc(var(--safe-b) + 14px);z-index:5;color:#fff;font-size:13px;text-shadow:0 0 3px #000;pointer-events:none}
 #v3d .maplibregl-ctrl-top-right{top:calc(var(--safe-t) + var(--tg))}
+#radial{position:fixed;inset:0;z-index:2200;display:none;background:rgba(0,0,0,.28);-webkit-user-select:none;user-select:none}
+#radial.on{display:block}
+.rad-it{position:absolute;width:62px;height:62px;margin:-31px 0 0 -31px;border-radius:50%;background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:10px;font-weight:600;line-height:1.05;text-align:center;box-shadow:var(--shadow);padding:2px;min-height:0;animation:radIn .14s ease-out}
+.rad-it.sm{width:56px;height:56px;margin:-28px 0 0 -28px;font-size:9px}
+.rad-it svg{width:26px;height:26px;flex:none}
+.rad-it.sm svg{width:24px;height:24px}
+.rad-c{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--signal);color:#1d1206;font-size:18px;font-weight:800;padding:0;min-height:0;box-shadow:var(--shadow)}
+.rad-t{position:absolute;transform:translate(-50%,0);color:#fff;font-size:13px;font-weight:700;text-shadow:0 0 3px #000,0 0 3px #000;white-space:nowrap;pointer-events:none}
+@keyframes radIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
 #compass{position:fixed;left:10px;bottom:calc(max(var(--sheet-h,0px), calc(var(--safe-b) + var(--badge))) + 12px);z-index:1000;width:48px;height:48px;min-height:0;padding:0;border-radius:50%;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center}
 #compass svg{width:30px;height:30px}
 #cross{position:fixed;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;z-index:460;pointer-events:none}
@@ -160,6 +169,9 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 .pt .dot.ex{font-size:14px;font-weight:800}
 .pt.edit .dot{width:22px;height:22px;left:-11px;top:-11px;border-width:3px}
 .pt.edit .dot.g{width:28px;height:28px;left:-14px;top:-14px;font-size:12px}
+.pt .sym{position:absolute;left:-16px;top:-16px;width:32px;height:32px;filter:drop-shadow(0 0 1.2px #fff) drop-shadow(0 0 1.2px #fff) drop-shadow(0 0 2px rgba(255,255,255,.8))}
+.pt .sym svg{width:100%;height:100%;display:block}
+.pt .sym + .lb{left:17px;top:-24px}
 .pt .lb{position:absolute;left:10px;top:-22px;white-space:nowrap;font:700 12.5px/1 "IBM Plex Sans Condensed",sans-serif;color:#111;background:rgba(255,255,255,.88);padding:2px 4px;border-radius:4px}
 .pt.edit .lb{left:14px}
 .leaflet-marker-icon.pt-wrap,.leaflet-marker-icon.plc-wrap{background:none;border:0}
@@ -250,7 +262,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="seg" id="relEx"><button data-x="1">×1</button><button data-x="3">×3</button><button data-x="6">×6</button><button data-x="10">×10</button></div>
 <div class="duo"><label class="f">Цвет высот: от, м<input id="relMin" inputmode="numeric"></label><label class="f">до, м<input id="relMax" inputmode="numeric"></label></div>
 <div class="row"><button id="relAuto">Диапазон по экрану</button></div>
-<label class="f" style="display:flex;align-items:center;gap:10px;margin-top:10px"><input type="checkbox" id="rotOn" style="width:22px;min-height:22px;margin:0"> Поворот карты двумя пальцами</label>
+<label class="f" style="display:flex;align-items:center;gap:10px;margin-top:10px"><input type="checkbox" id="rotOn" style="width:22px;min-height:22px;margin:0"> Поворот карты двумя пальцами (вращение без раздвигания пальцев)</label>
 <p class="status">Рельеф строится по матрице высот: без интернета — только в районах, сохранённых с галочкой «высоты» (на крупных масштабах). Компас слева внизу показывает север; касание — север вверх.</p>
 <div class="sub-h">Сессия</div>
 <div class="row"><button id="sesSave">Выгрузить сессию</button><button id="sesLoad">Загрузить сессию</button></div>
@@ -340,12 +352,13 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div id="v3d"><div id="v3map"></div>
 <div id="v3top"><button id="v3close" class="glass">✕ 2D</button><select id="v3base" class="glass"></select><label class="glass" id="v3exl">Рельеф ×<span id="v3exv">2</span><input type="range" id="v3ex" min="1" max="6" step="0.5" value="2"></label></div>
 <div id="v3msg"></div></div>
+<div id="radial"></div>
 <div id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 3.0';
+const VERSION = 'версия 3.1';
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
 document.documentElement.style.setProperty('--badge', framed ? '64px' : '10px');
@@ -430,7 +443,7 @@ const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v == n
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
 const rel = Object.assign({mode:'off', op:60, ex:3, min:50, max:250}, lsGet('skat_rel', {}));
 let rotOn = lsGet('skat_rot', true);
-const map = L.map('map', {crs:crsOf(state.layer), zoomControl:false, maxZoom:20, minZoom:3, zoomSnap:0.5, rotate:true, touchRotate:rotOn, rotateControl:false, bearing:0}).setView(START, 12);
+const map = L.map('map', {crs:crsOf(state.layer), zoomControl:false, maxZoom:20, minZoom:3, zoomSnap:0.5, rotate:true, touchRotate:false, rotateControl:false, bearing:0}).setView(START, 12);
 const ROTP = map._rotatePane || undefined, NROTP = map._norotatePane || undefined;
 L.control.zoom({position:'bottomright'}).addTo(map);
 map.attributionControl.setPrefix('Leaflet');
@@ -711,8 +724,9 @@ const icon = editing || active || !a.noIcon;
 if (!icon && !showLb) return;
 html = `<div class="ax${editing?' edit':''}${icon?'':' noicon'}" style="opacity:${op}">${icon ? `<div class="tr">${TREE(a.style.color)}</div>` : ''}${showLb ? `<div class="lb">${escapeHtml(p.name)}</div>` : ''}</div>`;
 } else {
-const st = styleOf(a,p), ex = a.kind === 'desc', g = ex ? '!' : (st.glyph||'');
-html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="dot${g?' g':''}${ex?' ex':''}" style="background:${st.color};color:${ink(st.color)}">${escapeHtml(g)}</div>${showLb ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
+const st = styleOf(a,p), ex = a.kind === 'desc', g = ex ? '!' : (st.glyph||''), sid = p.sym || a.sym;
+if (sid && SYM_BY[sid]) html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="sym" style="color:${st.color}">${symSvg(sid)}</div>${showLb ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
+else html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="dot${g?' g':''}${ex?' ex':''}" style="background:${st.color};color:${ink(st.color)}">${escapeHtml(g)}</div>${showLb ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
 }
 const m = L.marker([p.lat,p.lng], {icon:L.divIcon({className:'pt-wrap', html, iconSize:[0,0]}), draggable:editing, interactive:editing, keyboard:false});
 if (editing){
@@ -765,7 +779,8 @@ if (showLb) lbl(p.name, q.x+11, q.y-3, true, false);
 } else lbl(p.name, q.x, q.y+4, true, true);
 return;
 }
-const st = styleOf(a,p), g = a.kind === 'desc' ? '!' : (st.glyph||''), r = g ? 10 : 6;
+const st = styleOf(a,p), g = a.kind === 'desc' ? '!' : (st.glyph||''), r = g ? 10 : 6, sid = p.sym || a.sym;
+if (sid && SYM_BY[sid]){ drawSym(ctx2, sid, q.x, q.y, st.color); if (showLb) lbl(labelOf(a,i), q.x+17, q.y-16, false, false); return; }
 ctx2.beginPath(); ctx2.arc(q.x, q.y, r, 0, Math.PI*2); ctx2.fillStyle = st.color; ctx2.fill();
 ctx2.strokeStyle = '#fff'; ctx2.lineWidth = 2; ctx2.stroke();
 if (g){ ctx2.fillStyle = ink(st.color); ctx2.font = `800 ${g === '!' ? 13 : 10}px "IBM Plex Sans Condensed", sans-serif`; ctx2.textAlign = 'center'; ctx2.textBaseline = 'middle'; ctx2.fillText(g, q.x, q.y+0.5); ctx2.textAlign = 'left'; }
@@ -1012,7 +1027,9 @@ if (commit) toast('Точки сохранены');
 function createNamed(a, ll, raw){
 if (a.kind === 'aux'){ if (!raw) return false; a.points.push({lat:ll.lat, lng:ll.lng, name:withPre(auxPre(a), raw)}); }
 else {
-const p = {lat:ll.lat, lng:ll.lng, h:null, place:'', name:raw || ((a.kind === 'desc' ? 'О' : 'Т') + (a.points.length+1))};
+const ps = pendSym && pendSym.aid === a.id ? pendSym.sid : null; pendSym = null;
+const p = {lat:ll.lat, lng:ll.lng, h:null, place:'', name:raw || (ps ? SYM_BY[ps].n : ((a.kind === 'desc' ? 'О' : 'Т') + (a.points.length+1)))};
+if (ps) p.sym = ps;
 if (session && session.style && !sameSt(session.style, a.style)) p.style = copySt(session.style);
 a.points.push(p); fillHeight(p); fillPlace(p);
 }
@@ -1840,7 +1857,7 @@ rel.min = Math.floor(Math.min(...hs) / 5) * 5; rel.max = Math.ceil(Math.max(...h
 if (rel.mode === 'off' || rel.mode === 'shade') rel.mode = 'both';
 applyRelief(); renderRelUI(); toast(`Диапазон высот: ${rel.min}–${rel.max} м`);
 };
-$('rotOn').onchange = e => { rotOn = e.target.checked; lsSet('skat_rot', rotOn); if (map.touchRotate) rotOn ? map.touchRotate.enable() : map.touchRotate.disable(); };
+$('rotOn').onchange = e => { rotOn = e.target.checked; lsSet('skat_rot', rotOn); };
 // ======== КОМПАС ========
 function updCompass(){
 const el = $('compass'); if (!map.getBearing){ el.style.display = 'none'; return; }
@@ -1922,6 +1939,131 @@ $('v3Btn').onclick = open3D;
 $('v3close').onclick = close3D;
 $('v3base').onchange = e => { if (!v3) return; const k = e.target.value; try { v3.removeLayer('base'); v3.removeSource('base'); v3.addSource('base', v3baseSrc(k)); v3.addLayer({id:'base', type:'raster', source:'base'}, 'hs'); } catch(_){} };
 $('v3ex').oninput = e => { $('v3exv').textContent = e.target.value; if (v3) try { v3.setTerrain({source:'dem', exaggeration:+e.target.value}); } catch(_){} };
+// ======== ТАКТИЧЕСКИЕ ЗНАКИ ========
+const CIRC = (x, y, r) => `M${x-r} ${y}a${r} ${r} 0 1 0 ${2*r} 0a${r} ${r} 0 1 0 ${-2*r} 0`;
+const SYMS = [
+{id:'kp', n:'КНП', ab:'КП', d:['M9 29V4', 'M9 4h15l-4 5 4 5H9']},
+{id:'nab', n:'Набл. пункт', ab:'НП', d:['M16 5L28 27H4Z'], f:[CIRC(16, 19, 2.6)]},
+{id:'op', n:'Опорный пункт', ab:'ОП', d:['M4 25C4 7 28 7 28 25']},
+{id:'okop', n:'Окоп', ab:'ОК', d:['M3 20H29', 'M7 20v-5M12 20v-5M17 20v-5M22 20v-5M27 20v-5']},
+{id:'pul', n:'Пулемёт', ab:'ПЛ', d:['M16 29V5', 'M10 11l6-6 6 6', 'M10 21h12']},
+{id:'ptrk', n:'ПТРК', ab:'ПТ', d:['M16 29V5', 'M10 11l6-6 6 6', 'M10 25l6-6 6 6']},
+{id:'min', n:'Миномёт', ab:'МН', d:['M16 22V5', 'M10 11l6-6 6 6', CIRC(16, 25.5, 3.5)]},
+{id:'art', n:'Орудие', ab:'ОР', d:['M16 26V5', 'M10 11l6-6 6 6', 'M8 26h16']},
+{id:'tank', n:'Танк', ab:'Т', d:['M6 11h20a5 5 0 0 1 0 10H6a5 5 0 0 1 0-10Z']},
+{id:'bmp', n:'БМП / БТР', ab:'БМ', d:['M6 13h20a4.5 4.5 0 0 1 0 9H6a4.5 4.5 0 0 1 0-9Z', 'M16 13V6', 'M12 6h8']},
+{id:'bpla', n:'БпЛА', ab:'БП', d:['M16 5v22', 'M4 15l12-4 12 4', 'M11 26h10']},
+{id:'mina', n:'Мины', ab:'МП', d:[CIRC(7, 16, 3.2), CIRC(16, 16, 3.2), CIRC(25, 16, 3.2)]},
+{id:'sklad', n:'Склад', ab:'СК', d:['M5 10h22v15H5Z', 'M5 10l11 8 11-8']},
+{id:'rls', n:'РЛС / РЭБ', ab:'РЛ', d:['M9 27l7-9', 'M5 12a13 13 0 0 0 15 11', 'M16 18l7-7', 'M21 7l4 4']}];
+const SYM_BY = Object.fromEntries(SYMS.map(x => [x.id, x]));
+const SIDES = {r:{name:'Красные', color:'#e0302a', pre:'К'}, b:{name:'Синие', color:'#1f5fe0', pre:'С'}};
+let pendSym = null;
+function symSvg(sid){ const s = SYM_BY[sid]; return `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">${s.d.map(x => `<path d="${x}"/>`).join('')}${(s.f || []).map(x => `<path d="${x}" fill="currentColor" stroke="none"/>`).join('')}</svg>`; }
+const symPaths = {};
+function drawSym(g, sid, x, y, color){
+const s = SYM_BY[sid]; if (!symPaths[sid]) symPaths[sid] = {d:s.d.map(v => new Path2D(v)), f:(s.f || []).map(v => new Path2D(v))};
+const P = symPaths[sid]; g.save(); g.translate(x - 16, y - 16); g.lineCap = 'round'; g.lineJoin = 'round';
+g.strokeStyle = '#fff'; g.lineWidth = 6; P.d.forEach(v => g.stroke(v)); g.fillStyle = '#fff'; P.f.forEach(v => { g.stroke(v); });
+g.strokeStyle = color; g.lineWidth = 2.6; P.d.forEach(v => g.stroke(v)); g.fillStyle = color; P.f.forEach(v => g.fill(v)); g.restore();
+}
+// ======== КРУГОВОЕ МЕНЮ ПО УДЕРЖАНИЮ ========
+const IC = {
+obj:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4h11l-3 4 3 4H5"/></svg>',
+shape:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="5"/><path d="M12 13h8v8h-8z"/></svg>',
+route:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/><path d="M7 18c6-1 3-8 10-11"/></svg>',
+pt:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="currentColor"/></svg>',
+arr:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="3"/><circle cx="12" cy="12" r="3"/><circle cx="19" cy="12" r="3"/></svg>',
+circle:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/></svg>',
+rect:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12"/></svg>',
+poly:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9l7-5 9 5-3 11H7z"/></svg>',
+line:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20L20 4"/><circle cx="4" cy="20" r="1.5"/><circle cx="20" cy="4" r="1.5"/></svg>',
+side:c => `<svg viewBox="0 0 24 24"><path d="M5 21V4h11l-3 4 3 4H5" fill="${c}" stroke="${c}" stroke-width="1.5"/></svg>`};
+let radStack = [], radPos = null;
+function radRender(){
+const el = $('radial'), lv = radStack[radStack.length-1], n = lv.items.length;
+const inner = Math.min(n, 8), outer = n - inner, R1 = n <= 4 ? 88 : n <= 6 ? 98 : 104, R2 = 170, small = n > 6;
+const need = (outer ? R2 : R1) + 36, cx = Math.max(need, Math.min(innerWidth - need, radPos.x)), cy = Math.max(need + 20, Math.min(innerHeight - need, radPos.y));
+let h = `<div class="rad-t" style="left:${cx}px;top:${cy - (outer ? R2 : R1) - 62}px">${escapeHtml(lv.title)}</div><button class="rad-c" id="radC" style="left:${cx}px;top:${cy}px">${radStack.length > 1 ? '←' : '✕'}</button>`;
+lv.items.forEach((it, i) => { const ring = i < inner ? 0 : 1, k = ring ? i - inner : i, m = ring ? outer : inner, R = ring ? R2 : R1;
+const ang = (-90 + k * 360 / m + (ring ? 180 / m : 0)) * Math.PI / 180;
+h += `<button class="rad-it${small ? ' sm' : ''}" data-i="${i}" style="left:${cx + R * Math.cos(ang)}px;top:${cy + R * Math.sin(ang)}px${it.color ? `;color:${it.color}` : ''}">${it.ic || ''}<span${it.color ? ' style="color:var(--ink)"' : ''}>${escapeHtml(it.t)}</span></button>`; });
+el.innerHTML = h;
+el.querySelectorAll('.rad-it').forEach(b => b.onclick = ev => { ev.stopPropagation(); lv.items[+b.dataset.i].go(); });
+$('radC').onclick = ev => { ev.stopPropagation(); if (radStack.length > 1){ radStack.pop(); radRender(); } else closeRadial(); };
+}
+function radPush(title, items){ radStack.push({title, items}); radRender(); }
+function closeRadial(){ radStack = []; $('radial').classList.remove('on'); $('radial').innerHTML = ''; }
+$('radial').onclick = e => { if (e.target.id === 'radial') closeRadial(); };
+function openRadial(x, y, ll){
+if (session || tool.on || document.querySelector('.modal.open') || $('v3d').classList.contains('on')) return;
+try { navigator.vibrate && navigator.vibrate(25); } catch(e){}
+radPos = {x, y, ll}; radStack = []; $('radial').classList.add('on');
+radPush('Нанести', [
+{t:'Объект', ic:IC.obj, go:() => radPush('Сторона', [
+{t:'Красные', ic:IC.side(SIDES.r.color), go:() => radKind('r')},
+{t:'Синие', ic:IC.side(SIDES.b.color), go:() => radKind('b')}])},
+{t:'Ориентир', ic:TREE_BTN, go:placeAuxAt},
+{t:'Фигура', ic:IC.shape, go:() => radPush('Фигура', [
+{t:'Круг', ic:IC.circle, go:() => toolAt('circle')}, {t:'Прямо­угольник', ic:IC.rect, go:() => toolAt('rect')},
+{t:'Много­угольник', ic:IC.poly, go:() => toolAt('poly')}, {t:'Линия', ic:IC.line, go:() => toolAt('line')}])},
+{t:'Маршрут', ic:IC.route, go:() => toolAt('line')}]);
+}
+function radKind(side){ const S = SIDES[side];
+radPush(S.name, [{t:'Точка', ic:IC.pt, color:S.color, go:() => radSym(side, 'pt')}, {t:'Массив', ic:IC.arr, color:S.color, go:() => radSym(side, 'arr')}]); }
+function radSym(side, kind){ const S = SIDES[side];
+radPush(`${S.name} · ${kind === 'pt' ? 'точка' : 'массив'}`, SYMS.map(sy => ({t:sy.n, ic:symSvg(sy.id), color:S.color, go:() => placeSym(side, kind, sy.id)}))); }
+function placeSym(side, kind, sid){
+const ll = radPos.ll, S = SIDES[side], sy = SYM_BY[sid], st = {color:S.color, name:S.name, glyph:''};
+closeRadial();
+if (kind === 'pt'){
+let a = state.arrays.find(x => x.symSide === side && x.kind === 'pts');
+if (!a){ a = normArr({id:Date.now(), kind:'pts', name:`${S.name}: объекты`, ident:S.name, style:st, symSide:side, points:[]}); state.arrays.push(a); }
+pendSym = {aid:a.id, sid}; openAux(a, null, ll);
+$('auxTitle').textContent = `${S.name}: ${sy.n}`; $('auxName').placeholder = `название (пусто — ${sy.n})`;
+return;
+}
+let a = state.arrays.find(x => x.symSide === side && x.kind === 'main' && x.sym === sid);
+if (!a){ a = normArr({id:Date.now(), kind:'main', name:`${S.name}: ${sy.n}`, ident:`${S.name} ${sy.n}`, prefix:S.pre + sy.ab, start:'1', step:1, style:st, symSide:side, sym:sid, points:[]}); state.arrays.push(a); }
+const p = {lat:ll.lat, lng:ll.lng, h:null, place:''}; a.points.push(p); fillHeight(p); fillPlace(p);
+persist(); renderMarkers(); toast(`${labelOf(a, a.points.length-1)} — ${S.name.toLowerCase()}, ${sy.n}`);
+}
+function placeAuxAt(){
+const ll = radPos.ll; closeRadial();
+let a = state.arrays.find(x => x.kind === 'aux');
+if (!a){ const g = state.palette.find(p => !p.glyph && p.name === 'Зелёный') || DEFAULT_PAL[0]; a = normArr({id:Date.now(), kind:'aux', name:'Лесополосы', style:copySt(g), auxPrefix:'лп', points:[]}); state.arrays.push(a); }
+openAux(a, null, ll);
+}
+function toolAt(mode){ const ll = radPos.ll; closeRadial(); openTools(null); tool.mode = mode; tool.pts = []; tool.r = 0; toolAdd(ll); }
+// ---- удержание пальца
+{ const mc = map.getContainer(); let lp = null;
+const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
+mc.addEventListener('touchstart', e => {
+clearLP();
+if (e.touches.length !== 1 || session || tool.on) return;
+const t = e.touches[0]; lp = {x:t.clientX, y:t.clientY};
+lp.tm = setTimeout(() => { if (!lp) return; const r = mc.getBoundingClientRect(); const ll = map.containerPointToLatLng([lp.x - r.left, lp.y - r.top]); const pos = {x:lp.x, y:lp.y}; lp = null; openRadial(pos.x, pos.y, ll); }, 550);
+}, {passive:true});
+mc.addEventListener('touchmove', e => { if (!lp) return; const t = e.touches[0]; if (e.touches.length > 1 || Math.hypot(t.clientX - lp.x, t.clientY - lp.y) > 10) clearLP(); }, {passive:true});
+mc.addEventListener('touchend', clearLP); mc.addEventListener('touchcancel', clearLP);
+map.on('contextmenu', e => { if (e.originalEvent && e.originalEvent.pointerType !== 'touch' && !('ontouchstart' in window)) openRadial(e.originalEvent.clientX, e.originalEvent.clientY, e.latlng); });
+}
+// ---- поворот отдельно от масштаба
+{ const mc = map.getContainer(); let g2 = null, rotSign = 0;
+const northAng = () => { const c = map.getCenter(), a = map.latLngToContainerPoint(c), b = map.latLngToContainerPoint([c.lat + 0.01, c.lng]); return Math.atan2(b.x - a.x, a.y - b.y) * 180 / Math.PI; };
+const calib = () => { if (rotSign) return; const b0 = map.getBearing(), a0 = northAng(); map.setBearing(b0 + 10); const a1 = northAng(); map.setBearing(b0); let d = a1 - a0; if (d > 180) d -= 360; if (d < -180) d += 360; rotSign = d >= 0 ? 1 : -1; };
+const geo = e => { const a = e.touches[0], b = e.touches[1]; return {ang:Math.atan2(b.clientY - a.clientY, b.clientX - a.clientX) * 180 / Math.PI, d:Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY)}; };
+mc.addEventListener('touchstart', e => { if (e.touches.length === 2 && rotOn && map.setBearing){ calib(); const q = geo(e); g2 = {a0:q.ang, d0:q.d, b0:map.getBearing(), mode:null}; } else if (e.touches.length !== 2) g2 = null; }, {passive:true, capture:true});
+mc.addEventListener('touchmove', e => {
+if (!g2 || e.touches.length !== 2) return;
+const q = geo(e); let da = q.ang - g2.a0; if (da > 180) da -= 360; if (da < -180) da += 360;
+const ds = Math.abs(Math.log(q.d / g2.d0));
+if (!g2.mode){ if (Math.abs(da) > 14 && ds < 0.1){ g2.mode = 'rot'; g2.a0 = q.ang; da = 0; } else if (ds > 0.1) g2.mode = 'zoom'; }
+if (g2.mode === 'rot'){ e.stopPropagation(); map.setBearing(g2.b0 + rotSign * da); }
+}, {passive:true, capture:true});
+const endG = e => { if (g2 && e.touches.length < 2){ if (g2.mode === 'rot'){ setTimeout(() => { redrawAll(); renderMarkers(); updCompass(); }, 50); } g2 = null; } };
+mc.addEventListener('touchend', endG, {capture:true}); mc.addEventListener('touchcancel', endG, {capture:true});
+}
 $('layBtn').onclick = () => { openModal('layModal'); renderLayers(); };
 $('setBtn').onclick = () => { openModal('setModal'); $('ver2').textContent = VERSION; pdbInfo(); renderRelUI(); };
 $('layNew').onclick = () => { closeModals(); openArrModal(); };
