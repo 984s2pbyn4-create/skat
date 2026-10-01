@@ -47,6 +47,17 @@ button:disabled{opacity:.35}
 .laybtn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .laybtn select{position:absolute;inset:0;opacity:0;width:100%;height:100%;font-size:16px}
 #layLbl{max-width:58px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mute)}
+#v3d{position:fixed;inset:0;z-index:2500;background:#0b0f0d;display:none}
+#v3d.on{display:block}
+#v3map{position:absolute;inset:0}
+#v3top{position:absolute;left:10px;right:60px;top:calc(var(--safe-t) + var(--tg));display:flex;gap:8px;flex-wrap:wrap;z-index:5}
+#v3top>*{min-height:42px;padding:6px 12px;border-radius:12px;color:var(--ink);font-size:15px}
+#v3exl{display:flex;align-items:center;gap:8px}
+#v3exl input{width:110px}
+#v3msg{position:absolute;left:10px;right:10px;bottom:calc(var(--safe-b) + 14px);z-index:5;color:#fff;font-size:13px;text-shadow:0 0 3px #000;pointer-events:none}
+#v3d .maplibregl-ctrl-top-right{top:calc(var(--safe-t) + var(--tg))}
+#compass{position:fixed;left:10px;bottom:calc(max(var(--sheet-h,0px), calc(var(--safe-b) + var(--badge))) + 12px);z-index:1000;width:48px;height:48px;min-height:0;padding:0;border-radius:50%;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center}
+#compass svg{width:30px;height:30px}
 #cross{position:fixed;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;z-index:460;pointer-events:none}
 #cross i{position:absolute;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.6)}
 #cross i:nth-child(1){left:10px;top:0;width:2px;height:7px}
@@ -60,6 +71,9 @@ body.picking #cross i{background:var(--signal)}
 .rb.accent,.rb.on{color:var(--signal)}
 #banner,#netmsg,#vbar{position:fixed;left:10px;right:72px;top:calc(var(--safe-t) + var(--tg) + 68px);z-index:990;border-radius:12px;display:none}
 #banner{background:#3b1f1a;border:1px solid #6b3a33;color:#ffd9d2;padding:10px 12px;font-size:14px;line-height:1.35}
+#dlbar{position:fixed;left:10px;right:72px;top:calc(var(--safe-t) + var(--tg) + 68px);z-index:995;display:none;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:6px 6px 6px 12px;font-size:13.5px;box-shadow:var(--shadow)}
+#dlbar span{flex:1;min-width:0}
+#dlbar button{min-height:36px;padding:4px 12px}
 #netmsg{background:var(--glass);border:1px solid var(--line);color:var(--ink);padding:9px 12px;font-size:13.5px;line-height:1.35;box-shadow:var(--shadow)}
 #vbar{z-index:1500;background:#20301f;border:1px solid var(--ok);border-radius:14px;padding:8px 8px 8px 12px;align-items:center;gap:6px;box-shadow:var(--shadow)}
 #vbar.wait{background:#2a2f2c;border-color:var(--line)}
@@ -71,6 +85,16 @@ body.picking #cross i{background:var(--signal)}
 #sheet{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:8px 14px calc(var(--safe-b) + var(--badge));max-height:55vh;overflow:auto;box-shadow:0 160px 0 0 var(--panel),0 -8px 28px rgba(0,0,0,.4)}
 #sheet::before{content:"";display:block;width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin:0 auto 10px}
 #sheet.hidden{display:none}
+#tpanel{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:8px 14px calc(var(--safe-b) + var(--badge));max-height:52vh;overflow:auto;box-shadow:0 160px 0 0 var(--panel),0 -8px 28px rgba(0,0,0,.4)}
+#tpanel.hidden{display:none}
+#tpanel h2{margin:0 0 8px;font-size:17px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}
+#tpanel .res{font-size:15px;line-height:1.45;margin:0 0 10px}
+#tpanel .res b{color:var(--signal)}
+#tpanel .segs{font-size:12.5px;color:var(--mute);margin:-4px 0 10px;line-height:1.5;max-height:110px;overflow:auto}
+#tpanel input[type=range]{width:100%}
+.seglb{transform:translate(-50%,-140%);white-space:nowrap;font:700 11px/1.2 "IBM Plex Sans Condensed",sans-serif;color:#111;background:rgba(255,255,255,.92);padding:2px 5px;border-radius:4px;display:inline-block}
+.shl{transform:translate(-50%,-50%);white-space:nowrap;font:600 11.5px/1 "IBM Plex Sans Condensed",sans-serif;color:#fff;text-shadow:0 0 2px #000,0 0 2px #000,0 0 4px #000;display:inline-block}
+.arr .sw.shp{border-radius:3px;opacity:.75}
 #sheet.mini{padding-top:6px}
 .minibar{display:flex;align-items:center;gap:6px}
 .minibar .mt{flex:1;min-width:0;line-height:1.2}
@@ -158,6 +182,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <body>
 <div id="map"></div>
 <canvas id="grid"></canvas>
+<button id="compass" title="Север вверх"><svg viewBox="0 0 24 24"><path d="M12 2l4.5 10h-9z" fill="#e2533f"/><path d="M12 22l-4.5-10h9z" fill="#eef1e8"/></svg></button>
 <div id="cross"><i></i><i></i><i></i><i></i></div>
 <div id="top">
 <div id="readout" class="glass" title="Нажмите, чтобы переключить полные и сокращённые координаты"></div>
@@ -165,15 +190,19 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 </div>
 <div id="banner"></div>
 <div id="netmsg"></div>
+<div id="dlbar"><span id="dlbarT"></span><button class="danger" id="dlbarStop">Стоп</button></div>
 <div id="rail">
 <button class="rb accent" id="newArrBtn" title="Новый слой"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Слой</button>
 <button class="rb" id="layBtn" title="Слои"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>Слои</button>
-<button class="rb" id="expBtn" title="Экспорт в Excel"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Excel</button>
+<button class="rb" id="setBtn" title="Настройки"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Настр.</button>
 <button class="rb" id="searchBtn" title="Поиск по координатам"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>Поиск</button>
+<button class="rb" id="toolBtn" title="Инструменты"><svg viewBox="0 0 24 24"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg>Инстр.</button>
 <button class="rb" id="plcBtn" title="Подписи населённых пунктов"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V10l5-4 5 4v10M15 20v-7h4v7M8 13h4"/></svg>Н.п.</button>
+<button class="rb" id="v3Btn" title="3D-просмотр рельефа"><svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg>3D</button>
 <button class="rb on" id="gridBtn" title="Сетка СК-42"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M9 4v16M15 4v16"/></svg>Сетка</button>
 </div>
 <div id="sheet" class="hidden"></div>
+<div id="tpanel" class="hidden"></div>
 <div class="modal" id="arrModal"><div class="card big">
 <h3 id="arrTitle">Новый слой</h3>
 <div class="seg" id="kindSeg"><button data-k="main" class="on">Массив</button><button data-k="pts">Точки</button><button data-k="aux">Ориентиры</button><button data-k="route">Маршрут</button><button data-k="desc">Описание</button></div>
@@ -203,23 +232,42 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="modal" id="layModal"><div class="card big">
 <h3>Слои <small id="ver"></small></h3>
 <div id="layList"></div>
-<div class="row" style="margin-top:12px"><button class="primary" id="layNew">Новый слой</button><button id="impBtn">Импорт ориентиров CSV</button></div>
+<div class="row" style="margin-top:12px"><button class="primary" id="layNew">Новый слой</button></div>
 <div class="row" style="margin-top:8px"><button class="ghost" id="optAll">⚡ Оптимизировать все</button><button class="ghost" id="optNone">Вернуть все</button></div>
 <p class="status" style="margin-top:10px">⚡ — оптимизация: слой рисуется одной картинкой и не тормозит даже с тысячами точек, но точки нельзя нажимать. Пока вы ставите или правите точки слоя, он временно работает как обычный.</p>
+<div class="row"><button class="ghost" data-close>Закрыть</button></div>
+<input type="file" id="csvIn" accept=".csv,.txt,text/csv,text/plain" style="display:none">
+<input type="file" id="sesIn" accept=".json,application/json,text/plain" style="display:none">
+</div></div>
+<div class="modal" id="setModal"><div class="card big">
+<h3>Настройки <small id="ver2"></small></h3>
+<div class="sub-h">Данные</div>
+<div class="row"><button id="expBtn">Excel: все слои</button><button id="impBtn">Импорт ориентиров CSV</button></div>
+<div class="sub-h">Рельеф и поворот</div>
+<div class="seg" id="relSeg"><button data-r="off">Выкл</button><button data-r="shade">Отмывка</button><button data-r="color">Цвет высот</button><button data-r="both">Оба</button></div>
+<label class="f">Прозрачность рельефа: <span id="relOpV"></span><input type="range" id="relOp" min="10" max="100" step="5" style="width:100%"></label>
+<div class="flabel">Усиление рельефа</div>
+<div class="seg" id="relEx"><button data-x="1">×1</button><button data-x="3">×3</button><button data-x="6">×6</button><button data-x="10">×10</button></div>
+<div class="duo"><label class="f">Цвет высот: от, м<input id="relMin" inputmode="numeric"></label><label class="f">до, м<input id="relMax" inputmode="numeric"></label></div>
+<div class="row"><button id="relAuto">Диапазон по экрану</button></div>
+<label class="f" style="display:flex;align-items:center;gap:10px;margin-top:10px"><input type="checkbox" id="rotOn" style="width:22px;min-height:22px;margin:0"> Поворот карты двумя пальцами</label>
+<p class="status">Рельеф строится по матрице высот: без интернета — только в районах, сохранённых с галочкой «высоты» (на крупных масштабах). Компас слева внизу показывает север; касание — север вверх.</p>
 <div class="sub-h">Сессия</div>
 <div class="row"><button id="sesSave">Выгрузить сессию</button><button id="sesLoad">Загрузить сессию</button></div>
 <p class="status" style="margin-top:10px">Сессия — файл со всеми слоями и палитрой. Сохраните его в «Файлы», а потом загрузите, чтобы продолжить работу с того же места. CSV ориентиров: в строке название и координаты X;Y в СК-42 (5 или 7 цифр) или широта;долгота.</p>
-<div class="sub-h">Офлайн: карты и населённые пункты</div>
-<div class="row"><button id="pdbBtn">Н.п. в радиусе 100 км</button><button id="mapDlBtn">Сохранить карту района</button></div>
-<div class="row" style="margin-top:8px"><button id="offExp">Выгрузить в файл</button><button id="offImp">Загрузить из файла</button></div>
-<div class="row" style="margin-top:8px"><button class="ghost" id="pdbClr">Очистить н.п.</button><button class="ghost" id="tilesClr">Очистить карты</button></div>
+<div class="sub-h">Карты</div>
+<div id="mapList"></div>
+<div class="row" style="margin-top:8px"><button id="mapDlBtn">Сохранить карту района</button><button id="offImp">Загрузить файл карты</button></div>
+<div class="row" style="margin-top:8px"><button id="mbExp">Выгрузить карту (.mbtiles)</button><button class="ghost" id="tilesClr">Очистить все карты</button></div>
 <p class="status" id="tileInfo" style="margin-top:10px"></p>
+<p class="status">Файлы <b>.mbtiles</b> (SASPlanet, MOBAC, QGIS и др.) появляются в списке выше и в выборе подложки. «Выгрузить карту» сохраняет скачанные тайлы текущей подложки отдельным файлом .mbtiles.</p>
+<div class="sub-h">Населённые пункты</div>
+<div class="row"><button id="pdbBtn">Н.п. в радиусе 100 км</button><button id="pdbExp">Выгрузить н.п.</button></div>
+<div class="row" style="margin-top:8px"><button id="pdbImp">Загрузить н.п.</button><button class="ghost" id="pdbClr">Очистить н.п.</button></div>
 <input type="file" id="offIn" style="display:none">
 <p class="status" id="pdbInfo" style="margin-top:10px"></p>
 <p class="status" id="offInfo"></p>
 <div class="row"><button class="ghost" data-close>Закрыть</button></div>
-<input type="file" id="csvIn" accept=".csv,.txt,text/csv,text/plain" style="display:none">
-<input type="file" id="sesIn" accept=".json,application/json,text/plain" style="display:none">
 </div></div>
 <div class="modal" id="dlModal"><div class="card big">
 <h3>Сохранить карту района</h3>
@@ -230,6 +278,12 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <p class="status" id="dlProg"></p>
 <div class="row"><button class="ghost" data-close>Закрыть</button><button class="danger" id="dlStop" style="display:none">Стоп</button><button class="primary" id="dlGo">Скачать</button></div>
 <p class="status" style="margin-top:10px">Центр — перекрестие карты. Каждый следующий масштаб даёт в 4 раза больше тайлов: для обзора хватает 10–14, для работы по месту — 15–17 на небольшом радиусе. Скачивайте по Wi‑Fi и не блокируйте экран. Уже сохранённое повторно не качается. Сохранённое попадает в файл «Выгрузить в файл» для переноса на другое устройство.</p>
+</div></div>
+<div class="modal" id="profModal"><div class="card big">
+<h3>Профиль высот</h3>
+<div id="profSvg"></div>
+<p class="status" id="profInfo" style="margin-top:10px"></p>
+<div class="row"><button class="ghost" data-close>Закрыть</button></div>
 </div></div>
 <div class="modal" id="tblModal"><div class="card big">
 <h3 id="tblTitle"></h3>
@@ -283,11 +337,15 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <h3 id="cfText"></h3>
 <div class="row"><button class="ghost" id="cfNo">Отмена</button><button class="primary" id="cfYes" style="background:#e2533f;color:#fff">Удалить</button></div>
 </div></div>
+<div id="v3d"><div id="v3map"></div>
+<div id="v3top"><button id="v3close" class="glass">✕ 2D</button><select id="v3base" class="glass"></select><label class="glass" id="v3exl">Рельеф ×<span id="v3exv">2</span><input type="range" id="v3ex" min="1" max="6" step="0.5" value="2"></label></div>
+<div id="v3msg"></div></div>
 <div id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 2.6';
+const VERSION = 'версия 3.0';
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
 document.documentElement.style.setProperty('--badge', framed ? '64px' : '10px');
@@ -368,7 +426,12 @@ function persist(){ clearTimeout(persistT); persistT = setTimeout(persistNow, 40
 document.addEventListener('visibilitychange', () => { if (document.hidden) persistNow(); });
 addEventListener('pagehide', persistNow);
 const START = GEO.fromSK(5474000, 7406000, 7);
-const map = L.map('map', {crs:crsOf(state.layer), zoomControl:false, maxZoom:20, minZoom:3, zoomSnap:0.5}).setView(START, 12);
+const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
+const rel = Object.assign({mode:'off', op:60, ex:3, min:50, max:250}, lsGet('skat_rel', {}));
+let rotOn = lsGet('skat_rot', true);
+const map = L.map('map', {crs:crsOf(state.layer), zoomControl:false, maxZoom:20, minZoom:3, zoomSnap:0.5, rotate:true, touchRotate:rotOn, rotateControl:false, bearing:0}).setView(START, 12);
+const ROTP = map._rotatePane || undefined, NROTP = map._norotatePane || undefined;
 L.control.zoom({position:'bottomright'}).addTo(map);
 map.attributionControl.setPrefix('Leaflet');
 addEventListener('orientationchange', () => setTimeout(() => map.invalidateSize(), 350));
@@ -382,7 +445,8 @@ L.DomEvent.on(img, 'error', L.Util.bind(this._tileOnError, this, done, img));
 const url = this.getTileUrl(coords);
 const show = b => { const o = URL.createObjectURL(b); img.addEventListener('load', () => URL.revokeObjectURL(o), {once:true}); img.src = o; };
 keysReady.then(async () => {
-if (savedKeys.has(url)){ const b = await tileGet(url); if (b){ show(b); return; } }
+if (savedKeys.has(url)){ const b = await tileGetFast(url); if (b){ show(b); return; } }
+if (url.startsWith('mb:')) return;
 if (navigator.onLine === false){ img.src = url; return; }
 if (savedKeys.size < 150000){ try { const b = await netBlob(url); show(b); queuePut(url, b); return; } catch(e){} }
 img.src = url;
@@ -394,7 +458,7 @@ tiles.forEach(t => map.removeLayer(t)); tiles = [];
 const crs = crsOf(key);
 if (map.options.crs !== crs){ map.options.crs = crs; map._resetView(c, z, true); }
 tileErr = 0; tileOk = 0; $('banner').style.display = 'none';
-def.urls.forEach(u => tiles.push(new IdbTile(u, {maxNativeZoom:def.max, maxZoom:20, subdomains:'abc', attribution:def.attr, keepBuffer:4, updateWhenZooming:false})
+def.urls.forEach(u => tiles.push(new IdbTile(u, {maxNativeZoom:def.max, minNativeZoom:def.min || 0, maxZoom:20, subdomains:'abc', attribution:def.attr, keepBuffer:4, updateWhenZooming:false, updateWhenIdle:false})
 .on('tileload', () => { tileOk++; $('banner').style.display = 'none'; })
 .on('tileerror', () => { tileErr++; if (tileErr >= 4 && tileOk === 0) showTileBanner(def.name); })
 .addTo(map)));
@@ -408,8 +472,9 @@ Object.entries(LAYERS).forEach(([k,d]) => sel.add(new Option(d.name, k)));
 sel.value = state.layer;
 sel.onchange = () => setLayer(sel.value);
 const cv = $('grid'), ctx = cv.getContext('2d');
-const gridPane = map.createPane('gridPane'); gridPane.style.zIndex = 350; gridPane.style.pointerEvents = 'none'; gridPane.appendChild(cv);
-const optPane = map.createPane('optPane'); optPane.style.zIndex = 550; optPane.style.pointerEvents = 'none';
+const gridPane = map.createPane('gridPane', ROTP); gridPane.style.zIndex = 350; gridPane.style.pointerEvents = 'none'; gridPane.appendChild(cv);
+const optPane = map.createPane('optPane', ROTP);
+const relPane = map.createPane('reliefPane', ROTP); relPane.style.zIndex = 300; relPane.style.pointerEvents = 'none'; optPane.style.zIndex = 550; optPane.style.pointerEvents = 'none';
 const cv2 = document.createElement('canvas'); cv2.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none';
 optPane.appendChild(cv2); const ctx2 = cv2.getContext('2d');
 let dpr = 1, W = 0, H = 0;
@@ -418,9 +483,16 @@ function sizeCanvas(){ dpr = window.devicePixelRatio || 1; const sz = map.getSiz
 $('cross').style.top = (H/2) + 'px'; }
 const pad2 = n => String(((n%100)+100)%100).padStart(2,'0');
 const pad5 = n => String(((Math.round(n)%100000)+100000)%100000).padStart(5,'0');
+function canvasBox(c, g){
+const P = [[0,0],[W,0],[0,H],[W,H]].map(q => map.containerPointToLayerPoint(q));
+const x0 = Math.floor(Math.min(...P.map(p => p.x))), y0 = Math.floor(Math.min(...P.map(p => p.y))), x1 = Math.ceil(Math.max(...P.map(p => p.x))), y1 = Math.ceil(Math.max(...P.map(p => p.y)));
+const bw = Math.max(1, x1 - x0), bh = Math.max(1, y1 - y0);
+if (c.width !== Math.round(bw*dpr) || c.height !== Math.round(bh*dpr)){ c.width = Math.round(bw*dpr); c.height = Math.round(bh*dpr); c.style.width = bw + 'px'; c.style.height = bh + 'px'; }
+L.DomUtil.setPosition(c, L.point(x0, y0)); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,bw,bh);
+return {o:L.point(x0, y0), bw, bh};
+}
 function drawGrid(){
-L.DomUtil.setPosition(cv, map.containerPointToLayerPoint([0,0]));
-ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+const BX = canvasBox(cv, ctx);
 if (!state.grid) return;
 const c = map.getCenter(), ref = GEO.toSK(c.lat, c.lng), zone = ref.zone;
 const pc = map.latLngToContainerPoint(c);
@@ -440,7 +512,7 @@ const nx = Math.round((x1-x0)/sub), ny = Math.round((y1-y0)/sub);
 if ((nx+1)*(ny+1) > 60000) return;
 const P = new Float32Array((nx+1)*(ny+1)*2);
 for (let i=0;i<=nx;i++) for (let j=0;j<=ny;j++){
-const p = map.latLngToContainerPoint(GEO.fromSK(x0+i*sub, y0+j*sub, zone));
+const p = map.latLngToLayerPoint(GEO.fromSK(x0+i*sub, y0+j*sub, zone)).subtract(BX.o);
 const o = (i*(ny+1)+j)*2; P[o]=p.x; P[o+1]=p.y;
 }
 const at = (i,j) => { const o=(i*(ny+1)+j)*2; return [P[o],P[o+1]]; };
@@ -464,7 +536,7 @@ ctx.font = `600 ${fs}px "IBM Plex Sans Condensed", "Arial Narrow", sans-serif`;
 ctx.textBaseline = 'alphabetic'; ctx.lineJoin = 'round';
 for (let i=0;i<nx;i+=k) for (let j=0;j<ny;j+=k){
 const [x,y] = at(i,j);
-if (x < -60 || x > W+10 || y < -10 || y > H+30) continue;
+if (x < -60 || x > BX.bw+10 || y < -10 || y > BX.bh+30) continue;
 const t = pad2(Math.round((x0+i*sub)/1000)) + pad2(Math.round((y0+j*sub)/1000));
 ctx.lineWidth = 3; ctx.strokeStyle = txtHalo; ctx.strokeText(t, x+4, y-4);
 ctx.fillStyle = txt; ctx.fillText(t, x+4, y-4);
@@ -472,26 +544,29 @@ ctx.fillStyle = txt; ctx.fillText(t, x+4, y-4);
 }
 }
 let raf = 0;
-const redraw = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; drawGrid(); drawOpt(); updateReadout(); }); };
+const redraw = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; updateReadout(); }); };
+const redrawAll = () => { drawGrid(); drawOpt(); updateReadout(); };
+map.on('moveend viewreset', redrawAll);
 map.on('move zoom viewreset', redraw);
 map.on('zoomanim', () => { cv.style.opacity = 0; cv2.style.opacity = 0; });
-map.on('zoomend', () => { cv.style.opacity = 1; cv2.style.opacity = 1; redraw(); });
+map.on('zoomend', () => { cv.style.opacity = 1; cv2.style.opacity = 1; redrawAll(); });
 map.on('moveend', () => { centerHeight(); });
-map.on('resize', () => { sizeCanvas(); redraw(); });
+map.on('resize', () => { sizeCanvas(); redrawAll(); });
 $('gridBtn').onclick = e => { state.grid = !state.grid; e.currentTarget.classList.toggle('on', state.grid); persist(); drawGrid(); };
 $('gridBtn').classList.toggle('on', state.grid);
 const DEM_Z = 15, demCache = new Map();
-function demTile(x,y){
-const key = x+'/'+y;
-if (!demCache.has(key)) demCache.set(key, new Promise((res,rej) => {
+function demTile(x,y){ return demData(DEM_Z, x, y); }
+function demData(dz, x, y){
+const key = dz+'/'+x+'/'+y;
+if (!demCache.has(key)){ if (demCache.size > 400) demCache.delete(demCache.keys().next().value); demCache.set(key, new Promise((res,rej) => {
 const img = new Image(); img.crossOrigin = 'anonymous';
 img.onload = () => { const c = document.createElement('canvas'); c.width = c.height = 256;
 const g = c.getContext('2d', {willReadFrequently:true}); g.drawImage(img,0,0);
 try { res(g.getImageData(0,0,256,256).data); } catch(e){ rej(e); } };
 img.onerror = rej;
-const du = `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${DEM_Z}/${x}/${y}.png`;
-tileGet(du).then(b => { img.src = b ? URL.createObjectURL(b) : du; });
-}));
+const du = `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${dz}/${x}/${y}.png`;
+tileGet(du).then(b => { if (!b && navigator.onLine === false){ rej(0); return; } img.src = b ? URL.createObjectURL(b) : du; });
+})); }
 const p = demCache.get(key); p.catch(() => demCache.delete(key)); return p;
 }
 async function elevation(lat, lng){
@@ -545,6 +620,7 @@ if (!a.style) a.style = {color:a.color || '#ff7a1a', name:colorName(a.color || '
 if (!a.kind) a.kind = 'main';
 if (a.kind !== 'aux' && a.ident == null) a.ident = a.name;
 if (a.kind === 'desc' && !a.numMode) a.numMode = 'auto';
+if (a.kind === 'shapes' && !Array.isArray(a.shapes)) a.shapes = [];
 if (!Array.isArray(a.points)) a.points = [];
 if (a.minZ == null) a.minZ = 0;
 if (a.lblZ == null) a.lblZ = a.kind === 'aux' && a.noIcon ? 0 : DEF_LBLZ;
@@ -581,6 +657,7 @@ function rangeText(a){
 const n = a.points.length;
 if (a.kind === 'aux') return n ? `ориентиры, ${n} шт.${a.noIcon ? ', только надписи' : ''}` : 'ориентиров нет';
 if (a.kind === 'pts') return n ? `отдельные точки, ${n} шт.` : 'точек нет';
+if (a.kind === 'shapes') return (a.shapes || []).length ? `фигуры, ${a.shapes.length} шт.` : 'фигур нет';
 if (a.kind === 'desc') return n ? `описание, ${n} т.` : 'описание без точек';
 if (a.kind === 'route') return n ? `маршрут ${labelOf(a,0)}…${labelOf(a,n-1)}, ${n} т.` : 'маршрут без точек';
 return n ? `${labelOf(a,0)}…${labelOf(a,n-1)}, ${n} т.` : 'нет точек';
@@ -621,6 +698,7 @@ state.arrays.forEach(a => {
 const active = session && session.arrId === a.id, editing = active && session.mode === 'edit';
 const op = session && !active ? .45 : 1;
 if (a.hidden && !active) return;
+if (a.kind === 'shapes'){ if (z < (a.minZ || 0)) return; drawShapes(a, z >= (a.lblZ ?? DEF_LBLZ)); return; }
 if (a.opt && !active) return;
 if (!active && z < (a.minZ || 0)) return;
 const showLb = editing || active || z >= (a.lblZ ?? DEF_LBLZ);
@@ -653,9 +731,8 @@ let rmT = 0;
 map.on('moveend', () => { clearTimeout(rmT); rmT = setTimeout(renderMarkers, 120); });
 const TREE_PTS = [[0,-20],[5,-13],[2.5,-13],[6,-7],[3,-7],[7.5,-2],[-7.5,-2],[-3,-7],[-6,-7],[-2.5,-13],[-5,-13]];
 function drawOpt(){
-L.DomUtil.setPosition(cv2, map.containerPointToLayerPoint([0,0]));
-ctx2.setTransform(dpr,0,0,dpr,0,0); ctx2.clearRect(0,0,W,H);
-const z = map.getZoom(), b = map.getBounds().pad(0.05);
+const BX = canvasBox(cv2, ctx2);
+const z = map.getZoom(), b = map.getBounds().pad(0.3);
 const S = b.getSouth(), N = b.getNorth(), Wd = b.getWest(), Ed = b.getEast();
 let labels = 0;
 const lbl = (t, x, y, italic, center) => {
@@ -673,12 +750,12 @@ ctx2.globalAlpha = session ? .45 : 1;
 const showLb = z >= (a.lblZ ?? DEF_LBLZ);
 if (a.kind === 'route' && a.points.length > 1){
 ctx2.beginPath();
-a.points.forEach((p,i) => { const q = map.latLngToContainerPoint([p.lat,p.lng]); i ? ctx2.lineTo(q.x,q.y) : ctx2.moveTo(q.x,q.y); });
+a.points.forEach((p,i) => { const q = map.latLngToLayerPoint([p.lat,p.lng]).subtract(BX.o); i ? ctx2.lineTo(q.x,q.y) : ctx2.moveTo(q.x,q.y); });
 ctx2.strokeStyle = a.style.color; ctx2.lineWidth = 3.5; ctx2.stroke();
 }
 a.points.forEach((p,i) => {
 if (p.lat < S || p.lat > N || p.lng < Wd || p.lng > Ed) return;
-const q = map.latLngToContainerPoint([p.lat,p.lng]);
+const q = map.latLngToLayerPoint([p.lat,p.lng]).subtract(BX.o);
 if (a.kind === 'aux'){
 if (!a.noIcon){
 ctx2.beginPath(); TREE_PTS.forEach(([dx,dy],k) => k ? ctx2.lineTo(q.x+dx, q.y+dy) : ctx2.moveTo(q.x+dx, q.y+dy)); ctx2.closePath();
@@ -706,8 +783,8 @@ elevation(p.lat, p.lng).then(h => { if (!p.hManual){ p.h = h; persist(); sheetSo
 }
 const PDB_KEY = 'sk42_placedb';
 let pdb = [], idb = null;
-function idbOpen(){ return new Promise(res => { try { const r = indexedDB.open('skat', 2);
-r.onupgradeneeded = () => { const d = r.result; if (!d.objectStoreNames.contains('regions')) d.createObjectStore('regions', {keyPath:'id'}); if (!d.objectStoreNames.contains('tiles')) d.createObjectStore('tiles'); };
+function idbOpen(){ return new Promise(res => { try { const r = indexedDB.open('skat', 3);
+r.onupgradeneeded = () => { const d = r.result; if (!d.objectStoreNames.contains('regions')) d.createObjectStore('regions', {keyPath:'id'}); if (!d.objectStoreNames.contains('tiles')) d.createObjectStore('tiles'); if (!d.objectStoreNames.contains('maps')) d.createObjectStore('maps', {keyPath:'id'}); };
 r.onsuccess = () => res(r.result); r.onerror = () => res(null); r.onblocked = () => res(null); } catch(e){ res(null); } }); }
 const idbReady = idbOpen().then(d => { idb = d; return d; });
 function tst(mode){ return idb.transaction('tiles', mode).objectStore('tiles'); }
@@ -716,14 +793,20 @@ const keysReady = idbReady.then(() => tileKeys()).then(k => { savedKeys = new Se
 function queuePut(u, b){ putQ.push([u, b]); savedKeys.add(u); if (!putT) putT = setTimeout(() => { putT = 0; const q = putQ; putQ = []; tilePutMany(q); }, 800); }
 const noCors = new Set();
 function b64blob(d){ const bin = atob(d), n = bin.length, a = new Uint8Array(n); for (let i = 0; i < n; i++) a[i] = bin.charCodeAt(i); return new Blob([a]); }
-async function netBlob(u){
+async function netBlob(u, signal){
 const H = NATIVE && window.Capacitor.Plugins && window.Capacitor.Plugins.CapacitorHttp;
 if (H){ const r = await H.get({url:u, responseType:'blob', connectTimeout:15000, readTimeout:20000});
 if (r.status < 200 || r.status >= 300 || typeof r.data !== 'string' || !r.data) throw 0; return b64blob(r.data); }
 const host = new URL(u).hostname; if (noCors.has(host)) throw 0;
-try { const r = await fetch(u, {mode:'cors'}); if (!r.ok) throw 0; const b = await r.blob(); if (!b.size) throw 0; return b; }
+try { const r = await fetch(u, {mode:'cors', signal}); if (!r.ok) throw 0; const b = await r.blob(); if (!b.size) throw 0; return b; }
 catch(e){ noCors.add(host); throw e; }
 }
+let getQ = [], getT = 0;
+function tileGetFast(u){ return new Promise(res => { getQ.push([u, res]); if (!getT) getT = setTimeout(flushGets, 0); }); }
+function flushGets(){ getT = 0; const q = getQ; getQ = [];
+idbReady.then(d => { if (!d){ q.forEach(([, r]) => r(null)); return; }
+try { const st = tst('readonly'); q.forEach(([u, r]) => { const g = st.get(u); g.onsuccess = () => r(g.result || null); g.onerror = () => r(null); }); }
+catch(e){ q.forEach(([, r]) => r(null)); } }); }
 function tileGet(u){ return idbReady.then(d => !d ? null : new Promise(res => { try { const q = tst('readonly').get(u); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); } catch(e){ res(null); } })); }
 function tileHas(u){ return idbReady.then(d => !d ? false : new Promise(res => { try { const q = tst('readonly').getKey(u); q.onsuccess = () => res(q.result !== undefined); q.onerror = () => res(false); } catch(e){ res(false); } })); }
 function tilePutMany(list){ return idbReady.then(d => !d ? 0 : new Promise(res => { try { const tx = idb.transaction('tiles', 'readwrite'), st = tx.objectStore('tiles'); list.forEach(([u, b]) => st.put(b, u)); tx.oncomplete = () => { list.forEach(([u]) => savedKeys.add(u)); res(list.length); }; tx.onerror = tx.onabort = () => res(0); } catch(e){ res(0); } })); }
@@ -791,12 +874,11 @@ netMsg(''); placeCache.clear(); drawPlaces(); setLayer(state.layer); pdbInfo();
 toast(`Загружено: ${h.tiles.length} тайлов карт${addN ? `, ${addN} населённых пунктов` : ''}`);
 } catch(e){ netMsg(''); toast('Не удалось прочитать файл карт'); }
 }
-$('offExp').onclick = () => { closeModals(); exportOffline(); };
 $('offImp').onclick = () => $('offIn').click();
-$('offIn').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f){ closeModals(); importOffline(f); } };
-$('tilesClr').onclick = () => askConfirm('Удалить все сохранённые для переноса карты?', 'Удалить', async () => { await tileClear(); setLayer(state.layer); pdbInfo(); toast('Карты удалены'); });
+$('offIn').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f){ closeModals(); importAny(f); } };
+$('tilesClr').onclick = () => askConfirm('Удалить все сохранённые карты, включая загруженные файлы?', 'Удалить', async () => { await tileClear(); await mapsClear(); pdbInfo(); toast('Карты удалены'); });
 function pdbInfo(){
-tileInfo();
+tileInfo(); renderMapList();
 const n = pdb.reduce((sum, r) => sum + r.items.length, 0);
 $('pdbInfo').innerHTML = pdb.length ? `В памяти: <b>${n}</b> населённых пунктов (участков: ${pdb.length}).` : 'База пока пуста.';
 const sw = !framed && 'serviceWorker' in navigator && navigator.serviceWorker.controller;
@@ -864,7 +946,7 @@ $('pdbBtn').disabled = false;
 $('pdbBtn').onclick = downloadPlaceDb;
 $('pdbClr').onclick = () => askConfirm('Очистить сохранённую базу населённых пунктов?', 'Очистить', () => { pdbClear(); placeCache.clear(); pdbInfo(); drawPlaces(); });
 let placeWarned = false;
-const plcPane = map.createPane('placePane'); plcPane.style.zIndex = 450; plcPane.style.pointerEvents = 'none';
+const plcPane = map.createPane('placePane', NROTP); plcPane.style.zIndex = 450; plcPane.style.pointerEvents = 'none';
 const plcLayer = L.layerGroup().addTo(map);
 let plcTimer = 0, plcGen = 0;
 const PLC_RANK = {city:0, town:1, village:2, hamlet:3};
@@ -910,6 +992,7 @@ return nearestPlace(p.lat, p.lng).then(n => { if (!p.placeManual){ p.place = n; 
 }
 let vCancel = null;
 function startSession(id, mode, isNew=false){
+if (tool.on) closeTools();
 const a = arrById(id); a.hidden = false;
 session = {arrId:id, mode, snap:JSON.stringify(a.points), isNew, style:null, mini:true};
 document.body.classList.toggle('picking', mode==='pick');
@@ -942,7 +1025,7 @@ const p = {lat:ll.lat, lng:ll.lng, h:null, place:''};
 if (session.style && !sameSt(session.style, a.style)) p.style = copySt(session.style);
 a.points.push(p); fillHeight(p); fillPlace(p); persist(); renderMarkers(); renderSheet();
 }
-map.on('click', e => { if (session && session.mode === 'pick') addPoint(e.latlng); });
+map.on('click', e => { if (session && session.mode === 'pick') addPoint(e.latlng); else if (!session && tool.on) toolAdd(e.latlng); });
 const sheet = $('sheet');
 { let sy = 0; sheet.addEventListener('touchstart', e => { sy = e.touches[0].clientY; }, {passive:true});
 sheet.addEventListener('touchend', e => { if (!session) return; const dy = e.changedTouches[0].clientY - sy;
@@ -952,16 +1035,16 @@ const EYE_OFF = '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7c2.2 0 4 .8 5
 function renderLayers(){
 const el = $('layList');
 el.innerHTML = state.arrays.length ? state.arrays.map(a => `<div class="arr${a.hidden?' off':''}" data-id="${a.id}">
-${a.kind==='aux' ? `<span class="swt">${TREE(a.style.color)}</span>` : a.kind==='desc' ? `<span class="sw ex" style="background:${a.style.color}">!</span>` : `<span class="sw${a.kind==='route'?' rt':a.kind==='pts'?' one':''}" style="background:${a.style.color}"></span>`}
+${a.kind==='aux' ? `<span class="swt">${TREE(a.style.color)}</span>` : a.kind==='shapes' ? `<span class="sw shp" style="background:${a.style.color}"></span>` : a.kind==='desc' ? `<span class="sw ex" style="background:${a.style.color}">!</span>` : `<span class="sw${a.kind==='route'?' rt':a.kind==='pts'?' one':''}" style="background:${a.style.color}"></span>`}
 <div class="nm"><div>${escapeHtml(a.name)}</div><div>${escapeHtml(rangeText(a))}</div></div>
-<button data-act="pick">Точки</button><button data-act="tbl">Таблица</button>
+<button data-act="pick">${a.kind==='shapes' ? 'Рисовать' : 'Точки'}</button><button data-act="tbl">Таблица</button>
 ${a.kind==='aux' ? `<button class="eye${a.noIcon?' off':''}" data-act="ico" title="${a.noIcon?'Показать ёлочки':'Только надписи'}">${TREE_BTN}</button>` : ''}
 <button class="eye ${a.opt?'lit':'dim'}" data-act="opt" title="${a.opt?'Оптимизирован':'Оптимизировать'}">${BOLT}</button>
 <button class="eye${a.hidden?' off':''}" data-act="eye" title="${a.hidden?'Показать':'Скрыть'}">${a.hidden?EYE_OFF:EYE_ON}</button></div>`).join('')
 : '<div class="empty">Слоёв пока нет. Создайте слой или импортируйте CSV.</div>';
 el.querySelectorAll('.arr').forEach(r => {
 const id = +r.dataset.id, a = arrById(id);
-r.querySelector('[data-act=pick]').onclick = () => startSession(id, 'pick');
+r.querySelector('[data-act=pick]').onclick = () => { if (a.kind === 'shapes'){ closeModals(); openTools(id); } else startSession(id, 'pick'); };
 r.querySelector('[data-act=tbl]').onclick = () => openTable(id);
 const ib = r.querySelector('[data-act=ico]');
 if (ib) ib.onclick = () => { a.noIcon = !a.noIcon; persist(); renderMarkers(); renderLayers(); toast(a.noIcon ? 'Только надписи' : 'Ёлочки и надписи'); };
@@ -1014,9 +1097,10 @@ $('commit').onclick = () => endSession(true);
 $('xcol').onclick = () => { session.mini = true; renderSheet(); };
 }
 }
-$('newArrBtn').disabled = !!session; $('layBtn').disabled = !!session;
-$('expBtn').disabled = !!session || !state.arrays.some(a => a.points.length);
-requestAnimationFrame(() => document.documentElement.style.setProperty('--sheet-h', (session ? sheet.offsetHeight + 4 : 0) + 'px'));
+$('newArrBtn').disabled = !!session; $('layBtn').disabled = !!session; $('setBtn').disabled = !!session; $('v3Btn').disabled = !!session;
+$('expBtn').disabled = !!session || !state.arrays.some(a => a.points.length || (a.shapes && a.shapes.length));
+$('toolBtn').disabled = !!session;
+setSheetH();
 }
 function openModal(id){ const m = $(id); m.classList.add('open'); const c = m.querySelector('.card'); if (c){ c.classList.remove('full'); c.style.height = ''; c.scrollTop = 0; } }
 function closeModal(m){ m.classList.remove('open'); }
@@ -1123,6 +1207,8 @@ startSession(id, 'pick', true);
 };
 let tblId = null;
 function openTable(id){
+if (arrById(id).kind === 'shapes'){ openShapeTable(id); return; }
+$('tblEdit').style.display = ''; $('tblPick').textContent = 'Добавить точки';
 tblId = id; const a = arrById(id), aux = a.kind === 'aux', route = a.kind === 'route', desc = a.kind === 'desc';
 $('tblTitle').textContent = a.name + (aux ? ' (ориентиры)' : route ? ' (маршрут)' : a.kind === 'pts' ? ' (отдельные точки)' : desc ? ' (описание)' : '');
 const heads = aux ? ['Название','X','Y','Квадрат'] : desc ? ['№ п/п','Наименование','Местоположение','Примечание','Населённый пункт'] : ['Идентификатор','Точка','X','Y','H','Квадрат','Нас. пункт','Комментарий','Цвет'];
@@ -1139,7 +1225,7 @@ $('tblXlsx').disabled = !rows.length; $('tblEdit').disabled = !rows.length;
 openModal('tblModal');
 }
 $('tblXlsx').onclick = () => { const a = arrById(tblId); a.kind === 'aux' ? exportAuxCsv(a) : exportXlsx([a], a.name); };
-$('tblPick').onclick = () => startSession(tblId, 'pick');
+$('tblPick').onclick = () => { if (arrById(tblId).kind === 'shapes'){ closeModals(); openTools(tblId); } else startSession(tblId, 'pick'); };
 $('tblEdit').onclick = () => startSession(tblId, 'edit');
 $('tblNum').onclick = () => { closeModals(); openArrModal(tblId); };
 $('tblDel').onclick = () => { const a = arrById(tblId); askConfirm(`Удалить «${a.name}» со всеми точками?`, 'Удалить', () => { state.arrays = state.arrays.filter(x => x.id !== tblId); persist(); closeModals(); renderMarkers(); renderSheet(); toast('Слой удалён'); }); };
@@ -1204,6 +1290,10 @@ const sheetOf = (list, title) => { const aoa = [head];
 list.forEach(a => rowsOf(a).forEach(r => aoa.push([r.ident, r.id, r.x, r.y, r.h === '' ? '' : r.h, r.sq, r.place, r.comment, styleText(r.st)])));
 if (aoa.length > 1){ const ws = XLSX.utils.aoa_to_sheet(aoa); textify(ws, aoa.length, ['A','B','C','D','F','G','H','I']); ws['!cols'] = colsW; XLSX.utils.book_append_sheet(wb, ws, title); } };
 sheetOf(mains, 'Точки'); sheetOf(routes, 'Маршруты');
+const shp = [['Слой','Название','Фигура','Длина / периметр, м','Площадь, м²','Центр X','Центр Y']];
+arrs.filter(a => a.kind === 'shapes').forEach(a => (a.shapes || []).forEach(sh => { const g = shapeGeo(sh), c = GEO.toSK(g.c.lat, g.c.lng);
+shp.push([a.name, sh.name || '', SHAPE_NAMES[sh.type], Math.round(g.len || g.per || 0), g.area ? Math.round(g.area) : '', pad5(c.x), pad5(c.y)]); }));
+if (shp.length > 1){ const ws = XLSX.utils.aoa_to_sheet(shp); textify(ws, shp.length, ['A','B','C','F','G']); ws['!cols'] = [{wch:14},{wch:20},{wch:14},{wch:12},{wch:12},{wch:8},{wch:8}]; XLSX.utils.book_append_sheet(wb, ws, 'Фигуры'); }
 const ds = [['№ п/п','Наименование','Местоположение','Примечание','Населённый пункт']];
 descs.forEach(a => descRowsOf(a).forEach(r => ds.push([r.n, r.id, r.loc, r.note, r.place])));
 if (ds.length > 1){ const ws = XLSX.utils.aoa_to_sheet(ds); textify(ws, ds.length, ['B','C','D','E']); ws['!cols'] = [{wch:7},{wch:14},{wch:48},{wch:24},{wch:20}]; XLSX.utils.book_append_sheet(wb, ws, 'Описание'); }
@@ -1283,7 +1373,7 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;',
 let tt = 0;
 function toast(msg){ const t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(tt); tt = setTimeout(() => t.style.display = 'none', 2600); }
 $('newArrBtn').onclick = () => openArrModal();
-$('expBtn').onclick = () => exportXlsx(state.arrays, 'СКАТ_точки');
+$('expBtn').onclick = () => { closeModals(); exportXlsx(state.arrays, 'СКАТ_точки'); };
 $('searchBtn').onclick = () => { $('sErr').textContent = ''; openModal('srchModal'); setTimeout(() => $('sQ').focus(), 50); };
 $('sQ').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 $('sGo').onclick = () => doSearch();
@@ -1355,6 +1445,7 @@ const n = P.z1 >= P.z0 ? dlCount(P.km, P.z0, P.z1, P.dem) : 0, mb = Math.round(n
 let msg = `Тайлов: <b>${n.toLocaleString('ru-RU')}</b>, примерно <b>${mb} МБ</b>.`, ok = n > 0;
 if (!idb){ msg = 'Хранилище устройства недоступно в этом режиме.'; ok = false; }
 else if (osm){ msg = 'Правила OpenStreetMap запрещают массовое скачивание. Выберите другую подложку.'; ok = false; }
+else if (LAYERS[state.layer].local){ msg = 'Эта карта уже из файла и хранится на устройстве.'; ok = false; }
 else if (P.z1 < P.z0){ msg = 'Масштаб «по» должен быть не меньше «с».'; ok = false; }
 else if (n > DL_CAP){ msg += ` Это больше лимита ${DL_CAP.toLocaleString('ru-RU')} за раз — уменьшите радиус или верхний масштаб.`; ok = false; }
 $('dlEst').innerHTML = msg; $('dlGo').disabled = !ok;
@@ -1370,29 +1461,469 @@ dlUpdate(); openModal('dlModal');
 function fillZSel2(el, v, mx){ let h = ''; for (let z = 6; z <= mx; z++) h += `<option value="${z}"${z===v?' selected':''}>${z}</option>`; el.innerHTML = h; }
 ['dlKm','dlZ0','dlZ1','dlDem'].forEach(id => { $(id).addEventListener('input', dlUpdate); $(id).addEventListener('change', dlUpdate); });
 $('mapDlBtn').onclick = openDl;
-$('dlStop').onclick = () => { dlStopF = true; };
+let dlCtl = null;
+function dlBar(t){ const b = $('dlbar'); if (t){ $('dlbarT').textContent = t; b.style.display = 'flex'; } else b.style.display = 'none'; }
+function dlStopNow(){ if (!dlBusy) return; dlStopF = true; try { dlCtl && dlCtl.abort(); } catch(e){} $('dlStop').style.display = 'none'; dlBar(''); $('dlProg').textContent = 'Останавливаю…'; }
+$('dlStop').onclick = dlStopNow; $('dlbarStop').onclick = dlStopNow;
 $('dlGo').onclick = async () => {
 if (dlBusy) return;
 const P = dlParams(), total = dlCount(P.km, P.z0, P.z1, P.dem), it = dlTiles(P.km, P.z0, P.z1, P.dem);
-dlBusy = true; dlStopF = false; $('dlGo').disabled = true; $('dlStop').style.display = '';
+dlBusy = true; dlStopF = false; dlCtl = new AbortController(); $('dlGo').disabled = true; $('dlStop').style.display = '';
 let done = 0, err = 0, nocopy = 0, buf = [];
-const show = () => { const t = `Сохранено ${done.toLocaleString('ru-RU')} из ${total.toLocaleString('ru-RU')}${nocopy ? `, без переноса ${nocopy}` : ''}${err ? `, ошибок ${err}` : ''}`; $('dlProg').textContent = t; netMsg('🗺 ' + t); };
+const show = () => { const t = `Сохранено ${done.toLocaleString('ru-RU')} из ${total.toLocaleString('ru-RU')}${nocopy ? `, без переноса ${nocopy}` : ''}${err ? `, ошибок ${err}` : ''}`; if (dlStopF) return; $('dlProg').textContent = t; dlBar('🗺 ' + t); };
 const flush = async () => { if (buf.length){ const b = buf; buf = []; await tilePutMany(b); } };
 const worker = async () => { for (;;){ if (dlStopF) return; const n = it.next(); if (n.done) return; const u = n.value;
 if (!savedKeys.has(u)){
-try { buf.push([u, await netBlob(u)]); if (buf.length >= 40) await flush(); }
-catch(e){ if (NATIVE){ err++; } else { nocopy++; try { await fetch(u, {mode:'no-cors'}); } catch(_){ err++; } } }
+try { const b = await netBlob(u, dlCtl.signal); if (dlStopF) return; buf.push([u, b]); if (buf.length >= 40) await flush(); }
+catch(e){ if (dlStopF) return; if (NATIVE){ err++; } else { nocopy++; try { await fetch(u, {mode:'no-cors', signal:dlCtl.signal}); } catch(_){ err++; } } }
 }
 done++; if (done % 25 === 0) show(); } };
 show();
 await Promise.all(Array.from({length:6}, worker));
 await flush();
-dlBusy = false; $('dlStop').style.display = 'none'; netMsg('');
+dlBusy = false; $('dlStop').style.display = 'none'; dlBar('');
 toast(dlStopF ? `Остановлено: сохранено ${done} тайлов` : nocopy && nocopy >= done - err ? 'Эта подложка не разрешает копирование: карта сохранена только для офлайна на этом устройстве, в файл для переноса не попадёт.' : `Карта района сохранена: ${done} тайлов${err ? `, ошибок ${err}` : ''}`);
 pdbInfo();
-show(); netMsg(''); dlUpdate();
+if (!dlStopF) show(); else $('dlProg').textContent = `Остановлено: сохранено ${done} тайлов`; dlBar(''); dlUpdate();
 };
-$('layBtn').onclick = () => { openModal('layModal'); renderLayers(); pdbInfo(); };
+const SQLJS = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/';
+let SQLp = null;
+function loadSQL(){ if (SQLp) return SQLp;
+SQLp = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = SQLJS + 'sql-wasm.js';
+sc.onload = () => initSqlJs({locateFile: f => SQLJS + f}).then(res, rej);
+sc.onerror = () => { SQLp = null; rej(new Error('sql')); }; document.head.appendChild(sc); });
+SQLp.catch(() => { SQLp = null; }); return SQLp; }
+let mbMaps = [];
+function mapsAll(){ return idbReady.then(d => !d ? [] : new Promise(res => { try { const q = idb.transaction('maps').objectStore('maps').getAll(); q.onsuccess = () => res(q.result || []); q.onerror = () => res([]); } catch(e){ res([]); } })); }
+function mapsPut(m){ return idbReady.then(d => d && new Promise(res => { try { const tx = idb.transaction('maps', 'readwrite'); tx.objectStore('maps').put(m); tx.oncomplete = () => res(); tx.onerror = () => res(); } catch(e){ res(); } })); }
+function registerMap(m){ LAYERS['mb_' + m.id] = {short:(m.name || 'Файл').slice(0, 8), name:'Файл: ' + m.name, crs:m.crs || '3857', max:m.maxzoom || 18, min:m.minzoom || 0, urls:[`mb:${m.id}/{z}/{x}/{y}`], attr:m.name, local:true, dark:true, m}; }
+function rebuildSel(){ sel.innerHTML = ''; Object.entries(LAYERS).forEach(([k, d]) => sel.add(new Option(d.name, k))); sel.value = state.layer; }
+function fitMap(m){ const b = String(m.bounds || '').split(',').map(Number); if (b.length === 4 && b.every(isFinite)) map.fitBounds([[b[1], b[0]], [b[3], b[2]]]); }
+async function deleteMap(m){
+await idbReady; if (!idb) return;
+await new Promise(res => { try { const tx = idb.transaction(['tiles', 'maps'], 'readwrite'); tx.objectStore('tiles').delete(IDBKeyRange.bound(`mb:${m.id}/`, `mb:${m.id}/\uffff`)); tx.objectStore('maps').delete(m.id); tx.oncomplete = () => res(); tx.onerror = () => res(); } catch(e){ res(); } });
+const pre = `mb:${m.id}/`; for (const k of [...savedKeys]) if (k.startsWith(pre)) savedKeys.delete(k);
+mbMaps = mbMaps.filter(x => x.id !== m.id); delete LAYERS['mb_' + m.id];
+if (state.layer === 'mb_' + m.id) setLayer('ya_hyb'); rebuildSel(); pdbInfo(); toast('Карта удалена');
+}
+async function mapsClear(){
+await idbReady; if (idb){ try { const tx = idb.transaction('maps', 'readwrite'); tx.objectStore('maps').clear(); } catch(e){} }
+mbMaps.forEach(m => delete LAYERS['mb_' + m.id]); mbMaps = [];
+if (!LAYERS[state.layer]) state.layer = 'ya_hyb'; rebuildSel(); setLayer(state.layer);
+}
+function renderMapList(){
+const el = $('mapList'); if (!el) return;
+el.innerHTML = mbMaps.length ? mbMaps.map(m => `<div class="arr" data-id="${m.id}"><span class="sw one" style="background:#3c8f6a"></span><div class="nm"><div>${escapeHtml(m.name)}</div><div>масшт. ${m.minzoom}–${m.maxzoom} · ${Number(m.count).toLocaleString('ru-RU')} тайлов${m.crs === '3395' ? ' · проекция Яндекса' : ''}</div></div><button data-act="show">${state.layer === 'mb_' + m.id ? 'Выбрана' : 'Показать'}</button><button class="eye" data-act="del" title="Удалить">🗑</button></div>`).join('')
+: '<div class="empty">Файлов карт пока нет.</div>';
+el.querySelectorAll('.arr').forEach(r => { const m = mbMaps.find(x => x.id === r.dataset.id);
+r.querySelector('[data-act=show]').onclick = () => { closeModals(); setLayer('mb_' + m.id); sel.value = state.layer; fitMap(m); };
+r.querySelector('[data-act=del]').onclick = () => askConfirm(`Удалить карту «${m.name}»?`, 'Удалить', () => deleteMap(m)); });
+}
+const wantLayer = saved.layer;
+idbReady.then(() => mapsAll()).then(list => { mbMaps = list.sort((a, b) => a.t - b.t); mbMaps.forEach(registerMap); rebuildSel();
+if (LAYERS[wantLayer] && state.layer !== wantLayer){ setLayer(wantLayer); sel.value = wantLayer; } });
+async function magic(f){ return new TextDecoder().decode(await f.slice(0, 16).arrayBuffer()); }
+async function importAny(f){
+const m = await magic(f);
+if (m.startsWith('SKT1')) return importOffline(f);
+if (m.startsWith('SQLite format 3')) return importMbtiles(f);
+if (m.trim().startsWith('{')) return importPlaces(f);
+toast('Неизвестный формат файла. Нужен .mbtiles, .skat или файл н.п.');
+}
+async function importMbtiles(f){
+let db = null;
+try {
+if (f.size > 700 * 1048576) toast('Файл больше 700 МБ — может не хватить памяти. Лучше разделить район.');
+netMsg('Подключаю модуль карт…');
+const SQL = await loadSQL();
+netMsg('Читаю файл карты…');
+db = new SQL.Database(new Uint8Array(await f.arrayBuffer()));
+const meta = {};
+try { const r = db.exec('SELECT name, value FROM metadata'); if (r[0]) r[0].values.forEach(([k, v]) => { meta[k] = v; }); } catch(e){}
+const total = db.exec('SELECT COUNT(*) FROM tiles')[0].values[0][0];
+const id = String(Date.now()), xyz = meta.scheme === 'xyz';
+const st = db.prepare('SELECT zoom_level, tile_column, tile_row, tile_data FROM tiles');
+let n = 0, batch = [], zmin = 99, zmax = 0;
+while (st.step()){
+const [z, x, row, data] = st.get(); if (!data) continue;
+const y = xyz ? row : (Math.pow(2, z) - 1 - row);
+batch.push([`mb:${id}/${z}/${x}/${y}`, new Blob([data])]); zmin = Math.min(zmin, z); zmax = Math.max(zmax, z); n++;
+if (batch.length >= 300){ await tilePutMany(batch); batch = []; netMsg(`Загружаю карту: ${n.toLocaleString('ru-RU')} из ${total.toLocaleString('ru-RU')}`); }
+}
+st.free(); if (batch.length) await tilePutMany(batch);
+db.close(); db = null;
+const mm = {id, name:meta.name || f.name.replace(/\.[^.]+$/, ''), minzoom:n ? zmin : 0, maxzoom:n ? zmax : 18, bounds:meta.bounds || '', crs:meta.skat_crs === '3395' ? '3395' : '3857', count:n, t:Date.now()};
+await mapsPut(mm); mbMaps.push(mm); registerMap(mm); rebuildSel();
+netMsg(''); setLayer('mb_' + id); sel.value = state.layer; fitMap(mm);
+toast(`Карта «${mm.name}» загружена: ${n.toLocaleString('ru-RU')} тайлов`);
+} catch(e){ try { db && db.close(); } catch(_){} netMsg(''); toast(SQLp === null ? 'Модуль карт не загрузился — откройте один раз с интернетом.' : 'Не удалось прочитать файл .mbtiles'); }
+}
+function tmplRe(t){
+const esc = t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+return new RegExp('^' + esc.replace('\\{s\\}', '[abc]').replace('\\{x\\}', '(?<x>\\d+)').replace('\\{y\\}', '(?<y>\\d+)').replace('\\{z\\}', '(?<z>\\d+)') + '$');
+}
+async function exportMbtiles(){
+const def = LAYERS[state.layer], re = tmplRe(def.urls[0]), list = [];
+for (const k of savedKeys){ const g = k.match(re); if (g) list.push([+g.groups.z, +g.groups.x, +g.groups.y, k]); }
+if (!list.length){ toast('Для этой подложки нет сохранённых тайлов. Сначала «Сохранить карту района».'); return; }
+let db = null;
+try {
+netMsg('Подключаю модуль карт…');
+const SQL = await loadSQL(); db = new SQL.Database();
+db.run('CREATE TABLE metadata (name text, value text); CREATE TABLE tiles (zoom_level integer, tile_column integer, tile_row integer, tile_data blob); CREATE UNIQUE INDEX tile_index on tiles (zoom_level, tile_column, tile_row);');
+const ins = db.prepare('INSERT OR REPLACE INTO tiles VALUES (?,?,?,?)');
+let zmin = 99, zmax = 0, fmt = 'png', crs = crsOf(state.layer), W = 180, E = -180, S = 90, N = -90;
+for (let i = 0; i < list.length; i += 300){
+const part = list.slice(i, i + 300), vals = await tileGetMany(part.map(r => r[3]));
+for (let j = 0; j < part.length; j++){ const b = vals[j]; if (!b) continue; const [z, x, y] = part[j];
+const u8 = new Uint8Array(await b.arrayBuffer()); if (i === 0 && j === 0 && u8[0] === 0xFF) fmt = 'jpg';
+ins.run([z, x, Math.pow(2, z) - 1 - y, u8]); zmin = Math.min(zmin, z); zmax = Math.max(zmax, z);
+if (z === zmin){ const nw = crs.pointToLatLng(L.point(x * 256, y * 256), z), se = crs.pointToLatLng(L.point((x + 1) * 256, (y + 1) * 256), z);
+W = Math.min(W, nw.lng); E = Math.max(E, se.lng); N = Math.max(N, nw.lat); S = Math.min(S, se.lat); } }
+netMsg(`Готовлю файл: ${Math.min(i + 300, list.length).toLocaleString('ru-RU')} из ${list.length.toLocaleString('ru-RU')}`);
+}
+ins.free();
+const md = {name:`СКАТ ${def.short}`, format:fmt, minzoom:zmin, maxzoom:zmax, bounds:[W, S, E, N].map(v => v.toFixed(5)).join(','), type:'baselayer', version:'1.1', scheme:'tms', skat_crs:def.crs};
+const mi = db.prepare('INSERT INTO metadata VALUES (?,?)'); Object.entries(md).forEach(([k, v]) => mi.run([k, String(v)])); mi.free();
+const out = db.export(); db.close(); db = null; netMsg('');
+deliverFile(new Blob([out], {type:'application/octet-stream'}), `СКАТ_${safeName(def.short)}_${stamp()}.mbtiles`,
+`Карта готова: ${list.length} тайлов, ${Math.max(1, Math.round(out.length / 1048576))} МБ${def.crs === '3395' ? ' (проекция Яндекса: в СКАТ откроется точно, в других программах возможен сдвиг)' : ''}`);
+} catch(e){ try { db && db.close(); } catch(_){} netMsg(''); toast('Не удалось подготовить файл .mbtiles'); }
+}
+function exportPlaces(){
+if (!pdb.length){ toast('База н.п. пуста'); return; }
+const data = {app:'skat', type:'places', saved:new Date().toISOString(), pdb:pdb.map(r => ({s:r.s, w:r.w, n:r.n, e:r.e, t:r.t, items:r.items}))};
+deliverFile(new Blob([JSON.stringify(data)], {type:'application/json'}), `СКАТ_нп_${stamp()}.json`, `Файл н.п. готов: ${pdb.reduce((a, r) => a + r.items.length, 0)} пунктов`);
+}
+async function importPlaces(f){
+try { const d = JSON.parse(await f.text());
+if (!d || !Array.isArray(d.pdb)){ toast(Array.isArray(d && d.arrays) ? 'Это файл сессии — загрузите его через «Загрузить сессию».' : 'В файле нет населённых пунктов'); return; }
+let add = 0;
+d.pdb.forEach(r => { if (!pdb.some(q => covers(q, r.s, r.w, r.n, r.e))){ const x = {...r, id:Date.now() + Math.random()}; pdb.push(x); pdbPut(x); add += r.items.length; } });
+placeCache.clear(); drawPlaces(); pdbInfo(); toast(add ? `Добавлено населённых пунктов: ${add}` : 'Эти районы уже есть в базе');
+} catch(e){ toast('Не удалось прочитать файл н.п.'); }
+}
+$('mbExp').onclick = () => { closeModals(); exportMbtiles(); };
+$('pdbExp').onclick = () => { closeModals(); exportPlaces(); };
+$('pdbImp').onclick = () => $('offIn').click();
+// ======== ИНСТРУМЕНТЫ ========
+const SHAPE_NAMES = {line:'Линия', poly:'Многоугольник', rect:'Прямоугольник', circle:'Круг'};
+const MODE_NAMES = {line:'Линейка', poly:'Многоугольник', rect:'Прямоугольник', circle:'Круг'};
+const tool = {on:false, mode:'line', pts:[], r:0, color:null, op:35, mini:false, target:null};
+const toolLayer = L.layerGroup().addTo(map);
+const fmtDist = d => d < 1000 ? `${Math.round(d)} м` : `${(d/1000).toFixed(2).replace('.', ',')} км`;
+function fmtArea(a){ if (a < 10000) return `${Math.round(a)} м²`; const ga = `${(a/10000).toFixed(2).replace('.', ',')} га`; return a >= 1e6 ? `${ga} (${(a/1e6).toFixed(3).replace('.', ',')} км²)` : ga; }
+const milStr = m => `${Math.floor(m/100)}-${String(m % 100).padStart(2, '0')}`;
+function segInfo(a, b, zone){
+const A = GEO.toSK(a.lat, a.lng, zone), B = GEO.toSK(b.lat, b.lng, zone), dx = B.x - A.x, dy = B.y - A.y;
+let al = Math.atan2(dy, dx) * 180 / Math.PI; if (al < 0) al += 360;
+const r = Math.PI / 180, f1 = a.lat * r, f2 = b.lat * r, dl = (b.lng - a.lng) * r;
+let az = Math.atan2(Math.sin(dl) * Math.cos(f2), Math.cos(f1) * Math.sin(f2) - Math.sin(f1) * Math.cos(f2) * Math.cos(dl)) / r; if (az < 0) az += 360;
+return {d:Math.hypot(dx, dy), mil:Math.round(al / 360 * 6000) % 6000, az};
+}
+function areaSK(pts, zone){ let s = 0; const P = pts.map(p => GEO.toSK(p.lat, p.lng, zone)); for (let i = 0; i < P.length; i++){ const a = P[i], b = P[(i+1) % P.length]; s += a.x * b.y - b.x * a.y; } return Math.abs(s) / 2; }
+function rectPts(a, b){ const z = GEO.toSK(a.lat, a.lng).zone, A = GEO.toSK(a.lat, a.lng, z), B = GEO.toSK(b.lat, b.lng, z);
+return [[A.x, A.y], [A.x, B.y], [B.x, B.y], [B.x, A.y]].map(([x, y]) => { const q = GEO.fromSK(x, y, z); return L.latLng(q[0], q[1]); }); }
+const LL = p => L.latLng(p.lat ?? p[0], p.lng ?? p[1]);
+function shapeGeo(sh){
+const pts = (sh.pts || []).map(LL);
+if (!pts.length) return {pts, len:0, c:L.latLng(0, 0)};
+const zone = GEO.toSK(pts[0].lat, pts[0].lng).zone;
+if (sh.type === 'circle'){ const r = sh.r || 0; return {pts, area:Math.PI*r*r, per:2*Math.PI*r, c:pts[0], r}; }
+const segs = []; for (let i = 1; i < pts.length; i++) segs.push(segInfo(pts[i-1], pts[i], zone));
+const len = segs.reduce((s, x) => s + x.d, 0), c = L.latLngBounds(pts).getCenter();
+if (sh.type === 'line') return {pts, segs, len, c};
+const close = pts.length > 2 ? segInfo(pts[pts.length-1], pts[0], zone).d : 0;
+return {pts, segs, per:len + close, area:pts.length > 2 ? areaSK(pts, zone) : 0, c};
+}
+function curShape(){
+const m = tool.mode, p = tool.pts;
+if (m === 'line') return p.length >= 2 ? {type:'line', pts:p} : null;
+if (m === 'poly') return p.length >= 3 ? {type:'poly', pts:p} : null;
+if (m === 'rect') return p.length === 2 ? {type:'rect', pts:rectPts(p[0], p[1])} : null;
+if (m === 'circle') return p.length && tool.r > 0 ? {type:'circle', pts:[p[0]], r:tool.r} : null;
+}
+function shapeLayer(sh, color, op, extra){
+const o = Object.assign({color, weight:2.5, opacity:.95, fillColor:color, fillOpacity:sh.type === 'line' ? 0 : op, interactive:false}, extra || {});
+const pts = sh.pts.map(LL);
+return sh.type === 'circle' ? L.circle(pts[0], Object.assign(o, {radius:sh.r})) : sh.type === 'line' ? L.polyline(pts, o) : L.polygon(pts, o);
+}
+function drawShapes(a, lbl){
+(a.shapes || []).forEach(sh => {
+markers.addLayer(shapeLayer(sh, sh.color || a.style.color, (sh.op ?? 35) / 100));
+if (lbl && sh.name){ const c = shapeGeo(sh).c; markers.addLayer(L.marker(c, {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="shl">${escapeHtml(sh.name)}</div>`})})); }
+});
+}
+function drawTool(){
+toolLayer.clearLayers();
+const col = tool.color ? tool.color.color : '#ff8a2a', sh = curShape();
+if (sh) toolLayer.addLayer(shapeLayer(sh, col, tool.op / 100, {dashArray: tool.mode === 'line' ? null : '6 4'}));
+else if (tool.pts.length >= 2 && tool.mode === 'poly') toolLayer.addLayer(L.polyline(tool.pts, {color:col, weight:2.5, dashArray:'6 4', interactive:false}));
+tool.pts.forEach(p => toolLayer.addLayer(L.circleMarker(p, {radius:5, color:'#fff', weight:2, fillColor:col, fillOpacity:1, interactive:false})));
+if (tool.mode === 'line' && tool.pts.length >= 2){
+const z = GEO.toSK(tool.pts[0].lat, tool.pts[0].lng).zone;
+for (let i = 1; i < tool.pts.length; i++){ const a = tool.pts[i-1], b = tool.pts[i], g = segInfo(a, b, z);
+toolLayer.addLayer(L.marker([(a.lat + b.lat) / 2, (a.lng + b.lng) / 2], {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="seglb">${fmtDist(g.d)} · ${milStr(g.mil)}</div>`})})); }
+}
+}
+function toolSummary(){
+const sh = curShape(), m = tool.mode;
+if (!sh) return m === 'line' ? 'Ставьте точки: от первой до последней' : m === 'poly' ? 'Ставьте вершины (не меньше трёх)' : m === 'rect' ? 'Поставьте два противоположных угла' : tool.pts.length ? 'Коснитесь края круга или введите радиус' : 'Коснитесь центра круга';
+const g = shapeGeo(sh);
+if (m === 'line'){ const last = g.segs[g.segs.length-1]; return `Длина <b>${fmtDist(g.len)}</b> · отрезков ${g.segs.length}${g.segs.length === 1 ? ` · ДУ <b>${milStr(last.mil)}</b>` : ''}`; }
+return `Площадь <b>${fmtArea(g.area)}</b> · ${m === 'circle' ? 'длина окружности' : 'периметр'} ${fmtDist(g.per)}`;
+}
+function setSheetH(){ requestAnimationFrame(() => { const h = session ? sheet.offsetHeight : tool.on ? $('tpanel').offsetHeight : 0; document.documentElement.style.setProperty('--sheet-h', (h ? h + 4 : 0) + 'px'); }); }
+function renderTool(){
+const el = $('tpanel');
+if (!tool.on){ el.classList.add('hidden'); setSheetH(); return; }
+el.classList.remove('hidden');
+const sh = curShape(), m = tool.mode, line = m === 'line';
+if (tool.mini){
+el.innerHTML = `<div class="minibar"><button class="ghost" id="tX">⌃</button><div class="mt"><b>${MODE_NAMES[m]}</b><small>${toolSummary().replace(/<[^>]+>/g, '')}</small></div><button id="tUndo" ${tool.pts.length ? '' : 'disabled'}>↶</button><button id="tCross">⊕</button><button class="ok" id="tSave" ${sh ? '' : 'disabled'}>✓</button><button class="ghost" id="tClose">✕</button></div>`;
+} else {
+let segs = '';
+if (line && sh){ const g = shapeGeo(sh); segs = g.segs.map((x, i) => `${i+1}) ${fmtDist(x.d)} · ДУ ${milStr(x.mil)} · аз. ${x.az.toFixed(1).replace('.', ',')}°`).join('<br>'); }
+el.innerHTML = `<h2>Инструменты <span><button class="ghost" id="tX" style="min-height:32px;padding:2px 10px">⌄ свернуть</button> <button class="ghost" id="tClose" style="min-height:32px;padding:2px 10px">✕</button></span></h2>
+<div class="seg" id="tSeg">${Object.entries(MODE_NAMES).map(([k, v]) => `<button data-m="${k}" class="${k === m ? 'on' : ''}">${v}</button>`).join('')}</div>
+<p class="res">${toolSummary()}</p>
+${segs ? `<div class="segs">${segs}</div>` : ''}
+${m === 'circle' && tool.pts.length ? `<label class="f">Радиус, м<input id="tR" inputmode="decimal" value="${tool.r ? Math.round(tool.r) : ''}" placeholder="например, 500"></label>` : ''}
+<div class="row" style="margin-bottom:8px"><button id="tUndo" ${tool.pts.length ? '' : 'disabled'}>↶ Убрать</button><button id="tCross">⊕ В прицел</button><button class="ghost" id="tClear" ${tool.pts.length ? '' : 'disabled'}>Сброс</button>${line ? `<button id="tProf" ${sh ? '' : 'disabled'}>Профиль высот</button>` : ''}</div>
+<div class="flabel">Цвет</div><div class="colors strip" id="tCol"></div>
+${line ? '' : `<label class="f">Прозрачность заливки: <span id="tOpV">${tool.op}%</span><input type="range" id="tOp" min="0" max="90" step="5" value="${tool.op}"></label>`}
+<label class="f">Подпись фигуры<input id="tName" autocomplete="off" placeholder="необязательно"></label>
+<div class="row"><button class="ok" id="tSave" ${sh ? '' : 'disabled'}>Сохранить фигуру в слой</button></div>`;
+$('tSeg').querySelectorAll('button').forEach(b => b.onclick = () => { tool.mode = b.dataset.m; tool.pts = []; tool.r = 0; drawTool(); renderTool(); });
+const pickC = st => { tool.color = st; renderPalette($('tCol'), tool.color, pickC); drawTool(); };
+renderPalette($('tCol'), tool.color, pickC);
+if ($('tOp')) $('tOp').oninput = e => { tool.op = +e.target.value; $('tOpV').textContent = tool.op + '%'; drawTool(); };
+if ($('tR')) $('tR').onchange = e => { const v = parseFloat(String(e.target.value).replace(',', '.')); if (v > 0){ tool.r = v; drawTool(); renderTool(); } };
+if ($('tClear')) $('tClear').onclick = () => { tool.pts = []; tool.r = 0; drawTool(); renderTool(); };
+if ($('tProf')) $('tProf').onclick = () => showProfile(tool.pts.slice());
+}
+$('tX').onclick = () => { tool.mini = !tool.mini; renderTool(); };
+$('tClose').onclick = closeTools;
+$('tUndo').onclick = () => { if (tool.mode === 'circle'){ if (tool.r){ tool.r = 0; } else tool.pts = []; } else if (tool.mode === 'rect' && tool.pts.length === 2) tool.pts.pop(); else tool.pts.pop(); drawTool(); renderTool(); };
+$('tCross').onclick = () => toolAdd(map.getCenter());
+$('tSave').onclick = saveShape;
+setSheetH();
+}
+function openTools(target){
+if (session) return;
+tool.on = true; tool.target = target || null; tool.pts = []; tool.r = 0;
+if (target){ const a = arrById(target); if (a && !tool.color) tool.color = copySt(a.style); }
+if (!tool.color) tool.color = copySt(state.palette.find(p => p.name === 'Оранжевый') || state.palette[0] || DEFAULT_PAL[2]);
+document.body.classList.add('picking'); map.doubleClickZoom.disable();
+drawTool(); renderTool();
+}
+function closeTools(){ tool.on = false; tool.pts = []; tool.r = 0; toolLayer.clearLayers(); document.body.classList.remove('picking'); map.doubleClickZoom.enable(); renderTool(); }
+function toolAdd(ll){
+const m = tool.mode;
+if (m === 'circle'){ if (!tool.pts.length || tool.r){ tool.pts = [ll]; tool.r = 0; } else tool.r = distM(tool.pts[0], ll); }
+else if (m === 'rect'){ if (tool.pts.length >= 2) tool.pts = []; tool.pts.push(ll); }
+else tool.pts.push(ll);
+drawTool(); renderTool();
+}
+function saveShape(){
+const sh = curShape(); if (!sh) return;
+let a = (tool.target && arrById(tool.target)) || state.arrays.find(x => x.kind === 'shapes');
+if (!a || a.kind !== 'shapes'){ a = normArr({id:Date.now(), kind:'shapes', name:'Фигуры', ident:'Фигуры', style:copySt(tool.color), points:[], shapes:[]}); state.arrays.push(a); }
+const nm = ($('tName') && $('tName').value.trim()) || '';
+a.shapes.push({type:sh.type, pts:sh.pts.map(p => [+p.lat.toFixed(6), +p.lng.toFixed(6)]), r:sh.r || 0, color:tool.color.color, op:tool.op, name:nm, t:Date.now()});
+tool.target = a.id; tool.pts = []; tool.r = 0;
+persistNow(); renderMarkers(); drawTool(); renderTool(); toast(`Сохранено в слой «${a.name}»`);
+}
+function openShapeTable(id){
+tblId = id; const a = arrById(id), E = escapeHtml;
+$('tblTitle').textContent = a.name + ' (фигуры)';
+$('tblHead').innerHTML = '<tr><th>№</th><th>Подпись</th><th>Фигура</th><th>Размер</th><th></th></tr>';
+$('tblBody').innerHTML = a.shapes.length ? a.shapes.map((sh, i) => { const g = shapeGeo(sh);
+return `<tr data-i="${i}"><td>${i+1}</td><td><span class="c" style="background:${sh.color}"></span><b>${E(sh.name || '—')}</b></td><td>${SHAPE_NAMES[sh.type]}</td><td>${sh.type === 'line' ? fmtDist(g.len) : fmtArea(g.area)}</td><td><button class="ghost" data-del="${i}" style="min-height:30px;padding:2px 10px">✕</button></td></tr>`; }).join('')
+: '<tr><td colspan="5" class="empty">Фигур пока нет. Нажмите «Рисовать».</td></tr>';
+$('tblBody').querySelectorAll('tr[data-i]').forEach(tr => tr.onclick = e => {
+const i = +tr.dataset.i;
+if (e.target.dataset.del != null){ e.stopPropagation(); askConfirm('Удалить фигуру?', 'Удалить', () => { a.shapes.splice(i, 1); persist(); renderMarkers(); openShapeTable(id); }); return; }
+const sh = a.shapes[i], g = shapeGeo(sh); closeModals();
+if (sh.type === 'circle') map.fitBounds(L.latLng(g.c).toBounds(g.r * 2.4)); else map.fitBounds(L.latLngBounds(g.pts).pad(0.2));
+});
+$('tblXlsx').textContent = 'Скачать Excel'; $('tblXlsx').disabled = !a.shapes.length;
+$('tblEdit').style.display = 'none'; $('tblPick').textContent = 'Рисовать';
+openModal('tblModal');
+}
+async function showProfile(pts){
+if (pts.length < 2) return;
+const z = GEO.toSK(pts[0].lat, pts[0].lng).zone, cum = [0];
+for (let i = 1; i < pts.length; i++) cum.push(cum[i-1] + segInfo(pts[i-1], pts[i], z).d);
+const tot = cum[cum.length-1], step = Math.max(10, tot / 150), samp = [];
+for (let d = 0; d <= tot + 0.01; d += step){ let i = 1; while (i < cum.length - 1 && cum[i] < d) i++;
+const t = cum[i] > cum[i-1] ? Math.min(1, (d - cum[i-1]) / (cum[i] - cum[i-1])) : 0;
+samp.push([d, pts[i-1].lat + (pts[i].lat - pts[i-1].lat) * t, pts[i-1].lng + (pts[i].lng - pts[i-1].lng) * t]); }
+if (samp[samp.length-1][0] < tot) samp.push([tot, pts[pts.length-1].lat, pts[pts.length-1].lng]);
+$('profSvg').innerHTML = ''; $('profInfo').textContent = 'Считаю высоты…'; openModal('profModal');
+let done = 0;
+const hs = await Promise.all(samp.map(([, la, lo]) => elevation(la, lo).then(h => { done++; if (done % 20 === 0) $('profInfo').textContent = `Считаю высоты: ${done} из ${samp.length}`; return h; }).catch(() => null)));
+const ok = hs.map((h, i) => [samp[i][0], h]).filter(x => x[1] != null && isFinite(x[1]));
+if (ok.length < 2){ $('profInfo').textContent = 'Высоты не получены: нет связи с матрицей высот и нет сохранённых высот для этого района.'; return; }
+const ds = ok.map(x => x[0]), H = ok.map(x => x[1]);
+let up = 0, dn = 0; for (let i = 1; i < H.length; i++){ const d = H[i] - H[i-1]; if (d > 0) up += d; else dn -= d; }
+const max = Math.max(...H), min = Math.min(...H), rg = Math.max(1, max - min), Wd = 600, Hh = 230, P = 40;
+const X = d => P + d / tot * (Wd - P - 10), Y = h => Hh - 24 - (h - min) / rg * (Hh - 44);
+const path = H.map((h, i) => `${i ? 'L' : 'M'}${X(ds[i]).toFixed(1)},${Y(h).toFixed(1)}`).join('');
+$('profSvg').innerHTML = `<svg viewBox="0 0 ${Wd} ${Hh}" style="width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px">
+<path d="${path}L${X(tot).toFixed(1)},${Hh-24}L${P},${Hh-24}Z" fill="rgba(255,138,42,.22)"/><path d="${path}" fill="none" stroke="#ff8a2a" stroke-width="2.2"/>
+<line x1="${P}" y1="${Hh-24}" x2="${Wd-10}" y2="${Hh-24}" stroke="rgba(255,255,255,.25)"/>
+<text x="6" y="${Y(max)+4}" fill="#97a393" font-size="13">${Math.round(max)}</text><text x="6" y="${Y(min)+4}" fill="#97a393" font-size="13">${Math.round(min)}</text>
+<text x="${P}" y="${Hh-6}" fill="#97a393" font-size="13">0</text><text x="${Wd-10}" y="${Hh-6}" fill="#97a393" font-size="13" text-anchor="end">${fmtDist(tot)}</text></svg>`;
+$('profInfo').innerHTML = `Длина <b>${fmtDist(tot)}</b> · высоты от <b>${Math.round(min)}</b> до <b>${Math.round(max)} м</b> · перепад <b>${Math.round(max - min)} м</b><br>Набор ↑ ${Math.round(up)} м · сброс ↓ ${Math.round(dn)} м · начало ${Math.round(H[0])} м, конец ${Math.round(H[H.length-1])} м`;
+}
+$('toolBtn').onclick = () => tool.on ? closeTools() : openTools(null);
+// ======== РЕЛЬЕФ ========
+const RAMP = [[0,[54,120,70]],[.25,[120,160,80]],[.5,[214,200,110]],[.75,[176,120,70]],[1,[245,240,235]]];
+function ramp(t){ t = Math.max(0, Math.min(1, t)); for (let i = 1; i < RAMP.length; i++) if (t <= RAMP[i][0]){ const [a, A] = RAMP[i-1], [b, B] = RAMP[i], k = (t - a) / (b - a); return A.map((v, j) => v + (B[j] - v) * k); } return RAMP[RAMP.length-1][1]; }
+async function demSampler(pts, zd){
+const S = 256 * Math.pow(2, zd), need = new Map(), px = pts.map(([la, lo]) => { const r = la * Math.PI / 180;
+const x = (lo + 180) / 360 * S, y = (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * S; const k = Math.floor(x/256) + '/' + Math.floor(y/256); need.set(k, 1); return [x, y, k]; });
+const data = {}; await Promise.all([...need.keys()].map(k => { const [tx, ty] = k.split('/').map(Number); return demData(zd, tx, ty).then(d => { data[k] = d; }).catch(() => {}); }));
+return px.map(([x, y, k]) => { const d = data[k]; if (!d) return NaN; const ix = Math.min(255, Math.floor(x) & 255), iy = Math.min(255, Math.floor(y) & 255), o = (iy*256 + ix) * 4; return d[o]*256 + d[o+1] + d[o+2]/256 - 32768; });
+}
+async function reliefTile(coords, m){
+const N = 48, z = coords.z, crs = m.options.crs, base = coords.scaleBy(L.point(256, 256));
+let zd = Math.min(15, Math.max(3, z));
+if (navigator.onLine === false){ if (z < 11) return null; zd = 15; }
+const pts = [];
+for (let j = -1; j <= N; j++) for (let i = -1; i <= N; i++){ const ll = crs.pointToLatLng(base.add(L.point((i + .5) * 256 / N, (j + .5) * 256 / N)), z); pts.push([ll.lat, ll.lng]); }
+let h = await demSampler(pts, zd);
+if (h.every(v => !isFinite(v)) && zd < 15 && navigator.onLine === false) return null;
+const M = N + 2, lat = pts[(M * M) >> 1][0], ds = 40075016.7 * Math.cos(lat * Math.PI / 180) / Math.pow(2, z) / N, ex = rel.ex;
+const c = document.createElement('canvas'); c.width = c.height = N; const g = c.getContext('2d'), im = g.createImageData(N, N);
+const zen = 45 * Math.PI / 180, az = 315 * Math.PI / 180, Lx = Math.sin(az) * Math.sin(zen), Ly = Math.cos(az) * Math.sin(zen), Lz = Math.cos(zen), rg = Math.max(1, rel.max - rel.min);
+for (let j = 0; j < N; j++) for (let i = 0; i < N; i++){
+const at = (a, b) => h[(b + 1) * M + (a + 1)], v = at(i, j), o = (j * N + i) * 4;
+if (!isFinite(v)){ im.data[o+3] = 0; continue; }
+const e = at(i+1, j), w = at(i-1, j), n = at(i, j-1), s = at(i, j+1);
+const dx = (isFinite(e) && isFinite(w) ? (e - w) : 0) / (2 * ds) * ex, dy = (isFinite(n) && isFinite(s) ? (n - s) : 0) / (2 * ds) * ex;
+const len = Math.sqrt(dx*dx + dy*dy + 1), hs = Math.max(0, (-dx * Lx - dy * Ly + Lz) / len), base0 = Lz;
+let r, gg, b, a;
+if (rel.mode === 'shade'){ if (hs < base0){ r = gg = b = 0; a = Math.min(220, (base0 - hs) / base0 * 330); } else { r = gg = b = 255; a = Math.min(120, (hs - base0) / (1 - base0) * 160); } }
+else { const col = ramp((v - rel.min) / rg); const k = rel.mode === 'both' ? Math.min(1.25, .35 + hs / base0 * .65) : 1; r = col[0] * k; gg = col[1] * k; b = col[2] * k; a = 255; }
+im.data[o] = r; im.data[o+1] = gg; im.data[o+2] = b; im.data[o+3] = a;
+}
+g.putImageData(im, 0, 0); return c;
+}
+const Relief = L.GridLayer.extend({ createTile(coords, done){
+const c = document.createElement('canvas'); c.width = c.height = 256;
+reliefTile(coords, this._map).then(img => { if (img){ const g = c.getContext('2d'); g.imageSmoothingEnabled = true; g.drawImage(img, 0, 0, 256, 256); } done(null, c); }).catch(() => done(null, c));
+return c; } });
+let reliefLayer = null;
+function applyRelief(){
+if (reliefLayer){ map.removeLayer(reliefLayer); reliefLayer = null; }
+if (rel.mode !== 'off'){ reliefLayer = new Relief({pane:'reliefPane', opacity:rel.op / 100, maxNativeZoom:16, maxZoom:20, updateWhenIdle:true, keepBuffer:1}); reliefLayer.addTo(map); }
+lsSet('skat_rel', rel);
+}
+function renderRelUI(){
+$('relSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.r === rel.mode));
+$('relEx').querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.x === rel.ex));
+$('relOp').value = rel.op; $('relOpV').textContent = rel.op + '%'; $('relMin').value = rel.min; $('relMax').value = rel.max; $('rotOn').checked = rotOn;
+}
+$('relSeg').querySelectorAll('button').forEach(b => b.onclick = () => { rel.mode = b.dataset.r; applyRelief(); renderRelUI(); });
+$('relEx').querySelectorAll('button').forEach(b => b.onclick = () => { rel.ex = +b.dataset.x; applyRelief(); renderRelUI(); });
+$('relOp').oninput = e => { rel.op = +e.target.value; $('relOpV').textContent = rel.op + '%'; if (reliefLayer) reliefLayer.setOpacity(rel.op / 100); lsSet('skat_rel', rel); };
+['relMin','relMax'].forEach(id => $(id).onchange = () => { const a = +$('relMin').value, b = +$('relMax').value; if (isFinite(a) && isFinite(b) && b > a){ rel.min = a; rel.max = b; applyRelief(); } renderRelUI(); });
+$('relAuto').onclick = async () => {
+const bb = map.getBounds(), pts = []; for (let j = 0; j <= 15; j++) for (let i = 0; i <= 15; i++) pts.push([bb.getSouth() + (bb.getNorth() - bb.getSouth()) * j / 15, bb.getWest() + (bb.getEast() - bb.getWest()) * i / 15]);
+$('relAuto').disabled = true;
+const hs = (await demSampler(pts, Math.min(15, Math.max(3, Math.round(map.getZoom()))))).filter(isFinite);
+$('relAuto').disabled = false;
+if (hs.length < 10){ toast('Высоты не получены для этого участка'); return; }
+rel.min = Math.floor(Math.min(...hs) / 5) * 5; rel.max = Math.ceil(Math.max(...hs) / 5) * 5; if (rel.max <= rel.min) rel.max = rel.min + 10;
+if (rel.mode === 'off' || rel.mode === 'shade') rel.mode = 'both';
+applyRelief(); renderRelUI(); toast(`Диапазон высот: ${rel.min}–${rel.max} м`);
+};
+$('rotOn').onchange = e => { rotOn = e.target.checked; lsSet('skat_rot', rotOn); if (map.touchRotate) rotOn ? map.touchRotate.enable() : map.touchRotate.disable(); };
+// ======== КОМПАС ========
+function updCompass(){
+const el = $('compass'); if (!map.getBearing){ el.style.display = 'none'; return; }
+const c = map.getCenter(), a = map.latLngToContainerPoint(c), b = map.latLngToContainerPoint([c.lat + 0.01, c.lng]);
+const ang = Math.atan2(b.x - a.x, a.y - b.y) * 180 / Math.PI;
+el.querySelector('svg').style.transform = `rotate(${ang.toFixed(1)}deg)`;
+el.style.opacity = Math.abs(map.getBearing()) < 0.5 ? .75 : 1;
+}
+$('compass').onclick = () => { if (map.setBearing){ map.setBearing(0); setTimeout(() => { updCompass(); redrawAll(); }, 60); } };
+let rotT = 0;
+map.on('rotate', () => { updCompass(); clearTimeout(rotT); rotT = setTimeout(() => { redrawAll(); renderMarkers(); }, 150); });
+map.on('moveend', updCompass);
+renderRelUI(); applyRelief(); updCompass();
+// ======== 3D-ПРОСМОТР ========
+const ML = 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/';
+let MLp = null, v3 = null, v3proto = false;
+function loadML(){ if (MLp) return MLp;
+MLp = new Promise((res, rej) => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = ML + 'maplibre-gl.css'; document.head.appendChild(l);
+const sc = document.createElement('script'); sc.src = ML + 'maplibre-gl.js'; sc.onload = () => res(window.maplibregl); sc.onerror = () => { MLp = null; rej(new Error('ml')); }; document.head.appendChild(sc); });
+MLp.catch(() => { MLp = null; }); return MLp; }
+function v3bases(){ const o = {esri:'Спутник Esri', topo:'Топокарта', osm:'OpenStreetMap'}; mbMaps.filter(m => m.crs !== '3395').forEach(m => { o['mb_' + m.id] = 'Файл: ' + m.name; }); return o; }
+function keyUrl(layer, z, x, y){ if (layer === 'dem') return `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${z}/${x}/${y}.png`;
+return LAYERS[layer].urls[0].replace('{s}', 'abc'[(x+y)%3]).replace('{x}', x).replace('{y}', y).replace('{z}', z); }
+async function tileBytes(u){
+if (savedKeys.has(u)){ const b = await tileGetFast(u); if (b) return await b.arrayBuffer(); }
+if (u.startsWith('mb:') || navigator.onLine === false) throw new Error('нет тайла');
+try { const b = await netBlob(u); if (savedKeys.size < 150000) queuePut(u, b); return await b.arrayBuffer(); }
+catch(e){ const r = await fetch(u); if (!r.ok) throw new Error(String(r.status)); return await r.arrayBuffer(); }
+}
+function circlePoly(c, r){ const out = [], R = 6371008.8, la = c.lat * Math.PI / 180, lo = c.lng * Math.PI / 180, d = r / R;
+for (let i = 0; i <= 64; i++){ const b = i / 64 * 2 * Math.PI, la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b));
+const lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(la2)); out.push([lo2 * 180 / Math.PI, la2 * 180 / Math.PI]); } return out; }
+function v3data(){
+const F = [];
+state.arrays.forEach(a => { if (a.hidden) return;
+if (a.kind === 'shapes'){ (a.shapes || []).forEach(sh => { const col = sh.color || a.style.color, op = (sh.op ?? 35) / 100, pts = sh.pts.map(p => [p[1] ?? p.lng, p[0] ?? p.lat]);
+if (sh.type === 'line') F.push({type:'Feature', properties:{color:col}, geometry:{type:'LineString', coordinates:pts}});
+else { const ring = sh.type === 'circle' ? circlePoly(LL(sh.pts[0]), sh.r) : pts.concat([pts[0]]); F.push({type:'Feature', properties:{color:col, op}, geometry:{type:'Polygon', coordinates:[ring]}}); } }); return; }
+if (a.kind === 'route' && a.points.length > 1) F.push({type:'Feature', properties:{color:a.style.color}, geometry:{type:'LineString', coordinates:a.points.map(p => [p.lng, p.lat])}});
+a.points.forEach(p => F.push({type:'Feature', properties:{color:a.kind === 'aux' ? a.style.color : styleOf(a, p).color}, geometry:{type:'Point', coordinates:[p.lng, p.lat]}}));
+});
+return {type:'FeatureCollection', features:F};
+}
+function v3baseSrc(k){ return {type:'raster', tiles:[`skat://${k}/{z}/{x}/{y}`], tileSize:256, maxzoom:(LAYERS[k] && LAYERS[k].max) || 18, minzoom:(LAYERS[k] && LAYERS[k].min) || 0}; }
+async function open3D(){
+if (session) return;
+if (tool.on) closeTools();
+const el = $('v3d'); el.classList.add('on'); $('v3msg').textContent = 'Загружаю 3D‑модуль…';
+let ml;
+try { ml = await loadML(); } catch(e){ el.classList.remove('on'); toast('3D‑модуль не загрузился — откройте один раз с интернетом'); return; }
+if (!v3proto){ ml.addProtocol('skat', async (params) => { const m = params.url.match(/^skat:\/\/([^/]+)\/(\d+)\/(\d+)\/(\d+)/); return {data: await tileBytes(keyUrl(m[1], +m[2], +m[3], +m[4]))}; }); v3proto = true; }
+const B = v3bases(), cur = B[state.layer] ? state.layer : state.layer === 'ya_map' ? 'topo' : 'esri';
+$('v3base').innerHTML = Object.entries(B).map(([k, v]) => `<option value="${k}"${k === cur ? ' selected' : ''}>${escapeHtml(v)}</option>`).join('');
+const ex = +$('v3ex').value, c = map.getCenter();
+if (v3){ try { v3.remove(); } catch(e){} v3 = null; }
+try {
+v3 = new ml.Map({container:'v3map', center:[c.lng, c.lat], zoom:Math.max(1, map.getZoom() - 1), pitch:60, maxPitch:85, attributionControl:false,
+style:{version:8, sources:{base:v3baseSrc(cur),
+dem:{type:'raster-dem', tiles:['skat://dem/{z}/{x}/{y}'], tileSize:256, encoding:'terrarium', maxzoom:15},
+dem2:{type:'raster-dem', tiles:['skat://dem/{z}/{x}/{y}'], tileSize:256, encoding:'terrarium', maxzoom:15},
+pts:{type:'geojson', data:v3data()}},
+layers:[{id:'base', type:'raster', source:'base'},
+{id:'hs', type:'hillshade', source:'dem2', paint:{'hillshade-exaggeration':0.35}},
+{id:'fill', type:'fill', source:'pts', filter:['==', '$type', 'Polygon'], paint:{'fill-color':['get', 'color'], 'fill-opacity':['get', 'op']}},
+{id:'outl', type:'line', source:'pts', filter:['==', '$type', 'Polygon'], paint:{'line-color':['get', 'color'], 'line-width':2}},
+{id:'line', type:'line', source:'pts', filter:['==', '$type', 'LineString'], paint:{'line-color':['get', 'color'], 'line-width':3}},
+{id:'pt', type:'circle', source:'pts', filter:['==', '$type', 'Point'], paint:{'circle-color':['get', 'color'], 'circle-radius':6, 'circle-stroke-color':'#fff', 'circle-stroke-width':2}}],
+terrain:{source:'dem', exaggeration:ex}}});
+v3.addControl(new ml.NavigationControl({visualizePitch:true}), 'top-right');
+v3.on('load', () => { $('v3msg').textContent = 'Наклон — двумя пальцами вверх/вниз, поворот — двумя пальцами по кругу. Компас справа — север вверх.'; });
+v3.on('error', () => {});
+} catch(e){ el.classList.remove('on'); toast('Устройство не поддерживает 3D (WebGL)'); }
+}
+function close3D(){
+if (v3){ try { const c = v3.getCenter(); map.setView([c.lat, c.lng], Math.min(20, v3.getZoom() + 1)); v3.remove(); } catch(e){} v3 = null; }
+$('v3d').classList.remove('on');
+}
+$('v3Btn').onclick = open3D;
+$('v3close').onclick = close3D;
+$('v3base').onchange = e => { if (!v3) return; const k = e.target.value; try { v3.removeLayer('base'); v3.removeSource('base'); v3.addSource('base', v3baseSrc(k)); v3.addLayer({id:'base', type:'raster', source:'base'}, 'hs'); } catch(_){} };
+$('v3ex').oninput = e => { $('v3exv').textContent = e.target.value; if (v3) try { v3.setTerrain({source:'dem', exaggeration:+e.target.value}); } catch(_){} };
+$('layBtn').onclick = () => { openModal('layModal'); renderLayers(); };
+$('setBtn').onclick = () => { openModal('setModal'); $('ver2').textContent = VERSION; pdbInfo(); renderRelUI(); };
 $('layNew').onclick = () => { closeModals(); openArrModal(); };
 $('impBtn').onclick = () => $('csvIn').click();
 $('csvIn').onchange = async e => {

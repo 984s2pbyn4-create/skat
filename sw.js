@@ -1,9 +1,12 @@
-const V = 'skat-2.4';
+const V = 'skat-2.6';
 const APP = 'skat-app-' + V, LIB = 'skat-lib', TILES = 'skat-tiles';
 const SHELL = ['./', './index.html'];
 const LIBS = ['https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
-'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'];
+'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+'https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js',
+'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js',
+'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css'];
 const TILE_HOSTS = ['maps.yandex.net', 'opentopomap.org', 'arcgisonline.com', 'tile.openstreetmap.org', 'elevation-tiles-prod'];
 const MAX_TILES = 80000;
 self.addEventListener('install', e => {
@@ -48,5 +51,5 @@ if (req.method !== 'GET') return;
 const u = new URL(req.url);
 if (req.mode === 'navigate') { e.respondWith(appFirst(req, e)); return; }
 if (TILE_HOSTS.some(h => u.hostname.includes(h) || u.pathname.includes(h))) { e.respondWith(cacheFirst(req, TILES)); return; }
-if (u.hostname === 'cdnjs.cloudflare.com' || u.hostname.includes('fonts.g')) { e.respondWith(cacheFirst(req, LIB)); return; }
+if (u.hostname === 'cdnjs.cloudflare.com' || u.hostname === 'cdn.jsdelivr.net' || u.hostname.includes('fonts.g')) { e.respondWith(cacheFirst(req, LIB)); return; }
 });
