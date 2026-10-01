@@ -238,7 +238,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <h3 id="arrTitle">Новый слой</h3>
 <div class="seg" id="kindSeg"><button data-k="main" class="on">Массив</button><button data-k="pts">Точки</button><button data-k="aux">Ориентиры</button><button data-k="route">Маршрут</button><button data-k="desc">Описание</button></div>
 <p class="status" id="kindHint"></p>
-<div id="symFields"><div class="flabel">Тактический знак (необязательно)</div><div class="seg" id="symSideSeg"><button data-s="">Нет</button><button data-s="r">Красные</button><button data-s="b">Синие</button></div><div class="colors" id="symGrid" style="display:none"></div></div>
+<div id="symFields"><div class="flabel">Тактический знак (необязательно)</div><div class="seg" id="symSideSeg"><button data-s="">Нет</button><button data-s="r">Красные</button><button data-s="b">Синие</button></div><div class="colors" id="symGrid" style="display:none"></div><div id="arrFillW" style="display:none"><div class="flabel">Заливка знака (принадлежность)</div><div class="colors strip" id="arrFill"></div></div></div>
 <div id="descFields" style="display:none"><div class="seg" id="descSeg"><button data-m="auto" class="on">Нумерация как массив</button><button data-m="manual">Названия как точки</button></div></div>
 <label class="f">Название слоя<input id="fName" autocomplete="off"></label>
 <div id="mainFields">
@@ -311,8 +311,8 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 </div></div>
 <div class="modal" id="askModal"><div class="card">
 <h3 id="askTitle"></h3>
+<div class="flabel">Заливка знака (принадлежность)</div><div class="colors strip" id="askFill"></div>
 <p class="status" id="askHint"></p>
-<div id="askFillW"><div class="flabel">Заливка знака (принадлежность к подразделению)</div><div id="askFill" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div></div>
 <div class="row" style="margin-bottom:8px"><button class="primary" id="askAuto">Автоматически</button><button id="askManual">Вручную</button></div>
 <div class="row"><button class="ghost" data-close>Отмена</button></div>
 </div></div>
@@ -320,14 +320,15 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <h3 id="symTitle">Знак</h3>
 <div class="seg" id="symType"><button data-t="pt">Точечный</button><button data-t="line">Линия</button><button data-t="area">Зона</button></div>
 <div class="duo"><label class="f">Название<input id="symN" autocomplete="off"></label><label class="f">Сокращение (для номера)<input id="symAb" maxlength="4" autocomplete="off"></label></div>
-<div class="duo"><label class="f">Цвет у красных<input type="color" id="symCr"></label><label class="f">Цвет у синих<input type="color" id="symCb"></label></div>
-<div id="symPtEd"><div class="flabel">Значок из элементов: добавьте, тяните за точки, касание элемента — выбрать/двигать. ✎ — рисование пальцем</div>
-<div id="symElBar" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"></div>
+<div id="symPtEd"><div class="seg" id="symTool" style="flex-wrap:wrap"><button data-t="sel">Выбор</button><button data-t="line">Линия</button><button data-t="poly">Ломаная</button><button data-t="rect">Прямоуг.</button><button data-t="ell">Круг</button><button data-t="tri">Треуг.</button><button data-t="rhomb">Ромб</button><button data-t="arc">Дуга</button><button data-t="text">Буква</button><button data-t="free">Палец</button></div>
+<label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="symFillNew" style="width:22px;min-height:22px;margin:0"> Новые фигуры залитые</label>
 <canvas id="symCv" width="256" height="256" style="width:200px;height:200px;background:#fff;border-radius:12px;touch-action:none;display:block;margin:0 auto 8px"></canvas>
-<div id="symSelBar" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"></div>
-<div class="row" style="margin-bottom:8px"><button id="symUndo">↶ Отмена</button><button id="symClr">Очистить</button><button id="symImg">Картинка…</button></div>
+<div class="row" style="margin-bottom:8px"><button id="symPolyEnd" class="primary" style="display:none">Завершить ломаную</button><button id="symUndo">↶ Отменить</button><button id="symDelEl">Удалить элемент</button><button id="symFillEl">Залить / снять</button></div>
+<div class="row" style="margin-bottom:8px"><button class="ghost" id="symClr">Очистить</button><button class="ghost" id="symImg">Картинка…</button></div>
+<p class="status">Фигуры — проведите пальцем от угла до угла. Ломаная — касайтесь по точкам; касание первой точки замыкает её. «Выбор» — коснитесь элемента, чтобы сдвинуть, удалить или залить. Незалитые замкнутые фигуры принимают заливку принадлежности.</p>
 <input type="file" id="symImgIn" accept="image/*" style="display:none"></div>
 <div id="symLnEd"><div class="flabel">Оформление</div><div class="seg" id="symStyle"></div></div>
+<div class="duo"><label class="f">Цвет у красных<select id="symCR"><option value="#e0302a">Красный</option><option value="#111111">Чёрный</option><option value="#1f5fe0">Синий</option><option value="#2a8a3a">Зелёный</option><option value="#8a5a2b">Коричневый</option></select></label><label class="f">Цвет у синих<select id="symCB"><option value="#1f5fe0">Синий</option><option value="#111111">Чёрный</option><option value="#e0302a">Красный</option><option value="#2a8a3a">Зелёный</option><option value="#8a5a2b">Коричневый</option></select></label></div>
 <label class="f" style="display:flex;align-items:center;gap:10px" id="symSclL"><input type="checkbox" id="symScl" style="width:22px;min-height:22px;margin:0"> Масштабировать с картой (по умолчанию для новых линий и зон этого знака)</label>
 <label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="symFav" style="width:22px;min-height:22px;margin:0"> В избранном</label>
 <div class="row"><button class="danger" id="symDel">Удалить</button><button class="ghost" data-close>Отмена</button><button class="ok" id="symSave">Сохранить</button></div>
@@ -359,7 +360,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <p class="status" id="ptInfo"></p>
 <label class="f" id="ptNameL" style="display:none">Название точки<input id="ptName" autocomplete="off"></label>
 <div class="flabel">Цвет точки</div><div class="colors" id="ptColors"></div>
-<div id="ptFillW"><div class="flabel">Заливка знака</div><div id="ptFill" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div></div>
+<div id="ptFillW"><div class="flabel">Заливка знака (принадлежность)</div><div class="colors strip" id="ptFill"></div></div>
 <label class="f">Высота H, м (пусто — взять из матрицы высот)<input id="ptH" inputmode="numeric" autocomplete="off"></label>
 <label class="f">Населённый пункт (пусто — ближайший автоматически)<input id="ptPlace" autocomplete="off"></label>
 <label class="f" id="ptComL">Комментарий (пусто — ближайший ориентир)<input id="ptCom" autocomplete="off"></label>
@@ -780,7 +781,7 @@ if (!icon && !showLb) return;
 html = `<div class="ax${editing?' edit':''}${icon?'':' noicon'}" style="opacity:${op}">${icon ? `<div class="tr">${TREE(a.style.color)}</div>` : ''}${showLb ? `<div class="lb">${escapeHtml(p.name)}</div>` : ''}</div>`;
 } else {
 const st = styleOf(a,p), ex = a.kind === 'desc', g = ex ? '!' : (st.glyph||''), sid = p.sym || a.sym;
-if (sid && SYM_BY[sid]) html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="sym" style="color:${symC(a, p, st, sid)}">${symSvg(sid, p.uf ?? a.uf)}</div>${showLb ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
+if (sid && SYM_BY[sid]) html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="sym" style="color:${symCol(sid, sideOf(a, p), st.color)}">${symSvg(sid, p.fc || a.fc)}</div>${showLb ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
 else html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="dot${g?' g':''}${ex?' ex':''}" style="background:${st.color};color:${ink(st.color)}">${escapeHtml(g)}</div>${showLb ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
 }
 const m = L.marker([p.lat,p.lng], {icon:L.divIcon({className:'pt-wrap', html, iconSize:[0,0]}), draggable:editing, interactive:editing, keyboard:false});
@@ -838,7 +839,7 @@ if (showLb) lbl(p.name, q.x+11, q.y-3, true, false);
 return;
 }
 const st = styleOf(a,p), g = a.kind === 'desc' ? '!' : (st.glyph||''), r = g ? 10 : 6, sid = p.sym || a.sym;
-if (sid && SYM_BY[sid]){ drawSym(ctx2, sid, q.x, q.y, symC(a, p, st, sid), p.uf ?? a.uf); if (showLb) lbl(labelOf(a,i), q.x+17, q.y-16, false, false); return; }
+if (sid && SYM_BY[sid]){ drawSym(ctx2, sid, q.x, q.y, symCol(sid, sideOf(a, p), st.color), p.fc || a.fc); if (showLb) lbl(labelOf(a,i), q.x+17, q.y-16, false, false); return; }
 ctx2.beginPath(); ctx2.arc(q.x, q.y, r, 0, Math.PI*2); ctx2.fillStyle = st.color; ctx2.fill();
 ctx2.strokeStyle = '#fff'; ctx2.lineWidth = 2; ctx2.stroke();
 if (g){ ctx2.fillStyle = ink(st.color); ctx2.font = `800 ${g === '!' ? 13 : 10}px "IBM Plex Sans Condensed", sans-serif`; ctx2.textAlign = 'center'; ctx2.textBaseline = 'middle'; ctx2.fillText(g, q.x, q.y+0.5); ctx2.textAlign = 'left'; }
@@ -1089,9 +1090,9 @@ if (commit) toast('Точки сохранены');
 function createNamed(a, ll, raw){
 if (a.kind === 'aux'){ if (!raw) return false; a.points.push({lat:ll.lat, lng:ll.lng, name:withPre(auxPre(a), raw)}); }
 else {
-const ps = pendSym && pendSym.aid === a.id ? pendSym.sid : null, pu = ps ? pendSym.uf : ''; pendSym = null;
+const pfc = pendSym && pendSym.aid === a.id ? pendSym.fc : null, ps = pendSym && pendSym.aid === a.id ? pendSym.sid : null; pendSym = null;
 const p = {lat:ll.lat, lng:ll.lng, h:null, place:'', name:raw || (ps ? SYM_BY[ps].n : ((a.kind === 'desc' ? 'О' : 'Т') + (a.points.length+1)))};
-if (ps){ p.sym = ps; if (pu) p.uf = pu; }
+if (ps) p.sym = ps; if (pfc) p.fc = pfc;
 if (session && session.style && !sameSt(session.style, a.style)) p.style = copySt(session.style);
 a.points.push(p); fillHeight(p); fillPlace(p);
 }
@@ -1265,7 +1266,7 @@ fillZSel($('fMinZ'), a ? a.minZ || 0 : 0);
 fillZSel($('fLblZ'), a ? (a.lblZ ?? DEF_LBLZ) : DEF_LBLZ);
 $('zHint').textContent = `Сейчас масштаб карты: ${map.getZoom()}. Чем больше число, тем крупнее масштаб (ближе).`;
 pickStyle = a ? copySt(a.style) : copySt(state.palette.length ? state.palette[0] : DEFAULT_PAL[0]);
-mSide = (a && a.symSide) || ''; mSym = (a && a.sym) || null; renderSymPick();
+mSide = (a && a.symSide) || ''; mSym = (a && a.sym) || null; mFc = (a && a.fc) || null; renderSymPick();
 setKind(a ? a.kind : 'main');
 $('kindHint').style.display = a ? 'none' : '';
 renderColors(); updPreview(); openModal('arrModal');
@@ -1281,7 +1282,7 @@ const f = arrKind === 'aux' ? {auxPrefix:$('fAuxPre').value.trim()} : named ? {i
 if (f.ident === '') f.ident = name;
 if (arrKind === 'desc') f.numMode = descMode;
 f.minZ = +$('fMinZ').value; f.lblZ = +$('fLblZ').value;
-f.symSide = mSide || null; f.sym = mSide ? mSym : null;
+f.symSide = mSide || null; f.sym = mSide ? mSym : null; f.fc = mSide ? mFc : null;
 const stl = mSide ? {color:SIDES[mSide].color, name:SIDES[mSide].name, glyph:''} : pickStyle;
 if (arrEditId){ Object.assign(arrById(arrEditId), f, {name, style:stl}); persist(); renderMarkers(); renderSheet(); closeModals(); openTable(arrEditId); return; }
 const id = Date.now();
@@ -1326,9 +1327,9 @@ const auto = auxNear(p);
 $('ptCom').value = p.comment || ''; $('ptCom').placeholder = auto ? `авто: ${auto}` : 'например, лп Репей';
 const pickSt = st => { if (!st || sameSt(st, a.style)) delete p.style; else p.style = st; renderMarkers(); renderPalette($('ptColors'), p.style || null, pickSt, {same:true}); };
 renderPalette($('ptColors'), p.style || null, pickSt, {same:true});
-const fsid = p.sym || a.sym, fsy = fsid && SYM_BY[fsid]; $('ptFillW').style.display = fsy && !fsy.img ? '' : 'none';
-if (fsy) fillPick($('ptFill'), p.uf ?? a.uf ?? '', c => { p.uf = c; persist(); renderMarkers(); });
 openModal('ptModal');
+const psid = p.sym || a.sym; $('ptFillW').style.display = psid && SYM_BY[psid] && SYM_BY[psid].type === 'pt' ? '' : 'none';
+if (psid) renderFillPick($('ptFill'), p.fc || a.fc || null, c => { if (c) p.fc = c; else delete p.fc; persist(); renderMarkers(); });
 }
 $('ptDel').onclick = () => { ptRef.a.points.splice(ptRef.i,1); persist(); closeModals(); renderMarkers(); renderSheet(); if (!ptRef.a.points.length) setMode('pick'); };
 $('ptSave').onclick = () => { const a = ptRef.a, p = a.points[ptRef.i], v = $('ptH').value.trim().replace(',','.');
@@ -2030,15 +2031,15 @@ function v3aux(){ const F = []; state.arrays.forEach(a => { if (a.kind !== 'aux'
 function v3tac(c){
 const F = [];
 state.arrays.forEach(a => { if (a.hidden || a.kind === 'aux' || a.kind === 'shapes') return;
-a.points.forEach((p, i) => { const sid = p.sym || a.sym, col = styleOf(a, p).color, lb = v3cfg.tacLbl ? clean(labelOf(a, i)) : '';
-F.push({d:Math.abs(p.lat - c.lat) + Math.abs(p.lng - c.lng), f:{type:'Feature', properties:{img:sid && SYM_BY[sid] ? `ts|${sid}|${col}|${lb}` : `td|${col}|${lb}`}, geometry:{type:'Point', coordinates:[p.lng, p.lat]}}}); }); });
+a.points.forEach((p, i) => { const sid = p.sym || a.sym, col = sid ? symCol(sid, sideOf(a, p), styleOf(a, p).color) : styleOf(a, p).color, fcol = p.fc || a.fc || '', lb = v3cfg.tacLbl ? clean(labelOf(a, i)) : '';
+F.push({d:Math.abs(p.lat - c.lat) + Math.abs(p.lng - c.lng), f:{type:'Feature', properties:{img:sid && SYM_BY[sid] ? `ts|${sid}|${col}|${lb}|${fcol}` : `td|${col}|${lb}`}, geometry:{type:'Point', coordinates:[p.lng, p.lat]}}}); }); });
 F.sort((x, y) => x.d - y.d);
 return {type:'FeatureCollection', features:F.slice(0, 500).map(x => x.f)};
 }
 function txtCanvas(w, h){ const c = document.createElement('canvas'); c.width = Math.ceil(w * 2); c.height = Math.ceil(h * 2); const g = c.getContext('2d'); g.scale(2, 2); return [c, g]; }
 function haloText(g, t, x, y, fs, col, bold){ g.font = `${bold ? 700 : 600} ${fs}px "IBM Plex Sans Condensed", sans-serif`; g.textBaseline = 'alphabetic'; g.lineJoin = 'round'; g.lineWidth = 3.5; g.strokeStyle = 'rgba(0,0,0,.85)'; g.strokeText(t, x, y); g.fillStyle = col; g.fillText(t, x, y); }
 function v3img(id){
-const [kind, a1, a2, a3] = id.split('|');
+const [kind, a1, a2, a3, a4] = id.split('|');
 const meas = (t, fs) => { const g = document.createElement('canvas').getContext('2d'); g.font = `700 ${fs}px "IBM Plex Sans Condensed", sans-serif`; return g.measureText(t).width; };
 let c, g;
 if (kind === 'pl'){ const fs = [18, 15.5, 13.5, 12][+a2] || 12, t = +a2 === 0 ? a1.toUpperCase() : a1, w = meas(t, fs) + 10; [c, g] = txtCanvas(w, fs + 10); haloText(g, t, 5, fs + 3, fs, '#fff', true); }
@@ -2050,7 +2051,7 @@ else if (kind === 'ts' || kind === 'td'){ const lb = kind === 'ts' ? a3 : a2, co
 if (lb) haloText(g, lb, (w - lw) / 2 + 5, 13, fs, '#fff', true);
 g.strokeStyle = 'rgba(30,30,30,.9)'; g.lineWidth = 2; g.beginPath(); g.moveTo(x0, top + 38); g.lineTo(x0, h); g.stroke();
 g.fillStyle = 'rgba(255,255,255,.93)'; g.strokeStyle = col; g.lineWidth = 2; g.beginPath(); g.roundRect ? g.roundRect(x0 - 20, top, 40, 38, 6) : g.rect(x0 - 20, top, 40, 38); g.fill(); g.stroke();
-if (kind === 'ts') drawSym(g, a1, x0, top + 19, col); else { g.fillStyle = col; g.beginPath(); g.arc(x0, top + 19, 8, 0, 7); g.fill(); } }
+if (kind === 'ts') drawSym(g, a1, x0, top + 19, col, a4 || null); else { g.fillStyle = col; g.beginPath(); g.arc(x0, top + 19, 8, 0, 7); g.fill(); } }
 else if (kind === 'tex-wall'){ [c, g] = txtCanvas(32, 32); g.fillStyle = '#e2d9c6'; g.fillRect(0, 0, 32, 32); g.fillStyle = '#cfc4ad'; g.fillRect(0, 30, 32, 2);
 [[5, 8], [19, 8]].forEach(([x, y]) => { g.fillStyle = '#f4efe4'; g.fillRect(x - 1, y - 1, 10, 13); g.fillStyle = '#4f6273'; g.fillRect(x, y, 8, 11); g.fillStyle = '#f4efe4'; g.fillRect(x + 3.5, y, 1, 11); g.fillRect(x, y + 4, 8, 1); g.fillStyle = 'rgba(255,255,255,.3)'; g.fillRect(x, y, 3, 4); }); }
 else if (kind === 'tex-lattice'){ [c, g] = txtCanvas(16, 16); g.fillStyle = '#c4c8cc'; g.fillRect(0, 0, 16, 16); g.strokeStyle = '#626870'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(0, 0); g.lineTo(16, 16); g.moveTo(16, 0); g.lineTo(0, 16); g.moveTo(0, .7); g.lineTo(16, .7); g.moveTo(.7, 0); g.lineTo(.7, 16); g.stroke(); }
@@ -2203,11 +2204,11 @@ $('v3close').onclick = close3D;
 $('v3base').onchange = e => { if (!v3) return; const k = e.target.value; try { v3.removeLayer('base'); v3.removeSource('base'); v3.addSource('base', v3baseSrc(k)); v3.addLayer({id:'base', type:'raster', source:'base'}, 'hs'); } catch(_){} };
 $('v3ex').oninput = e => { $('v3exv').textContent = +e.target.value === 1 ? 'Реальный' : '×' + e.target.value; if (v3) try { v3.setTerrain({source:'dem', exaggeration:+e.target.value}); } catch(_){} };
 // ======== ТАКТИЧЕСКИЕ ЗНАКИ ========
-const CIRC = (x, y, r) => `M${x-r} ${y}a${r} ${r} 0 1 0 ${2*r} 0a${r} ${r} 0 1 0 ${-2*r} 0z`;
+const CIRC = (x, y, r) => `M${x-r} ${y}a${r} ${r} 0 1 0 ${2*r} 0a${r} ${r} 0 1 0 ${-2*r} 0`;
 const SYM_DEF = [
 // пункты управления, связь
-{id:'pu', n:'Пункт управления (штаб)', ab:'ПУ', d:['M8 29V6', 'M8 6h18v9H8z']},
-{id:'kp', n:'КНП (флажок)', ab:'КП', d:['M10 29V4', 'M10 4l15 6-15 6z']},
+{id:'pu', n:'Пункт управления (штаб)', ab:'ПУ', d:['M8 29V6', 'M8 6h18v9H8']},
+{id:'kp', n:'КНП (флажок)', ab:'КП', d:['M10 29V4', 'M10 4l15 6-15 6']},
 {id:'kp_r', n:'КНП роты, взвода', ab:'КР', d:['M8 28h16L16 15z', 'M16 15V3', 'M12 6h8M12 9h8']},
 {id:'nab', n:'Наблюдательный пункт', ab:'НП', d:['M5 27h22L16 8z']},
 {id:'reg', n:'Пост регулирования', ab:'Р', d:[CIRC(16, 16, 11), 'M13.5 22V10h4a3 3 0 0 1 0 6h-4']},
@@ -2277,6 +2278,7 @@ const SYM_DEF = [
 const LSTYLES = {plain:'Сплошная', dash:'Пунктир', dashdot:'Штрихпунктир', ticks:'Засечки', teeth:'Зубцы', cross:'Крестики', dots:'Точки (мины ПТ)', circles:'Кружки (мины ПП)', arrow:'Со стрелкой', dasharrow:'Пунктир со стрелкой', double:'Двойная со стрелкой'};
 const ASTYLES = {zone:'Пунктир с заливкой', solid:'Сплошная с заливкой', hatch:'Штриховка', dotsArea:'Точки внутри (мины)'};
 const SIDES = {r:{name:'Красные', color:'#e0302a', pre:'К'}, b:{name:'Синие', color:'#1f5fe0', pre:'С'}};
+['min', 'ptp', 'art', 'sau', 'rszo', 'zpu', 'zrk'].forEach(id => { const d = SYM_DEF.find(x => x.id === id); if (d) d.cR = '#111111'; });
 let SYMS = [], SYM_BY = {}, pendSym = null;
 const symPaths = {}, symImgs = {};
 function defSym(x){ return Object.assign({type:'pt', fav:true, d:[], f:[]}, JSON.parse(JSON.stringify(x))); }
@@ -2287,19 +2289,8 @@ const old = lsGet('skat_syms_ver', 1) < 4, force = old;
 const cur = st.filter(x => !(old && !x.edited && !x.custom && !SYM_DEF.some(d => d.id === x.id))).map(x => { const d = SYM_DEF.find(q => q.id === x.id); return force && d ? Object.assign(defSym(d), {fav:x.fav !== false}) : x; });
 const has = new Set(cur.map(x => x.id)); SYMS = cur.concat(SYM_DEF.filter(x => !has.has(x.id) && !del.includes(x.id)).map(defSym)); }
 else SYMS = SYM_DEF.map(defSym);
-SYMS.forEach(x => { if (!x.type) x.type = 'pt'; if (x.fav === undefined) x.fav = true; if (!x.d) x.d = []; if (!x.f) x.f = [];
-const D = SYM_DEF.find(y => y.id === x.id); if (D && !x.edited){ x.d = D.d.slice(); x.f = (D.f || []).slice(); }
-if (!x.cr) x.cr = defCr(x.id); if (!x.cb) x.cb = SIDES.b.color; });
+SYMS.forEach(x => { if (!x.type) x.type = 'pt'; if (x.fav === undefined) x.fav = true; if (!x.d) x.d = []; if (!x.f) x.f = []; const d0 = SYM_DEF.find(q => q.id === x.id); if (d0 && x.cR === undefined && d0.cR) x.cR = d0.cR; if (!x.z) x.z = x.d.filter(isClosedP); });
 SYM_BY = Object.fromEntries(SYMS.map(x => [x.id, x])); lsSet('skat_syms_ver', 4);
-}
-const CR_RED = new Set('pu kp kp_r nab pul pul2 pul3 grm grm2 ags ptrk ptrk2 bmp btr brm tank tank_tr op okop okop_t shchel blind ubezh dot zasada l_rub l_trench l_fire l_border l_route l_attack l_dir a_zone a_area'.split(' '));
-function defCr(id){ return CR_RED.has(id) || !SYM_DEF.some(x => x.id === id) ? SIDES.r.color : '#111111'; }
-function symCol(sid, side){ const s = SYM_BY[sid]; return (s && s['c' + side]) || SIDES[side].color; }
-const symC = (a, p, st, sid) => a.symSide && !p.style ? symCol(sid, a.symSide) : st.color;
-function fillPick(el, cur, cb){
-const cols = [...new Set(['#ffffff', '#f2d33a', '#3aa64a', '#e0302a', '#1f5fe0', '#111111'].concat(state.palette.map(p => p.color)))], ol = c => c === (cur || '') ? 'outline:3px solid #ff8a2a;outline-offset:1px;' : '';
-el.innerHTML = `<button data-c="" style="${ol('')}min-height:36px">нет</button>` + cols.map(c => `<button data-c="${c}" style="${ol(c)}width:36px;min-width:36px;min-height:36px;padding:0;background:${c};border:1px solid #888"></button>`).join('');
-el.querySelectorAll('button').forEach(b => b.onclick = () => { cb(b.dataset.c); fillPick(el, b.dataset.c, cb); });
 }
 function saveSyms(){ lsSet('skat_syms', SYMS); SYM_BY = Object.fromEntries(SYMS.map(x => [x.id, x])); Object.keys(symPaths).forEach(k => delete symPaths[k]); Object.keys(symImgs).forEach(k => delete symImgs[k]); }
 loadSyms();
@@ -2319,8 +2310,7 @@ const s = SYM_BY[sid]; if (!s) return '';
 if (s.img) return `<span class="symimg" style="-webkit-mask-image:url(${s.img});mask-image:url(${s.img})"></span>`;
 if (s.type === 'line') return SVGH + (LPREV[s.style] || LPREV.plain) + '</svg>';
 if (s.type === 'area') return SVGH + (APREV[s.style] || APREV.zone) + '</svg>';
-return SVGH + (fc ? s.d.filter(x => /z/i.test(x)).map(x => `<path d="${x}" fill="${fc}" stroke="none"/>`).join('') : '') + s.d.map(x => `<path d="${x}"/>`).join('')
-+ (s.tx || []).map(t => `<text x="${t.x}" y="${t.y}" font-size="${t.s}" fill="currentColor" stroke="none" text-anchor="middle" dominant-baseline="central" font-weight="700" font-family="sans-serif">${escapeHtml(t.t)}</text>`).join('') + (s.f || []).map(x => `<path d="${x}" fill="currentColor" stroke="none"/>`).join('') + '</svg>';
+return SVGH + (fc ? (s.z || []).map(x => `<path d="${x}" fill="${fc}" stroke="none"/>`).join('') : '') + s.d.map(x => `<path d="${x}"/>`).join('') + (s.f || []).map(x => `<path d="${x}" fill="currentColor" stroke="none"/>`).join('') + (s.tx || []).map(t => `<text x="${t.x}" y="${t.y}" font-size="${t.s}" font-weight="700" font-family="sans-serif" text-anchor="middle" dominant-baseline="central" fill="currentColor" stroke="none">${escapeHtml(t.t)}</text>`).join('') + '</svg>';
 }
 function symImgCanvas(s, color){
 const key = s.id + '|' + color; let c = symImgs[key]; if (c) return c.ready ? c.cv : null;
@@ -2328,15 +2318,18 @@ c = symImgs[key] = {ready:false, cv:document.createElement('canvas')}; c.cv.widt
 const im = new Image(); im.onload = () => { const g = c.cv.getContext('2d'); g.drawImage(im, 0, 0, 64, 64); g.globalCompositeOperation = 'source-in'; g.fillStyle = color; g.fillRect(0, 0, 64, 64); c.ready = true; drawOpt(); }; im.src = s.img;
 return null;
 }
+function sideOf(a, p){ if (a.symSide) return a.symSide; const c = styleOf(a, p).color; return c === SIDES.r.color ? 'r' : c === SIDES.b.color ? 'b' : ''; }
+function symCol(sid, side, def){ const s = SYM_BY[sid]; if (!s) return def; return side === 'r' ? (s.cR || SIDES.r.color) : side === 'b' ? (s.cB || SIDES.b.color) : def; }
 function drawSym(g, sid, x, y, color, fc){
 const s = SYM_BY[sid]; if (!s) return;
 if (s.img){ const cv = symImgCanvas(s, color); if (cv) g.drawImage(cv, x - 16, y - 16, 32, 32); return; }
-if (!symPaths[sid]) symPaths[sid] = {d:s.d.map(v => new Path2D(v)), f:(s.f || []).map(v => new Path2D(v)), z:s.d.filter(v => /z/i.test(v)).map(v => new Path2D(v))};
+if (!symPaths[sid]) symPaths[sid] = {d:s.d.map(v => new Path2D(v)), f:(s.f || []).map(v => new Path2D(v)), z:(s.z || []).map(v => new Path2D(v))};
 const P = symPaths[sid]; g.save(); g.translate(x - 16, y - 16); g.lineCap = 'round'; g.lineJoin = 'round';
 g.strokeStyle = '#fff'; g.lineWidth = 6; P.d.forEach(v => g.stroke(v)); P.f.forEach(v => g.stroke(v));
 if (fc){ g.fillStyle = fc; P.z.forEach(v => g.fill(v)); }
 g.strokeStyle = color; g.lineWidth = 2.6; P.d.forEach(v => g.stroke(v)); g.fillStyle = color; P.f.forEach(v => g.fill(v));
-(s.tx || []).forEach(t => { g.font = `700 ${t.s}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.strokeStyle = '#fff'; g.lineWidth = 3; g.strokeText(t.t, t.x, t.y); g.fillStyle = color; g.fillText(t.t, t.x, t.y); }); g.restore();
+(s.tx || []).forEach(t => { g.font = `700 ${t.s}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 3; g.strokeStyle = '#fff'; g.strokeText(t.t, t.x, t.y); g.fillStyle = color; g.fillText(t.t, t.x, t.y); });
+g.restore();
 }
 // ---- линейные и площадные знаки
 function shK(sh){ return sh.scl ? Math.max(.25, Math.min(8, Math.pow(2, map.getZoom() - (sh.z0 ?? map.getZoom())))) : 1; }
@@ -2398,7 +2391,7 @@ $('clR').onchange = e => { clCfg.r = +e.target.value; lsSet('skat_cl', clCfg); r
 const TYPE_N = {pt:'точечный', line:'линейный', area:'площадной'};
 function renderSymList(){
 const el = $('symList'); if (!el) return;
-el.innerHTML = SYMS.map(s => `<div class="arr" data-id="${s.id}"><span class="symico" style="color:${s.cr || '#c0282a'}">${symSvg(s.id)}</span><div class="nm"><div>${escapeHtml(s.n)}</div><div>${TYPE_N[s.type] || ''}${s.ab ? ' · ' + escapeHtml(s.ab) : ''}</div></div><button class="eye ${s.fav ? 'lit' : 'dim'}" data-act="fav" title="Избранное" style="font-size:20px">★</button></div>`).join('');
+el.innerHTML = SYMS.map(s => `<div class="arr" data-id="${s.id}"><span class="symico" style="color:#c0282a">${symSvg(s.id)}</span><div class="nm"><div>${escapeHtml(s.n)}</div><div>${TYPE_N[s.type] || ''}${s.ab ? ' · ' + escapeHtml(s.ab) : ''}</div></div><button class="eye ${s.fav ? 'lit' : 'dim'}" data-act="fav" title="Избранное" style="font-size:20px">★</button></div>`).join('');
 el.querySelectorAll('.arr').forEach(r => { const s = SYM_BY[r.dataset.id];
 r.querySelector('[data-act=fav]').onclick = e => { e.stopPropagation(); s.fav = !s.fav; saveSyms(); renderSymList(); };
 r.onclick = () => openSymEd(s.id); });
@@ -2408,10 +2401,10 @@ $('symFavAll').onclick = () => { SYMS.forEach(s => s.fav = true); saveSyms(); re
 let symEd = null;
 function openSymEd(id){
 const s = id ? SYM_BY[id] : null;
-symEd = s ? JSON.parse(JSON.stringify(s)) : {id:'u' + Date.now(), n:'', ab:'', type:'pt', d:[], f:[], fav:true, style:'plain', custom:true, cr:SIDES.r.color, cb:SIDES.b.color};
-if (!symEd.el){ symEd.el = []; symEd.hd = (symEd.d || []).slice(); symEd.hf = (symEd.f || []).slice(); } symEd._h = []; symSel = -1; symMode = 'el';
-$('symCr').value = symEd.cr || SIDES.r.color; $('symCb').value = symEd.cb || SIDES.b.color;
+symEd = s ? JSON.parse(JSON.stringify(s)) : {id:'u' + Date.now(), n:'', ab:'', type:'pt', d:[], f:[], els:[], fav:true, style:'plain', custom:true};
 $('symTitle').textContent = s ? 'Изменить знак' : 'Новый знак';
+if (!symEd.els) symEd.els = elsFrom(symEd); selIdx = -1; polyCur = null; edDrag = null;
+$('symCR').value = symEd.cR || SIDES.r.color; $('symCB').value = symEd.cB || SIDES.b.color; renderSymTools();
 $('symN').value = symEd.n; $('symAb').value = symEd.ab || ''; $('symFav').checked = symEd.fav !== false; $('symScl').checked = !!symEd.scl;
 const builtin = SYM_DEF.some(x => x.id === symEd.id);
 $('symDel').textContent = builtin ? 'Сбросить' : 'Удалить'; $('symDel').style.display = s ? '' : 'none';
@@ -2424,98 +2417,101 @@ $('symPtEd').style.display = t === 'pt' ? '' : 'none'; $('symLnEd').style.displa
 const ST = t === 'area' ? ASTYLES : LSTYLES; if (t !== 'pt' && !ST[symEd.style]) symEd.style = Object.keys(ST)[0];
 $('symStyle').innerHTML = t === 'pt' ? '' : Object.entries(ST).map(([k, v]) => `<button data-st="${k}" class="${k === symEd.style ? 'on' : ''}">${v}</button>`).join('');
 $('symStyle').querySelectorAll('button').forEach(b => b.onclick = () => { symEd.style = b.dataset.st; renderSymEd(); });
-renderSymBars(); drawSymEd();
+drawSymEd();
 }
 $('symType').querySelectorAll('button').forEach(b => b.onclick = () => { symEd.type = b.dataset.t; renderSymEd(); });
-const EL_T = {line:'Линия', pl:'Ломаная', rect:'Прямоуг.', ell:'Эллипс', tri:'Треуг.', dia:'Ромб', arc:'Дуга', txt:'Текст'}, EL_CL = new Set(['rect', 'ell', 'tri', 'dia']);
-const EL_DEF = {line:[[8,24],[24,8]], pl:[[6,22],[12,10],[20,22],[26,10]], rect:[[8,10],[24,22]], ell:[[8,10],[24,22]], tri:[[16,7],[26,25],[6,25]], dia:[[8,8],[24,24]], arc:[[6,22],[16,4],[26,22]], txt:[[16,16]]};
-let symMode = 'el', symSel = -1;
-function elPath(e){
-const P = e.p, f = v => +v.toFixed(1), pt = q => f(q[0]) + ' ' + f(q[1]);
-if (e.t === 'line' || e.t === 'pl') return 'M' + P.map(pt).join('L');
-if (e.t === 'arc') return `M${pt(P[0])}Q${pt(P[1])} ${pt(P[2])}`;
-if (e.t === 'tri') return 'M' + P.map(pt).join('L') + 'Z';
-const x0 = f(Math.min(P[0][0], P[1][0])), x1 = f(Math.max(P[0][0], P[1][0])), y0 = f(Math.min(P[0][1], P[1][1])), y1 = f(Math.max(P[0][1], P[1][1])), cx = f((x0 + x1) / 2), cy = f((y0 + y1) / 2), rx = f((x1 - x0) / 2) || .1, ry = f((y1 - y0) / 2) || .1;
-if (e.t === 'rect') return `M${x0} ${y0}H${x1}V${y1}H${x0}Z`;
-if (e.t === 'dia') return `M${cx} ${y0}L${x1} ${cy}L${cx} ${y1}L${x0} ${cy}Z`;
-return `M${x0} ${cy}A${rx} ${ry} 0 1 0 ${x1} ${cy}A${rx} ${ry} 0 1 0 ${x0} ${cy}Z`;
+// ---- редактор знака из элементов
+function isClosedP(p){ return /[zZ]\s*$/.test(p) || /a[\d.]+ [\d.]+ 0 1 0/.test(p); }
+function elPath(e){ const r = v => +(+v).toFixed(1);
+switch (e.t){
+case 'line': return `M${r(e.x1)} ${r(e.y1)}L${r(e.x2)} ${r(e.y2)}`;
+case 'poly': return 'M' + e.p.map(q => r(q[0]) + ' ' + r(q[1])).join('L') + (e.cl ? 'Z' : '');
+case 'rect': return `M${r(e.x)} ${r(e.y)}h${r(e.w)}v${r(e.h)}h${r(-e.w)}Z`;
+case 'ell': { const rx = e.w / 2, ry = e.h / 2; return `M${r(e.x)} ${r(e.y + ry)}a${r(rx)} ${r(ry)} 0 1 0 ${r(2 * rx)} 0a${r(rx)} ${r(ry)} 0 1 0 ${r(-2 * rx)} 0`; }
+case 'tri': return `M${r(e.x + e.w / 2)} ${r(e.y)}L${r(e.x + e.w)} ${r(e.y + e.h)}L${r(e.x)} ${r(e.y + e.h)}Z`;
+case 'rhomb': return `M${r(e.x + e.w / 2)} ${r(e.y)}L${r(e.x + e.w)} ${r(e.y + e.h / 2)}L${r(e.x + e.w / 2)} ${r(e.y + e.h)}L${r(e.x)} ${r(e.y + e.h / 2)}Z`;
+case 'arc': return `M${r(e.x)} ${r(e.y + e.h)}A${r(e.w / 2)} ${r(e.h)} 0 0 1 ${r(e.x + e.w)} ${r(e.y + e.h)}`;
+case 'path': case 'free': return e.p;
+} return ''; }
+const elClosed = e => ['rect', 'ell', 'tri', 'rhomb'].includes(e.t) || (e.t === 'poly' && e.cl) || (e.t === 'path' && isClosedP(e.p));
+function compileSym(s){ s.d = []; s.f = []; s.z = []; s.tx = [];
+(s.els || []).forEach(e => { if (e.t === 'text'){ s.tx.push({x:e.x, y:e.y, s:e.s || 12, t:e.txt}); return; } const p = elPath(e); if (!p) return; (e.fill ? s.f : s.d).push(p); if (!e.fill && elClosed(e)) s.z.push(p); }); }
+function elsFrom(s){ return (s.d || []).map(p => ({t:'path', p})).concat((s.f || []).map(p => ({t:'path', p, fill:true}))).concat((s.tx || []).map(t => ({t:'text', x:t.x, y:t.y, s:t.s, txt:t.t}))); }
+function elBox(e){
+if (e.t === 'line') return [Math.min(e.x1, e.x2), Math.min(e.y1, e.y2), Math.max(e.x1, e.x2), Math.max(e.y1, e.y2)];
+if (e.t === 'poly'){ const xs = e.p.map(q => q[0]), ys = e.p.map(q => q[1]); return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]; }
+if (e.t === 'text'){ const w = (e.s || 12) * .32 * String(e.txt).length + 2, h = (e.s || 12) / 2; return [e.x - w, e.y - h, e.x + w, e.y + h]; }
+if ('w' in e) return [e.x, e.y, e.x + e.w, e.y + e.h];
+const n = (e.p.match(/-?[\d.]+/g) || []).map(Number); let x0 = 32, y0 = 32, x1 = 0, y1 = 0;
+for (let i = 0; i + 1 < n.length; i += 2){ if (n[i] < 0 || n[i] > 32 || n[i+1] < 0 || n[i+1] > 32) continue; x0 = Math.min(x0, n[i]); x1 = Math.max(x1, n[i]); y0 = Math.min(y0, n[i+1]); y1 = Math.max(y1, n[i+1]); }
+return [x0, y0, x1, y1];
 }
-function compileEl(e){
-const d = (e.hd || []).slice(), f = (e.hf || []).slice(), tx = [];
-(e.el || []).forEach(x => { if (x.t === 'txt') tx.push({x:+x.p[0][0].toFixed(1), y:+x.p[0][1].toFixed(1), s:x.s || 12, t:x.tx || ''}); else (x.fill && EL_CL.has(x.t) ? f : d).push(elPath(x)); });
-return {d, f, tx};
-}
-function elHit(e, q){
-if (e.t === 'txt'){ const w = Math.max(3, (e.s || 12) * .32 * (e.tx || '').length); return Math.abs(q[0] - e.p[0][0]) < w && Math.abs(q[1] - e.p[0][1]) < (e.s || 12) * .6; }
-const xs = e.p.map(v => v[0]), ys = e.p.map(v => v[1]);
-return q[0] > Math.min(...xs) - 2 && q[0] < Math.max(...xs) + 2 && q[1] > Math.min(...ys) - 2 && q[1] < Math.max(...ys) + 2;
-}
-function renderSymBars(){
-$('symElBar').innerHTML = Object.entries(EL_T).map(([k, v]) => `<button data-e="${k}" style="flex:1 0 22%;padding:6px 4px;font-size:13px">${v}</button>`).join('') + `<button data-e="pen" class="${symMode === 'pen' ? 'on' : ''}" style="flex:1 0 22%;padding:6px 4px;font-size:13px${symMode === 'pen' ? ';background:#ff8a2a;color:#111' : ''}">✎ Пальцем</button>`;
-$('symElBar').querySelectorAll('button').forEach(b => b.onclick = () => {
-const t = b.dataset.e; if (t === 'pen'){ symMode = symMode === 'pen' ? 'el' : 'pen'; symSel = -1; renderSymBars(); drawSymEd(); return; }
-const e = {t, p:JSON.parse(JSON.stringify(EL_DEF[t])), fill:false};
-if (t === 'txt'){ const v = prompt('Текст в знаке', 'А'); if (!v) return; e.tx = v.slice(0, 6); e.s = 12; }
-symEd.el.push(e); symEd._h.push('el'); symSel = symEd.el.length - 1; symMode = 'el'; renderSymBars(); drawSymEd(); });
-const e = symEd.el[symSel], sb = $('symSelBar'); if (!e){ sb.innerHTML = ''; return; }
-const B = (k, v, on) => `<button data-k="${k}" style="flex:1 0 22%;padding:6px 4px;font-size:13px${on ? ';background:#ff8a2a;color:#111' : ''}">${v}</button>`;
-sb.innerHTML = `<span style="flex:1 0 100%;font-size:13px;opacity:.8">Выбрано: ${EL_T[e.t]}</span>` + (EL_CL.has(e.t) ? B('fill', 'Заливка', e.fill) : '') + (e.t === 'pl' ? B('add', '＋ Вершина') : '') + (e.t === 'txt' ? B('tx', 'Текст…') + B('sm', 'A−') + B('bg', 'A+') : '') + B('del', 'Удалить');
-sb.querySelectorAll('button').forEach(b => b.onclick = () => { const k = b.dataset.k;
-if (k === 'fill') e.fill = !e.fill;
-else if (k === 'add'){ const l = e.p[e.p.length - 1], m = e.p[e.p.length - 2]; e.p.push([Math.max(1, Math.min(31, 2 * l[0] - m[0])), Math.max(1, Math.min(31, 2 * l[1] - m[1]))]); }
-else if (k === 'tx'){ const v = prompt('Текст в знаке', e.tx); if (v) e.tx = v.slice(0, 6); }
-else if (k === 'sm') e.s = Math.max(5, (e.s || 12) - 2); else if (k === 'bg') e.s = Math.min(28, (e.s || 12) + 2);
-else if (k === 'del'){ symEd.el.splice(symSel, 1); const j = symEd._h.lastIndexOf('el'); if (j >= 0) symEd._h.splice(j, 1); symSel = -1; }
-renderSymBars(); drawSymEd(); });
-}
+function elMove(e, dx, dy){ if (e.t === 'line'){ e.x1 += dx; e.x2 += dx; e.y1 += dy; e.y2 += dy; } else if (e.t === 'poly') e.p = e.p.map(q => [q[0] + dx, q[1] + dy]); else if (e.t === 'path' || e.t === 'free') return false; else { e.x += dx; e.y += dy; } return true; }
+let symTool = 'rect', selIdx = -1, polyCur = null, edDrag = null;
+const edCol = () => ($('symCR') && $('symCR').value) || '#e0302a';
 function drawSymEd(){
-const c = $('symCv'), g = c.getContext('2d'), col = $('symCr').value || '#c0282a';
+const c = $('symCv'), g = c.getContext('2d'), col = edCol();
 g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#fff'; g.fillRect(0, 0, 256, 256);
 g.strokeStyle = 'rgba(0,0,0,.08)'; g.lineWidth = 1; for (let i = 32; i < 256; i += 32){ g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 256); g.moveTo(0, i); g.lineTo(256, i); g.stroke(); }
-const C = compileEl(symEd), drawV = () => { g.setTransform(8, 0, 0, 8, 0, 0); g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = col; g.lineWidth = 2.6;
-C.d.forEach(v => g.stroke(new Path2D(v))); g.fillStyle = col; C.f.forEach(v => g.fill(new Path2D(v)));
-C.tx.forEach(t => { g.font = `700 ${t.s}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(t.t, t.x, t.y); });
-const e = symEd.el[symSel]; if (e && symMode === 'el'){ g.strokeStyle = '#ff8a2a'; g.lineWidth = .35; g.setLineDash([1, .8]);
-if (e.t !== 'txt') g.stroke(new Path2D(elPath(e))); g.setLineDash([]);
-e.p.forEach(q => { g.beginPath(); g.arc(q[0], q[1], 1.3, 0, 7); g.fillStyle = '#ff8a2a'; g.fill(); g.strokeStyle = '#fff'; g.lineWidth = .3; g.stroke(); }); } };
-if (symEd.img){ const im = new Image(); im.onload = () => { g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(im, 0, 0, 256, 256); drawV(); }; im.src = symEd.img; }
-drawV();
+g.strokeStyle = 'rgba(0,0,0,.18)'; g.beginPath(); g.moveTo(128, 0); g.lineTo(128, 256); g.moveTo(0, 128); g.lineTo(256, 128); g.stroke();
+if (symEd.img){ const im = new Image(); im.onload = () => { g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(im, 0, 0, 256, 256); }; im.src = symEd.img; }
+g.setTransform(8, 0, 0, 8, 0, 0); g.lineCap = 'round'; g.lineJoin = 'round'; g.lineWidth = 2.6; g.strokeStyle = col; g.fillStyle = col;
+const els = symEd.els || [];
+if (edDrag && edDrag.a && edDrag.b && symTool !== 'sel' && symTool !== 'free'){ const [x0, y0] = edDrag.a, [x1, y1] = edDrag.b;
+const pv = symTool === 'line' ? {t:'line', x1:x0, y1:y0, x2:x1, y2:y1} : {t:symTool, x:Math.min(x0, x1), y:Math.min(y0, y1), w:Math.abs(x1 - x0), h:Math.abs(y1 - y0)};
+g.globalAlpha = .5; g.stroke(new Path2D(elPath(pv))); g.globalAlpha = 1; }
+els.forEach((e, i) => {
+if (e.t === 'text'){ g.font = `700 ${e.s || 12}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(e.txt, e.x, e.y); }
+else { const P = new Path2D(elPath(e)); if (e.fill) g.fill(P); else g.stroke(P); }
+if (i === selIdx){ const [x0, y0, x1, y1] = elBox(e); g.save(); g.strokeStyle = '#ff8a2a'; g.lineWidth = .4; g.setLineDash([1, 1]); g.strokeRect(x0 - 1, y0 - 1, x1 - x0 + 2, y1 - y0 + 2); g.restore(); }
+});
+if (polyCur){ g.fillStyle = '#ff8a2a'; polyCur.p.forEach(q => { g.beginPath(); g.arc(q[0], q[1], .7, 0, 7); g.fill(); }); }
 }
-{ const c = $('symCv'); let st = null, drag = null;
-const pos = e => { const r = c.getBoundingClientRect(), t = e.touches ? e.touches[0] : e; return [Math.max(0, Math.min(32, (t.clientX - r.left) / r.width * 32)), Math.max(0, Math.min(32, (t.clientY - r.top) / r.height * 32))]; };
-const down = e => { e.preventDefault(); const q = pos(e);
-if (symMode === 'pen'){ st = [q]; return; }
-const E = symEd.el, s0 = E[symSel];
-if (s0){ const k = s0.p.findIndex(h => Math.hypot(h[0] - q[0], h[1] - q[1]) < 2.6); if (k >= 0){ drag = {k, q}; return; } }
-symSel = -1; for (let i = E.length - 1; i >= 0; i--) if (elHit(E[i], q)){ symSel = i; break; }
-drag = symSel >= 0 ? {k:-1, q} : null; renderSymBars(); drawSymEd(); };
-const mv = e => { if (!st && !drag) return; e.preventDefault(); const q = pos(e);
-if (st){ const l = st[st.length-1]; if (Math.hypot(q[0] - l[0], q[1] - l[1]) > 0.5){ st.push(q); const g = c.getContext('2d'); g.setTransform(8, 0, 0, 8, 0, 0); g.strokeStyle = $('symCr').value; g.lineWidth = 2.6; g.lineCap = 'round'; g.beginPath(); g.moveTo(l[0], l[1]); g.lineTo(q[0], q[1]); g.stroke(); } return; }
-const s0 = symEd.el[symSel]; if (!s0) return;
-if (drag.k >= 0) s0.p[drag.k] = q; else { const dx = q[0] - drag.q[0], dy = q[1] - drag.q[1]; s0.p = s0.p.map(([x, y]) => [x + dx, y + dy]); drag.q = q; }
-drawSymEd(); };
-const up = () => { drag = null; if (!st) return; const P = st.map(([x, y]) => x.toFixed(1) + ' ' + y.toFixed(1)); symEd.hd.push(P.length === 1 ? `M${P[0]}h0.1` : 'M' + P[0] + 'L' + P.slice(1).join('L')); symEd._h.push('hd'); st = null; drawSymEd(); };
+function renderSymTools(){ $('symTool').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === symTool)); $('symPolyEnd').style.display = polyCur ? '' : 'none'; }
+$('symTool').querySelectorAll('button').forEach(b => b.onclick = () => { if (polyCur && polyCur.p.length < 2) symEd.els.splice(symEd.els.indexOf(polyCur), 1); polyCur = null; symTool = b.dataset.t; selIdx = -1; renderSymTools(); drawSymEd(); });
+{ const c = $('symCv'); let st = null;
+const pos = e => { const r = c.getBoundingClientRect(), t = e.touches ? (e.touches[0] || e.changedTouches[0]) : e; return [Math.max(0, Math.min(32, (t.clientX - r.left) / r.width * 32)), Math.max(0, Math.min(32, (t.clientY - r.top) / r.height * 32))]; };
+const down = e => { e.preventDefault(); const q = pos(e), els = symEd.els;
+if (symTool === 'free'){ st = [q]; return; }
+if (symTool === 'poly'){ if (!polyCur){ polyCur = {t:'poly', p:[q], fill:false}; els.push(polyCur); } else { const f0 = polyCur.p[0]; if (polyCur.p.length > 2 && Math.hypot(q[0] - f0[0], q[1] - f0[1]) < 1.6){ polyCur.cl = true; polyCur.fill = $('symFillNew').checked; polyCur = null; } else polyCur.p.push(q); } renderSymTools(); drawSymEd(); return; }
+if (symTool === 'text'){ const t = prompt('Буква, цифра или короткий текст знака', ''); if (t && t.trim()) els.push({t:'text', x:q[0], y:q[1], s:Math.max(6, Math.min(20, +(prompt('Размер (6–20)', '12') || 12))), txt:t.trim().slice(0, 6)}); drawSymEd(); return; }
+if (symTool === 'sel'){ selIdx = -1; for (let i = els.length - 1; i >= 0; i--){ const [x0, y0, x1, y1] = elBox(els[i]); if (q[0] >= x0 - 1.5 && q[0] <= x1 + 1.5 && q[1] >= y0 - 1.5 && q[1] <= y1 + 1.5){ selIdx = i; break; } } edDrag = {last:q}; drawSymEd(); return; }
+edDrag = {a:q, b:q};
+};
+const mv = e => { const q = pos(e);
+if (st){ e.preventDefault(); const l = st[st.length-1]; if (Math.hypot(q[0] - l[0], q[1] - l[1]) > 0.5){ st.push(q); const g = c.getContext('2d'); g.setTransform(8, 0, 0, 8, 0, 0); g.strokeStyle = edCol(); g.lineWidth = 2.6; g.lineCap = 'round'; g.beginPath(); g.moveTo(l[0], l[1]); g.lineTo(q[0], q[1]); g.stroke(); } return; }
+if (!edDrag) return; e.preventDefault();
+if (symTool === 'sel'){ if (selIdx >= 0){ const ok = elMove(symEd.els[selIdx], q[0] - edDrag.last[0], q[1] - edDrag.last[1]); if (!ok && !edDrag.warn){ edDrag.warn = 1; toast('Этот элемент можно удалить или залить, но не сдвинуть'); } } edDrag.last = q; drawSymEd(); return; }
+edDrag.b = q; drawSymEd();
+};
+const up = () => {
+if (st){ const P = st.map(([x, y]) => x.toFixed(1) + ' ' + y.toFixed(1)); symEd.els.push({t:'free', p:P.length === 1 ? `M${P[0]}h0.1` : 'M' + P[0] + 'L' + P.slice(1).join('L')}); st = null; drawSymEd(); return; }
+if (!edDrag) return;
+if (symTool !== 'sel' && edDrag.a){ const [x0, y0] = edDrag.a, [x1, y1] = edDrag.b;
+if (Math.hypot(x1 - x0, y1 - y0) >= 1) symEd.els.push(symTool === 'line' ? {t:'line', x1:x0, y1:y0, x2:x1, y2:y1} : {t:symTool, x:Math.min(x0, x1), y:Math.min(y0, y1), w:Math.max(1, Math.abs(x1 - x0)), h:Math.max(1, Math.abs(y1 - y0)), fill:symTool !== 'arc' && $('symFillNew').checked}); }
+edDrag = null; drawSymEd();
+};
 c.addEventListener('touchstart', down, {passive:false}); c.addEventListener('touchmove', mv, {passive:false}); c.addEventListener('touchend', up);
 c.addEventListener('mousedown', down); c.addEventListener('mousemove', mv); addEventListener('mouseup', up); }
-$('symCr').oninput = () => drawSymEd();
-$('symUndo').onclick = () => { const k = symEd._h.pop();
-if (k === 'el' && symEd.el.length) symEd.el.pop(); else if (k === 'hd' && symEd.hd.length) symEd.hd.pop();
-else if (symEd.el.length) symEd.el.pop(); else if (symEd.hd.length) symEd.hd.pop(); else if (symEd.hf.length) symEd.hf.pop(); else delete symEd.img;
-symSel = -1; renderSymBars(); drawSymEd(); };
-$('symClr').onclick = () => { symEd.el = []; symEd.hd = []; symEd.hf = []; symEd._h = []; symSel = -1; delete symEd.img; renderSymBars(); drawSymEd(); };
+$('symPolyEnd').onclick = () => { if (polyCur && polyCur.p.length < 2) symEd.els.splice(symEd.els.indexOf(polyCur), 1); polyCur = null; renderSymTools(); drawSymEd(); };
+$('symDelEl').onclick = () => { if (selIdx < 0){ toast('Выберите элемент инструментом «Выбор»'); return; } symEd.els.splice(selIdx, 1); selIdx = -1; drawSymEd(); };
+$('symFillEl').onclick = () => { if (selIdx < 0){ toast('Выберите элемент инструментом «Выбор»'); return; } const e = symEd.els[selIdx]; if (e.t === 'text') return; e.fill = !e.fill; drawSymEd(); };
+['symCR', 'symCB'].forEach(id => $(id).onchange = drawSymEd);
+$('symUndo').onclick = () => { if (polyCur){ polyCur.p.pop(); if (!polyCur.p.length){ symEd.els.splice(symEd.els.indexOf(polyCur), 1); polyCur = null; } } else if (symEd.els.length) symEd.els.pop(); else delete symEd.img; selIdx = -1; renderSymTools(); drawSymEd(); };
+$('symClr').onclick = () => { symEd.els = []; polyCur = null; selIdx = -1; delete symEd.img; renderSymTools(); drawSymEd(); };
 $('symImg').onclick = () => $('symImgIn').click();
 $('symImgIn').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
 const im = new Image(), u = URL.createObjectURL(f);
 im.onload = () => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), sc = Math.min(64 / im.width, 64 / im.height), w = im.width * sc, h = im.height * sc;
 g.drawImage(im, (64 - w) / 2, (64 - h) / 2, w, h); const d = g.getImageData(0, 0, 64, 64), px = d.data;
 for (let i = 0; i < px.length; i += 4){ const lum = .3 * px[i] + .59 * px[i+1] + .11 * px[i+2]; px[i+3] = Math.round(Math.max(0, Math.min(255, (235 - lum) * 3)) * px[i+3] / 255); px[i] = px[i+1] = px[i+2] = 0; }
-g.putImageData(d, 0, 0); symEd.img = c.toDataURL('image/png'); symEd.el = []; symEd.hd = []; symEd.hf = []; symSel = -1; renderSymBars(); URL.revokeObjectURL(u); drawSymEd(); };
+g.putImageData(d, 0, 0); symEd.img = c.toDataURL('image/png'); symEd.els = []; URL.revokeObjectURL(u); drawSymEd(); };
 im.src = u; };
 $('symSave').onclick = () => {
 const n = $('symN').value.trim(); if (!n){ $('symN').focus(); return; }
-Object.assign(symEd, compileEl(symEd)); delete symEd._h; symEd.cr = $('symCr').value; symEd.cb = $('symCb').value;
-symEd.n = n; symEd.edited = true; symEd.ab = $('symAb').value.trim() || n.slice(0, 2).toUpperCase(); symEd.fav = $('symFav').checked; symEd.scl = $('symScl').checked;
-if (symEd.type === 'pt' && !symEd.d.length && !symEd.f.length && !symEd.tx.length && !symEd.img){ toast('Нарисуйте значок или загрузите картинку'); return; }
+symEd.n = n; symEd.edited = true; symEd.ab = $('symAb').value.trim() || n.slice(0, 2).toUpperCase(); symEd.fav = $('symFav').checked; symEd.scl = $('symScl').checked; symEd.cR = $('symCR').value; symEd.cB = $('symCB').value;
+if (polyCur){ if (polyCur.p.length < 2) symEd.els.splice(symEd.els.indexOf(polyCur), 1); polyCur = null; }
+if (symEd.type === 'pt'){ compileSym(symEd); if (!symEd.d.length && !symEd.f.length && !symEd.tx.length && !symEd.img){ toast('Добавьте элементы значка или загрузите картинку'); return; } }
 const i = SYMS.findIndex(x => x.id === symEd.id); if (i >= 0) SYMS[i] = symEd; else SYMS.push(symEd);
 saveSyms(); closeModals(); renderMarkers(); toast('Знак сохранён'); renderSymList(); openModal('setModal');
 };
@@ -2525,12 +2521,13 @@ if (def){ const i = SYMS.findIndex(x => x.id === symEd.id); SYMS[i] = defSym(def
 askConfirm(`Удалить знак «${symEd.n}»? Уже нанесённые объекты останутся обычными точками.`, 'Удалить', () => { SYMS = SYMS.filter(x => x.id !== symEd.id); saveSyms(); renderMarkers(); renderSymList(); openModal('setModal'); });
 };
 // ---- выбор знака в «Новый слой»
-let mSide = '', mSym = null;
+let mSide = '', mSym = null, mFc = null;
 function renderSymPick(){
 $('symSideSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.s === mSide));
-const g = $('symGrid'); g.style.display = mSide ? 'flex' : 'none'; if (!mSide) return;
-const col = SIDES[mSide].color, list = SYMS.filter(s => s.type === 'pt').sort((a, b) => (b.fav ? 1 : 0) - (a.fav ? 1 : 0));
-g.innerHTML = list.map(s => `<button class="symb${s.id === mSym ? ' on' : ''}" data-id="${s.id}" title="${escapeHtml(s.n)}" style="color:${symCol(s.id, mSide)}">${symSvg(s.id)}</button>`).join('');
+const g = $('symGrid'); g.style.display = mSide ? 'flex' : 'none'; $('arrFillW').style.display = mSide ? '' : 'none'; if (!mSide) return;
+renderFillPick($('arrFill'), mFc, c => { mFc = c; });
+const list = SYMS.filter(s => s.type === 'pt').sort((a, b) => (b.fav ? 1 : 0) - (a.fav ? 1 : 0));
+g.innerHTML = list.map(s => `<button class="symb${s.id === mSym ? ' on' : ''}" data-id="${s.id}" title="${escapeHtml(s.n)}" style="color:${symCol(s.id, mSide, SIDES[mSide].color)}">${symSvg(s.id, mFc)}</button>`).join('');
 g.querySelectorAll('button').forEach(b => b.onclick = () => { mSym = b.dataset.id; renderSymPick(); toast(SYM_BY[mSym].n); });
 }
 $('symSideSeg').querySelectorAll('button').forEach(b => b.onclick = () => { mSide = b.dataset.s; if (mSide && !mSym) mSym = (SYMS.find(s => s.type === 'pt' && s.fav) || SYMS.find(s => s.type === 'pt')).id; renderSymPick(); });
@@ -2585,29 +2582,37 @@ function radSym(side, kind){
 const S = SIDES[side], types = kind === 'line' ? ['line'] : kind === 'area' ? ['area'] : ['pt'];
 const list = SYMS.filter(s => s.fav && types.includes(s.type));
 if (!list.length){ toast('В избранном нет знаков этого типа — отметьте их ★ в ⚙ Настр.'); return; }
-radPush(`${S.name} · ${{pt:'точка', arr:'массив', line:'линия', area:'зона'}[kind]}`, list.map(sy => ({t:sy.n, ic:symSvg(sy.id), color:symCol(sy.id, side), go:() => pickSym(side, kind, sy.id)})));
+radPush(`${S.name} · ${{pt:'точка', arr:'массив', line:'линия', area:'зона'}[kind]}`, list.map(sy => ({t:sy.n, ic:symSvg(sy.id), color:S.color, go:() => pickSym(side, kind, sy.id)})));
+}
+let placeFc = null;
+function renderFillPick(el, cur, onPick){
+const cols = [...new Set(state.palette.map(p => p.color).concat(['#ffd400', '#2aa84a', '#ffffff', '#8a8a8a']))];
+el.innerHTML = `<button class="same ${cur ? '' : 'on'}" data-c="">без заливки</button>` + cols.map(c => `<button data-c="${c}" class="${c === cur ? 'on' : ''}" style="background:${c}"></button>`).join('');
+el.querySelectorAll('button').forEach(b => b.onclick = () => { const c = b.dataset.c || null; onPick(c); renderFillPick(el, c, onPick); });
 }
 function sideStyle(side){ const S = SIDES[side]; return {color:S.color, name:S.name, glyph:''}; }
 function pickSym(side, kind, sid){
 if (kind === 'line' || kind === 'area') return startLineSym(side, sid, kind);
 const S = SIDES[side], sy = SYM_BY[sid], ll = radPos.ll; closeRadial();
 let autoA = state.arrays.find(x => x.symSide === side && x.kind === 'main' && x.sym === sid);
-let uf = ''; $('askFillW').style.display = sy.img ? 'none' : ''; fillPick($('askFill'), '', c => uf = c);
 $('askTitle').textContent = `${S.name}: ${sy.n}${kind === 'arr' ? ' — массив' : ''}`;
 $('askHint').innerHTML = kind === 'arr'
 ? `<b>Автоматически</b> — номера по порядку: ${escapeHtml(autoA ? labelOf(autoA, autoA.points.length) : S.pre + sy.ab + '1')}, … (префикс и шаг можно поменять в «Настройках» слоя).<br><b>Вручную</b> — для каждой точки введёте название и номер сами.<br>Первая точка — в месте удержания, дальше касайтесь карты, в конце ✓.`
 : `<b>Автоматически</b> — название «${escapeHtml(sy.n)} N».<br><b>Вручную</b> — введёте название сами.`;
+placeFc = null; renderFillPick($('askFill'), null, c => { placeFc = c; });
 $('askAuto').onclick = () => { closeModals();
 if (kind === 'pt'){ const a = symObjLayer(side); const cnt = a.points.filter(p => p.sym === sid).length;
-const p = {lat:ll.lat, lng:ll.lng, h:null, place:'', name:`${sy.n} ${cnt + 1}`, sym:sid}; if (uf) p.uf = uf; a.points.push(p); fillHeight(p); fillPlace(p); persist(); renderMarkers(); toast(`${S.name}: ${p.name}`); return; }
+const p = {lat:ll.lat, lng:ll.lng, h:null, place:'', name:`${sy.n} ${cnt + 1}`, sym:sid}; if (placeFc) p.fc = placeFc; a.points.push(p); fillHeight(p); fillPlace(p); persist(); renderMarkers(); toast(`${S.name}: ${p.name}`); return; }
 if (!autoA){ autoA = normArr({id:Date.now(), kind:'main', name:`${S.name}: ${sy.n}`, ident:`${S.name} ${sy.n}`, prefix:S.pre + sy.ab, start:'1', step:1, style:sideStyle(side), symSide:side, sym:sid, points:[]}); state.arrays.push(autoA); }
-autoA.uf = uf; startSession(autoA.id, 'pick'); toast('Касайтесь карты, чтобы ставить точки, в конце ✓');
+if (placeFc) autoA.fc = placeFc;
+startSession(autoA.id, 'pick'); toast('Касайтесь карты, чтобы ставить точки, в конце ✓');
 };
 $('askManual').onclick = () => { closeModals();
-if (kind === 'pt'){ const a = symObjLayer(side); pendSym = {aid:a.id, sid, uf}; openAux(a, null, ll); $('auxTitle').textContent = `${S.name}: ${sy.n}`; $('auxName').placeholder = `название и номер (пусто — ${sy.n})`; return; }
+if (kind === 'pt'){ const a = symObjLayer(side); pendSym = {aid:a.id, sid, fc:placeFc}; openAux(a, null, ll); $('auxTitle').textContent = `${S.name}: ${sy.n}`; $('auxName').placeholder = `название и номер (пусто — ${sy.n})`; return; }
 let a = state.arrays.find(x => x.symSide === side && x.kind === 'pts' && x.sym === sid);
 if (!a){ a = normArr({id:Date.now(), kind:'pts', name:`${S.name}: ${sy.n} (подписи)`, ident:`${S.name} ${sy.n}`, style:sideStyle(side), symSide:side, sym:sid, points:[]}); state.arrays.push(a); }
-a.uf = uf; startSession(a.id, 'pick'); toast('Касайтесь карты, чтобы ставить точки, в конце ✓');
+if (placeFc) a.fc = placeFc;
+startSession(a.id, 'pick'); toast('Касайтесь карты, чтобы ставить точки, в конце ✓');
 };
 openModal('askModal');
 }
@@ -2620,7 +2625,7 @@ function startLineSym(side, sid, kind){
 const S = SIDES[side], sy = SYM_BY[sid], ll = radPos.ll; closeRadial();
 let a = state.arrays.find(x => x.symSide === side && x.kind === 'shapes');
 if (!a){ a = normArr({id:Date.now(), kind:'shapes', name:`${S.name}: линии и зоны`, ident:S.name, style:sideStyle(side), symSide:side, points:[], shapes:[]}); state.arrays.push(a); persist(); }
-openTools(a.id); tool.mode = kind === 'area' ? 'poly' : 'line'; tool.sym = sid; tool.scl = !!sy.scl; tool.color = Object.assign(sideStyle(side), {color:symCol(sid, side)}); tool.op = sy.style === 'hatch' ? 0 : 25; tool.pts = []; tool.r = 0;
+openTools(a.id); tool.mode = kind === 'area' ? 'poly' : 'line'; tool.sym = sid; tool.scl = !!sy.scl; tool.color = {color:symCol(sid, side, SIDES[side].color), name:SIDES[side].name, glyph:''}; tool.op = sy.style === 'hatch' ? 0 : 25; tool.pts = []; tool.r = 0;
 toast(`${sy.n}: касайтесь карты, ставя точки линии, затем «Сохранить»`);
 }
 function placeAuxAt(){
