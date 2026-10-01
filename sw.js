@@ -1,4 +1,4 @@
-const V = 'skat-2.6';
+const V = 'skat-3.7';
 const APP = 'skat-app-' + V, LIB = 'skat-lib', TILES = 'skat-tiles';
 const SHELL = ['./', './index.html'];
 const LIBS = ['https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
