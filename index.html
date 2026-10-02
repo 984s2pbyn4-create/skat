@@ -128,6 +128,11 @@ body:has(#v3d.on) .modal{z-index:2600}
 #laySelBar{flex-wrap:wrap}#laySelBar button{flex:0 1 auto;min-height:36px;padding:4px 10px;font-size:13.5px}
 .kth{width:24px;height:24px;flex:none;display:grid;place-items:center;background:#f2f2ec;border-radius:6px;color:#333;font-size:14px}.kth svg{width:20px;height:20px}.kth i{width:11px;height:11px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
 .tg{color:var(--signal);font-weight:600}
+#corr{position:fixed;left:10px;top:calc(var(--safe-t) + var(--tg) + 68px);z-index:1100;display:none;flex-direction:column;gap:6px;padding:10px 12px;max-width:min(360px,calc(100vw - 90px));color:var(--ink);font-size:14px}
+#corr.on{display:flex}.crow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.crow b{flex:1}.crow button,.crow select{min-height:36px;padding:4px 10px;border-radius:10px;background:var(--panel2);color:var(--ink);border:0}
+.crow button.on{box-shadow:0 0 0 2px var(--signal)}.cdv{line-height:1.4}.ctm{font:800 26px/1 "IBM Plex Sans Condensed",sans-serif;color:#ffd400}
+.boomic{position:relative;transform:translate(-50%,-50%);width:30px;height:30px}.boomic svg{width:30px;height:30px;filter:drop-shadow(0 0 2px #000)}.boomic b{position:absolute;right:-8px;top:-8px;background:#111;color:#fff;border-radius:9px;font:700 11px/16px sans-serif;min-width:16px;text-align:center;padding:0 3px}
+.ctgun,.cttgt{transform:translate(-50%,-50%);font:800 22px/1 sans-serif;color:#ff8a2a;text-shadow:0 0 3px #000;display:inline-block}.cttgt{color:#e2533f;font-size:28px}
 #compass{position:fixed;left:10px;bottom:calc(max(var(--sheet-h,0px), calc(var(--safe-b) + var(--badge))) + 12px);z-index:1000;width:48px;height:48px;min-height:0;padding:0;border-radius:50%;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center}
 #compass svg{width:30px;height:30px}
 #cross{position:fixed;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;z-index:460;pointer-events:none}
@@ -272,6 +277,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <button class="rb accent" id="newArrBtn" title="Добавить"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Добавить</button>
 <button class="rb" id="layBtn" title="Слои"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>Слои</button>
 <button class="rb" id="setBtn" title="Настройки"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Настр.</button>
+<button class="rb" id="corrBtn" title="Корректировка огня" style="display:none"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>Корр.</button>
 <button class="rb" id="prnBtn" title="Печать в JPEG" style="display:none"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2"/><path d="M7 14h10v7H7z"/></svg>Печать</button>
 <button class="rb" id="searchBtn" title="Поиск по координатам"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>Поиск</button>
 <button class="rb" id="toolBtn" title="Инструменты"><svg viewBox="0 0 24 24"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg>Инстр.</button>
@@ -470,7 +476,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div id="radial"></div>
 <div id="launch"><div class="lc"><h2>СКАТ</h2><p>Выберите раздел</p>
 <button data-m="op"><b>Оператор</b><small>Нанесение обстановки, тактические знаки, надписи, оформление и печать, импорт и экспорт</small></button>
-<button data-m="tp"><b>Топопланшет</b><small>Точки, массивы, маршруты, инструменты, таблицы Excel</small></button>
+<button data-m="tp"><b>Боевой контур</b><small>Точки, массивы, маршруты, инструменты, таблицы Excel</small></button>
 <button data-m="mk"><b>Макет</b><small>3D-рельеф местности, модели, анимация</small></button></div></div>
 <div class="modal" id="addModal"><div class="card"><h3 id="addTitle">Добавить</h3><div class="addgrid" id="addGrid"></div><div class="row" style="margin-top:10px"><button class="ghost" data-close>Отмена</button></div></div></div>
 <div class="modal" id="spModal"><div class="card big"><h3>Знаки</h3><div class="spgrid" id="spGrid"></div><div class="row" style="margin-top:10px"><button class="ghost" data-close>Отмена</button></div></div></div>
@@ -531,17 +537,19 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="row"><button class="ghost" data-close>Отмена</button><button class="ok" id="batOk">Применить</button></div></div></div>
 <div class="modal" id="propModal"><div class="card big"><h3>Свойства знака</h3>
 <label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="prPlan" style="width:22px;min-height:22px;margin:0"> Планируется (знак пунктиром)</label>
+<label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="prNoL" style="width:22px;min-height:22px;margin:0"> Без подписи</label>
 <label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="prFake" style="width:22px;min-height:22px;margin:0"> Ложная (знак зелёным)</label>
 <div class="duo"><label class="f">Размер знака: <span id="prSzV"></span><input type="range" id="prSz" min="0.5" max="3" step="0.1" style="width:100%"></label><label class="f">Толщина линий: <span id="prLwV"></span><input type="range" id="prLw" min="1" max="5" step="0.2" style="width:100%"></label></div>
 <div class="duo"><label class="f">Шрифт подписи<select id="prLf"></select></label><label class="f">Размер подписи: <span id="prLsV"></span><input type="range" id="prLs" min="8" max="30" step="0.5" style="width:100%"></label></div>
 <div class="flabel">Цвет подписи</div><div class="colors strip" id="prLc"></div>
 <div class="row"><button class="ok" id="prOk">Готово</button></div></div></div>
+<div id="corr" class="glass"></div>
 <div id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 5.2';
+const VERSION = 'версия 5.3';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -614,11 +622,11 @@ const DEFAULT_PAL = [
 {color:PINK, name:'Розовый', glyph:'ЗМ'}, {color:PINK, name:'Розовый', glyph:'Вс'},
 {color:'#8a8a8a', name:'Серый', glyph:''}];
 const PAL_VER = 2;
-const state = { scenes: saved.scenes || [], trash: saved.trash || [], arrays: saved.arrays || [], layer: LAYERS[saved.layer] ? saved.layer : 'ya_map', grid: saved.grid !== false, full: saved.full === true, places: saved.places !== false, voice: saved.voice === true,
+const state = { ftasks: saved.ftasks || [], scenes: saved.scenes || [], trash: saved.trash || [], arrays: saved.arrays || [], layer: LAYERS[saved.layer] ? saved.layer : 'ya_map', grid: saved.grid !== false, full: saved.full === true, places: saved.places !== false, voice: saved.voice === true,
 palette: (saved.palVer === PAL_VER && saved.palette) || DEFAULT_PAL.map(x => ({...x})) };
 let persistT = 0;
 function persistNow(){ clearTimeout(persistT);
-try{ localStorage.setItem(LS, JSON.stringify({scenes:state.scenes, trash:state.trash, arrays:state.arrays, palette:state.palette, palVer:PAL_VER, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice})); }catch(e){} histSnap(); }
+try{ localStorage.setItem(LS, JSON.stringify({ftasks:state.ftasks, scenes:state.scenes, trash:state.trash, arrays:state.arrays, palette:state.palette, palVer:PAL_VER, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice})); }catch(e){} histSnap(); }
 function persist(){ clearTimeout(persistT); persistT = setTimeout(persistNow, 400); }
 document.addEventListener('visibilitychange', () => { if (document.hidden) persistNow(); });
 addEventListener('pagehide', persistNow);
@@ -904,7 +912,7 @@ if (a.kind === 'shapes'){ if (z < (a.minZ || 0)) return; drawShapes(a, z >= (a.l
 if (a.shapes && a.shapes.length && z >= (a.minZ || 0)) drawShapes(a, z >= (a.lblZ ?? DEF_LBLZ));
 if (a.opt && !active) return;
 if (!active && z < (a.minZ || 0)) return;
-const showLb = editing || active || z >= (a.lblZ ?? DEF_LBLZ);
+const showLb = editing || active || (z >= (a.lblZ ?? DEF_LBLZ) && !a.nolbl && !NOLBL);
 if (a.kind === 'route' && a.points.length > 1){ const pl = L.polyline(a.points.map(p => [p.lat,p.lng]), {color:a.style.color, weight:3.5, opacity:0.9*op, interactive:false}); pl._rtId = a.id; markers.addLayer(pl); }
 a.points.forEach((p,i) => {
 if (p.hid || !tagOk(a, p)) return;
@@ -914,11 +922,11 @@ let html;
 if (a.kind === 'aux'){
 const icon = editing || active || !a.noIcon;
 if (!icon && !showLb) return;
-html = `<div class="ax${editing?' edit':''}${icon?'':' noicon'}" style="opacity:${op}">${icon ? `<div class="tr">${TREE(a.style.color)}</div>` : ''}${showLb ? `<div class="lb">${escapeHtml(p.name)}</div>` : ''}</div>`;
+html = `<div class="ax${editing?' edit':''}${icon?'':' noicon'}" style="opacity:${op}">${icon ? `<div class="tr">${TREE(a.style.color)}</div>` : ''}${showLb && !p.nolbl ? `<div class="lb">${escapeHtml(p.name)}</div>` : ''}</div>`;
 } else {
 const st = styleOf(a,p), ex = a.kind === 'desc', g = ex ? '!' : (st.glyph||''), sid = p.sym === '_none' ? null : (p.sym || a.sym);
-if (sid && SYM_BY[sid]) html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="sym" style="color:${p.fake ? FAKE : symCol(sid, sideOf(a, p), st.color)}${p.rot || p.ssz ? `;transform:${p.rot ? `rotate(${p.rot}deg)` : ''} ${p.ssz ? `scale(${p.ssz})` : ''}` : ''}">${symSvg(sid, p.fc || a.fc, symOpt(p))}</div>${showLb ? `<div class="lb"${lbStyle(p)}>${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
-else html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="dot${g?' g':''}${ex?' ex':''}" style="background:${st.color};color:${ink(st.color)}">${escapeHtml(g)}</div>${showLb ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
+if (sid && SYM_BY[sid]) html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="sym" style="color:${p.fake ? FAKE : symCol(sid, sideOf(a, p), st.color)}${p.rot || p.ssz ? `;transform:${p.rot ? `rotate(${p.rot}deg)` : ''} ${p.ssz ? `scale(${p.ssz})` : ''}` : ''}">${symSvg(sid, p.fc || a.fc, symOpt(p))}</div>${showLb && !p.nolbl ? `<div class="lb"${lbStyle(p)}>${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
+else html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="dot${g?' g':''}${ex?' ex':''}" style="background:${st.color};color:${ink(st.color)}">${escapeHtml(g)}</div>${showLb && !p.nolbl ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
 }
 const m = L.marker([p.lat,p.lng], {icon:L.divIcon({className:'pt-wrap', html, iconSize:[0,0]}), draggable:editing, interactive:editing, keyboard:false});
 if (editing){
@@ -955,7 +963,7 @@ ctx2.fillStyle = '#111'; ctx2.fillText(t, lx, y);
 state.arrays.forEach(a => {
 if (!a.opt || a.hidden || (session && session.arrId === a.id) || z < (a.minZ || 0)) return;
 ctx2.globalAlpha = session ? .45 : 1;
-const showLb = z >= (a.lblZ ?? DEF_LBLZ);
+const showLb = z >= (a.lblZ ?? DEF_LBLZ) && !a.nolbl && !NOLBL;
 if (a.kind === 'route' && a.points.length > 1){
 ctx2.beginPath();
 a.points.forEach((p,i) => { const q = map.latLngToLayerPoint([p.lat,p.lng]).subtract(BX.o); i ? ctx2.lineTo(q.x,q.y) : ctx2.moveTo(q.x,q.y); });
@@ -976,11 +984,11 @@ if (showLb) lbl(p.name, q.x+11, q.y-3, true, false);
 return;
 }
 const st = styleOf(a,p), g = a.kind === 'desc' ? '!' : (st.glyph||''), r = g ? 10 : 6, sid = p.sym === '_none' ? null : (p.sym || a.sym);
-if (sid && SYM_BY[sid]){ if (p.rot){ ctx2.save(); ctx2.translate(q.x, q.y); ctx2.rotate(p.rot * Math.PI / 180); drawSym(ctx2, sid, 0, 0, p.fake ? FAKE : symCol(sid, sideOf(a, p), st.color), p.fc || a.fc, 0, p.ssz, symOpt(p)); ctx2.restore(); } else drawSym(ctx2, sid, q.x, q.y, p.fake ? FAKE : symCol(sid, sideOf(a, p), st.color), p.fc || a.fc, 0, p.ssz, symOpt(p)); if (showLb) lbl(labelOf(a,i), q.x+17, q.y-16, false, false); return; }
+if (sid && SYM_BY[sid]){ if (p.rot){ ctx2.save(); ctx2.translate(q.x, q.y); ctx2.rotate(p.rot * Math.PI / 180); drawSym(ctx2, sid, 0, 0, p.fake ? FAKE : symCol(sid, sideOf(a, p), st.color), p.fc || a.fc, 0, p.ssz, symOpt(p)); ctx2.restore(); } else drawSym(ctx2, sid, q.x, q.y, p.fake ? FAKE : symCol(sid, sideOf(a, p), st.color), p.fc || a.fc, 0, p.ssz, symOpt(p)); if (showLb && !p.nolbl) lbl(labelOf(a,i), q.x+17, q.y-16, false, false); return; }
 ctx2.beginPath(); ctx2.arc(q.x, q.y, r, 0, Math.PI*2); ctx2.fillStyle = st.color; ctx2.fill();
 ctx2.strokeStyle = '#fff'; ctx2.lineWidth = 2; ctx2.stroke();
 if (g){ ctx2.fillStyle = ink(st.color); ctx2.font = `800 ${g === '!' ? 13 : 10}px "IBM Plex Sans Condensed", sans-serif`; ctx2.textAlign = 'center'; ctx2.textBaseline = 'middle'; ctx2.fillText(g, q.x, q.y+0.5); ctx2.textAlign = 'left'; }
-if (showLb) lbl(labelOf(a,i), q.x+r+3, q.y-r-2, false, false);
+if (showLb && !p.nolbl) lbl(labelOf(a,i), q.x+r+3, q.y-r-2, false, false);
 });
 });
 ctx2.globalAlpha = 1;
@@ -1244,7 +1252,7 @@ if (session.sym){ p.sym = session.sym; if (session.side) p.side = session.side; 
 if (session.style && !sameSt(session.style, a.style)) p.style = copySt(session.style);
 a.points.push(p); fillHeight(p); fillPlace(p); persist(); renderMarkers(); renderSheet();
 }
-map.on('click', e => { if (tblPending && tblPending.rows && !session){ const a = (tblPending.target && arrById(tblPending.target)) || textLayer(); if (!a.tables) a.tables = []; openTbEd(a, null, e.latlng); return; }
+map.on('click', e => { if (CT && !session && !tool.on){ corrTap(e.latlng); return; } if (tblPending && tblPending.rows && !session){ const a = (tblPending.target && arrById(tblPending.target)) || textLayer(); if (!a.tables) a.tables = []; openTbEd(a, null, e.latlng); return; }
 if (textPending && !session){ const a = textLayer(); openTextEd(a, null, e.latlng); return; } if (session && session.mode === 'pick') addPoint(e.latlng); else if (!session && tool.on) toolAdd(e.latlng); });
 const sheet = $('sheet');
 { let sy = 0; sheet.addEventListener('touchstart', e => { sy = e.touches[0].clientY; }, {passive:true});
@@ -1837,7 +1845,7 @@ $('pdbExp').onclick = () => { closeModals(); exportPlaces(); };
 $('pdbImp').onclick = () => $('offIn').click();
 // ======== ИНСТРУМЕНТЫ ========
 const SHAPE_NAMES = {line:'Линия', poly:'Многоугольник', rect:'Прямоугольник', circle:'Круг'};
-const MODE_NAMES = {line:'Линейка', poly:'Многоугольник', rect:'Прямоугольник', circle:'Круг', sector:'Сектор', oval:'Овалы (массив)'};
+const MODE_NAMES = {line:'Линейка', poly:'Многоугольник', rect:'Прямоугольник', circle:'Круг', sector:'Сектор', oval:'Полосы (массив)'};
 const tool = {on:false, mode:'line', pts:[], r:0, color:null, op:35, mini:false, target:null};
 const toolLayer = L.layerGroup().addTo(map);
 const fmtDist = d => d < 1000 ? `${Math.round(d)} м` : `${(d/1000).toFixed(2).replace('.', ',')} км`;
@@ -1902,7 +1910,7 @@ function toolSummary(){
 const sh = curShape(), m = tool.mode;
 if (m === 'sector' && tool.pts.length === 2){ const g0 = segInfo(tool.pts[0], tool.pts[1], GEO.toSK(tool.pts[0].lat, tool.pts[0].lng).zone); return `Радиус <b>${fmtDist(g0.d)}</b> · ДУ <b>${milStr(g0.mil)}</b> · аз. ${g0.az.toFixed(1).replace('.', ',')}° · ширина ${tool.sw || 30}° (${milStr(Math.round((tool.sw || 30) / 360 * 6000))})`; }
 if (m === 'sector') return tool.pts.length ? 'Коснитесь точки на краю — радиус и направление' : 'Коснитесь центра сектора';
-if (m === 'oval') return 'Касайтесь двух концов каждой области — овал сохраняется сразу; можно ставить подряд';
+if (m === 'oval') return 'Касайтесь двух концов каждой полосы — она сохраняется сразу; можно ставить подряд';
 if (!sh) return m === 'line' ? 'Ставьте точки: от первой до последней' : m === 'poly' ? 'Ставьте вершины (не меньше трёх)' : m === 'rect' ? 'Поставьте два противоположных угла' : tool.pts.length ? 'Коснитесь края круга или введите радиус' : 'Коснитесь центра круга';
 const g = shapeGeo(sh);
 if (m === 'line'){ const last = g.segs[g.segs.length-1]; return `Длина <b>${fmtDist(g.len)}</b> · отрезков ${g.segs.length}${g.segs.length === 1 ? ` · ДУ <b>${milStr(last.mil)}</b>` : ''}`; }
@@ -1924,7 +1932,7 @@ el.innerHTML = `<h2>Инструменты <span><button class="ghost" id="tX" s
 <p class="res">${toolSummary()}</p>
 ${tool.sym && SYM_BY[tool.sym] ? `<p class="status">Знак: <b>${escapeHtml(SYM_BY[tool.sym].n)}</b></p><label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="tScl" ${tool.scl ? 'checked' : ''} style="width:22px;min-height:22px;margin:0"> Масштабировать с картой</label>` : ''}
 ${segs ? `<div class="segs">${segs}</div>` : ''}
-${m === 'sector' ? `<label class="f">Ширина сектора, °<input id="tSw" inputmode="decimal" value="${tool.sw || 30}"></label>` : ''}${m === 'oval' ? `<label class="f">Ширина овала, м<input id="tOw" inputmode="decimal" value="${tool.ow || 30}"></label>` : ''}${m === 'circle' && tool.pts.length ? `<label class="f">Радиус, м<input id="tR" inputmode="decimal" value="${tool.r ? Math.round(tool.r) : ''}" placeholder="например, 500"></label>` : ''}
+${m === 'sector' ? `<label class="f">Ширина сектора, °<input id="tSw" inputmode="decimal" value="${tool.sw || 30}"></label>` : ''}${m === 'oval' ? `<label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="tOc" ${tool.op === 0 ? 'checked' : ''} style="width:22px;min-height:22px;margin:0"> Только контур</label>` : ''}${m === 'oval' ? `<label class="f">Ширина полосы, м<input id="tOw" inputmode="decimal" value="${tool.ow || 30}"></label>` : ''}${m === 'circle' && tool.pts.length ? `<label class="f">Радиус, м<input id="tR" inputmode="decimal" value="${tool.r ? Math.round(tool.r) : ''}" placeholder="например, 500"></label>` : ''}
 <div class="row" style="margin-bottom:8px"><button id="tUndo" ${tool.pts.length ? '' : 'disabled'}>↶ Убрать</button><button id="tCross">⊕ В прицел</button><button class="ghost" id="tClear" ${tool.pts.length ? '' : 'disabled'}>Сброс</button>${line ? `<button id="tProf" ${sh ? '' : 'disabled'}>Профиль высот</button>` : ''}</div>
 <div class="flabel">Цвет</div><div class="colors strip" id="tCol"></div>
 ${line ? '' : `<label class="f">Прозрачность заливки: <span id="tOpV">${tool.op}%</span><input type="range" id="tOp" min="0" max="90" step="5" value="${tool.op}"></label>`}
@@ -1937,6 +1945,7 @@ renderPalette($('tCol'), tool.color, pickC);
 if ($('tOp')) $('tOp').oninput = e => { tool.op = +e.target.value; $('tOpV').textContent = tool.op + '%'; drawTool(); };
 if ($('tSw')) $('tSw').onchange = e => { const v = parseFloat(String(e.target.value).replace(',', '.')); if (v > 0 && v < 360){ tool.sw = v; drawTool(); renderTool(); } };
 if ($('tOw')) $('tOw').onchange = e => { const v = parseFloat(String(e.target.value).replace(',', '.')); if (v > 0){ tool.ow = v; } };
+if ($('tOc')) $('tOc').onchange = e => { tool.op = e.target.checked ? 0 : 35; renderTool(); };
 if ($('tR')) $('tR').onchange = e => { const v = parseFloat(String(e.target.value).replace(',', '.')); if (v > 0){ tool.r = v; drawTool(); renderTool(); } };
 if ($('tClear')) $('tClear').onclick = () => { tool.pts = []; tool.r = 0; drawTool(); renderTool(); };
 if ($('tProf')) $('tProf').onclick = () => showProfile(tool.pts.slice());
@@ -2265,6 +2274,9 @@ g.strokeStyle = 'rgba(30,30,30,.9)'; g.lineWidth = 2; g.beginPath(); g.moveTo(x0
 g.fillStyle = 'rgba(255,255,255,.93)'; g.strokeStyle = col; g.lineWidth = 2; g.beginPath(); g.roundRect ? g.roundRect(x0 - 20, top, 40, 38, 6) : g.rect(x0 - 20, top, 40, 38); g.fill(); g.stroke();
 if (kind === 'ts') drawSym(g, a1, x0, top + 19, col, a4 || null); else { g.fillStyle = col; g.beginPath(); g.arc(x0, top + 19, 8, 0, 7); g.fill(); } }
 else if (kind === 'tex-win'){ [c, g] = txtCanvas(16, 16); g.fillStyle = '#ddd3bf'; g.fillRect(0, 0, 16, 16); g.fillStyle = '#f2ede2'; g.fillRect(3, 0, 10, 16); g.fillStyle = '#41566a'; g.fillRect(4, 0, 8, 16); g.fillStyle = '#f2ede2'; g.fillRect(7.5, 0, 1, 16); g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(4, 0, 3, 16); }
+else if (kind === 'boom'){ [c, g] = txtCanvas(64, 64); const gr = g.createRadialGradient(32, 40, 2, 32, 40, 30); gr.addColorStop(0, '#fff6c0'); gr.addColorStop(.35, '#ffd400'); gr.addColorStop(.7, '#ff6a00'); gr.addColorStop(1, 'rgba(255,60,0,0)'); g.fillStyle = gr;
+g.beginPath(); for (let i = 0; i < 18; i++){ const q = i / 18 * 2 * Math.PI, r = i % 2 ? 14 : 30; g.lineTo(32 + Math.cos(q) * r, 40 + Math.sin(q) * r * .9 - (Math.sin(q) < 0 ? 6 : 0)); } g.closePath(); g.fill(); }
+else if (kind === 'smoke'){ [c, g] = txtCanvas(64, 64); [[32, 40, 18], [22, 30, 13], [42, 30, 13], [32, 20, 12]].forEach(([x, y, r]) => { const gr = g.createRadialGradient(x, y, 1, x, y, r); gr.addColorStop(0, 'rgba(110,105,98,.85)'); gr.addColorStop(1, 'rgba(110,105,98,0)'); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }); }
 else if (kind === 'tex-wall'){ [c, g] = txtCanvas(32, 32); g.fillStyle = '#e2d9c6'; g.fillRect(0, 0, 32, 32); g.fillStyle = '#cfc4ad'; g.fillRect(0, 30, 32, 2);
 [[5, 8], [19, 8]].forEach(([x, y]) => { g.fillStyle = '#f4efe4'; g.fillRect(x - 1, y - 1, 10, 13); g.fillStyle = '#4f6273'; g.fillRect(x, y, 8, 11); g.fillStyle = '#f4efe4'; g.fillRect(x + 3.5, y, 1, 11); g.fillRect(x, y + 4, 8, 1); g.fillStyle = 'rgba(255,255,255,.3)'; g.fillRect(x, y, 3, 4); }); }
 else if (kind === 'tex-lattice'){ [c, g] = txtCanvas(16, 16); g.fillStyle = '#c4c8cc'; g.fillRect(0, 0, 16, 16); g.strokeStyle = '#626870'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(0, 0); g.lineTo(16, 16); g.moveTo(16, 0); g.lineTo(0, 16); g.moveTo(0, .7); g.lineTo(16, .7); g.moveTo(.7, 0); g.lineTo(.7, 16); g.stroke(); }
@@ -3320,7 +3332,7 @@ openAux(a, null, ll);
 }
 function toolAt(mode){ closeRadial(); openTools(null); tool.mode = mode; tool.pts = []; tool.r = 0; drawTool(); renderTool(); toast('Касайтесь карты, чтобы ставить точки'); }
 // ======== РАЗДЕЛЫ, ДОБАВЛЕНИЕ, КОРЗИНА, ОТМЕНА ========
-const SECTIONS = {op:'Оператор', tp:'Топопланшет', mk:'Макет'}, SEC_SH = {op:'Опер.', tp:'Топо', mk:'Макет'};
+const SECTIONS = {op:'Оператор', tp:'Боевой контур', mk:'Макет'}, SEC_SH = {op:'Опер.', tp:'Б.конт.', mk:'Макет'};
 let secMode = lsGet('skat_mode', null), favCache = null;
 function favList(){ if (favCache) return favCache; const f = lsGet('skat_fav_' + (secMode || 'tp'), null); favCache = new Set(f || SYMS.filter(s => s.fav !== false).map(s => s.id)); return favCache; }
 function isFav(s){ return favList().has(s.id); }
@@ -3448,7 +3460,7 @@ function textLayer(){ let a = (textPending && textPending.target && arrById(text
 if (!a){ a = normArr({id:Date.now(), kind:'shapes', name:'Надписи', ident:'Надписи', style:{color:'#111111', name:'Чёрный', glyph:''}, points:[], shapes:[], texts:[]}); state.arrays.push(a); }
 if (!a.texts) a.texts = []; return a; }
 function openTextEd(a, ti, ll){
-const t = ti != null ? a.texts[ti] : {t:'', f:'IBM Plex Sans Condensed', s:18, c:'#111111', sc:'#ffffff', sw:2, b:true, i:false, bg:'', r:0, lat:ll.lat, lng:ll.lng};
+const t = ti != null ? a.texts[ti] : {t:'', f:'Roboto Condensed', s:18, c:'#111111', sc:'#ffffff', sw:2, b:true, i:false, bg:'', r:0, lat:ll.lat, lng:ll.lng};
 txtRef = {a, ti, t:Object.assign({}, t)};
 $('txtTitle').textContent = ti != null ? 'Надпись' : 'Новая надпись';
 $('tTxt').value = t.t; $('tFont').value = t.f; $('tSize').value = t.s; $('tSC').value = t.sc || ''; $('tSW').value = t.sw || 0; $('tB').checked = !!t.b; $('tI').checked = !!t.i; $('tBg').value = t.bg || ''; $('tRot').value = t.r || 0;
@@ -3622,7 +3634,7 @@ if (!blob){ toast('Не хватило памяти — уменьшите фо�
 deliverFile(blob, `СКАТ_печать_${stamp()}.jpg`, `Лист готов: ${W}×${H} пикс.${miss ? ` Не загрузилось тайлов подложки: ${miss} (Яндекс в веб-версии не копируется — выберите Esri или Топо).` : ''}`);
 } catch(e){ netMsg(''); toast('Не удалось подготовить лист: ' + (e.message || e)); }
 };
-function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; }
+function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; }
 
 // ======== МАКЕТ: ОБЪЕКТЫ, КРУГОВОЕ МЕНЮ 3D, АНИМАЦИЯ ========
 const ENV_N = {trow:'Ряд деревьев', tpoly:'Роща', house:'Дом', flat:'Многоэтажка', wh:'Склад', hangar:'Ангар', tree_n:'Ель', tree_b:'Берёза', grove:'Роща', pw:'Опора ЛЭП', mast:'Мачта связи', wt:'Водонапорная башня', tank:'Цистерна'};
@@ -3858,7 +3870,8 @@ function decorateLayers(){
 const el = $('layList'); if (!el) return;
 let tb = $('laySelBar'); if (!tb){ tb = document.createElement('div'); tb.id = 'laySelBar'; tb.className = 'row'; tb.style.marginBottom = '8px'; el.parentNode.insertBefore(tb, el); }
 selBar();
-tagBar(); if (MKX === null) MKX = secMode !== 'mk';
+tagBar(); if (MKX === null) MKX = secMode !== 'mk'; ftaskSection(el);
+let nb = $('nolblBtn'); if (!nb){ nb = document.createElement('button'); nb.id = 'nolblBtn'; nb.className = 'ghost'; tb.appendChild(nb); } nb.textContent = NOLBL ? 'Подписи: выкл' : 'Подписи: вкл'; nb.onclick = () => { NOLBL = !NOLBL; lsSet('skat_nolbl', NOLBL); renderMarkers(); renderLayers(); };
 const mh = [...el.querySelectorAll('.sub-h')].find(h => h.textContent.replace(/[▸▾\s\d()]/g, '') === 'Макет');
 if (mh){ const n = state.arrays.filter(isMk).length; mh.textContent = `${MKX ? '▸' : '▾'} Макет (${n})`; mh.style.cursor = 'pointer'; mh.onclick = () => { MKX = !MKX; renderLayers(); }; }
 el.querySelectorAll('.arr[data-id]').forEach(r => { const id = +r.dataset.id, a = arrById(id); if (!a) return;
@@ -3867,6 +3880,7 @@ const tgb = document.createElement('button'); tgb.className = 'eye'; tgb.textCon
 if (a.tags && a.tags.length){ const nm = r.querySelector('.nm div:last-child'); if (nm) nm.innerHTML += a.tags.map(t => ` <small class="tg">#${escapeHtml(t)}</small>`).join(''); }
 const tg = document.createElement('button'); tg.className = 'eye'; tg.textContent = LX.has(id) ? '▾' : '▸'; tg.title = 'Объекты слоя'; tg.onclick = e => { e.stopPropagation(); LX.has(id) ? LX.delete(id) : LX.add(id); renderLayers(); }; r.insertBefore(tg, r.firstChild);
 if (SELM.on){ const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'selcb'; cb.checked = SELM.sel.has('L:' + id); cb.onchange = () => { cb.checked ? SELM.sel.add('L:' + id) : SELM.sel.delete('L:' + id); selBar(); }; r.insertBefore(cb, r.firstChild); }
+const aa = document.createElement('button'); aa.className = 'eye' + (a.nolbl ? ' dim' : ''); aa.textContent = 'Aa'; aa.title = 'Подписи слоя'; aa.onclick = e => { e.stopPropagation(); a.nolbl = !a.nolbl; if (!a.nolbl) delete a.nolbl; persist(); renderMarkers(); renderLayers(); }; r.appendChild(aa);
 const rn = document.createElement('button'); rn.className = 'eye'; rn.textContent = '✎'; rn.title = 'Переименовать'; rn.onclick = e => { e.stopPropagation(); const v = prompt('Название слоя', a.name); if (v && v.trim()){ a.name = v.trim(); persist(); renderLayers(); } }; r.appendChild(rn);
 if (LX.has(id)){ const kd = document.createElement('div'); kd.className = 'kids'; kd.innerHTML = kidsHtml(a); r.after(kd); bindKids(kd, a); } });
 }
@@ -3931,12 +3945,12 @@ function symOpt(p){ return p && (p.plan || p.slw) ? {dash:!!p.plan, lw:p.slw || 
 function lbStyle(p){ if (!p || !(p.lf || p.ls || p.lc)) return ''; return ` style="${p.lf ? `font-family:'${p.lf}',sans-serif;` : ''}${p.ls ? `font-size:${p.ls}px;` : ''}${p.lc ? `color:${p.lc};` : ''}"`; }
 let propRef = null;
 function openProp(a, p){ propRef = {a, p};
-$('prPlan').checked = !!p.plan; $('prFake').checked = !!p.fake; $('prSz').value = p.ssz || 1; $('prLw').value = p.slw || 2.6; $('prLs').value = p.ls || 12.5;
+$('prPlan').checked = !!p.plan; $('prNoL').checked = !!p.nolbl; $('prFake').checked = !!p.fake; $('prSz').value = p.ssz || 1; $('prLw').value = p.slw || 2.6; $('prLs').value = p.ls || 12.5;
 $('prLf').innerHTML = '<option value="">как обычно</option>' + FONTS.map(([v, n]) => `<option value="${v}">${n}</option>`).join(''); $('prLf').value = p.lf || '';
 renderFillPick($('prLc'), p.lc || null, c => { if (c) p.lc = c; else delete p.lc; renderMarkers(); }); prV(); openModal('propModal'); }
 function prV(){ $('prSzV').textContent = '×' + $('prSz').value; $('prLwV').textContent = $('prLw').value; $('prLsV').textContent = $('prLs').value; }
-['prPlan', 'prFake', 'prSz', 'prLw', 'prLf', 'prLs'].forEach(id => $(id).addEventListener('input', () => { const p = propRef.p;
-p.plan = $('prPlan').checked || undefined; p.fake = $('prFake').checked || undefined; const sz = +$('prSz').value, lw = +$('prLw').value, ls = +$('prLs').value;
+['prPlan', 'prNoL', 'prFake', 'prSz', 'prLw', 'prLf', 'prLs'].forEach(id => $(id).addEventListener('input', () => { const p = propRef.p;
+p.plan = $('prPlan').checked || undefined; if ($('prNoL').checked) p.nolbl = true; else delete p.nolbl; p.fake = $('prFake').checked || undefined; const sz = +$('prSz').value, lw = +$('prLw').value, ls = +$('prLs').value;
 if (sz !== 1) p.ssz = sz; else delete p.ssz; if (lw !== 2.6) p.slw = lw; else delete p.slw; if (ls !== 12.5) p.ls = ls; else delete p.ls; if ($('prLf').value) p.lf = $('prLf').value; else delete p.lf;
 ['plan', 'fake'].forEach(k => { if (!p[k]) delete p[k]; }); prV(); renderMarkers(); }));
 $('prOk').onclick = () => { persist(); closeModals(); renderMarkers(); };
@@ -3954,7 +3968,8 @@ function destLL(c, az, r){ const R0 = 6371008.8, d = r / R0, la = c.lat * Math.P
 const la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b)), lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(la2)); return L.latLng(la2 * 180 / Math.PI, lo2 * 180 / Math.PI); }
 function sectorPts(c, p1){ const r = distM(c, p1), az = segInfo(c, p1, GEO.toSK(c.lat, c.lng).zone).az, w = tool.sw || 30, out = [c];
 for (let i = 0; i <= 24; i++) out.push(destLL(c, az - w / 2 + w * i / 24, r)); out.push(c); return out; }
-function ovalPts(a, b){ const c = L.latLng((a.lat + b.lat) / 2, (a.lng + b.lng) / 2), L0 = distM(a, b) / 2, W = (tool.ow || 30) / 2, az = segInfo(a, b, GEO.toSK(a.lat, a.lng).zone).az, out = [];
+function ovalPts(a, b){ return stadiumPts(a, b); }
+function ovalPts0(a, b){ const c = L.latLng((a.lat + b.lat) / 2, (a.lng + b.lng) / 2), L0 = distM(a, b) / 2, W = (tool.ow || 30) / 2, az = segInfo(a, b, GEO.toSK(a.lat, a.lng).zone).az, out = [];
 for (let i = 0; i <= 36; i++){ const t = i / 36 * 2 * Math.PI, x = Math.cos(t) * (L0 + W * .4), y = Math.sin(t) * W, r = Math.hypot(x, y), q = Math.atan2(y, x) * 180 / Math.PI; out.push(destLL(c, az + q, r)); } return out; }
 
 // ======== МАКЕТ: СЦЕНАРИЙ (МОНТАЖ), КАМЕРЫ, ОГОНЬ, НАСТРОЙКИ ОБЪЕКТОВ ========
@@ -3962,19 +3977,20 @@ const FIRE_K = {gun:{tof:28, ev:6, n:6}, sau:{tof:30, ev:6, n:6}, rszo:{tof:25, 
 let fireMode = null, camMode = 'free', camAng = 0, tlZoom = 8;
 const fxSrc = () => { try { return v3.getSource('fx'); } catch(e){ return null; } };
 function fxInit(){ try { if (!v3.getSource('fx')){ v3.addSource('fx', {type:'geojson', data:{type:'FeatureCollection', features:[]}});
+v3.addSource('fxp', {type:'geojson', data:{type:'FeatureCollection', features:[]}}); v3.addLayer({id:'fxp', type:'symbol', source:'fxp', layout:{'icon-image':['get', 'img'], 'icon-size':['get', 'sz'], 'icon-allow-overlap':true, 'icon-ignore-placement':true, 'icon-anchor':'bottom', 'icon-pitch-alignment':'viewport'}});
 v3.addLayer({id:'fx', type:'fill-extrusion', source:'fx', paint:{'fill-extrusion-color':['get', 'c'], 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h'], 'fill-extrusion-opacity':.9}}); }
 v3.setLayoutProperty('apath', 'visibility', v3cfg.paths === false ? 'none' : 'visible'); } catch(e){} }
 function itKind(a, it){ const sid = it.sym || a.sym; return sid && MDL_OF[sid]; }
-function fireFx(t){ const F = [];
+function fireFx(t){ const F = [], P = [];
 state.arrays.forEach(a => a.points.forEach((p, pi) => { (p.fires || []).forEach(f => { const k = FIRE_K[f.k] || FIRE_K.gun, ov = ANIM.get(a.id + ':' + pi) || p;
 for (let i = 0; i < (f.n || k.n); i++){ const ts = (f.t0 || 0) + i * (f.ev || k.ev), dt = t - ts, tof = f.tof || k.tof, hsx = hsh(i * 3.1, f.t0 + 1), hsy = hsh(i * 7.7, f.t0 + 2);
 const tx = f.tx + (hsx - .5) * 50 / mk(f.ty)[0], ty = f.ty + (hsy - .5) * 50 / 111320;
 if (dt >= 0 && dt < tof){ const u = dt / tof, x = ov.lng + (tx - ov.lng) * u, y = ov.lat + (ty - ov.lat) * u, Hm = f.k === 'tank' ? 3 : Math.max(60, distM({lat:ov.lat, lng:ov.lng}, {lat:ty, lng:tx}) * .25), z = 4 * Hm * u * (1 - u) + 2;
 F.push({type:'Feature', properties:{c:'#ffd27a', b:z, h:z + 1.5}, geometry:{type:'Polygon', coordinates:[ngon([x, y], .8, 6)]}});
 if (v3cfg.traj !== false) for (let q = 1; q < 24; q++){ const w = q / 24; if (w > u) break; const zz = 4 * Hm * w * (1 - w) + 2; F.push({type:'Feature', properties:{c:'#ff8a2a', b:zz, h:zz + .4}, geometry:{type:'Polygon', coordinates:[ngon([ov.lng + (tx - ov.lng) * w, ov.lat + (ty - ov.lat) * w], .35, 4)]}}); } }
-const de = dt - tof; if (de >= 0 && de < 3){ const r = 4 + de * 9, hh = de < .6 ? 14 + de * 20 : 26 - de * 4; F.push({type:'Feature', properties:{c:de < .6 ? '#ffb02e' : '#6d6a64', b:0, h:Math.max(2, hh)}, geometry:{type:'Polygon', coordinates:[ngon([tx, ty], r, 12, i)]}}); }
+const de = dt - tof; if (de >= 0 && de < 3){ P.push({type:'Feature', properties:{img:de < .8 ? 'boom|' : 'smoke|', sz:de < .8 ? .6 + de : 1 + de * .3}, geometry:{type:'Point', coordinates:[tx, ty]}}); } if (false){ const r = 4 + de * 9, hh = de < .6 ? 14 + de * 20 : 26 - de * 4; F.push({type:'Feature', properties:{c:de < .6 ? '#ffb02e' : '#6d6a64', b:0, h:Math.max(2, hh)}, geometry:{type:'Polygon', coordinates:[ngon([tx, ty], r, 12, i)]}}); }
 } }); }));
-const s0 = fxSrc(); if (s0) s0.setData({type:'FeatureCollection', features:F}); }
+const s0 = fxSrc(); if (s0) s0.setData({type:'FeatureCollection', features:F}); try { v3.getSource('fxp').setData({type:'FeatureCollection', features:P}); } catch(_){} }
 function camTarget(){ let it = null, key = null;
 if (v3sel){ const a = state.arrays[v3sel.ai]; if (a){ it = v3item(a); key = (v3sel.ei != null ? 'e' : '') + a.id + ':' + (v3sel.ei != null ? v3sel.ei : v3sel.pi); } }
 if (!it && SC.cur){ const x = scnItems(SC.cur).find(z => z.it.path); if (x){ it = x.it; key = x.key; } }
@@ -4018,6 +4034,7 @@ if (key && MDL_AIR[key]) h += optSel('alt', [20, 40, 60, 100, 150, 240, 400, 600
 if (v3sel.ei != null && ['trow', 'tpoly', 'grove'].includes(p.k)){ if (p.k !== 'grove') h += optSel('step', [3, 5, 7, 10, 15, 25], p.step || 7, v => 'шаг ' + v + ' м'); if (p.k === 'trow') h += optSel('w', [3, 6, 8, 12, 20, 40], p.w || 8, v => 'ширина ' + v + ' м');
 if (p.k === 'grove'){ h += optSel('n', [5, 10, 14, 25, 40, 80], p.n || 14, v => v + ' деревьев'); h += optSel('r', [8, 12, 18, 30, 50], p.r || 18, v => 'радиус ' + v + ' м'); }
 h += optSel('sp', [0, .2, .4, .7, 1], p.sp ?? .3, v => 'рассеивание ' + v); h += optSel('lf', ['m', 'n', 'b'].map((x, i) => i), ['m', 'n', 'b'].indexOf(p.lf || 'm'), v => ['смешанные', 'ели', 'берёзы'][v]); }
+if (key === 'rszo') h += optSel('rs', [4, 8, 12, 20, 40], p.rs || 12, v => v + ' РС');
 if (key && FIRE_K[key]) h += `<button data-x="fire">Огонь${p.fires && p.fires.length ? ' (' + p.fires.length + ')' : ''}</button>${p.fires && p.fires.length ? '<button data-x="fclr">Сброс огня</button>' : ''}`;
 return h; }
 $('v3act').addEventListener('change', e => { const sl = e.target.closest('select[data-o]'); if (!sl || !v3sel) return; const a = state.arrays[v3sel.ai], p = a && v3item(a); if (!p) return; const k = sl.dataset.o, v = +sl.value;
@@ -4026,9 +4043,70 @@ $('v3act').addEventListener('click', e => { const b = e.target.closest('button[d
 if (b.dataset.x === 'fire'){ fireMode = {a, p}; toast('Коснитесь цели на 3D-карте'); }
 if (b.dataset.x === 'fclr'){ delete p.fires; persist(); fireFx(SC.t); v3bar(); if (SC.cur) tlRender(); } }, true);
 function fireTap(e){ const {a, p} = fireMode, key = itKind(a, p) || 'gun', k = FIRE_K[key] || FIRE_K.gun; fireMode = null;
-(p.fires = p.fires || []).push({tx:+e.lngLat.lng.toFixed(6), ty:+e.lngLat.lat.toFixed(6), t0:Math.round((SC.cur ? SC.t : 0) * 2) / 2, k:key, n:k.n, ev:k.ev, tof:k.tof});
+(p.fires = p.fires || []).push({tx:+e.lngLat.lng.toFixed(6), ty:+e.lngLat.lat.toFixed(6), t0:Math.round((SC.cur ? SC.t : 0) * 2) / 2, k:key, n:key === 'rszo' ? (p.rs || 12) : k.n, ev:k.ev, tof:k.tof});
 persist(); v3bar(); if (SC.cur){ SC.T = scnDur(SC.cur); $('tlR').max = SC.T; tlRender(); } toast(`Огневое поражение: ${k.n} выстр., подлёт ${k.tof} с. Сдвиньте начало на шкале сценария`); }
 
+// ======== БОЕВОЙ КОНТУР: КОРРЕКТИРОВКА ОГНЯ ========
+const SYS = {m82:{n:'Миномёт 82 мм', v:180, hi:1}, m120:{n:'Миномёт 120 мм', v:260, hi:1}, d30:{n:'Д-30 122 мм', v:520}, msta:{n:'Мста-Б 152 мм', v:600}, sau:{n:'САУ 2С3/2С19', v:600}, grad:{n:'РСЗО «Град»', v:550, rs:40}, uragan:{n:'РСЗО «Ураган»', v:650, rs:16}, tank:{n:'Танк', v:1400}};
+let CT = null, corrPick = null, corrFly = [], corrRaf = 0;
+const corrL = L.layerGroup().addTo(map);
+function sysTof(sys, d){ const k = SYS[sys] || SYS.d30; return Math.max(2, d / k.v * (k.hi ? 2 : 1.25)); }
+const BOOM = n => `<div class="boomic"><svg viewBox="0 0 32 32"><path d="M16 2l3 8 7-4-3 8 8 2-8 3 4 7-8-3-3 8-3-8-8 3 4-7-8-3 8-2-3-8 7 4z" fill="#ff7a1a" stroke="#ffd400" stroke-width="1.5"/><circle cx="16" cy="16" r="5" fill="#ffd400"/></svg>${n != null ? `<b>${n}</b>` : ''}</div>`;
+function corrDev(b){ const t = CT.tgt, [kx, ky] = mk(t.lat), dN = (b.lat - t.lat) * ky, dE = (b.lng - t.lng) * kx;
+const g = CT.gun, gx = (t.lng - g.lng) * kx, gy = (t.lat - g.lat) * ky, D = Math.hypot(gx, gy) || 1, ux = gx / D, uy = gy / D, along = dE * ux + dN * uy, lat = dE * uy - dN * ux, mil = Math.round(Math.atan2(lat, D + along) / (2 * Math.PI) * 6000);
+return {dN, dE, along, lat, mil, D}; }
+const devTxt = v => `${v.dN >= 0 ? 'Север' : 'Юг'} ${Math.abs(Math.round(v.dN))}, ${v.dE >= 0 ? 'Восток' : 'Запад'} ${Math.abs(Math.round(v.dE))}`;
+function corrDraw(){ corrL.clearLayers(); if (!CT) return;
+if (CT.gun) corrL.addLayer(L.marker([CT.gun.lat, CT.gun.lng], {interactive:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:'<div class="ctgun">▲</div>'})}));
+if (CT.tgt) corrL.addLayer(L.marker([CT.tgt.lat, CT.tgt.lng], {interactive:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:'<div class="cttgt">⊕</div>'})}));
+if (CT.gun && CT.tgt) corrL.addLayer(L.polyline([[CT.gun.lat, CT.gun.lng], [CT.tgt.lat, CT.tgt.lng]], {color:'#ff8a2a', weight:2, dashArray:'6 6', interactive:false}));
+(CT.bursts || []).forEach(b => corrL.addLayer(L.marker([b.lat, b.lng], {interactive:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:BOOM(b.n)})})));
+corrFly.forEach(f => { if (f.pts) corrL.addLayer(L.polyline(f.pts, {color:'#ffd400', weight:2, opacity:.8, interactive:false})); if (f.pos) corrL.addLayer(L.circleMarker(f.pos, {radius:4, color:'#111', weight:1, fillColor:'#ffd400', fillOpacity:1, interactive:false})); }); }
+function corrPanel(){ const el = $('corr'); if (!CT){ el.classList.remove('on'); return; } el.classList.add('on'); const sys = SYS[CT.sys] || SYS.d30, last = (CT.bursts || []).slice(-1)[0];
+const d = CT.gun && CT.tgt ? distM(CT.gun, CT.tgt) : 0, fl = corrFly.length ? Math.max(...corrFly.map(f => f.left)) : 0;
+let dv = ''; if (last && CT.gun && CT.tgt){ const v = corrDev(last); dv = `<div class="cdv"><b>Разрыв ${last.n}:</b> ${devTxt(v)}<br>${v.along >= 0 ? 'Перелёт' : 'Недолёт'} ${Math.abs(Math.round(v.along))} м, ${v.lat >= 0 ? 'вправо' : 'влево'} ${Math.abs(Math.round(v.lat))} м (${v.mil >= 0 ? '+' : ''}${milStr(Math.abs(v.mil))})</div>`; }
+el.innerHTML = `<div class="crow"><b>${escapeHtml(CT.name)}</b><button data-c="x">✕</button></div>
+<div class="crow"><button data-c="gun" class="${corrPick === 'gun' ? 'on' : ''}">Орудие${CT.gun ? ' ✓' : ''}</button><button data-c="tgt" class="${corrPick === 'tgt' ? 'on' : ''}">Цель${CT.tgt ? ' ✓' : ''}</button><select data-c="sys">${Object.entries(SYS).map(([k, v]) => `<option value="${k}"${k === CT.sys ? ' selected' : ''}>${v.n}</option>`).join('')}</select>${sys.rs ? `<select data-c="rs">${[1, 2, 4, 8, 12, 20, sys.rs].filter((v, i, ar) => v <= sys.rs && ar.indexOf(v) === i).map(v => `<option value="${v}"${v === (CT.rs || 4) ? ' selected' : ''}>${v} РС</option>`).join('')}</select>` : ''}</div>
+${d ? `<div class="cdv">Дальность ${fmtDist(d)} · подлёт ${sysTof(CT.sys, d).toFixed(1)} с</div>` : '<div class="cdv">Выберите орудие и цель: кнопка, затем касание карты или знака</div>'}
+${fl > 0 ? `<div class="ctm">⏱ ${fl.toFixed(1)} с</div>` : ''}${dv}
+<div class="crow"><button data-c="fire" class="primary" ${CT.gun && CT.tgt ? '' : 'disabled'}>▶ Выстрел</button><button data-c="un" ${(CT.bursts || []).length ? '' : 'disabled'}>↶ Разрыв</button></div>
+<div class="cdv" style="opacity:.75">Касание карты — отметить разрыв №${(CT.bursts || []).length + 1}</div>`;
+el.querySelectorAll('[data-c]').forEach(b => { const c = b.dataset.c; if (b.tagName === 'SELECT') b.onchange = () => { if (c === 'sys') CT.sys = b.value; else CT.rs = +b.value; persist(); corrPanel(); };
+else b.onclick = () => { if (c === 'x'){ CT = null; corrPick = null; corrDraw(); corrPanel(); return; } if (c === 'gun' || c === 'tgt'){ corrPick = corrPick === c ? null : c; corrPanel(); toast(c === 'gun' ? 'Коснитесь огневой позиции или знака орудия' : 'Коснитесь цели'); return; }
+if (c === 'un'){ CT.bursts.pop(); persist(); corrDraw(); corrPanel(); return; } if (c === 'fire') corrFire(); }; }); }
+function newTask(){ const t = {id:Date.now(), name:`Цель ${state.ftasks.length + 1}`, sys:'d30', rs:4, bursts:[]}; state.ftasks.push(t); persist(); return t; }
+$('corrBtn').onclick = () => { if (CT){ CT = null; corrDraw(); corrPanel(); return; } CT = newTask(); corrPick = 'gun'; corrDraw(); corrPanel(); toast('Коснитесь огневой позиции или знака орудия'); };
+function corrTap(ll){ const h = hitPoint(...(() => { const q = map.latLngToContainerPoint(ll), r = map.getContainer().getBoundingClientRect(); return [q.x + r.left, q.y + r.top]; })()), at = h && h.i != null ? {lat:h.a.points[h.i].lat, lng:h.a.points[h.i].lng} : {lat:ll.lat, lng:ll.lng};
+if (corrPick === 'gun'){ CT.gun = at; if (h && h.i != null){ const k = itKind(h.a, h.a.points[h.i]); CT.sys = k === 'mortar' ? 'm120' : k === 'rszo' ? 'grad' : k === 'tank' ? 'tank' : k === 'sau' ? 'sau' : CT.sys; } corrPick = CT.tgt ? null : 'tgt'; if (corrPick) toast('Коснитесь цели'); }
+else if (corrPick === 'tgt'){ CT.tgt = at; corrPick = null; const nm = prompt('Название цели', CT.name); if (nm && nm.trim()) CT.name = nm.trim(); }
+else { CT.bursts.push({lat:+ll.lat.toFixed(7), lng:+ll.lng.toFixed(7), n:CT.bursts.length + 1, t:Date.now()}); try { navigator.vibrate && navigator.vibrate(20); } catch(e){} }
+persist(); corrDraw(); corrPanel(); }
+function arcPts(g, t, k){ const out = [], [kx, ky] = mk(g.lat), dx = (t.lng - g.lng) * kx, dy = (t.lat - g.lat) * ky, D = Math.hypot(dx, dy) || 1, nx = -dy / D, ny = dx / D, bow = D * (k ? .18 : .1);
+for (let i = 0; i <= 30; i++){ const u = i / 30, o = 4 * bow * u * (1 - u); out.push([g.lat + (dy * u + ny * o) / ky, g.lng + (dx * u + nx * o) / kx]); } return out; }
+function corrFire(){ const sys = SYS[CT.sys] || SYS.d30, d = distM(CT.gun, CT.tgt), tof = sysTof(CT.sys, d), n = sys.rs ? (CT.rs || 4) : 1, pts = arcPts(CT.gun, CT.tgt, sys.hi), t0 = performance.now();
+corrFly = Array.from({length:n}, (_, i) => ({d0:i * .5, tof, pts, pos:null, left:tof + i * .5}));
+cancelAnimationFrame(corrRaf); let lastUi = 0;
+const step = now => { const t = (now - t0) / 1000; let alive = false;
+corrFly.forEach(f => { const u = (t - f.d0) / f.tof; f.left = Math.max(0, f.tof + f.d0 - t); if (u >= 0 && u < 1){ alive = true; f.pos = f.pts[Math.min(30, Math.floor(u * 30))]; } else { f.pos = null; if (u < 0) alive = true; } });
+corrDraw(); if (now - lastUi > 100){ lastUi = now; corrPanel(); }
+if (alive) corrRaf = requestAnimationFrame(step); else { corrFly = []; corrDraw(); corrPanel(); toast('Разрыв! Отметьте место касанием карты'); try { navigator.vibrate && navigator.vibrate([60, 40, 60]); } catch(e){} } };
+corrRaf = requestAnimationFrame(step); }
+// ---- огневые задачи в «Слоях»
+const FX = new Set();
+function ftaskSection(el){ if (!state.ftasks.length) return; const box = document.createElement('div');
+box.innerHTML = `<div class="sub-h">Огневые задачи (${state.ftasks.length})</div>` + state.ftasks.map((t, k) => `<div class="arr${t.hid ? ' off' : ''}" data-ft="${k}"><button class="eye" data-f="x">${FX.has(t.id) ? '▾' : '▸'}</button><span class="kth" style="color:#d9532c">⊕</span><div class="nm"><div>${escapeHtml(t.name)}</div><div>${escapeHtml((SYS[t.sys] || SYS.d30).n)} · разрывов: ${(t.bursts || []).length}</div></div><button data-f="open">Открыть</button><button class="eye" data-f="del">🗑</button></div>` +
+(FX.has(t.id) ? `<div class="kids">${(t.bursts || []).map(b => `<div class="kid"><span class="kth">🔥</span><span class="kn">Разрыв ${b.n}: ${t.tgt && t.gun ? devTxt((CT = CT, (() => { const keep = CT; CT = t; const v = corrDev(b); CT = keep; return v; })())) : ''}</span></div>`).join('') || '<div class="empty" style="padding:6px 0">Разрывов нет</div>'}</div>` : '')).join('');
+el.appendChild(box);
+box.querySelectorAll('[data-ft]').forEach(r => { const t = state.ftasks[+r.dataset.ft];
+r.querySelector('[data-f=x]').onclick = () => { FX.has(t.id) ? FX.delete(t.id) : FX.add(t.id); renderLayers(); };
+r.querySelector('[data-f=open]').onclick = () => { closeModals(); CT = t; corrPick = null; corrDraw(); corrPanel(); if (t.tgt) map.setView([t.tgt.lat, t.tgt.lng], Math.max(map.getZoom(), 14)); };
+r.querySelector('[data-f=del]').onclick = () => askConfirm(`Удалить огневую задачу «${t.name}»?`, 'Удалить', () => { state.ftasks = state.ftasks.filter(x => x !== t); if (CT === t){ CT = null; corrDraw(); corrPanel(); } persist(); openModal('layModal'); renderLayers(); }); }); }
+// ---- полоса со скруглёнными краями
+function stadiumPts(a, b){ const W = (tool.ow || 30) / 2, az = segInfo(a, b, GEO.toSK(a.lat, a.lng).zone).az, out = [];
+for (let i = 0; i <= 12; i++) out.push(destLL(b, az - 90 + 180 * i / 12, W));
+for (let i = 0; i <= 12; i++) out.push(destLL(a, az + 90 + 180 * i / 12, W)); out.push(out[0]); return out; }
+
+let NOLBL = lsGet('skat_nolbl', false);
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
 const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
