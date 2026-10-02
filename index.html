@@ -107,6 +107,9 @@ body:has(#v3d.on) .modal{z-index:2600}
 .sw-open{background:rgba(226,83,63,.12)}
 .trashbtn{background:#e2533f;color:#fff;min-height:34px;padding:4px 12px;margin-left:6px;flex:none}
 .txl{position:absolute;white-space:nowrap;line-height:1.15;pointer-events:none;text-align:center;left:0;top:0}
+#v3my{position:absolute;right:10px;top:calc(var(--safe-t) + var(--tg) + 56px);z-index:6;padding:10px 14px;display:none;flex-direction:column;gap:6px;max-height:65vh;overflow:auto;min-width:280px;color:var(--ink)}
+#v3my.on{display:flex}
+.envic{font:700 18px/1 sans-serif;color:#2b3a2b;text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 4px #fff;display:inline-block}
 #v3scn{position:absolute;right:10px;top:calc(var(--safe-t) + var(--tg) + 56px);z-index:6;padding:10px 14px;display:none;flex-direction:column;gap:8px;max-height:60vh;overflow:auto;min-width:260px;color:var(--ink)}
 #v3scn.on{display:flex}
 #v3tl{position:absolute;left:10px;right:70px;bottom:calc(var(--safe-b) + 74px);z-index:6;display:none;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;color:var(--ink);flex-wrap:wrap}
@@ -439,8 +442,9 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="row"><button class="ghost" id="cfNo">Отмена</button><button class="primary" id="cfYes" style="background:#e2533f;color:#fff">Удалить</button></div>
 </div></div>
 <div id="v3d"><div id="v3map"></div>
-<div id="v3top"><button id="v3close" class="glass">✕ 2D</button><select id="v3base" class="glass"></select><label class="glass" id="v3exl">Рельеф: <span id="v3exv">Реальный</span><input type="range" id="v3ex" min="1" max="5" step="0.5" value="1"></label><button id="v3lay" class="glass">Слои</button><button id="v3play" class="glass" style="display:none">▶ Все</button><button id="v3scnBtn" class="glass" style="display:none">Сцены</button></div>
+<div id="v3top"><button id="v3close" class="glass">✕ 2D</button><select id="v3base" class="glass"></select><label class="glass" id="v3exl">Рельеф: <span id="v3exv">Реальный</span><input type="range" id="v3ex" min="1" max="5" step="0.5" value="1"></label><button id="v3lay" class="glass">Слои</button><button id="v3play" class="glass" style="display:none">▶ Все</button><button id="v3scnBtn" class="glass" style="display:none">Сцены</button><button id="v3myBtn" class="glass">Мои слои</button></div>
 <div id="v3panel" class="glass"><label><input type="checkbox" data-k="places"> Населённые пункты</label><label><input type="checkbox" data-k="aux"> Ориентиры с подписями</label><label><input type="checkbox" data-k="shapes"> Фигуры, линии, маршруты</label><label><input type="checkbox" data-k="tac"> Тактические знаки и точки</label><label style="padding-left:26px"><input type="checkbox" data-k="tacLbl"> подписи знаков</label><label><input type="checkbox" data-k="mdl"> 3D-модели знаков</label><label style="flex-direction:column;align-items:stretch;gap:4px">Масштаб моделей: <span id="v3msv"></span><input type="range" id="v3ms" min="1" max="12" step="1" style="width:100%;height:auto"></label><label style="flex-direction:column;align-items:stretch;gap:4px">Высота БПЛА, м: <span id="v3altv"></span><input type="range" id="v3alt" min="10" max="500" step="10" style="width:100%;height:auto"></label><label><input type="checkbox" data-k="bld"> Здания</label><label><input type="checkbox" data-k="towers"> Вышки и мачты</label><label><input type="checkbox" data-k="forest"> Леса и лесополосы</label><label><input type="checkbox" data-k="brg"> Мосты, броды, паромы</label><label style="flex-direction:column;align-items:stretch;gap:4px">Плотность деревьев: <span id="v3denv"></span><input type="range" id="v3den" min="0.2" max="3" step="0.1" style="width:100%;height:auto"></label><small style="color:var(--mute);max-width:220px;line-height:1.3">Объекты грузятся участками ~3×3 км вокруг центра на крупном масштабе и сохраняются для работы без интернета.</small></div>
+<div id="v3my" class="glass"><b>Мои слои и объекты</b><div id="myList"></div></div>
 <div id="v3scn" class="glass"><b>Сцены</b><div id="scnList"></div><button class="primary" id="scnNew">Новая сцена</button><small style="color:var(--mute);line-height:1.3">Сцена — участок местности. Объекты в нём проигрываются по общему времени: у каждого маршрут, скорость и время старта «Ч+».</small></div>
 <div id="v3tl" class="glass"><b id="tlN" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></b><button id="tlP">▶</button><input type="range" id="tlR" min="0" max="60" step="0.1" value="0"><span id="tlT" style="white-space:nowrap;font-variant-numeric:tabular-nums"></span>
 <div class="seg" id="tlM" style="margin:0"><button data-m="1" class="on">×1</button><button data-m="5">×5</button><button data-m="20">×20</button></div>
@@ -490,7 +494,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 4.6';
+const VERSION = 'версия 4.7';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -846,6 +850,7 @@ state.arrays.forEach(a => {
 const active = session && session.arrId === a.id, editing = active && session.mode === 'edit';
 const op = session && !active ? .45 : 1;
 if (a.hidden && !active) return;
+envMarkers(a);
 (a.texts || []).forEach(t => markers.addLayer(L.marker([t.lat, t.lng], {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:txtHtml(t)})})));
 if (a.kind === 'shapes'){ if (z < (a.minZ || 0)) return; drawShapes(a, z >= (a.lblZ ?? DEF_LBLZ)); return; }
 if (a.shapes && a.shapes.length && z >= (a.minZ || 0)) drawShapes(a, z >= (a.lblZ ?? DEF_LBLZ));
@@ -1198,7 +1203,7 @@ const EYE_ON = '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6
 const EYE_OFF = '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7c2.2 0 4 .8 5.5 1.8M22 12s-3.6 7-10 7c-2.2 0-4-.8-5.5-1.8"/><path d="M3 3l18 18"/></svg>';
 function renderLayers(){
 const el = $('layList');
-el.innerHTML = state.arrays.length ? state.arrays.map(a => `<div class="arr${a.hidden?' off':''}" data-id="${a.id}">
+el.innerHTML = state.arrays.length ? [...state.arrays.filter(a => !isMk(a)), ...state.arrays.filter(isMk)].map((a, k, all) => (isMk(a) && (k === 0 || !isMk(all[k-1])) ? '<div class="sub-h">Макет</div>' : '') + `<div class="arr${a.hidden?' off':''}" data-id="${a.id}">
 ${a.kind==='aux' ? `<span class="swt">${TREE(a.style.color)}</span>` : a.kind==='shapes' ? `<span class="sw shp" style="background:${a.style.color}"></span>` : a.kind==='desc' ? `<span class="sw ex" style="background:${a.style.color}">!</span>` : `<span class="sw${a.kind==='route'?' rt':a.kind==='pts'?' one':''}" style="background:${a.style.color}"></span>`}
 <div class="nm"><div>${escapeHtml(a.name)}</div><div>${escapeHtml(rangeText(a))}</div></div>
 <button data-act="pick" title="Добавить в слой">＋</button><button data-act="tbl">Таблица</button>
@@ -2342,7 +2347,7 @@ rows.forEach(o => { for (let i = 1; i < o.line.length && budget > 0; i++){ const
 const nx = -dy / L0, ny = dx / L0, st = Math.max(S * S / (rowW * 1), 3.2);
 for (let t = 0; t < L0 && budget > 0; t += st) offs.forEach((o2, q) => { if (budget <= 0) return; const tt = t + (q % 2 ? st / 2 : 0); if (tt > L0) return;
 const px = x1 + (dx * tt / L0 + nx * o2) / kx, py = y1 + (dy * tt / L0 + ny * o2) / ky; if (hsh(px * 3e4, py * 3e4) > Math.min(1, (st * rowW) / (S * S * offs.length))) return;
-addTree(F, px, py, kindOf('m', px, py), .95, true); budget--; }); } });
+addTree(F, px, py, kindOf(o.lf || 'm', px, py), .95, true); budget--; }); } });
 allF.forEach(o => { if (budget <= 0) return; let x0 = 180, x1 = -180, y0 = 90, y1 = -90; o.ring.forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); });
 const g = o.w < 45 ? Math.max(3, Math.min(S, o.w / 1.6)) : S, keep = (g / S) * (g / S), [kx, ky] = mk(y0), sx = g / kx, sy = g / ky;
 for (let y = y0 + sy / 2; y < y1 && budget > 0; y += sy) for (let x = x0 + sx / 2; x < x1 && budget > 0; x += sx){
@@ -2417,9 +2422,10 @@ if (A === 'l' || A === 'r'){ p.rot = (((p.rot || a.rot || 0) + (A === 'r' ? 15 :
 if (A === 'del'){ if (!confirm(`Удалить «${labelOf(a, v3sel.pi)}»?`)) return; if (v3sel.ei != null) a.env.splice(v3sel.ei, 1); else a.points.splice(v3sel.pi, 1); envRefresh(); v3sel = null; v3move = false; v3bar(); v3upd(); return; }
 v3sel = null; v3move = false; v3route = null; envRefresh(); v3bar(); };
 function v3tap(e){
+if (v3draw){ v3draw.pts.push([+e.lngLat.lng.toFixed(7), +e.lngLat.lat.toFixed(7)]); envRefresh(); drawBar(); return; }
 if (SC.pick){ scnPickTap(e); return; }
 if (v3route){ v3route.pts.push([+e.lngLat.lng.toFixed(7), +e.lngLat.lat.toFixed(7)]); envRefresh(); v3bar(); return; }
-if (v3move && v3sel){ const a = state.arrays[v3sel.ai], p = a && v3item(a); if (p){ p.lat = +e.lngLat.lat.toFixed(7); p.lng = +e.lngLat.lng.toFixed(7); if (!p.hManual) fillHeight(p); if (!p.placeManual) delete p.place; v3upd(); } v3move = false; v3bar(); return; }
+if (v3move && v3sel){ const a = state.arrays[v3sel.ai], p = a && v3item(a); if (p){ const dla = e.lngLat.lat - p.lat, dlo = e.lngLat.lng - p.lng; ['line', 'ring', 'path'].forEach(k => { if (p[k]) p[k] = p[k].map(q => [+(q[0] + dlo).toFixed(7), +(q[1] + dla).toFixed(7)]); }); p.lat = +e.lngLat.lat.toFixed(7); p.lng = +e.lngLat.lng.toFixed(7); if (!p.hManual) fillHeight(p); if (!p.placeManual) delete p.place; v3upd(); } v3move = false; v3bar(); return; }
 const pt = e.point, L = ['mdl', 'tac'].concat(v3.getStyle().layers.filter(l => l.id.startsWith('e_')).map(l => l.id)).filter(id => v3.getLayer(id));
 const f = v3.queryRenderedFeatures([[pt.x - 14, pt.y - 14], [pt.x + 14, pt.y + 14]], {layers:L}).find(q => q.properties && q.properties.ai != null);
 v3sel = f ? (f.properties.ei != null ? {ai:+f.properties.ai, ei:+f.properties.ei} : {ai:+f.properties.ai, pi:+f.properties.pi}) : null; v3move = false; v3bar(); }
@@ -3508,7 +3514,7 @@ deliverFile(blob, `СКАТ_печать_${stamp()}.jpg`, `Лист готов: 
 function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; }
 
 // ======== МАКЕТ: ОБЪЕКТЫ, КРУГОВОЕ МЕНЮ 3D, АНИМАЦИЯ ========
-const ENV_N = {house:'Дом', flat:'Многоэтажка', wh:'Склад', hangar:'Ангар', tree_n:'Ель', tree_b:'Берёза', grove:'Роща', pw:'Опора ЛЭП', mast:'Мачта связи', wt:'Водонапорная башня', tank:'Цистерна'};
+const ENV_N = {trow:'Ряд деревьев', tpoly:'Роща', house:'Дом', flat:'Многоэтажка', wh:'Склад', hangar:'Ангар', tree_n:'Ель', tree_b:'Берёза', grove:'Роща', pw:'Опора ЛЭП', mast:'Мачта связи', wt:'Водонапорная башня', tank:'Цистерна'};
 const ENV_D = {house:{w:9, l:11, h:6}, flat:{w:14, l:40, h:15}, wh:{w:18, l:40, h:8}, hangar:{w:22, l:30, h:9}, pw:{h:28}, mast:{h:45}, wt:{h:24}, tank:{r:6, h:9}};
 const ANIM = new Map(); let animRaf = 0, animList = [], animT0 = 0, animLast = 0, v3route = null, v3lp = null;
 function envLayer(){ let a = state.arrays.find(x => x.name === 'Макет: объекты'); if (!a){ a = normArr({id:Date.now(), kind:'shapes', name:'Макет: объекты', ident:'Макет', style:{color:'#6b6b6b', name:'Серый', glyph:''}, points:[], shapes:[], env:[]}); state.arrays.push(a); } if (!a.env) a.env = []; return a; }
@@ -3517,7 +3523,9 @@ F.forEach(f => { f.geometry.coordinates = f.geometry.coordinates.map(ring => rin
 function envFeatures(){
 const out = [];
 state.arrays.forEach((a, ai) => { if (a.hidden || !a.env) return; a.env.forEach((o0, ei) => { const ov = ANIM.get('e' + a.id + ':' + ei), o = ov ? Object.assign({}, o0, ov) : o0, c = [o.lng, o.lat], d = Object.assign({}, ENV_D[o.k] || {}, o), F = [];
-if (o.k === 'tree_n' || o.k === 'tree_b') addTree(F, o.lng, o.lat, o.k === 'tree_n' ? 'n' : 'b', 1.1, false);
+if (o.k === 'trow' && o.line) buildObjs([{t:'row', line:o.line, lf:o.lf}], v3cfg.den || 1).features.forEach(f => F.push(f));
+else if (o.k === 'tpoly' && o.ring) buildObjs([{t:'f', ring:o.ring, lf:o.lf || 'm'}], v3cfg.den || 1).features.forEach(f => F.push(f));
+else if (o.k === 'tree_n' || o.k === 'tree_b') addTree(F, o.lng, o.lat, o.k === 'tree_n' ? 'n' : 'b', 1.1, false);
 else if (o.k === 'grove'){ const [kx, ky] = mk(o.lat); for (let i = 0; i < 14; i++){ const r = 4 + hsh(i, 3) * 14, q = hsh(i, 7) * 6.28; addTree(F, o.lng + Math.cos(q) * r / kx, o.lat + Math.sin(q) * r / ky, hsh(i, 5) < .5 ? 'n' : 'b', 1, false); } }
 else { let raw;
 if (['house', 'flat', 'wh', 'hangar'].includes(o.k)) raw = {t:'b', ring:rectR(c, d.l / 2, d.w / 2), h:d.h, id:ei + 3, lv:o.k === 'flat' ? 5 : 0};
@@ -3528,7 +3536,7 @@ return {type:'FeatureCollection', features:out};
 }
 function v3item(a){ return v3sel.ei != null ? (a.env || [])[v3sel.ei] : a.points[v3sel.pi]; }
 function envRefresh(){ try { v3.getSource('env').setData(envFeatures()); } catch(_){} try { v3.getSource('apath').setData(pathData()); } catch(_){} }
-function pathData(){ const F = []; state.arrays.forEach(a => { if (a.hidden) return; a.points.concat(a.env || []).forEach(it => { if (it.path && it.path.length > 1) F.push({type:'Feature', properties:{}, geometry:{type:'LineString', coordinates:it.path}}); }); });
+function pathData(){ const F = []; if (v3draw && v3draw.pts.length > 1) F.push({type:'Feature', properties:{}, geometry:{type:'LineString', coordinates:v3draw.k === 'tpoly' ? v3draw.pts.concat([v3draw.pts[0]]) : v3draw.pts}}); state.arrays.forEach(a => { if (a.hidden) return; a.points.concat(a.env || []).forEach(it => { if (it.path && it.path.length > 1) F.push({type:'Feature', properties:{}, geometry:{type:'LineString', coordinates:it.path}}); }); });
 if (v3route && v3route.pts.length > 1) F.push({type:'Feature', properties:{}, geometry:{type:'LineString', coordinates:v3route.pts}}); return {type:'FeatureCollection', features:F}; }
 function envInit(){
 try {
@@ -3553,7 +3561,12 @@ const env = list => list.map(k => ({t:ENV_N[k], ic:'', go:() => { closeRadial();
 radPush('Макет', [
 {t:'Техника и знаки', ic:IC.obj, go:() => radPush('Сторона', [{t:'Красные', ic:IC.side(SIDES.r.color), go:() => tech('r')}, {t:'Синие', ic:IC.side(SIDES.b.color), go:() => tech('b')}])},
 {t:'Здания', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V10l8-6 8 6v11z"/><path d="M10 21v-6h4v6"/></svg>', go:() => radPush('Здания', env(['house', 'flat', 'wh', 'hangar']))},
-{t:'Деревья', ic:TREE_BTN, go:() => radPush('Деревья', env(['tree_n', 'tree_b', 'grove']))},
+{t:'Деревья', ic:TREE_BTN, go:() => radPush('Деревья', [
+{t:'Ель', ic:'▲', go:() => radPush('Ель', [{t:'Точкой', ic:IC.pt, go:() => { closeRadial(); placeEnv('tree_n', ll); }}, {t:'Маршрутом', ic:IC.route, go:() => startDraw('trow', 'n')}])},
+{t:'Берёза', ic:'●', go:() => radPush('Берёза', [{t:'Точкой', ic:IC.pt, go:() => { closeRadial(); placeEnv('tree_b', ll); }}, {t:'Маршрутом', ic:IC.route, go:() => startDraw('trow', 'b')}])},
+{t:'Смешанный ряд', ic:IC.route, go:() => startDraw('trow', 'm')},
+{t:'Роща (контур)', ic:IC.poly, go:() => startDraw('tpoly', 'm')},
+{t:'Роща (точкой)', ic:'♣', go:() => { closeRadial(); placeEnv('grove', ll); }}])},
 {t:'Вышки, ЛЭП', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 22L12 2l4 20M9 16h6M10 10h4M5 7h14"/></svg>', go:() => radPush('Вышки и сооружения', env(['pw', 'mast', 'wt', 'tank']))}]);
 }
 // ---- анимация по маршруту
@@ -3608,7 +3621,7 @@ if (b.dataset.a === 'open') openScene(sc); else askConfirm(`Удалить сц�
 function openScene(sc){ $('v3scn').classList.remove('on'); SC.cur = sc; SC.T = scnDur(sc); $('tlR').max = SC.T; $('v3tl').classList.add('on'); $('tlN').textContent = sc.name;
 try { v3.jumpTo({center:sc.cam.c, zoom:sc.cam.z, pitch:sc.cam.p, bearing:sc.cam.br}); } catch(_){} ANIM.clear(); scnBox(); scnSet(0, true); }
 function closeScene(){ scnPause(); SC.cur = null; ANIM.clear(); $('v3tl').classList.remove('on'); scnBox(); scnRefresh(true); }
-$('v3scnBtn').onclick = () => { $('v3panel').classList.remove('on'); renderScn(); $('v3scn').classList.toggle('on'); };
+$('v3scnBtn').onclick = () => { $('v3panel').classList.remove('on'); $('v3my').classList.remove('on'); renderScn(); $('v3scn').classList.toggle('on'); };
 $('scnNew').onclick = () => { $('v3scn').classList.remove('on'); SC.pick = {pts:[]}; scnBox(); toast('Коснитесь 3D-карты в двух противоположных углах сцены'); };
 $('tlP').onclick = () => SC.raf ? scnPause() : scnPlay();
 $('tlR').oninput = e => { scnPause(); scnSet(+e.target.value, true); };
@@ -3621,6 +3634,41 @@ if (SC.pick.pts.length < 2) return true;
 const [[x1, y1], [x2, y2]] = SC.pick.pts; SC.pick = null; const name = (prompt('Название сцены', `Сцена ${state.scenes.length + 1}`) || '').trim() || `Сцена ${state.scenes.length + 1}`;
 const sc = {id:Date.now(), name, b:[Math.min(x1, x2), Math.min(y1, y2), Math.max(x1, x2), Math.max(y1, y2)], cam:{c:v3.getCenter().toArray(), z:v3.getZoom(), p:v3.getPitch(), br:v3.getBearing()}};
 state.scenes.push(sc); persist(); openScene(sc); toast('Сцена создана. Объектам в ней задайте маршрут и время старта'); return true; }
+
+// ======== МАКЕТ: РИСОВАНИЕ РЯДОВ И РОЩ, «МОИ СЛОИ», ЗНАЧКИ В 2D ========
+let v3draw = null;
+function drawBar(){ const el = $('v3act'); if (!v3draw){ el.classList.remove('on'); el.innerHTML = ''; return; }
+el.innerHTML = `<b>${v3draw.k === 'trow' ? 'Ряд деревьев' : 'Роща'}: точек ${v3draw.pts.length} — касайтесь карты</b><button data-d="ok" class="on">Готово</button><button data-d="un">Убрать точку</button><button data-d="x">Отмена</button>`; el.classList.add('on'); }
+function startDraw(k, lf){ closeRadial(); v3sel = null; v3route = null; v3draw = {k, lf, pts:[]}; drawBar(); toast(k === 'trow' ? 'Касайтесь 3D-карты вдоль линии ряда деревьев' : 'Касайтесь 3D-карты по контуру рощи'); }
+$('v3act').addEventListener('click', e => { const b = e.target.closest('button[data-d]'); if (!b || !v3draw) return; e.stopPropagation(); const d = b.dataset.d;
+if (d === 'un'){ v3draw.pts.pop(); envRefresh(); drawBar(); return; }
+if (d === 'ok'){ const P = v3draw.pts, need = v3draw.k === 'trow' ? 2 : 3; if (P.length < need){ toast(`Нужно не меньше ${need} точек`); return; }
+const a = envLayer(), o = {k:v3draw.k, lf:v3draw.lf, lat:P[0][1], lng:P[0][0], rot:0}; if (v3draw.k === 'trow') o.line = P.slice(); else o.ring = P.concat([P[0]]);
+a.env.push(o); persist(); toast(ENV_N[o.k] + ' добавлен(а)'); }
+v3draw = null; drawBar(); envRefresh(); }, true);
+const ENV_IC = {house:'⌂', flat:'▥', wh:'▭', hangar:'⌓', tree_n:'▲', tree_b:'●', grove:'♣', pw:'ᛉ', mast:'⊥', wt:'♜', tank:'◉'};
+function envMarkers(a, z){ if (!a.env) return;
+a.env.forEach(o => {
+if (o.k === 'trow' && o.line) markers.addLayer(L.polyline(o.line.map(q => [q[1], q[0]]), {color:'#2f7a34', weight:5, dashArray:'2 6', lineCap:'round', interactive:false}));
+else if (o.k === 'tpoly' && o.ring) markers.addLayer(L.polygon(o.ring.map(q => [q[1], q[0]]), {color:'#2f7a34', weight:2, fillColor:'#3f8f3a', fillOpacity:.25, interactive:false}));
+else markers.addLayer(L.marker([o.lat, o.lng], {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="envic" style="transform:translate(-50%,-50%) rotate(${o.rot || 0}deg)">${ENV_IC[o.k] || '■'}</div>`})}));
+}); }
+const isMk = a => /^Макет:/.test(a.name);
+function renderMy(){
+const el = $('myList'), L1 = [];
+L1.push('<div class="sub-h" style="margin-top:0">Слои</div>');
+state.arrays.forEach((a, ai) => L1.push(`<div class="arr${a.hidden ? ' off' : ''}"><div class="nm"><div>${escapeHtml(a.name)}</div><div>${escapeHtml(rangeText(a))}</div></div><button class="eye${a.hidden ? ' off' : ''}" data-ai="${ai}" data-a="eye">${a.hidden ? EYE_OFF : EYE_ON}</button></div>`));
+const items = []; state.arrays.forEach((a, ai) => { if (!isMk(a)) return; a.points.forEach((p, pi) => items.push({ai, pi, n:labelOf(a, pi), lat:p.lat, lng:p.lng})); (a.env || []).forEach((o, ei) => items.push({ai, ei, n:ENV_N[o.k] || 'Объект', lat:o.lat, lng:o.lng})); });
+L1.push(`<div class="sub-h">Объекты макета (${items.length})</div>`);
+L1.push(items.length ? items.slice(0, 150).map((it, k) => `<div class="arr"><div class="nm"><div>${escapeHtml(it.n)}</div><div>${escapeHtml(state.arrays[it.ai].name)}</div></div><button data-k="${k}" data-a="go">Показать</button><button class="eye" data-k="${k}" data-a="del">🗑</button></div>`).join('') : '<div class="empty">Объектов макета пока нет — удержите палец на 3D-карте.</div>');
+el.innerHTML = L1.join('');
+el.querySelectorAll('button').forEach(b => b.onclick = () => {
+if (b.dataset.a === 'eye'){ const a = state.arrays[+b.dataset.ai]; a.hidden = !a.hidden; v3upd(); renderMy(); return; }
+const it = items[+b.dataset.k], a = state.arrays[it.ai];
+if (b.dataset.a === 'go'){ $('v3my').classList.remove('on'); try { v3.flyTo({center:[it.lng, it.lat], zoom:Math.max(v3.getZoom(), 16.5)}); } catch(_){} v3sel = it.ei != null ? {ai:it.ai, ei:it.ei} : {ai:it.ai, pi:it.pi}; v3move = false; v3bar(); return; }
+if (it.ei != null) a.env.splice(it.ei, 1); else a.points.splice(it.pi, 1); v3sel = null; v3bar(); v3upd(); renderMy(); });
+}
+$('v3myBtn').onclick = () => { $('v3panel').classList.remove('on'); $('v3scn').classList.remove('on'); renderMy(); $('v3my').classList.toggle('on'); };
 
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
