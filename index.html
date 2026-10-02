@@ -70,7 +70,7 @@ body:has(#v3d.on) .modal{z-index:2600}
 #v3exl input{width:110px}
 #v3msg{position:absolute;left:10px;right:10px;bottom:calc(var(--safe-b) + 14px);z-index:5;color:#fff;font-size:13px;text-shadow:0 0 3px #000;pointer-events:none}
 #v3d .maplibregl-ctrl-top-right{top:calc(var(--safe-t) + var(--tg))}
-#radial{position:fixed;inset:0;z-index:2200;display:none;background:rgba(0,0,0,.28);-webkit-user-select:none;user-select:none}
+#radial{position:fixed;inset:0;z-index:2700;display:none;background:rgba(0,0,0,.28);-webkit-user-select:none;user-select:none}
 #radial.on{display:block}
 .rad-it{position:absolute;width:62px;height:62px;margin:-31px 0 0 -31px;border-radius:50%;background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:10px;font-weight:600;line-height:1.05;text-align:center;box-shadow:var(--shadow);padding:2px;min-height:0;animation:radIn .14s ease-out}
 .rad-it.sm{width:56px;height:56px;margin:-28px 0 0 -28px;font-size:9px}
@@ -87,6 +87,30 @@ body:has(#v3d.on) .modal{z-index:2600}
 .symimg{display:block;width:26px;height:26px;background:currentColor;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center}
 .pt .sym .symimg{width:100%;height:100%}
 .clb{transform:translate(-50%,-50%);min-width:32px;height:32px;padding:0 7px;border-radius:16px;display:inline-grid;place-items:center;color:#fff;font:800 13px/1 "IBM Plex Sans Condensed",sans-serif;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.4)}
+#launch{position:fixed;inset:0;z-index:3500;background:rgba(10,14,12,.94);display:none;align-items:center;justify-content:center;padding:20px}
+#launch.on{display:flex}
+#launch .lc{width:100%;max-width:440px;display:flex;flex-direction:column;gap:12px}
+#launch h2{margin:0;font-size:30px;letter-spacing:.06em}#launch p{margin:0 0 6px;color:var(--mute)}
+#launch button{text-align:left;padding:16px 18px;min-height:0;border-radius:16px;background:var(--panel2);display:flex;flex-direction:column;gap:4px}
+#launch button b{font-size:20px}#launch button small{color:var(--mute);font-weight:500;font-size:13.5px}
+#launch button.on{box-shadow:0 0 0 2px var(--signal)}
+.rbpair{display:flex;gap:4px;width:52px}.rbpair .rb{width:24px;min-height:38px;padding:0;font-size:18px;flex:1}
+#modeBtn span{font-size:10.5px}
+.addgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.addgrid button{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:84px;padding:10px 6px;font-size:13px}
+.addgrid svg{width:28px;height:28px}
+.spgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px}
+.spgrid .spi{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:0;padding:6px 4px;font-size:10.5px;line-height:1.15;background:transparent}
+.spgrid .symb{width:48px;height:48px;border-radius:10px;background:#f2f2ec;padding:5px;display:block}
+.spgrid .symb svg{width:100%;height:100%;display:block}
+.baselist{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.baseit{text-align:left}.baseit.on{box-shadow:0 0 0 2px var(--signal)}
+.sw-open{background:rgba(226,83,63,.12)}
+.trashbtn{background:#e2533f;color:#fff;min-height:34px;padding:4px 12px;margin-left:6px;flex:none}
+.txl{position:absolute;white-space:nowrap;line-height:1.15;pointer-events:none;text-align:center;left:0;top:0}
+#v3scn{position:absolute;right:10px;top:calc(var(--safe-t) + var(--tg) + 56px);z-index:6;padding:10px 14px;display:none;flex-direction:column;gap:8px;max-height:60vh;overflow:auto;min-width:260px;color:var(--ink)}
+#v3scn.on{display:flex}
+#v3tl{position:absolute;left:10px;right:70px;bottom:calc(var(--safe-b) + 74px);z-index:6;display:none;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;color:var(--ink);flex-wrap:wrap}
+#v3tl.on{display:flex}#v3tl input[type=range]{flex:1;min-width:140px}#v3tl button{min-height:36px;padding:4px 10px}
 #compass{position:fixed;left:10px;bottom:calc(max(var(--sheet-h,0px), calc(var(--safe-b) + var(--badge))) + 12px);z-index:1000;width:48px;height:48px;min-height:0;padding:0;border-radius:50%;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center}
 #compass svg{width:30px;height:30px}
 #cross{position:fixed;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;z-index:460;pointer-events:none}
@@ -155,7 +179,7 @@ body.picking #cross i{background:var(--signal)}
 .seg button{flex:1;background:transparent;min-height:34px;padding:4px;font-size:13.5px}
 .seg button.on{background:var(--ink);color:var(--panel)}
 #kindSeg{flex-wrap:wrap}#kindSeg button{flex:1 0 30%}
-.modal{position:fixed;left:0;right:0;top:0;bottom:calc(-1 * var(--ext));padding-bottom:var(--ext);z-index:2000;background:rgba(8,11,9,.45);display:none;align-items:flex-end;justify-content:center}
+.modal{position:fixed;left:0;right:0;top:0;bottom:calc(-1 * var(--ext));padding-bottom:var(--ext);z-index:2800;background:rgba(8,11,9,.45);display:none;align-items:flex-end;justify-content:center}
 .modal.open{display:flex}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:20px 20px 0 0;width:100%;max-width:600px;padding:0 16px calc(var(--safe-b) + var(--badge));max-height:92vh;overflow:auto;box-shadow:0 160px 0 0 var(--panel),0 -8px 28px rgba(0,0,0,.4);-webkit-overflow-scrolling:touch}
 .card.big{height:45vh;transition:height .22s ease}.card.big.full{height:92vh}.card.drag{transition:none}
@@ -205,7 +229,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 .ax.edit .tr{width:24px;height:30px;left:-12px;top:-30px}.ax.edit .lb{left:14px;top:-22px}
 .plc{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font:700 13px/1 "IBM Plex Sans Condensed",sans-serif;color:#fff;letter-spacing:.03em;text-shadow:0 0 2px #000,0 0 2px #000,0 0 4px #000,0 1px 6px rgba(0,0,0,.9)}
 .plc.r0{font-size:18px;text-transform:uppercase}.plc.r1{font-size:15.5px}.plc.r2{font-size:13.5px}.plc.r3{font-size:11.5px;font-weight:600;color:#f1f1ea}
-#toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--safe-t) + var(--tg) + 72px);z-index:3000;background:var(--ink);color:var(--panel);padding:10px 14px;border-radius:12px;font-weight:600;display:none;max-width:90vw;text-align:center;box-shadow:var(--shadow)}
+#toast{position:fixed;z-index:3600;left:50%;transform:translateX(-50%);top:calc(var(--safe-t) + var(--tg) + 72px);z-index:3000;background:var(--ink);color:var(--panel);padding:10px 14px;border-radius:12px;font-weight:600;display:none;max-width:90vw;text-align:center;box-shadow:var(--shadow)}
 .leaflet-bottom{bottom:calc(max(var(--sheet-h,0px), calc(var(--safe-b) + var(--badge))) + var(--ext))}
 .leaflet-control-attribution{font-size:9.5px;background:rgba(255,255,255,.55)!important}
 .leaflet-touch .leaflet-bar{border:1px solid var(--line)!important;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
@@ -226,9 +250,12 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div id="netmsg"></div>
 <div id="dlbar"><span id="dlbarT"></span><button class="danger" id="dlbarStop">Стоп</button></div>
 <div id="rail">
-<button class="rb accent" id="newArrBtn" title="Новый слой"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Слой</button>
+<button class="rb" id="modeBtn" title="Раздел"><svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg><span>Раздел</span></button>
+<div class="rbpair"><button class="rb" id="undoBtn" title="Отменить">↶</button><button class="rb" id="redoBtn" title="Повторить">↷</button></div>
+<button class="rb accent" id="newArrBtn" title="Добавить"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Добавить</button>
 <button class="rb" id="layBtn" title="Слои"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>Слои</button>
 <button class="rb" id="setBtn" title="Настройки"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Настр.</button>
+<button class="rb" id="prnBtn" title="Печать в JPEG" style="display:none"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2"/><path d="M7 14h10v7H7z"/></svg>Печать</button>
 <button class="rb" id="searchBtn" title="Поиск по координатам"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>Поиск</button>
 <button class="rb" id="toolBtn" title="Инструменты"><svg viewBox="0 0 24 24"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg>Инстр.</button>
 <button class="rb" id="plcBtn" title="Подписи населённых пунктов"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V10l5-4 5 4v10M15 20v-7h4v7M8 13h4"/></svg>Н.п.</button>
@@ -266,11 +293,17 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 </div></div>
 <div class="modal" id="layModal"><div class="card big">
 <h3>Слои <small id="ver"></small></h3>
+<div class="seg" id="layTabs"><button data-t="L" class="on">Слои</button><button data-t="M">Карты</button><button data-t="F">Файлы</button></div>
+<div id="tabL">
 <div id="layList"></div>
 <div class="row" style="margin-top:12px"><button class="primary" id="layNew">Новый слой</button></div>
 <div class="row" style="margin-top:8px"><button class="ghost" id="optAll">⚡ Оптимизировать все</button><button class="ghost" id="optNone">Вернуть все</button></div>
-<p class="status" style="margin-top:10px">⚡ — оптимизация: слой рисуется одной картинкой и не тормозит даже с тысячами точек, но точки нельзя нажимать. Пока вы ставите или правите точки слоя, он временно работает как обычный.</p>
-<div class="row"><button class="ghost" data-close>Закрыть</button></div>
+<div class="row" style="margin-top:8px"><button class="ghost" id="trashBtn">🗑 Корзина</button></div>
+<p class="status" style="margin-top:10px">Свайп влево по слою — в корзину. ⚡ — оптимизация: слой рисуется одной картинкой и не тормозит даже с тысячами точек, но точки нельзя нажимать. Пока вы ставите или правите точки слоя, он временно работает как обычный.</p>
+</div>
+<div id="tabM" style="display:none"><div class="flabel">Подложка</div><div id="baseList" class="baselist"></div></div>
+<div id="tabF" style="display:none"></div>
+<div class="row" style="margin-top:12px"><button class="ghost" data-close>Закрыть</button></div>
 <input type="file" id="csvIn" accept=".csv,.txt,text/csv,text/plain" style="display:none">
 <input type="file" id="sesIn" accept=".json,application/json,text/plain" style="display:none">
 </div></div>
@@ -406,16 +439,59 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="row"><button class="ghost" id="cfNo">Отмена</button><button class="primary" id="cfYes" style="background:#e2533f;color:#fff">Удалить</button></div>
 </div></div>
 <div id="v3d"><div id="v3map"></div>
-<div id="v3top"><button id="v3close" class="glass">✕ 2D</button><select id="v3base" class="glass"></select><label class="glass" id="v3exl">Рельеф: <span id="v3exv">Реальный</span><input type="range" id="v3ex" min="1" max="5" step="0.5" value="1"></label><button id="v3lay" class="glass">Слои</button></div>
+<div id="v3top"><button id="v3close" class="glass">✕ 2D</button><select id="v3base" class="glass"></select><label class="glass" id="v3exl">Рельеф: <span id="v3exv">Реальный</span><input type="range" id="v3ex" min="1" max="5" step="0.5" value="1"></label><button id="v3lay" class="glass">Слои</button><button id="v3play" class="glass" style="display:none">▶ Все</button><button id="v3scnBtn" class="glass" style="display:none">Сцены</button></div>
 <div id="v3panel" class="glass"><label><input type="checkbox" data-k="places"> Населённые пункты</label><label><input type="checkbox" data-k="aux"> Ориентиры с подписями</label><label><input type="checkbox" data-k="shapes"> Фигуры, линии, маршруты</label><label><input type="checkbox" data-k="tac"> Тактические знаки и точки</label><label style="padding-left:26px"><input type="checkbox" data-k="tacLbl"> подписи знаков</label><label><input type="checkbox" data-k="mdl"> 3D-модели знаков</label><label style="flex-direction:column;align-items:stretch;gap:4px">Масштаб моделей: <span id="v3msv"></span><input type="range" id="v3ms" min="1" max="12" step="1" style="width:100%;height:auto"></label><label style="flex-direction:column;align-items:stretch;gap:4px">Высота БПЛА, м: <span id="v3altv"></span><input type="range" id="v3alt" min="10" max="500" step="10" style="width:100%;height:auto"></label><label><input type="checkbox" data-k="bld"> Здания</label><label><input type="checkbox" data-k="towers"> Вышки и мачты</label><label><input type="checkbox" data-k="forest"> Леса и лесополосы</label><label><input type="checkbox" data-k="brg"> Мосты, броды, паромы</label><label style="flex-direction:column;align-items:stretch;gap:4px">Плотность деревьев: <span id="v3denv"></span><input type="range" id="v3den" min="0.2" max="3" step="0.1" style="width:100%;height:auto"></label><small style="color:var(--mute);max-width:220px;line-height:1.3">Объекты грузятся участками ~3×3 км вокруг центра на крупном масштабе и сохраняются для работы без интернета.</small></div>
+<div id="v3scn" class="glass"><b>Сцены</b><div id="scnList"></div><button class="primary" id="scnNew">Новая сцена</button><small style="color:var(--mute);line-height:1.3">Сцена — участок местности. Объекты в нём проигрываются по общему времени: у каждого маршрут, скорость и время старта «Ч+».</small></div>
+<div id="v3tl" class="glass"><b id="tlN" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></b><button id="tlP">▶</button><input type="range" id="tlR" min="0" max="60" step="0.1" value="0"><span id="tlT" style="white-space:nowrap;font-variant-numeric:tabular-nums"></span>
+<div class="seg" id="tlM" style="margin:0"><button data-m="1" class="on">×1</button><button data-m="5">×5</button><button data-m="20">×20</button></div>
+<label style="display:flex;align-items:center;gap:6px;white-space:nowrap"><input type="checkbox" id="tlO" style="width:20px;height:20px;margin:0"> облёт</label><button id="tlCam" title="Запомнить вид">📷</button><button id="tlX">✕</button></div>
 <div id="v3msg"></div><div id="v3act" class="glass"></div></div>
 <div id="radial"></div>
+<div id="launch"><div class="lc"><h2>СКАТ</h2><p>Выберите раздел</p>
+<button data-m="op"><b>Оператор</b><small>Нанесение обстановки, тактические знаки, надписи, оформление и печать, импорт и экспорт</small></button>
+<button data-m="tp"><b>Топопланшет</b><small>Точки, массивы, маршруты, инструменты, таблицы Excel</small></button>
+<button data-m="mk"><b>Макет</b><small>3D-рельеф местности, модели, анимация</small></button></div></div>
+<div class="modal" id="addModal"><div class="card"><h3 id="addTitle">Добавить</h3><div class="addgrid" id="addGrid"></div><div class="row" style="margin-top:10px"><button class="ghost" data-close>Отмена</button></div></div></div>
+<div class="modal" id="spModal"><div class="card big"><h3>Знаки</h3><div class="spgrid" id="spGrid"></div><div class="row" style="margin-top:10px"><button class="ghost" data-close>Отмена</button></div></div></div>
+<div class="modal" id="trashModal"><div class="card big"><h3>Корзина</h3><div id="trashList"></div><div class="row" style="margin-top:10px"><button class="danger" id="trashClr">Очистить корзину</button><button class="ghost" data-close>Закрыть</button></div></div></div>
+<div class="modal" id="rotModal"><div class="card"><h3>Поворот <small id="rotV"></small></h3><input type="range" id="rotR" min="0" max="359" step="1" style="width:100%"><div class="row" style="margin-top:12px"><button class="ok" id="rotOk">Готово</button></div></div></div>
+<div class="modal" id="txtModal"><div class="card big"><h3 id="txtTitle">Надпись</h3>
+<div id="tPrev" style="height:90px;border-radius:12px;background:#b9c4b0;margin-bottom:10px;overflow:hidden"></div>
+<label class="f">Текст<textarea id="tTxt" rows="2" style="display:block;width:100%;margin-top:4px;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);font-size:16px"></textarea></label>
+<div class="duo"><label class="f">Шрифт<select id="tFont"></select></label><label class="f">Подложка<select id="tBg"></select></label></div>
+<label class="f">Размер: <span id="tSizeV"></span><input type="range" id="tSize" min="8" max="72" step="1" style="width:100%"></label>
+<div class="flabel">Цвет текста</div><div class="colors strip" id="tCol"></div>
+<div class="duo"><label class="f">Обводка<select id="tSC"><option value="#ffffff">белая</option><option value="#111111">чёрная</option><option value="#ffe066">жёлтая</option><option value="">без обводки</option></select></label><label class="f">Толщина: <span id="tSWV"></span><input type="range" id="tSW" min="0" max="6" step="0.5" style="width:100%"></label></div>
+<div class="duo"><label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="tB" style="width:22px;min-height:22px;margin:0"> Жирный</label><label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="tI" style="width:22px;min-height:22px;margin:0"> Курсив</label></div>
+<label class="f">Поворот: <span id="tRotV"></span><input type="range" id="tRot" min="0" max="359" step="1" style="width:100%"></label>
+<div class="row"><button class="danger" id="tDel">Удалить</button><button class="ghost" data-close>Отмена</button><button class="ok" id="tSave">Сохранить</button></div>
+</div></div>
+<div class="modal" id="impModal"><div class="card big"><h3>Импорт таблицы точек</h3><p class="status" id="impInfo"></p>
+<div class="duo"><label class="f">X (или широта)<select id="impX"></select></label><label class="f">Y (или долгота)<select id="impY"></select></label></div>
+<div class="duo"><label class="f">Название<select id="impN"></select></label><label class="f">Знак (название вида)<select id="impS"></select></label></div>
+<div class="duo"><label class="f">Сторона из столбца<select id="impSc"></select></label><label class="f">Иначе сторона<select id="impSide"><option value="">нет</option><option value="r">Красные</option><option value="b">Синие</option></select></label></div>
+<label class="f">Новый слой<input id="impL" autocomplete="off"></label>
+<p class="status">Координаты: СК-42 (5 или 7 цифр) или широта/долгота. Знак ищется по названию или сокращению из списка знаков.</p>
+<div class="row"><button class="ghost" data-close>Отмена</button><button class="primary" id="impGo">Нанести на карту</button></div>
+<input type="file" id="impTblIn" accept=".xlsx,.xls,.csv,.txt" style="display:none"></div></div>
+<div class="modal" id="prnModal"><div class="card big"><h3>Печать в JPEG</h3>
+<div class="seg" id="prnPaperSeg" style="flex-wrap:wrap"><button data-p="A5">A5</button><button data-p="A4">A4</button><button data-p="A3">A3</button><button data-p="A2">A2</button><button data-p="A1">A1</button><button data-p="A0">A0</button><button data-p="U">Свой</button></div>
+<div class="seg" id="prnOriSeg"><button data-o="p">Книжная</button><button data-o="l">Альбомная</button></div>
+<div class="duo" id="prnCustom" style="display:none"><label class="f">Ширина, мм<input id="prnW" inputmode="numeric" value="500"></label><label class="f">Высота, мм<input id="prnH" inputmode="numeric" value="350"></label></div>
+<label class="f">Разрешение, точек на дюйм<select id="prnDpi"><option value="100">100</option><option value="150" selected>150</option><option value="200">200</option><option value="300">300</option></select></label>
+<label class="f">Заголовок<input id="prnTitle" autocomplete="off" placeholder="например, Схема района"></label>
+<label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="prnGrid" checked style="width:22px;min-height:22px;margin:0"> Сетка СК-42 с подписями</label>
+<label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="prnLeg" checked style="width:22px;min-height:22px;margin:0"> Условные обозначения</label>
+<p class="status" id="prnInfo"></p>
+<div class="row"><button class="ghost" data-close>Отмена</button><button class="primary" id="prnGo">Сохранить JPEG</button></div>
+</div></div>
 <div id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 4.2';
+const VERSION = 'версия 4.6';
+const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
 document.documentElement.style.setProperty('--badge', framed ? '64px' : '10px');
@@ -487,11 +563,11 @@ const DEFAULT_PAL = [
 {color:PINK, name:'Розовый', glyph:'ЗМ'}, {color:PINK, name:'Розовый', glyph:'Вс'},
 {color:'#8a8a8a', name:'Серый', glyph:''}];
 const PAL_VER = 2;
-const state = { arrays: saved.arrays || [], layer: LAYERS[saved.layer] ? saved.layer : 'ya_map', grid: saved.grid !== false, full: saved.full === true, places: saved.places !== false, voice: saved.voice === true,
+const state = { scenes: saved.scenes || [], trash: saved.trash || [], arrays: saved.arrays || [], layer: LAYERS[saved.layer] ? saved.layer : 'ya_map', grid: saved.grid !== false, full: saved.full === true, places: saved.places !== false, voice: saved.voice === true,
 palette: (saved.palVer === PAL_VER && saved.palette) || DEFAULT_PAL.map(x => ({...x})) };
 let persistT = 0;
 function persistNow(){ clearTimeout(persistT);
-try{ localStorage.setItem(LS, JSON.stringify({arrays:state.arrays, palette:state.palette, palVer:PAL_VER, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice})); }catch(e){} }
+try{ localStorage.setItem(LS, JSON.stringify({scenes:state.scenes, trash:state.trash, arrays:state.arrays, palette:state.palette, palVer:PAL_VER, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice})); }catch(e){} histSnap(); }
 function persist(){ clearTimeout(persistT); persistT = setTimeout(persistNow, 400); }
 document.addEventListener('visibilitychange', () => { if (document.hidden) persistNow(); });
 addEventListener('pagehide', persistNow);
@@ -717,6 +793,7 @@ state.palette.push(st); persist(); renderPalList(); palDone && palDone(); $('nNa
 };
 $('saveCopy').onclick = saveCopy;
 function labelOf(a, i){
+if (a.points[i] && a.points[i].lbl) return a.points[i].lbl;
 if (a.kind && namedKind(a)) return (a.points[i] && a.points[i].name) || ((a.kind === 'desc' ? 'О' : 'Т') + (i+1));
 const s = String(a.start ?? '1').trim(), n = parseInt(s,10);
 const base = isNaN(n) ? 1 : n, num = base + i*(Number(a.step)||1), width = /^0\d/.test(s) ? s.length : 0;
@@ -769,7 +846,9 @@ state.arrays.forEach(a => {
 const active = session && session.arrId === a.id, editing = active && session.mode === 'edit';
 const op = session && !active ? .45 : 1;
 if (a.hidden && !active) return;
+(a.texts || []).forEach(t => markers.addLayer(L.marker([t.lat, t.lng], {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:txtHtml(t)})})));
 if (a.kind === 'shapes'){ if (z < (a.minZ || 0)) return; drawShapes(a, z >= (a.lblZ ?? DEF_LBLZ)); return; }
+if (a.shapes && a.shapes.length && z >= (a.minZ || 0)) drawShapes(a, z >= (a.lblZ ?? DEF_LBLZ));
 if (a.opt && !active) return;
 if (!active && z < (a.minZ || 0)) return;
 const showLb = editing || active || z >= (a.lblZ ?? DEF_LBLZ);
@@ -783,8 +862,8 @@ const icon = editing || active || !a.noIcon;
 if (!icon && !showLb) return;
 html = `<div class="ax${editing?' edit':''}${icon?'':' noicon'}" style="opacity:${op}">${icon ? `<div class="tr">${TREE(a.style.color)}</div>` : ''}${showLb ? `<div class="lb">${escapeHtml(p.name)}</div>` : ''}</div>`;
 } else {
-const st = styleOf(a,p), ex = a.kind === 'desc', g = ex ? '!' : (st.glyph||''), sid = p.sym || a.sym;
-if (sid && SYM_BY[sid]) html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="sym" style="color:${symCol(sid, sideOf(a, p), st.color)}">${symSvg(sid, p.fc || a.fc)}</div>${showLb ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
+const st = styleOf(a,p), ex = a.kind === 'desc', g = ex ? '!' : (st.glyph||''), sid = p.sym === '_none' ? null : (p.sym || a.sym);
+if (sid && SYM_BY[sid]) html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="sym" style="color:${symCol(sid, sideOf(a, p), st.color)}${p.rot ? `;transform:rotate(${p.rot}deg)` : ''}">${symSvg(sid, p.fc || a.fc)}</div>${showLb ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
 else html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="dot${g?' g':''}${ex?' ex':''}" style="background:${st.color};color:${ink(st.color)}">${escapeHtml(g)}</div>${showLb ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
 }
 const m = L.marker([p.lat,p.lng], {icon:L.divIcon({className:'pt-wrap', html, iconSize:[0,0]}), draggable:editing, interactive:editing, keyboard:false});
@@ -841,8 +920,8 @@ if (showLb) lbl(p.name, q.x+11, q.y-3, true, false);
 } else lbl(p.name, q.x, q.y+4, true, true);
 return;
 }
-const st = styleOf(a,p), g = a.kind === 'desc' ? '!' : (st.glyph||''), r = g ? 10 : 6, sid = p.sym || a.sym;
-if (sid && SYM_BY[sid]){ drawSym(ctx2, sid, q.x, q.y, symCol(sid, sideOf(a, p), st.color), p.fc || a.fc); if (showLb) lbl(labelOf(a,i), q.x+17, q.y-16, false, false); return; }
+const st = styleOf(a,p), g = a.kind === 'desc' ? '!' : (st.glyph||''), r = g ? 10 : 6, sid = p.sym === '_none' ? null : (p.sym || a.sym);
+if (sid && SYM_BY[sid]){ if (p.rot){ ctx2.save(); ctx2.translate(q.x, q.y); ctx2.rotate(p.rot * Math.PI / 180); drawSym(ctx2, sid, 0, 0, symCol(sid, sideOf(a, p), st.color), p.fc || a.fc); ctx2.restore(); } else drawSym(ctx2, sid, q.x, q.y, symCol(sid, sideOf(a, p), st.color), p.fc || a.fc); if (showLb) lbl(labelOf(a,i), q.x+17, q.y-16, false, false); return; }
 ctx2.beginPath(); ctx2.arc(q.x, q.y, r, 0, Math.PI*2); ctx2.fillStyle = st.color; ctx2.fill();
 ctx2.strokeStyle = '#fff'; ctx2.lineWidth = 2; ctx2.stroke();
 if (g){ ctx2.fillStyle = ink(st.color); ctx2.font = `800 ${g === '!' ? 13 : 10}px "IBM Plex Sans Condensed", sans-serif`; ctx2.textAlign = 'center'; ctx2.textBaseline = 'middle'; ctx2.fillText(g, q.x, q.y+0.5); ctx2.textAlign = 'left'; }
@@ -850,7 +929,7 @@ if (showLb) lbl(labelOf(a,i), q.x+r+3, q.y-r-2, false, false);
 });
 });
 ctx2.globalAlpha = 1;
-state.arrays.forEach(a => { if (a.kind !== 'shapes' || a.hidden || z < (a.minZ || 0)) return;
+state.arrays.forEach(a => { if (!(a.shapes && a.shapes.length) || a.hidden || z < (a.minZ || 0)) return;
 (a.shapes || []).forEach(sh => { const sy = sh.sym && SYM_BY[sh.sym]; if (!sy || !DECOR[sy.style]) return;
 const P = sh.pts.map(p => map.latLngToLayerPoint(LL(p)).subtract(BX.o)); if (sy.type === 'area' && P.length > 2) P.push(P[0]);
 DECOR[sy.style](ctx2, P, sh.color || a.style.color, shK(sh)); }); });
@@ -1096,6 +1175,7 @@ else {
 const pfc = pendSym && pendSym.aid === a.id ? pendSym.fc : null, ps = pendSym && pendSym.aid === a.id ? pendSym.sid : null; pendSym = null;
 const p = {lat:ll.lat, lng:ll.lng, h:null, place:'', name:raw || (ps ? SYM_BY[ps].n : ((a.kind === 'desc' ? 'О' : 'Т') + (a.points.length+1)))};
 if (ps) p.sym = ps; if (pfc) p.fc = pfc;
+if (!ps && session && session.sym){ p.sym = session.sym; if (session.side) p.side = session.side; }
 if (session && session.style && !sameSt(session.style, a.style)) p.style = copySt(session.style);
 a.points.push(p); fillHeight(p); fillPlace(p);
 }
@@ -1105,10 +1185,11 @@ function addPoint(ll){
 const a = arrById(session.arrId);
 if (a.kind === 'aux' || namedKind(a)){ openAux(a, null, ll); return; }
 const p = {lat:ll.lat, lng:ll.lng, h:null, place:''};
+if (session.sym){ p.sym = session.sym; if (session.side) p.side = session.side; }
 if (session.style && !sameSt(session.style, a.style)) p.style = copySt(session.style);
 a.points.push(p); fillHeight(p); fillPlace(p); persist(); renderMarkers(); renderSheet();
 }
-map.on('click', e => { if (session && session.mode === 'pick') addPoint(e.latlng); else if (!session && tool.on) toolAdd(e.latlng); });
+map.on('click', e => { if (textPending && !session){ const a = textLayer(); openTextEd(a, null, e.latlng); return; } if (session && session.mode === 'pick') addPoint(e.latlng); else if (!session && tool.on) toolAdd(e.latlng); });
 const sheet = $('sheet');
 { let sy = 0; sheet.addEventListener('touchstart', e => { sy = e.touches[0].clientY; }, {passive:true});
 sheet.addEventListener('touchend', e => { if (!session) return; const dy = e.changedTouches[0].clientY - sy;
@@ -1120,14 +1201,15 @@ const el = $('layList');
 el.innerHTML = state.arrays.length ? state.arrays.map(a => `<div class="arr${a.hidden?' off':''}" data-id="${a.id}">
 ${a.kind==='aux' ? `<span class="swt">${TREE(a.style.color)}</span>` : a.kind==='shapes' ? `<span class="sw shp" style="background:${a.style.color}"></span>` : a.kind==='desc' ? `<span class="sw ex" style="background:${a.style.color}">!</span>` : `<span class="sw${a.kind==='route'?' rt':a.kind==='pts'?' one':''}" style="background:${a.style.color}"></span>`}
 <div class="nm"><div>${escapeHtml(a.name)}</div><div>${escapeHtml(rangeText(a))}</div></div>
-<button data-act="pick">${a.kind==='shapes' ? 'Рисовать' : 'Точки'}</button><button data-act="tbl">Таблица</button>
+<button data-act="pick" title="Добавить в слой">＋</button><button data-act="tbl">Таблица</button>
 ${a.kind==='aux' ? `<button class="eye${a.noIcon?' off':''}" data-act="ico" title="${a.noIcon?'Показать ёлочки':'Только надписи'}">${TREE_BTN}</button>` : ''}
 <button class="eye ${a.opt?'lit':'dim'}" data-act="opt" title="${a.opt?'Оптимизирован':'Оптимизировать'}">${BOLT}</button>
 <button class="eye${a.hidden?' off':''}" data-act="eye" title="${a.hidden?'Показать':'Скрыть'}">${a.hidden?EYE_OFF:EYE_ON}</button></div>`).join('')
 : '<div class="empty">Слоёв пока нет. Создайте слой или импортируйте CSV.</div>';
 el.querySelectorAll('.arr').forEach(r => {
 const id = +r.dataset.id, a = arrById(id);
-r.querySelector('[data-act=pick]').onclick = () => { if (a.kind === 'shapes'){ closeModals(); openTools(id); } else startSession(id, 'pick'); };
+r.querySelector('[data-act=pick]').onclick = () => openAdd(id);
+swipeable(r, () => { trashLayer(a); renderLayers(); });
 r.querySelector('[data-act=tbl]').onclick = () => openTable(id);
 const ib = r.querySelector('[data-act=ico]');
 if (ib) ib.onclick = () => { a.noIcon = !a.noIcon; persist(); renderMarkers(); renderLayers(); toast(a.noIcon ? 'Только надписи' : 'Ёлочки и надписи'); };
@@ -1306,7 +1388,7 @@ $('tblBody').innerHTML = rows.length ? rows.map((r,i) => `<tr data-i="${i}">` + 
 : desc ? `<td>${r.n}</td><td><b>${E(r.id)}</b></td><td>${E(r.loc)}</td><td>${E(r.note)}</td><td>${E(r.place)}</td>`
 : `<td>${E(r.ident)}</td><td><b>${E(r.id)}</b></td><td>${r.x}</td><td>${r.y}</td><td>${r.h}</td><td>${r.sq}</td><td>${E(r.place)}</td><td>${E(r.comment)}</td><td><span class="c" style="background:${r.st.color}"></span>${E(styleText(r.st))}</td>`) + '</tr>').join('')
 : `<tr><td colspan="${heads.length}" class="empty">Точек пока нет. Нажмите «Добавить точки».</td></tr>`;
-$('tblBody').querySelectorAll('tr[data-i]').forEach(tr => tr.onclick = () => { const p = a.points[+tr.dataset.i]; closeModals(); map.setView([p.lat,p.lng], Math.max(map.getZoom(),16)); });
+$('tblBody').querySelectorAll('tr[data-i]').forEach(tr => { tr.onclick = e => { if (e.target.classList.contains('trashbtn')) return; const p = a.points[+tr.dataset.i]; closeModals(); map.setView([p.lat,p.lng], Math.max(map.getZoom(),16)); }; swipeable(tr, () => { trashPoint(a, +tr.dataset.i); openTable(id); }); });
 $('tblXlsx').textContent = aux ? 'Скачать CSV' : 'Скачать Excel';
 $('tblXlsx').disabled = !rows.length; $('tblEdit').disabled = !rows.length;
 openModal('tblModal');
@@ -1402,7 +1484,7 @@ a.points.forEach(p => { const s = GEO.toSK(p.lat, p.lng); lines.push(`${String(p
 deliverFile(new Blob(['\uFEFF' + lines.join('\r\n')], {type:'text/csv'}), `${safeName(a.name)}.csv`, 'CSV с ориентирами готов');
 }
 function exportSession(){
-const data = {app:'skat', ver:1, saved:new Date().toISOString(), palette:state.palette, palVer:PAL_VER, arrays:state.arrays, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice, syms:SYMS};
+const data = {app:'skat', ver:1, saved:new Date().toISOString(), palette:state.palette, palVer:PAL_VER, arrays:state.arrays, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice, syms:SYMS, scenes:state.scenes};
 deliverFile(new Blob([JSON.stringify(data)], {type:'application/json'}), `СКАТ_сессия_${stamp()}.json`, 'Сессия готова — сохраните её в «Файлы»');
 }
 function importSession(text){
@@ -1411,6 +1493,7 @@ try { d = JSON.parse(text); } catch(e){ toast('Это не файл сессии
 if (!d || !Array.isArray(d.arrays)){ toast('В файле нет данных сессии'); return; }
 askConfirm(`Загрузить сессию (${d.arrays.length} слоёв)? Текущие данные будут заменены.`, 'Загрузить', () => {
 state.arrays = d.arrays.map(normArr);
+if (Array.isArray(d.scenes)) state.scenes = d.scenes;
 if (Array.isArray(d.syms) && d.syms.length){ SYMS = d.syms; saveSyms(); }
 if (Array.isArray(d.palette) && d.palette.length) state.palette = d.palette;
 if (typeof d.grid === 'boolean'){ state.grid = d.grid; $('gridBtn').classList.toggle('on', state.grid); }
@@ -1462,7 +1545,6 @@ $('shareDl').onclick = () => { closeModals(); downloadBlob(shareItem.blob, share
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 let tt = 0;
 function toast(msg){ const t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(tt); tt = setTimeout(() => t.style.display = 'none', 2600); }
-$('newArrBtn').onclick = () => openArrModal();
 $('expBtn').onclick = () => { closeModals(); exportXlsx(state.arrays, 'СКАТ_точки'); };
 $('searchBtn').onclick = () => { $('sErr').textContent = ''; openModal('srchModal'); setTimeout(() => $('sQ').focus(), 50); };
 $('sQ').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
@@ -1820,7 +1902,8 @@ drawTool(); renderTool();
 function saveShape(){
 const sh = curShape(); if (!sh) return;
 let a = (tool.target && arrById(tool.target)) || state.arrays.find(x => x.kind === 'shapes');
-if (!a || a.kind !== 'shapes'){ a = normArr({id:Date.now(), kind:'shapes', name:'Фигуры', ident:'Фигуры', style:copySt(tool.color), points:[], shapes:[]}); state.arrays.push(a); }
+if (a && !a.shapes) a.shapes = [];
+if (!a){ a = normArr({id:Date.now(), kind:'shapes', name:'Фигуры', ident:'Фигуры', style:copySt(tool.color), points:[], shapes:[]}); state.arrays.push(a); }
 const nm = ($('tName') && $('tName').value.trim()) || '';
 a.shapes.push({type:sh.type, pts:sh.pts.map(p => [+p.lat.toFixed(6), +p.lng.toFixed(6)]), r:sh.r || 0, color:tool.color.color, op:tool.op, name:nm || (tool.sym && SYM_BY[tool.sym] ? SYM_BY[tool.sym].n : ''), t:Date.now(), sym:tool.sym || undefined, scl:tool.scl ? 1 : 0, z0:map.getZoom()});
 tool.target = a.id; tool.pts = []; tool.r = 0;
@@ -1968,9 +2051,9 @@ const lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d
 function v3data(){
 const F = [];
 state.arrays.forEach(a => { if (a.hidden) return;
-if (a.kind === 'shapes'){ (a.shapes || []).forEach(sh => { const col = sh.color || a.style.color, op = (sh.op ?? 35) / 100, pts = sh.pts.map(p => [p[1] ?? p.lng, p[0] ?? p.lat]);
+if (a.shapes && a.shapes.length){ (a.shapes || []).forEach(sh => { const col = sh.color || a.style.color, op = (sh.op ?? 35) / 100, pts = sh.pts.map(p => [p[1] ?? p.lng, p[0] ?? p.lat]);
 if (sh.type === 'line') F.push({type:'Feature', properties:{color:col}, geometry:{type:'LineString', coordinates:pts}});
-else { const ring = sh.type === 'circle' ? circlePoly(LL(sh.pts[0]), sh.r) : pts.concat([pts[0]]); F.push({type:'Feature', properties:{color:col, op}, geometry:{type:'Polygon', coordinates:[ring]}}); } }); return; }
+else { const ring = sh.type === 'circle' ? circlePoly(LL(sh.pts[0]), sh.r) : pts.concat([pts[0]]); F.push({type:'Feature', properties:{color:col, op}, geometry:{type:'Polygon', coordinates:[ring]}}); } }); if (a.kind === 'shapes') return; }
 if (a.kind === 'route' && a.points.length > 1) F.push({type:'Feature', properties:{color:a.style.color}, geometry:{type:'LineString', coordinates:a.points.map(p => [p.lng, p.lat])}});
 
 });
@@ -2017,7 +2100,7 @@ terrain:{source:'dem', exaggeration:ex}}});
 v3.addControl(new ml.NavigationControl({visualizePitch:true}), 'bottom-right');
 v3.on('styleimagemissing', e => { try { if (!v3.hasImage(e.id)){ const im = v3img(e.id); if (im) v3.addImage(e.id, im, {pixelRatio:2}); } } catch(_){} });
 ['fill', 'outl', 'line'].forEach(id => { try { v3.setLayoutProperty(id, 'visibility', v3cfg.shapes ? 'visible' : 'none'); } catch(_){} });
-v3.on('load', ensureObjs); v3.on('moveend', ensureObjs); v3.on('click', v3tap);
+v3.on('load', ensureObjs); v3.on('load', envInit); v3.on('moveend', ensureObjs); v3.on('click', v3tap);
 v3.on('load', () => { $('v3msg').textContent = 'Наклон — двумя пальцами вверх/вниз, поворот — двумя пальцами по кругу. Компас справа — север вверх.'; });
 v3.on('error', () => {});
 } catch(e){ el.classList.remove('on'); toast('Устройство не поддерживает 3D (WebGL)'); }
@@ -2090,9 +2173,9 @@ F.push({type:'Feature', properties:{c, b, h}, geometry:{type:'Polygon', coordina
 band(-w, w, 0, .05, M3.ditch); band(w, w * 2.2, 0, .55 * Math.max(1, S / 3), M3.earth); band(-w * 2.2, -w, 0, .35 * Math.max(1, S / 3), M3.earth); }
 function v3mdl(c){ const F = []; if (!v3cfg.mdl) return {type:'FeatureCollection', features:F}; const S = v3cfg.ms || 4; let n = 0;
 state.arrays.forEach(a => { if (a.hidden || a.kind === 'aux') return;
-if (a.kind === 'shapes'){ (a.shapes || []).forEach(sh => { const sy = sh.sym && SYM_BY[sh.sym]; if (!sy || !sh.pts || sh.pts.length < 2) return;
-if (/trench|rub_obor|a_obor/.test(sy.style)){ const L = sh.pts.map(p => [p.lng, p.lat]); if (sy.type === 'area') L.push(L[0]); mdlTrench(F, L, S); } }); return; }
-a.points.forEach((p, pi) => { const sid = p.sym || a.sym, key = sid && MDL_OF[sid]; if (!key || n > 400) return; const f0 = F.length, ai = state.arrays.indexOf(a); if (Math.abs(p.lat - c.lat) > 0.3 || Math.abs(p.lng - c.lng) > 0.45) return; n++;
+if (a.shapes && a.shapes.length){ (a.shapes || []).forEach(sh => { const sy = sh.sym && SYM_BY[sh.sym]; if (!sy || !sh.pts || sh.pts.length < 2) return;
+if (/trench|rub_obor|a_obor/.test(sy.style)){ const L = sh.pts.map(p => [p.lng, p.lat]); if (sy.type === 'area') L.push(L[0]); mdlTrench(F, L, S); } }); if (a.kind === 'shapes') return; }
+a.points.forEach((p, pi) => { const ov = ANIM.get(a.id + ':' + pi); if (ov) p = Object.assign({}, p, ov); const sid = p.sym || a.sym, key = sid && MDL_OF[sid]; if (!key || n > 400) return; const f0 = F.length, ai = state.arrays.indexOf(a); if (Math.abs(p.lat - c.lat) > 0.3 || Math.abs(p.lng - c.lng) > 0.45) return; n++;
 const col = sid === 'lozh' ? SCOL.g : symCol(sid, sideOf(a, p), styleOf(a, p).color), ang = -(p.rot || a.rot || 0) * Math.PI / 180;
 if (key === 'op' || key === 'trSeg'){ const [kx, ky] = mk(p.lat), R = key === 'op' ? 9 * S : 4 * S, L = []; const n2 = key === 'op' ? 24 : 6;
 for (let i = 0; i <= n2; i++){ const q = key === 'op' ? i / n2 * 2 * Math.PI : Math.PI * (0.65 + i / n2 * 0.7); L.push([p.lng + Math.cos(q) * R / kx, p.lat + Math.sin(q) * R / ky]); }
@@ -2314,23 +2397,32 @@ objBusy = false;
 }
 // ---- 3D: выбор и правка объектов
 let v3sel = null, v3move = false;
-function v3upd(){ persist(); renderMarkers(); renderSheet(); try { v3.getSource('pts').setData(v3data()); } catch(_){} v3apply(); try { if (!v3cfg.tac) v3.getSource('tac').setData(v3tac(v3.getCenter())); } catch(_){} }
+function v3upd(){ envRefresh(); persist(); renderMarkers(); renderSheet(); try { v3.getSource('pts').setData(v3data()); } catch(_){} v3apply(); try { if (!v3cfg.tac) v3.getSource('tac').setData(v3tac(v3.getCenter())); } catch(_){} }
 function v3bar(){ const el = $('v3act'); if (!v3sel){ el.classList.remove('on'); el.innerHTML = ''; return; }
-const a = state.arrays[v3sel.ai], p = a && a.points[v3sel.pi]; if (!p){ v3sel = null; return v3bar(); }
-el.innerHTML = `<b>${escapeHtml(labelOf(a, v3sel.pi))}${v3move ? ' — коснитесь нового места' : ''}</b><button data-a="card">Карточка</button><button data-a="move" class="${v3move ? 'on' : ''}">Переместить</button><button data-a="l">↺ 15°</button><button data-a="r">↻ 15°</button><button data-a="del">Удалить</button><button data-a="x">✕</button>`;
+const a = state.arrays[v3sel.ai], p = a && v3item(a); if (!p){ v3sel = null; return v3bar(); }
+el.innerHTML = `<b>${escapeHtml(v3sel.ei != null ? ENV_N[p.k] || 'Объект' : labelOf(a, v3sel.pi))}${v3move ? ' — коснитесь нового места' : ''}</b><button data-a="card">Карточка</button><button data-a="move" class="${v3move ? 'on' : ''}">Переместить</button><button data-a="l">↺ 15°</button><button data-a="r">↻ 15°</button>${v3route ? `<button data-a="rok" class="on">Готово (${v3route.pts.length})</button><button data-a="rx">Сброс</button>` : `<button data-a="route">Маршрут</button>${p.path ? `<button data-a="play">▶</button><button data-a="t0">Старт ${fmtT(p.t0 || 0)}</button><select data-a="spd">${[5, 10, 20, 40, 60].map(v => `<option value="${v}"${(p.spd || 20) === v ? ' selected' : ''}>${v} км/ч</option>`).join('')}</select>` : ''}`}<button data-a="del">Удалить</button><button data-a="x">✕</button>`;
+const sp = el.querySelector('[data-a=spd]'); if (sp) sp.onchange = e => { p.spd = +e.target.value; persist(); };
 el.classList.add('on'); }
-$('v3act').onclick = e => { const b = e.target.closest('button'); if (!b || !v3sel) return; const a = state.arrays[v3sel.ai], p = a && a.points[v3sel.pi]; if (!p) return;
+$('v3act').onclick = e => { const b = e.target.closest('button'); if (!b || !v3sel) return; const a = state.arrays[v3sel.ai], p = a && v3item(a); if (!p) return;
 const A = b.dataset.a;
-if (A === 'card'){ openPoint(a, v3sel.pi); return; }
+if (A === 'card'){ if (v3sel.ei == null) openPoint(a, v3sel.pi); return; }
+if (A === 'route'){ v3route = {pts:[[p.lng, p.lat]]}; v3bar(); toast('Касайтесь 3D-карты по точкам маршрута, затем «Готово»'); return; }
+if (A === 'rx'){ v3route = null; delete p.path; persist(); envRefresh(); v3bar(); return; }
+if (A === 'rok'){ if (v3route.pts.length > 1){ p.path = v3route.pts; p.spd = p.spd || 20; } v3route = null; persist(); envRefresh(); v3bar(); return; }
+if (A === 't0'){ const v = prompt('Время старта от «Ч» (минуты:секунды)', `${Math.floor((p.t0 || 0) / 60)}:${String((p.t0 || 0) % 60).padStart(2, '0')}`); if (v === null) return; const m2 = v.trim().match(/^(\d+)(?:[:.,](\d+))?$/); if (!m2){ toast('Формат: 5:30 или 5'); return; } p.t0 = (+m2[1]) * 60 + (+(m2[2] || 0)); persist(); if (SC.cur){ SC.T = scnDur(SC.cur); $('tlR').max = SC.T; scnSet(SC.t, true); } v3bar(); return; }
+if (A === 'play'){ playAnim([{key:(v3sel.ei != null ? 'e' : '') + a.id + ':' + (v3sel.ei != null ? v3sel.ei : v3sel.pi), it:p}]); return; }
+if (A === 'spd') return;
 if (A === 'move'){ v3move = !v3move; v3bar(); return; }
 if (A === 'l' || A === 'r'){ p.rot = (((p.rot || a.rot || 0) + (A === 'r' ? 15 : -15)) % 360 + 360) % 360; v3upd(); toast(`Поворот ${p.rot}°`); return; }
-if (A === 'del'){ if (!confirm(`Удалить «${labelOf(a, v3sel.pi)}»?`)) return; a.points.splice(v3sel.pi, 1); v3sel = null; v3move = false; v3bar(); v3upd(); return; }
-v3sel = null; v3move = false; v3bar(); };
+if (A === 'del'){ if (!confirm(`Удалить «${labelOf(a, v3sel.pi)}»?`)) return; if (v3sel.ei != null) a.env.splice(v3sel.ei, 1); else a.points.splice(v3sel.pi, 1); envRefresh(); v3sel = null; v3move = false; v3bar(); v3upd(); return; }
+v3sel = null; v3move = false; v3route = null; envRefresh(); v3bar(); };
 function v3tap(e){
-if (v3move && v3sel){ const a = state.arrays[v3sel.ai], p = a && a.points[v3sel.pi]; if (p){ p.lat = +e.lngLat.lat.toFixed(7); p.lng = +e.lngLat.lng.toFixed(7); if (!p.hManual) fillHeight(p); if (!p.placeManual) delete p.place; v3upd(); } v3move = false; v3bar(); return; }
-const pt = e.point, L = ['mdl', 'tac'].filter(id => v3.getLayer(id));
+if (SC.pick){ scnPickTap(e); return; }
+if (v3route){ v3route.pts.push([+e.lngLat.lng.toFixed(7), +e.lngLat.lat.toFixed(7)]); envRefresh(); v3bar(); return; }
+if (v3move && v3sel){ const a = state.arrays[v3sel.ai], p = a && v3item(a); if (p){ p.lat = +e.lngLat.lat.toFixed(7); p.lng = +e.lngLat.lng.toFixed(7); if (!p.hManual) fillHeight(p); if (!p.placeManual) delete p.place; v3upd(); } v3move = false; v3bar(); return; }
+const pt = e.point, L = ['mdl', 'tac'].concat(v3.getStyle().layers.filter(l => l.id.startsWith('e_')).map(l => l.id)).filter(id => v3.getLayer(id));
 const f = v3.queryRenderedFeatures([[pt.x - 14, pt.y - 14], [pt.x + 14, pt.y + 14]], {layers:L}).find(q => q.properties && q.properties.ai != null);
-v3sel = f ? {ai:+f.properties.ai, pi:+f.properties.pi} : null; v3move = false; v3bar(); }
+v3sel = f ? (f.properties.ei != null ? {ai:+f.properties.ai, ei:+f.properties.ei} : {ai:+f.properties.ai, pi:+f.properties.pi}) : null; v3move = false; v3bar(); }
 // после правки в карточке — обновить 3D
 ['ptSave', 'ptDel'].forEach(id => $(id).addEventListener('click', () => setTimeout(() => { if (!v3) return; if (id === 'ptDel'){ v3sel = null; v3bar(); } v3upd(); }, 0)));
 function close3D(){
@@ -2661,7 +2753,7 @@ c = symImgs[key] = {ready:false, cv:document.createElement('canvas')}; c.cv.widt
 const im = new Image(); im.onload = () => { const g = c.cv.getContext('2d'); g.drawImage(im, 0, 0, 64, 64); g.globalCompositeOperation = 'source-in'; g.fillStyle = color; g.fillRect(0, 0, 64, 64); c.ready = true; drawOpt(); }; im.src = s.img;
 return null;
 }
-function sideOf(a, p){ if (a.symSide) return a.symSide; const c = styleOf(a, p).color; return c === SIDES.r.color ? 'r' : c === SIDES.b.color ? 'b' : ''; }
+function sideOf(a, p){ if (p && p.side) return p.side; if (a.symSide) return a.symSide; const c = styleOf(a, p).color; return c === SIDES.r.color ? 'r' : c === SIDES.b.color ? 'b' : ''; }
 function symCol(sid, side, def){ const s = SYM_BY[sid]; if (!s) return def; return side === 'r' ? (s.cR || SIDES.r.color) : side === 'b' ? (s.cB || SIDES.b.color) : def; }
 const symC = (k, c) => !k ? c : k === 'y' ? SCOL.y : k === 'w' ? '#ffffff' : k === 'k' ? SCOL.k : k === 'g' ? SCOL.g : k === 'b' ? SIDES.b.color : SIDES.r.color;
 function drawSym(g, sid, x, y, color, fc, rot, sc){
@@ -2912,13 +3004,13 @@ $('clR').onchange = e => { clCfg.r = +e.target.value; lsSet('skat_cl', clCfg); r
 const TYPE_N = {pt:'точечный', line:'линейный', area:'площадной'};
 function renderSymList(){
 const el = $('symList'); if (!el) return;
-el.innerHTML = SYMS.map(s => `<div class="arr" data-id="${s.id}"><span class="symico" style="color:#c0282a">${symSvg(s.id)}</span><div class="nm"><div>${escapeHtml(s.n)}</div><div>${TYPE_N[s.type] || ''}${s.ab ? ' · ' + escapeHtml(s.ab) : ''}</div></div><button class="eye ${s.fav ? 'lit' : 'dim'}" data-act="fav" title="Избранное" style="font-size:20px">★</button></div>`).join('');
+el.innerHTML = SYMS.map(s => `<div class="arr" data-id="${s.id}"><span class="symico" style="color:#c0282a">${symSvg(s.id)}</span><div class="nm"><div>${escapeHtml(s.n)}</div><div>${TYPE_N[s.type] || ''}${s.ab ? ' · ' + escapeHtml(s.ab) : ''}</div></div><button class="eye ${isFav(s) ? 'lit' : 'dim'}" data-act="fav" title="Избранное" style="font-size:20px">★</button></div>`).join('');
 el.querySelectorAll('.arr').forEach(r => { const s = SYM_BY[r.dataset.id];
-r.querySelector('[data-act=fav]').onclick = e => { e.stopPropagation(); s.fav = !s.fav; saveSyms(); renderSymList(); };
+r.querySelector('[data-act=fav]').onclick = e => { e.stopPropagation(); toggleFav(s); renderSymList(); };
 r.onclick = () => openSymEd(s.id); });
 }
 $('symAdd').onclick = () => openSymEd(null);
-$('symFavAll').onclick = () => { SYMS.forEach(s => s.fav = true); saveSyms(); renderSymList(); toast('Все знаки в избранном'); };
+$('symFavAll').onclick = () => { lsSet('skat_fav_' + (secMode || 'tp'), SYMS.map(s => s.id)); favCache = null; renderSymList(); toast('Все знаки в избранном раздела'); };
 let symEd = null;
 function openSymEd(id){
 const s = id ? SYM_BY[id] : null;
@@ -3094,16 +3186,16 @@ radPush('Нанести', [
 {t:'Фигура', ic:IC.shape, go:() => radPush('Фигура', [
 {t:'Круг', ic:IC.circle, go:() => toolAt('circle')}, {t:'Прямо­угольник', ic:IC.rect, go:() => toolAt('rect')},
 {t:'Много­угольник', ic:IC.poly, go:() => toolAt('poly')}, {t:'Линия', ic:IC.line, go:() => toolAt('line')}])},
-{t:'Маршрут', ic:IC.route, go:() => toolAt('line')}]);
+{t:'Маршрут', ic:IC.route, go:() => toolAt('line')},
+{t:'Надпись', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>', go:() => { const ll = radPos.ll; closeRadial(); textPending = null; openTextEd(textLayer(), null, ll); }}]);
 }
 function radKind(side){ const S = SIDES[side];
 radPush(S.name, [{t:'Точка', ic:IC.pt, color:S.color, go:() => radSym(side, 'pt')}, {t:'Массив', ic:IC.arr, color:S.color, go:() => radSym(side, 'arr')},
 {t:'Линия, рубеж', ic:IC.lsym, color:S.color, go:() => radSym(side, 'line')}, {t:'Зона, район', ic:IC.asym, color:S.color, go:() => radSym(side, 'area')}]); }
 function radSym(side, kind){
 const S = SIDES[side], types = kind === 'line' ? ['line'] : kind === 'area' ? ['area'] : ['pt'];
-const list = SYMS.filter(s => s.fav && types.includes(s.type));
-if (!list.length){ toast('В избранном нет знаков этого типа — отметьте их ★ в ⚙ Настр.'); return; }
-radPush(`${S.name} · ${{pt:'точка', arr:'массив', line:'линия', area:'зона'}[kind]}`, list.map(sy => ({t:sy.n, ic:symSvg(sy.id), color:S.color, go:() => pickSym(side, kind, sy.id)})));
+const list = SYMS.filter(s => isFav(s) && types.includes(s.type)).slice(0, 21);
+radPush(`${S.name} · ${{pt:'точка', arr:'массив', line:'линия', area:'зона'}[kind]}`, list.map(sy => ({t:sy.n, ic:symSvg(sy.id), color:S.color, go:() => pickSym(side, kind, sy.id)})).concat([{t:'Все знаки', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>', go:() => { closeRadial(); openSymPick(types, id => { if (id) pickSym(side, kind, id); }, S.color); }}]));
 }
 let placeFc = null;
 function renderFillPick(el, cur, onPick){
@@ -3156,6 +3248,380 @@ if (!a){ const g = state.palette.find(p => !p.glyph && p.name === 'Зелёны�
 openAux(a, null, ll);
 }
 function toolAt(mode){ closeRadial(); openTools(null); tool.mode = mode; tool.pts = []; tool.r = 0; drawTool(); renderTool(); toast('Касайтесь карты, чтобы ставить точки'); }
+// ======== РАЗДЕЛЫ, ДОБАВЛЕНИЕ, КОРЗИНА, ОТМЕНА ========
+const SECTIONS = {op:'Оператор', tp:'Топопланшет', mk:'Макет'}, SEC_SH = {op:'Опер.', tp:'Топо', mk:'Макет'};
+let secMode = lsGet('skat_mode', null), favCache = null;
+function favList(){ if (favCache) return favCache; const f = lsGet('skat_fav_' + (secMode || 'tp'), null); favCache = new Set(f || SYMS.filter(s => s.fav !== false).map(s => s.id)); return favCache; }
+function isFav(s){ return favList().has(s.id); }
+function toggleFav(s){ const f = favList(); f.has(s.id) ? f.delete(s.id) : f.add(s.id); lsSet('skat_fav_' + (secMode || 'tp'), [...f]); }
+function showLaunch(){ $('launch').querySelectorAll('button[data-m]').forEach(b => b.classList.toggle('on', b.dataset.m === secMode)); $('launch').classList.add('on'); }
+$('launch').querySelectorAll('button[data-m]').forEach(b => b.onclick = () => setSection(b.dataset.m));
+function setSection(m){ secMode = m; favCache = null; lsSet('skat_mode', m); $('launch').classList.remove('on'); applySection(); toast('Раздел: ' + SECTIONS[m]); }
+function applySection(){
+$('modeBtn').querySelector('span').textContent = SEC_SH[secMode] || 'Раздел';
+$('v3Btn').style.display = secMode === 'mk' ? '' : 'none'; applySectionOp();
+if (secMode === 'mk'){ if (!$('v3d').classList.contains('on')) open3D(); } else if ($('v3d').classList.contains('on')) close3D();
+}
+$('modeBtn').onclick = showLaunch;
+// ---- отмена / повтор
+function histSnap(){ if (hist.mute) return; const js = JSON.stringify(state.arrays); if (hist.stack[hist.i] === js) return;
+hist.stack = hist.stack.slice(0, hist.i + 1); hist.stack.push(js); if (hist.stack.length > 30) hist.stack.shift(); hist.i = hist.stack.length - 1; updUndo(); }
+function updUndo(){ const u = $('undoBtn'), r = $('redoBtn'); if (!u) return; u.disabled = hist.i <= 0; r.disabled = hist.i >= hist.stack.length - 1; }
+function histGo(dir){ const j = hist.i + dir; if (j < 0 || j >= hist.stack.length) return;
+hist.i = j; hist.mute = true; state.arrays = JSON.parse(hist.stack[j]).map(normArr); persistNow(); hist.mute = false;
+if (session && !arrById(session.arrId)){ session = null; document.body.classList.remove('picking'); map.doubleClickZoom.enable(); }
+renderMarkers(); renderSheet(); if ($('layModal').classList.contains('open')) renderLayers(); updUndo(); toast(dir < 0 ? 'Отменено' : 'Повторено'); }
+$('undoBtn').onclick = () => { clearTimeout(persistT); persistNow(); histGo(-1); };
+$('redoBtn').onclick = () => histGo(1);
+// ---- корзина
+function trashPush(it){ state.trash.unshift(Object.assign({at:Date.now()}, it)); if (state.trash.length > 200) state.trash.length = 200; }
+function trashLayer(a){ state.arrays = state.arrays.filter(x => x !== a); trashPush({t:'layer', a}); persist(); renderMarkers(); renderSheet(); toast(`Слой «${a.name}» в корзине`); }
+function trashPoint(a, i){ const p = a.points.splice(i, 1)[0]; if (!p) return; trashPush({t:'pt', aid:a.id, an:a.name, p, i}); persist(); renderMarkers(); renderSheet(); toast('Точка в корзине'); }
+function renderTrash(){
+const el = $('trashList');
+el.innerHTML = state.trash.length ? state.trash.map((it, k) => `<div class="arr"><div class="nm"><div>${it.t === 'layer' ? 'Слой: ' + escapeHtml(it.a.name) : 'Точка ' + escapeHtml(it.p.lbl || it.p.name || ('№' + (it.i + 1))) + ' из «' + escapeHtml(it.an) + '»'}</div><div>${new Date(it.at).toLocaleString('ru-RU')}</div></div><button data-k="${k}" data-act="back">Вернуть</button><button class="eye" data-k="${k}" data-act="del" title="Удалить навсегда">✕</button></div>`).join('') : '<div class="empty">Корзина пуста.</div>';
+el.querySelectorAll('button').forEach(b => b.onclick = () => { const k = +b.dataset.k, it = state.trash[k];
+if (b.dataset.act === 'back'){ if (it.t === 'layer') state.arrays.push(normArr(it.a)); else { const a = arrById(it.aid); if (!a){ toast('Слоя этой точки больше нет'); return; } a.points.splice(Math.min(it.i, a.points.length), 0, it.p); } toast('Восстановлено'); }
+state.trash.splice(k, 1); persist(); renderMarkers(); renderTrash(); });
+}
+$('trashBtn').onclick = () => { closeModals(); renderTrash(); openModal('trashModal'); };
+$('trashClr').onclick = () => askConfirm('Очистить корзину навсегда?', 'Очистить', () => { state.trash = []; persist(); renderTrash(); openModal('trashModal'); });
+function swipeable(row, onTrash){
+let x0 = null, y0 = 0;
+row.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, {passive:true});
+row.addEventListener('touchmove', e => { if (x0 == null) return; const dx = e.touches[0].clientX - x0, dy = e.touches[0].clientY - y0; if (Math.abs(dy) > Math.abs(dx)) return;
+if (dx < -40 && !row.classList.contains('sw-open')){ row.classList.add('sw-open'); let b = row.querySelector('.trashbtn');
+if (!b){ b = document.createElement('button'); b.className = 'trashbtn'; b.textContent = '🗑'; b.onclick = ev => { ev.stopPropagation(); onTrash(); };
+if (row.tagName === 'TR'){ const td = document.createElement('td'); td.appendChild(b); row.appendChild(td); } else row.appendChild(b); } }
+else if (dx > 30 && row.classList.contains('sw-open')){ row.classList.remove('sw-open'); const b = row.querySelector('.trashbtn'); if (b) (row.tagName === 'TR' ? b.parentNode : b).remove(); } }, {passive:true});
+row.addEventListener('touchend', () => { x0 = null; });
+}
+// ---- выбор знака из полного списка
+function openSymPick(types, cb, color, none, filt){
+const list = SYMS.filter(s => types.includes(s.type) && (!filt || filt(s))).sort((a, b) => (isFav(b) ? 1 : 0) - (isFav(a) ? 1 : 0));
+$('spGrid').innerHTML = (none ? `<button class="spi" data-id=""><span class="symb" style="display:grid;place-items:center;font-size:22px">∅</span>без знака</button>` : '') +
+list.map(s => `<button class="spi" data-id="${s.id}"><span class="symb" style="color:${color || '#c0282a'}">${symSvg(s.id)}</span>${escapeHtml(s.n)}</button>`).join('');
+$('spGrid').querySelectorAll('button').forEach(b => b.onclick = () => { closeModals(); cb(b.dataset.id || null); });
+openModal('spModal');
+}
+// ---- меню «Добавить»
+let addTarget = null;
+const ADD_ITEMS = [['text', 'Надпись', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>'], ['pts', 'Точки', IC.pt], ['main', 'Массив', IC.arr], ['obj', 'Объект (знак)', IC.obj], ['route', 'Маршрут', IC.route], ['shape', 'Фигура', IC.shape], ['desc', 'Описание', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h9l4 4v14H6z"/><path d="M9 10h7M9 14h7M9 18h4"/></svg>'], ['aux', 'Ориентиры', TREE_BTN], ['layer', 'Новый слой', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M12 14v7M8.5 17.5h7"/></svg>']];
+function openAdd(target){
+addTarget = target || null; const a = addTarget && arrById(addTarget);
+$('addTitle').textContent = a ? `Добавить в «${a.name}»` : 'Добавить';
+const items = a ? ADD_ITEMS.filter(x => ['text', 'pts', 'obj', 'route', 'shape'].includes(x[0])) : ADD_ITEMS;
+$('addGrid').innerHTML = items.map(([k, t, ic]) => `<button data-k="${k}">${ic}<span>${t}</span></button>`).join('');
+$('addGrid').querySelectorAll('button').forEach(b => b.onclick = () => addPick(b.dataset.k));
+closeModals(); openModal('addModal');
+}
+function addPick(k){
+const a = addTarget && arrById(addTarget); closeModals();
+if (k === 'text'){ textPending = {target:a ? a.id : null}; toast('Коснитесь карты там, где поставить надпись'); return; }
+if (k === 'shape' || k === 'route'){ if (k === 'route' && !a){ openArrModal(); setKind('route'); return; } openTools(a ? a.id : null); tool.mode = k === 'route' ? 'line' : 'poly'; drawTool(); renderTool(); toast('Касайтесь карты, чтобы ставить точки'); return; }
+if (k === 'obj'){ $('addTitle').textContent = 'Сторона'; $('addGrid').innerHTML = `<button data-s="r">${IC.side(SIDES.r.color)}<span>Красные</span></button><button data-s="b">${IC.side(SIDES.b.color)}<span>Синие</span></button>`;
+$('addGrid').querySelectorAll('button').forEach(b => b.onclick = () => { const side = b.dataset.s; closeModals();
+openSymPick(['pt'], sid => { if (!sid) return; const L1 = a || symObjLayer(side); startSession(L1.id, 'pick'); session.sym = sid; session.side = side; renderSheet(); toast(`${SYM_BY[sid].n}: касайтесь карты, в конце ✓`); }, SIDES[side].color); });
+openModal('addModal'); return; }
+if (a){ startSession(a.id, 'pick'); toast('Касайтесь карты, чтобы ставить точки, в конце ✓'); return; }
+openArrModal(); if (k !== 'layer') setKind(k === 'pts' ? 'pts' : k);
+}
+$('newArrBtn').onclick = () => openAdd(null);
+// ---- вкладки «Слои / Карты / Файлы»
+function layTab(t){ $('layTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); ['L', 'M', 'F'].forEach(x => { $('tab' + x).style.display = x === t ? '' : 'none'; }); if (t === 'M') renderBaseList(); if (t !== 'L') pdbInfo(); }
+$('layTabs').querySelectorAll('button').forEach(b => b.onclick = () => layTab(b.dataset.t));
+function renderBaseList(){ const el = $('baseList');
+el.innerHTML = Object.entries(LAYERS).map(([k, d]) => `<button class="baseit${k === state.layer ? ' on' : ''}" data-k="${k}">${escapeHtml(d.name)}</button>`).join('');
+el.querySelectorAll('button').forEach(b => b.onclick = () => { setLayer(b.dataset.k); sel.value = b.dataset.k; renderBaseList(); }); }
+{ const card = $('setModal').querySelector('.card'), kids = [...card.children], st = kids.findIndex(el => el.classList.contains('sub-h') && el.textContent.trim() === 'Карты'), en = kids.findIndex(el => el.id === 'offInfo');
+if (st >= 0 && en >= st) kids.slice(st, en + 1).forEach(el => $('tabM').appendChild(el));
+const fr = document.createElement('div'); fr.className = 'row'; fr.style.marginTop = '8px';
+['offImp', 'sesLoad', 'impBtn', 'pdbImp'].forEach(id => { const b = $(id); if (b){ const old = b.parentNode; fr.appendChild(b); if (old && old.classList.contains('row') && !old.children.length) old.remove(); } });
+$('tabF').appendChild($('mapList')); $('tabF').appendChild(fr);
+const fr2 = document.createElement('div'); fr2.className = 'row'; fr2.style.marginTop = '8px'; fr2.innerHTML = '<button id="impTblBtn">Импорт таблицы точек (Excel/CSV)</button><button id="expPtsBtn">Экспорт всех точек (CSV)</button>'; $('tabF').appendChild(fr2);
+const hint = document.createElement('p'); hint.className = 'status'; hint.style.marginTop = '10px'; hint.textContent = 'Загруженные карты (.mbtiles) — в списке выше. Ниже — загрузка файла карты, сессии, ориентиров CSV и базы населённых пунктов.'; $('tabF').appendChild(hint); }
+// ---- удержание на объекте: повернуть, подпись, знак, удалить
+function hitPoint(cx, cy){
+const r = map.getContainer().getBoundingClientRect(), x = cx - r.left, y = cy - r.top, z = map.getZoom(); let best = null, bd = 26;
+state.arrays.forEach(a => { if (a.hidden) return; (a.texts || []).forEach((t, ti) => { const q = map.latLngToContainerPoint([t.lat, t.lng]), d = Math.hypot(q.x - x, q.y - y); if (d < bd + 8){ bd = d - 8; best = {a, ti}; } }); });
+state.arrays.forEach(a => { if (a.hidden || z < (a.minZ || 0)) return; a.points.forEach((p, i) => { const q = map.latLngToContainerPoint([p.lat, p.lng]), d = Math.hypot(q.x - x, q.y - y); if (d < bd){ bd = d; best = {a, i}; } }); });
+return best;
+}
+function openObjMenu(h, x, y){
+const {a, i} = h, p = a.points[i];
+try { navigator.vibrate && navigator.vibrate(25); } catch(e){}
+radPos = {x, y, ll:L.latLng(p.lat, p.lng)}; radStack = []; $('radial').classList.add('on');
+radPush(labelOf(a, i), [
+{t:'Повернуть', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v5h-5"/></svg>', go:() => { closeRadial(); openRot(a, p); }},
+{t:'Подпись', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>', go:() => { closeRadial(); const v = prompt('Подпись объекта (пусто — как было)', p.lbl || labelOf(a, i)); if (v === null) return; if (v.trim() && v.trim() !== labelOf(a, i)) p.lbl = v.trim(); else delete p.lbl; persist(); renderMarkers(); }},
+{t:'Знак', ic:IC.obj, go:() => { closeRadial(); const side = sideOf(a, p); openSymPick(['pt'], sid => { if (sid) p.sym = sid; else { delete p.sym; if (a.sym) p.sym = '_none'; } persist(); renderMarkers(); }, side ? SIDES[side].color : null, true); }},
+{t:'Свойства', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>', go:() => { closeRadial(); openPoint(a, i); }},
+{t:'Удалить', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>', color:'#e2533f', go:() => { closeRadial(); trashPoint(a, i); }}]);
+}
+let rotRef = null;
+function openRot(a, p){ rotRef = {a, p}; $('rotR').value = p.rot || 0; $('rotV').textContent = (p.rot || 0) + '°'; openModal('rotModal'); }
+$('rotR').oninput = e => { const v = +e.target.value; rotRef.p.rot = v; $('rotV').textContent = v + '°'; renderMarkers(); };
+$('rotOk').onclick = () => { if (!rotRef.p.rot) delete rotRef.p.rot; persist(); closeModals(); renderMarkers(); };
+
+// ======== ОПЕРАТОР: НАДПИСИ ========
+const FONTS = [['IBM Plex Sans Condensed', 'Узкий'], ['Arial', 'Arial'], ['Times New Roman', 'Times'], ['Georgia', 'Georgia'], ['Courier New', 'Моноширинный'], ['Impact', 'Плакатный']];
+const TXT_BG = [['', 'без подложки'], ['#ffffff', 'белая'], ['rgba(255,255,255,.7)', 'полупрозрачная'], ['#ffe066', 'жёлтая'], ['#111111', 'чёрная']];
+let textPending = null, txtRef = null;
+function txtShadow(t){ const w = +t.sw || 0; if (!w || !t.sc) return 'none'; const out = []; for (let a = 0; a < 16; a++){ const r = a / 16 * 2 * Math.PI; out.push(`${(Math.cos(r) * w).toFixed(1)}px ${(Math.sin(r) * w).toFixed(1)}px 0 ${t.sc}`); } return out.join(','); }
+function txtHtml(t){ return `<div class="txl" style="font-family:'${t.f}',sans-serif;font-size:${t.s}px;color:${t.c};font-weight:${t.b ? 700 : 500};font-style:${t.i ? 'italic' : 'normal'};text-shadow:${txtShadow(t)};${t.bg ? `background:${t.bg};padding:2px 6px;border-radius:4px;` : ''}transform:translate(-50%,-50%) rotate(${t.r || 0}deg)">${escapeHtml(t.t).replace(/\n/g, '<br>')}</div>`; }
+function textLayer(){ let a = (textPending && textPending.target && arrById(textPending.target)) || state.arrays.find(x => x.name === 'Надписи' && x.kind === 'shapes');
+if (!a){ a = normArr({id:Date.now(), kind:'shapes', name:'Надписи', ident:'Надписи', style:{color:'#111111', name:'Чёрный', glyph:''}, points:[], shapes:[], texts:[]}); state.arrays.push(a); }
+if (!a.texts) a.texts = []; return a; }
+function openTextEd(a, ti, ll){
+const t = ti != null ? a.texts[ti] : {t:'', f:'IBM Plex Sans Condensed', s:18, c:'#111111', sc:'#ffffff', sw:2, b:true, i:false, bg:'', r:0, lat:ll.lat, lng:ll.lng};
+txtRef = {a, ti, t:Object.assign({}, t)};
+$('txtTitle').textContent = ti != null ? 'Надпись' : 'Новая надпись';
+$('tTxt').value = t.t; $('tFont').value = t.f; $('tSize').value = t.s; $('tSC').value = t.sc || ''; $('tSW').value = t.sw || 0; $('tB').checked = !!t.b; $('tI').checked = !!t.i; $('tBg').value = t.bg || ''; $('tRot').value = t.r || 0;
+$('tDel').style.display = ti != null ? '' : 'none';
+renderFillPick($('tCol'), t.c, c => { txtRef.t.c = c || '#111111'; txtPrev(); });
+txtPrev(); openModal('txtModal'); setTimeout(() => $('tTxt').focus(), 60);
+}
+function txtRead(){ const t = txtRef.t; t.t = $('tTxt').value; t.f = $('tFont').value; t.s = +$('tSize').value; t.sc = $('tSC').value; t.sw = +$('tSW').value; t.b = $('tB').checked; t.i = $('tI').checked; t.bg = $('tBg').value; t.r = +$('tRot').value; }
+function txtPrev(){ txtRead(); const t = txtRef.t; $('tSizeV').textContent = t.s; $('tSWV').textContent = t.sw; $('tRotV').textContent = t.r + '°';
+$('tPrev').innerHTML = `<div style="position:relative;height:100%">${txtHtml(Object.assign({}, t, {t:t.t || 'Пример надписи'})).replace('class="txl" style="', 'class="txl" style="left:50%;top:50%;')}</div>`; }
+['tTxt', 'tFont', 'tSize', 'tSC', 'tSW', 'tB', 'tI', 'tBg', 'tRot'].forEach(id => { $(id).addEventListener('input', txtPrev); $(id).addEventListener('change', txtPrev); });
+$('tSave').onclick = () => { txtRead(); const {a, ti, t} = txtRef; if (!t.t.trim()){ $('tTxt').focus(); return; } if (ti != null) a.texts[ti] = t; else a.texts.push(t); textPending = null; persist(); closeModals(); renderMarkers(); };
+$('tDel').onclick = () => { const {a, ti} = txtRef; a.texts.splice(ti, 1); persist(); closeModals(); renderMarkers(); toast('Надпись удалена (↶ — вернуть)'); };
+$('tFont').innerHTML = FONTS.map(([v, n]) => `<option value="${v}" style="font-family:'${v}'">${n}</option>`).join('');
+$('tBg').innerHTML = TXT_BG.map(([v, n]) => `<option value="${v}">${n}</option>`).join('');
+// ======== ОПЕРАТОР: ИМПОРТ И ЭКСПОРТ ТОЧЕК ========
+function exportPointsCsv(){
+const L1 = ['Слой;Название;X;Y;Знак;Сторона;Комментарий'];
+state.arrays.forEach(a => { if (a.kind === 'aux') return; a.points.forEach((p, i) => { const s = GEO.toSK(p.lat, p.lng), sid = p.sym || a.sym, sd = sideOf(a, p);
+L1.push([a.name, labelOf(a, i), Math.round(s.x), Math.round(s.y), sid && SYM_BY[sid] ? SYM_BY[sid].n : '', sd === 'r' ? 'Красные' : sd === 'b' ? 'Синие' : '', p.comment || ''].map(v => String(v).replace(/;/g, ',')).join(';')); }); });
+if (L1.length < 2){ toast('Нет точек для экспорта'); return; }
+deliverFile(new Blob(['\uFEFF' + L1.join('\r\n')], {type:'text/csv'}), `СКАТ_точки_${stamp()}.csv`, `CSV готов: ${L1.length - 1} точек`);
+}
+let impRows = null, impName = '';
+$('impTblBtn').onclick = () => $('impTblIn').click();
+$('expPtsBtn').onclick = () => { closeModals(); exportPointsCsv(); };
+$('impTblIn').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+if (typeof XLSX === 'undefined'){ toast('Модуль Excel не загрузился'); return; }
+try { const wb = XLSX.read(await f.arrayBuffer(), {type:'array'}), ws = wb.Sheets[wb.SheetNames[0]];
+impRows = XLSX.utils.sheet_to_json(ws, {header:1, raw:false, defval:''}).filter(r => r.some(c => String(c).trim())); impName = f.name.replace(/\.[^.]+$/, '');
+if (impRows.length < 2){ toast('В таблице нет строк с данными'); return; } openImp(); } catch(err){ toast('Не удалось прочитать таблицу'); } };
+function openImp(){
+const hd = impRows[0].map((h, i) => String(h || ('Столбец ' + (i + 1))).trim()), opt = (sel0) => '<option value="">—</option>' + hd.map((h, i) => `<option value="${i}"${i === sel0 ? ' selected' : ''}>${escapeHtml(h)}</option>`).join('');
+const fx = re => hd.findIndex(h => re.test(h.toLowerCase()));
+let x = fx(/^(x|х)\b|север|широт|lat/), y = fx(/^(y|у)\b|восток|долгот|lon|lng/), n = fx(/назв|наим|имя|name|номер|№/), sy = fx(/знак|тип|объект|вид/), sd = fx(/сторон|принадл/);
+if (x < 0 || y < 0){ const num = hd.map((_, i) => impRows.slice(1, 6).every(r => /^-?\d+([.,]\d+)?$/.test(String(r[i]).replace(/\s/g, '')))); const ix = num.map((v, i) => v ? i : -1).filter(i => i >= 0); if (ix.length >= 2){ x = ix[0]; y = ix[1]; } }
+$('impX').innerHTML = opt(x); $('impY').innerHTML = opt(y); $('impN').innerHTML = opt(n); $('impS').innerHTML = opt(sy); $('impSc').innerHTML = opt(sd);
+$('impL').value = impName; $('impInfo').textContent = `Строк с данными: ${impRows.length - 1}. Проверьте столбцы.`;
+closeModals(); openModal('impModal');
+}
+function symByText(v){ v = String(v || '').trim().toLowerCase(); if (!v) return null; return (SYMS.find(s => s.n.toLowerCase() === v || (s.ab || '').toLowerCase() === v) || SYMS.find(s => s.type === 'pt' && (s.n.toLowerCase().includes(v) || v.includes(s.n.toLowerCase())))) || null; }
+$('impGo').onclick = () => {
+const gi = id => $(id).value === '' ? -1 : +$(id).value, ix = gi('impX'), iy = gi('impY'), inm = gi('impN'), isy = gi('impS'), isd = gi('impSc'), defSide = $('impSide').value;
+if (ix < 0 || iy < 0){ toast('Выберите столбцы X и Y'); return; }
+const pts = []; let bad = 0;
+impRows.slice(1).forEach((r, k) => { const a1 = String(r[ix]).replace(/\s/g, '').replace(',', '.'), b1 = String(r[iy]).replace(/\s/g, '').replace(',', '.');
+try { const ll = pairToLL(a1, b1); const p = {lat:ll[0], lng:ll[1], h:null, place:'', name:inm >= 0 && String(r[inm]).trim() ? String(r[inm]).trim() : 'Т' + (k + 1)};
+const sm = isy >= 0 ? symByText(r[isy]) : null; if (sm && sm.type === 'pt') p.sym = sm.id;
+const sv = isd >= 0 ? String(r[isd]).toLowerCase() : ''; const side = /син|^с$|^b/.test(sv) ? 'b' : /крас|^к$|^r/.test(sv) ? 'r' : defSide; if (side) p.side = side;
+pts.push(p); } catch(e){ bad++; } });
+if (!pts.length){ toast('Не удалось разобрать координаты ни в одной строке'); return; }
+const a = normArr({id:Date.now(), kind:'pts', name:$('impL').value.trim() || impName || 'Импорт', ident:$('impL').value.trim() || 'Импорт', style:copySt(state.palette[0] || DEFAULT_PAL[0]), points:pts, opt:pts.length > 300});
+state.arrays.push(a); pts.slice(0, 300).forEach(p => { fillHeight(p); fillPlace(p); });
+persistNow(); closeModals(); renderMarkers(); map.fitBounds(L.latLngBounds(pts.map(p => [p.lat, p.lng])).pad(0.2), {maxZoom:16});
+toast(`Нанесено точек: ${pts.length}${bad ? `, пропущено строк: ${bad}` : ''}`);
+};
+// ======== ОПЕРАТОР: ПЕЧАТЬ В JPEG ========
+const PAPERS = {A5:[148, 210], A4:[210, 297], A3:[297, 420], A2:[420, 594], A1:[594, 841], A0:[841, 1189]};
+let prnPaper = 'A4', prnOri = 'l';
+function prnSize(){ let w, h; if (prnPaper === 'U'){ w = +$('prnW').value || 297; h = +$('prnH').value || 210; } else { [w, h] = PAPERS[prnPaper]; if (prnOri === 'l') [w, h] = [h, w]; } return [w, h]; }
+function prnInfo(){ const [w, h] = prnSize(), dpi = +$('prnDpi').value; let W = Math.round(w / 25.4 * dpi), H = Math.round(h / 25.4 * dpi), note = '';
+if (W * H > 16e6){ const f = Math.sqrt(16e6 / (W * H)); W = Math.floor(W * f); H = Math.floor(H * f); note = ' (разрешение снижено под возможности устройства)'; }
+$('prnInfo').textContent = `Лист ${w}×${h} мм, изображение ${W}×${H} пикс.${note} Печатается видимая на экране область.`; return [w, h, W, H]; }
+function renderPrnUI(){ $('prnPaperSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.p === prnPaper)); $('prnOriSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.o === prnOri));
+$('prnCustom').style.display = prnPaper === 'U' ? '' : 'none'; $('prnOriSeg').style.display = prnPaper === 'U' ? 'none' : ''; prnInfo(); }
+$('prnPaperSeg').querySelectorAll('button').forEach(b => b.onclick = () => { prnPaper = b.dataset.p; renderPrnUI(); });
+$('prnOriSeg').querySelectorAll('button').forEach(b => b.onclick = () => { prnOri = b.dataset.o; renderPrnUI(); });
+['prnW', 'prnH', 'prnDpi'].forEach(id => $(id).addEventListener('input', prnInfo));
+$('prnBtn').onclick = () => { renderPrnUI(); openModal('prnModal'); };
+async function tileBmp(u){ try { let b = savedKeys.has(u) ? await tileGetFast(u) : null; if (!b && navigator.onLine !== false) b = await netBlob(u); return b ? await createImageBitmap(b) : null; } catch(e){ return null; } }
+$('prnGo').onclick = async () => {
+const [wmm, hmm, W, H] = prnInfo(), k = W / (wmm / 25.4 * +$('prnDpi').value), dpi = +$('prnDpi').value * k, mm = v => v / 25.4 * dpi;
+const title = $('prnTitle').value.trim(), legend = $('prnLeg').checked, grid = $('prnGrid').checked;
+closeModals(); netMsg('Готовлю лист для печати…');
+try {
+const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+const mg = mm(10), th = title ? mm(12) : 0, fh = mm(8), ix0 = mg, iy0 = mg + th, iw = W - 2 * mg, ih = H - 2 * mg - th - fh;
+const Ws = map.getSize().x, Hs = map.getSize().y, c = map.getCenter(), a0 = map.containerPointToLatLng([Ws / 2 - 50, Hs / 2]), a1 = map.containerPointToLatLng([Ws / 2 + 50, Hs / 2]), mpp = distM(a0, a1) / 100;
+let wm = Ws * mpp, hm = Hs * mpp; if (iw / ih > wm / hm) hm = wm * ih / iw; else wm = hm * iw / ih;
+const def = LAYERS[state.layer], crs = crsOf(state.layer), z0 = map.getZoom();
+let zt = Math.min(def.max, Math.max(Math.floor(z0), Math.round(z0 + Math.log2((wm / iw) > 0 ? mpp / (wm / iw) : 1))));
+const pc = crs.latLngToPoint(c, zt); let mz = mpp * Math.pow(2, z0 - zt);
+while (((wm / mz) / 256) * ((hm / mz) / 256) > 700 && zt > 3){ zt--; mz *= 2; }
+const pc2 = crs.latLngToPoint(c, zt), hw = wm / mz / 2, hh = hm / mz / 2, bx0 = pc2.x - hw, by0 = pc2.y - hh, f = iw / (2 * hw);
+const toC = ll => { const p = crs.latLngToPoint(L.latLng(ll), zt); return [ix0 + (p.x - bx0) * f, iy0 + (p.y - by0) * f]; };
+g.save(); g.beginPath(); g.rect(ix0, iy0, iw, ih); g.clip(); g.fillStyle = '#e9ece6'; g.fillRect(ix0, iy0, iw, ih);
+let miss = 0; const tx0 = Math.floor(bx0 / 256), tx1 = Math.floor((bx0 + 2 * hw) / 256), ty0 = Math.floor(by0 / 256), ty1 = Math.floor((by0 + 2 * hh) / 256), jobs = [];
+for (const tpl of def.urls) for (let tx = tx0; tx <= tx1; tx++) for (let ty = ty0; ty <= ty1; ty++) jobs.push([tpl, tx, ty]);
+for (let q = 0; q < jobs.length; q += 8){ netMsg(`Готовлю лист: подложка ${Math.min(q + 8, jobs.length)} из ${jobs.length}…`);
+const part = await Promise.all(jobs.slice(q, q + 8).map(async ([tpl, tx, ty]) => [tx, ty, await tileBmp(tpl.replace('{s}', 'abc'[(tx + ty) % 3]).replace('{x}', tx).replace('{y}', ty).replace('{z}', zt))]));
+part.forEach(([tx, ty, bm]) => { if (bm) g.drawImage(bm, ix0 + (tx * 256 - bx0) * f, iy0 + (ty * 256 - by0) * f, 256 * f + 1, 256 * f + 1); else miss++; }); }
+const sc = dpi / 110;
+if (grid){ const sw = map.options.crs === crs ? null : null; const corners = [[0, 0], [1, 0], [0, 1], [1, 1]].map(([u, v]) => crs.pointToLatLng(L.point(bx0 + u * 2 * hw, by0 + v * 2 * hh), zt)), ref = GEO.toSK(c.lat, c.lng), zone = ref.zone;
+const S1 = corners.map(q => GEO.toSK(q.lat, q.lng, zone)), X0 = Math.min(...S1.map(q => q.x)), X1 = Math.max(...S1.map(q => q.x)), Y0 = Math.min(...S1.map(q => q.y)), Y1 = Math.max(...S1.map(q => q.y)), st = (X1 - X0) > 20000 ? 5000 : (X1 - X0) > 9000 ? 2000 : 1000;
+g.strokeStyle = 'rgba(20,20,20,.75)'; g.lineWidth = Math.max(1, sc * .9); g.font = `600 ${Math.round(11 * sc)}px sans-serif`; g.fillStyle = '#111';
+for (let x = Math.ceil(X0 / st) * st; x <= X1; x += st){ g.beginPath(); for (let t = 0; t <= 10; t++){ const yy = Y0 + (Y1 - Y0) * t / 10, ll = GEO.fromSK(x, yy, zone), [px, py] = toC(ll); t ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+for (let y = Math.ceil(Y0 / st) * st; y <= Y1; y += st){ g.beginPath(); for (let t = 0; t <= 10; t++){ const xx = X0 + (X1 - X0) * t / 10, ll = GEO.fromSK(xx, y, zone), [px, py] = toC(ll); t ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+for (let x = Math.ceil(X0 / st) * st; x <= X1; x += st) for (let y = Math.ceil(Y0 / st) * st; y <= Y1; y += st){ const [px, py] = toC(GEO.fromSK(x, y, zone)); g.lineWidth = 3 * sc; g.strokeStyle = 'rgba(255,255,255,.85)'; const t = pad2(Math.round(x / 1000)) + pad2(Math.round(y / 1000)); g.strokeText(t, px + 3 * sc, py - 3 * sc); g.fillText(t, px + 3 * sc, py - 3 * sc); }
+g.lineWidth = Math.max(1, sc * .9); }
+const used = new Map();
+state.arrays.forEach(a => { if (a.hidden) return;
+(a.shapes || []).forEach(sh => { const col = sh.color || a.style.color, pts = sh.type === 'circle' ? circlePoly(LL(sh.pts[0]), sh.r).map(q => [q[1], q[0]]) : sh.pts.map(q => [q[0] ?? q.lat, q[1] ?? q.lng]);
+g.beginPath(); pts.forEach((q, i) => { const [px, py] = toC(q); i ? g.lineTo(px, py) : g.moveTo(px, py); }); if (sh.type !== 'line') g.closePath();
+if (sh.type !== 'line'){ g.globalAlpha = (sh.op ?? 35) / 100; g.fillStyle = col; g.fill(); g.globalAlpha = 1; } g.strokeStyle = col; g.lineWidth = 2.5 * sc; g.stroke(); });
+if (a.kind === 'route' && a.points.length > 1){ g.beginPath(); a.points.forEach((p, i) => { const [px, py] = toC([p.lat, p.lng]); i ? g.lineTo(px, py) : g.moveTo(px, py); }); g.strokeStyle = a.style.color; g.lineWidth = 3 * sc; g.stroke(); }
+a.points.forEach((p, i) => { const [px, py] = toC([p.lat, p.lng]); if (px < ix0 || py < iy0 || px > ix0 + iw || py > iy0 + ih) return;
+const st = styleOf(a, p), sid = p.sym === '_none' ? null : (p.sym || a.sym), lb = labelOf(a, i);
+if (a.kind === 'aux'){ g.save(); g.translate(px, py); g.scale(sc, sc); g.beginPath(); TREE_PTS.forEach(([dx, dy], k2) => k2 ? g.lineTo(dx, dy) : g.moveTo(dx, dy)); g.closePath(); g.fillStyle = a.style.color; g.fill(); g.restore(); }
+else if (sid && SYM_BY[sid]){ const col = symCol(sid, sideOf(a, p), st.color); g.save(); g.translate(px, py); g.scale(sc, sc); if (p.rot) g.rotate(p.rot * Math.PI / 180); drawSym(g, sid, 0, 0, col, p.fc || a.fc); g.restore(); used.set(sid + '|' + col, [sid, col]); }
+else { g.beginPath(); g.arc(px, py, 6 * sc, 0, 7); g.fillStyle = st.color; g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 2 * sc; g.stroke(); }
+g.font = `${a.kind === 'aux' ? 'italic ' : ''}700 ${Math.round(12 * sc)}px sans-serif`; g.lineWidth = 3 * sc; g.strokeStyle = '#fff'; g.fillStyle = '#111'; g.strokeText(lb, px + 14 * sc, py - 10 * sc); g.fillText(lb, px + 14 * sc, py - 10 * sc); });
+(a.texts || []).forEach(t => { const [px, py] = toC([t.lat, t.lng]); g.save(); g.translate(px, py); g.rotate((t.r || 0) * Math.PI / 180); g.font = `${t.i ? 'italic ' : ''}${t.b ? 700 : 500} ${Math.round(t.s * sc)}px '${t.f}', sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+const lines = String(t.t).split('\n'), lh = t.s * sc * 1.15, w = Math.max(...lines.map(l => g.measureText(l).width));
+if (t.bg){ g.fillStyle = t.bg; g.fillRect(-w / 2 - 6 * sc, -lh * lines.length / 2 - 2 * sc, w + 12 * sc, lh * lines.length + 4 * sc); }
+lines.forEach((l, k2) => { const yy = (k2 - (lines.length - 1) / 2) * lh; if (t.sw && t.sc){ g.lineJoin = 'round'; g.lineWidth = t.sw * 2 * sc; g.strokeStyle = t.sc; g.strokeText(l, 0, yy); } g.fillStyle = t.c; g.fillText(l, 0, yy); }); g.restore(); });
+});
+if (legend && used.size){ const items = [...used.values()].slice(0, 18), rh = 26 * sc, bw = 230 * sc, bh = rh * items.length + 30 * sc, bx = ix0 + iw - bw - 8 * sc, by = iy0 + ih - bh - 8 * sc;
+g.fillStyle = 'rgba(255,255,255,.92)'; g.fillRect(bx, by, bw, bh); g.strokeStyle = '#111'; g.lineWidth = 1.5 * sc; g.strokeRect(bx, by, bw, bh);
+g.fillStyle = '#111'; g.font = `700 ${Math.round(12 * sc)}px sans-serif`; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText('Условные обозначения', bx + 8 * sc, by + 14 * sc);
+items.forEach(([sid, col], k2) => { const yy = by + 30 * sc + k2 * rh + rh / 2; g.save(); g.translate(bx + 22 * sc, yy); g.scale(sc * .7, sc * .7); drawSym(g, sid, 0, 0, col, null); g.restore(); g.fillStyle = '#111'; g.font = `500 ${Math.round(11 * sc)}px sans-serif`; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(SYM_BY[sid].n, bx + 42 * sc, yy); }); }
+g.restore();
+g.strokeStyle = '#111'; g.lineWidth = Math.max(2, 1.5 * sc); g.strokeRect(ix0, iy0, iw, ih);
+g.fillStyle = '#111'; g.textAlign = 'center'; g.textBaseline = 'middle';
+if (title){ g.font = `700 ${Math.round(mm(6))}px sans-serif`; g.fillText(title, W / 2, mg + th / 2); }
+const scale = Math.round(wm / (iw / dpi * 0.0254) / 100) * 100;
+g.font = `500 ${Math.round(mm(3.2))}px sans-serif`; g.textAlign = 'left'; g.fillText(`Масштаб ~1:${scale.toLocaleString('ru-RU')} · СК-42 · ${new Date().toLocaleDateString('ru-RU')}`, ix0, iy0 + ih + fh / 2); g.textAlign = 'right'; g.fillText('СКАТ', ix0 + iw, iy0 + ih + fh / 2);
+const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.92)); netMsg('');
+if (!blob){ toast('Не хватило памяти — уменьшите формат или разрешение'); return; }
+deliverFile(blob, `СКАТ_печать_${stamp()}.jpg`, `Лист готов: ${W}×${H} пикс.${miss ? ` Не загрузилось тайлов подложки: ${miss} (Яндекс в веб-версии не копируется — выберите Esri или Топо).` : ''}`);
+} catch(e){ netMsg(''); toast('Не удалось подготовить лист: ' + (e.message || e)); }
+};
+function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; }
+
+// ======== МАКЕТ: ОБЪЕКТЫ, КРУГОВОЕ МЕНЮ 3D, АНИМАЦИЯ ========
+const ENV_N = {house:'Дом', flat:'Многоэтажка', wh:'Склад', hangar:'Ангар', tree_n:'Ель', tree_b:'Берёза', grove:'Роща', pw:'Опора ЛЭП', mast:'Мачта связи', wt:'Водонапорная башня', tank:'Цистерна'};
+const ENV_D = {house:{w:9, l:11, h:6}, flat:{w:14, l:40, h:15}, wh:{w:18, l:40, h:8}, hangar:{w:22, l:30, h:9}, pw:{h:28}, mast:{h:45}, wt:{h:24}, tank:{r:6, h:9}};
+const ANIM = new Map(); let animRaf = 0, animList = [], animT0 = 0, animLast = 0, v3route = null, v3lp = null;
+function envLayer(){ let a = state.arrays.find(x => x.name === 'Макет: объекты'); if (!a){ a = normArr({id:Date.now(), kind:'shapes', name:'Макет: объекты', ident:'Макет', style:{color:'#6b6b6b', name:'Серый', glyph:''}, points:[], shapes:[], env:[]}); state.arrays.push(a); } if (!a.env) a.env = []; return a; }
+function rotFeats(F, c, deg){ if (!deg) return; const r = -deg * Math.PI / 180, cr = Math.cos(r), sr = Math.sin(r), [kx, ky] = mk(c[1]);
+F.forEach(f => { f.geometry.coordinates = f.geometry.coordinates.map(ring => ring.map(([x, y]) => { const u = (x - c[0]) * kx, v = (y - c[1]) * ky; return [c[0] + (u * cr - v * sr) / kx, c[1] + (u * sr + v * cr) / ky]; })); }); }
+function envFeatures(){
+const out = [];
+state.arrays.forEach((a, ai) => { if (a.hidden || !a.env) return; a.env.forEach((o0, ei) => { const ov = ANIM.get('e' + a.id + ':' + ei), o = ov ? Object.assign({}, o0, ov) : o0, c = [o.lng, o.lat], d = Object.assign({}, ENV_D[o.k] || {}, o), F = [];
+if (o.k === 'tree_n' || o.k === 'tree_b') addTree(F, o.lng, o.lat, o.k === 'tree_n' ? 'n' : 'b', 1.1, false);
+else if (o.k === 'grove'){ const [kx, ky] = mk(o.lat); for (let i = 0; i < 14; i++){ const r = 4 + hsh(i, 3) * 14, q = hsh(i, 7) * 6.28; addTree(F, o.lng + Math.cos(q) * r / kx, o.lat + Math.sin(q) * r / ky, hsh(i, 5) < .5 ? 'n' : 'b', 1, false); } }
+else { let raw;
+if (['house', 'flat', 'wh', 'hangar'].includes(o.k)) raw = {t:'b', ring:rectR(c, d.l / 2, d.w / 2), h:d.h, id:ei + 3, lv:o.k === 'flat' ? 5 : 0};
+else if (o.k === 'tank') raw = {t:'tank', c, r:d.r, h:d.h}; else raw = {t:o.k, c, h:d.h};
+buildObjs([raw], 1).features.forEach(f => F.push(f)); }
+rotFeats(F, c, o.rot || 0); F.forEach(f => { f.properties.ai = ai; f.properties.ei = ei; out.push(f); }); }); });
+return {type:'FeatureCollection', features:out};
+}
+function v3item(a){ return v3sel.ei != null ? (a.env || [])[v3sel.ei] : a.points[v3sel.pi]; }
+function envRefresh(){ try { v3.getSource('env').setData(envFeatures()); } catch(_){} try { v3.getSource('apath').setData(pathData()); } catch(_){} }
+function pathData(){ const F = []; state.arrays.forEach(a => { if (a.hidden) return; a.points.concat(a.env || []).forEach(it => { if (it.path && it.path.length > 1) F.push({type:'Feature', properties:{}, geometry:{type:'LineString', coordinates:it.path}}); }); });
+if (v3route && v3route.pts.length > 1) F.push({type:'Feature', properties:{}, geometry:{type:'LineString', coordinates:v3route.pts}}); return {type:'FeatureCollection', features:F}; }
+function envInit(){
+try {
+if (!v3.getSource('env')) v3.addSource('env', {type:'geojson', data:envFeatures()});
+if (!v3.getSource('apath')) v3.addSource('apath', {type:'geojson', data:pathData()});
+v3.getStyle().layers.filter(l => l.source === 'obj').forEach(l => { const id = 'e_' + l.id; if (v3.getLayer(id)) return; const L1 = JSON.parse(JSON.stringify(l)); L1.id = id; L1.source = 'env'; delete L1.minzoom; L1.layout = Object.assign({}, L1.layout || {}, {visibility:'visible'}); v3.addLayer(L1); });
+if (!v3.getLayer('apath')) v3.addLayer({id:'apath', type:'line', source:'apath', paint:{'line-color':'#ff8a2a', 'line-width':3, 'line-dasharray':[2, 1.5]}});
+} catch(e){}
+$('v3play').style.display = secMode === 'mk' ? '' : 'none'; $('v3scnBtn').style.display = secMode === 'mk' ? '' : 'none';
+}
+function placeEnv(k, ll){ const a = envLayer(); a.env.push({k, lat:+ll.lat.toFixed(7), lng:+ll.lng.toFixed(7), rot:0}); persist(); envRefresh(); toast(ENV_N[k] + ' поставлен(а). Коснитесь объекта, чтобы править'); }
+function placeTech(side, sid, ll){ const S = SIDES[side], sy = SYM_BY[sid]; let a = state.arrays.find(x => x.name === `Макет: ${S.name}`);
+if (!a){ a = normArr({id:Date.now(), kind:'pts', name:`Макет: ${S.name}`, ident:S.name, style:{color:S.color, name:S.name, glyph:''}, symSide:side, points:[]}); state.arrays.push(a); }
+const cnt = a.points.filter(p => p.sym === sid).length; const p = {lat:+ll.lat.toFixed(7), lng:+ll.lng.toFixed(7), h:null, place:'', name:`${sy.n} ${cnt + 1}`, sym:sid, side}; a.points.push(p); fillHeight(p);
+if (!v3cfg.mdl){ v3cfg.mdl = true; lsSet('skat_v3', v3cfg); } v3upd(); toast(`${p.name} поставлен`); }
+function openRadial3D(x, y, ll){
+try { navigator.vibrate && navigator.vibrate(25); } catch(e){}
+radPos = {x, y, ll}; radStack = []; $('radial').classList.add('on');
+const tech = side => radPush(SIDES[side].name, SYMS.filter(s => s.type === 'pt' && MDL_OF[s.id] && isFav(s)).slice(0, 21).map(sy => ({t:sy.n, ic:symSvg(sy.id), color:SIDES[side].color, go:() => { closeRadial(); placeTech(side, sy.id, ll); }}))
+.concat([{t:'Вся техника', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>', go:() => { closeRadial(); openSymPick(['pt'], id => { if (id) placeTech(side, id, ll); }, SIDES[side].color, false, s => !!MDL_OF[s.id]); }}]));
+const env = list => list.map(k => ({t:ENV_N[k], ic:'', go:() => { closeRadial(); placeEnv(k, ll); }}));
+radPush('Макет', [
+{t:'Техника и знаки', ic:IC.obj, go:() => radPush('Сторона', [{t:'Красные', ic:IC.side(SIDES.r.color), go:() => tech('r')}, {t:'Синие', ic:IC.side(SIDES.b.color), go:() => tech('b')}])},
+{t:'Здания', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V10l8-6 8 6v11z"/><path d="M10 21v-6h4v6"/></svg>', go:() => radPush('Здания', env(['house', 'flat', 'wh', 'hangar']))},
+{t:'Деревья', ic:TREE_BTN, go:() => radPush('Деревья', env(['tree_n', 'tree_b', 'grove']))},
+{t:'Вышки, ЛЭП', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 22L12 2l4 20M9 16h6M10 10h4M5 7h14"/></svg>', go:() => radPush('Вышки и сооружения', env(['pw', 'mast', 'wt', 'tank']))}]);
+}
+// ---- анимация по маршруту
+function pathPos(path, dist){ let acc = 0;
+for (let i = 1; i < path.length; i++){ const [x1, y1] = path[i-1], [x2, y2] = path[i], [kx, ky] = mk(y1), dx = (x2 - x1) * kx, dy = (y2 - y1) * ky, L0 = Math.hypot(dx, dy);
+if (acc + L0 >= dist){ const f = L0 ? (dist - acc) / L0 : 0; return {lng:x1 + (x2 - x1) * f, lat:y1 + (y2 - y1) * f, rot:Math.round(-Math.atan2(dy, dx) * 180 / Math.PI), end:false}; } acc += L0; }
+const n = path.length, [x1, y1] = path[n-2], [x2, y2] = path[n-1], [kx, ky] = mk(y1); return {lng:x2, lat:y2, rot:Math.round(-Math.atan2((y2 - y1) * ky, (x2 - x1) * kx) * 180 / Math.PI), end:true}; }
+function playAnim(items){
+stopAnim(); animList = items.filter(x => x.it.path && x.it.path.length > 1); if (!animList.length){ toast('Нет объектов с маршрутом: выберите объект → «Маршрут»'); return; }
+animT0 = performance.now(); $('v3play').textContent = '■ Стоп';
+const step = now => { const t = (now - animT0) / 1000; let alive = false;
+animList.forEach(x => { const q = pathPos(x.it.path, t * (x.it.spd || 20) / 3.6); if (!q.end) alive = true; ANIM.set(x.key, q); });
+if (now - animLast > 60){ animLast = now; try { v3.getSource('mdl').setData(v3mdl(v3.getCenter())); } catch(_){} envRefresh(); }
+animRaf = alive ? requestAnimationFrame(step) : 0; if (!alive){ $('v3play').textContent = '▶ Все'; toast('Анимация завершена'); } };
+animRaf = requestAnimationFrame(step);
+}
+function stopAnim(){ if (animRaf) cancelAnimationFrame(animRaf); animRaf = 0; ANIM.clear(); $('v3play').textContent = '▶ Все'; try { v3.getSource('mdl').setData(v3mdl(v3.getCenter())); } catch(_){} envRefresh(); }
+function allAnimItems(){ const L1 = []; state.arrays.forEach(a => { if (a.hidden) return; a.points.forEach((p, pi) => L1.push({key:a.id + ':' + pi, it:p})); (a.env || []).forEach((o, ei) => L1.push({key:'e' + a.id + ':' + ei, it:o})); }); return L1; }
+$('v3play').onclick = () => animRaf ? stopAnim() : playAnim(allAnimItems());
+{ const box = $('v3map');
+const clr = () => { if (v3lp){ clearTimeout(v3lp.tm); v3lp = null; } };
+box.addEventListener('touchstart', e => { clr(); if (e.touches.length !== 1 || !v3 || secMode !== 'mk') return; const t = e.touches[0]; v3lp = {x:t.clientX, y:t.clientY};
+v3lp.tm = setTimeout(() => { if (!v3lp) return; const r = box.getBoundingClientRect(), ll = v3.unproject([v3lp.x - r.left, v3lp.y - r.top]), x = v3lp.x, y = v3lp.y; v3lp = null; openRadial3D(x, y, ll); }, 600); }, {passive:true});
+box.addEventListener('touchmove', e => { if (!v3lp) return; const t = e.touches[0]; if (e.touches.length > 1 || Math.hypot(t.clientX - v3lp.x, t.clientY - v3lp.y) > 10) clr(); }, {passive:true});
+box.addEventListener('touchend', clr); box.addEventListener('touchcancel', clr); }
+
+// ======== МАКЕТ: СЦЕНЫ И ВРЕМЕННАЯ ШКАЛА ========
+const SC = {cur:null, t:0, T:0, mul:1, raf:0, last:0, prev:0, orbit:false, pick:null};
+const fmtT = t => `Ч+${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+function pathLen(P){ let L1 = 0; for (let i = 1; i < P.length; i++){ const [kx, ky] = mk(P[i][1]); L1 += Math.hypot((P[i][0] - P[i-1][0]) * kx, (P[i][1] - P[i-1][1]) * ky); } return L1; }
+function scnItems(sc){ const [w, s0, e, n] = sc.b; return allAnimItems().filter(x => { const q = x.it.path && x.it.path.length ? {lng:x.it.path[0][0], lat:x.it.path[0][1]} : x.it; return q.lng >= w && q.lng <= e && q.lat >= s0 && q.lat <= n; }); }
+function scnDur(sc){ let T = 0; scnItems(sc).forEach(x => { const it = x.it; if (it.path && it.path.length > 1) T = Math.max(T, (it.t0 || 0) + pathLen(it.path) / ((it.spd || 20) / 3.6)); }); return Math.max(10, Math.ceil(T + 3)); }
+function scnRefresh(force){ const now = performance.now(); if (!force && now - SC.last < 60) return; SC.last = now; try { v3.getSource('mdl').setData(v3mdl(v3.getCenter())); } catch(_){} envRefresh(); }
+function scnSet(t, force){ if (!SC.cur) return; SC.t = Math.max(0, Math.min(SC.T, t));
+scnItems(SC.cur).forEach(x => { const it = x.it; if (!it.path || it.path.length < 2) return; const loc = Math.max(0, SC.t - (it.t0 || 0)); ANIM.set(x.key, pathPos(it.path, loc * (it.spd || 20) / 3.6)); });
+$('tlR').value = SC.t; $('tlT').textContent = `${fmtT(SC.t)} / ${fmtT(SC.T)}`; scnRefresh(force); }
+function scnLoop(now){ const dt = SC.prev ? (now - SC.prev) / 1000 : 0; SC.prev = now;
+if (SC.orbit) try { v3.setBearing(v3.getBearing() + dt * 4); } catch(_){}
+scnSet(SC.t + dt * SC.mul);
+if (SC.t >= SC.T){ scnPause(); toast('Сцена завершена'); return; } SC.raf = requestAnimationFrame(scnLoop); }
+function scnPlay(){ if (!SC.cur) return; if (SC.t >= SC.T) SC.t = 0; SC.prev = 0; $('tlP').textContent = '⏸'; SC.raf = requestAnimationFrame(scnLoop); }
+function scnPause(){ if (SC.raf) cancelAnimationFrame(SC.raf); SC.raf = 0; $('tlP').textContent = '▶'; scnRefresh(true); }
+function scnBox(){ const F = []; const box = b => [[b[0], b[1]], [b[2], b[1]], [b[2], b[3]], [b[0], b[3]], [b[0], b[1]]];
+if (SC.cur) F.push({type:'Feature', properties:{}, geometry:{type:'LineString', coordinates:box(SC.cur.b)}});
+if (SC.pick && SC.pick.pts.length) SC.pick.pts.forEach(q => F.push({type:'Feature', properties:{}, geometry:{type:'Point', coordinates:q}}));
+try { if (!v3.getSource('scnbox')){ v3.addSource('scnbox', {type:'geojson', data:{type:'FeatureCollection', features:F}}); v3.addLayer({id:'scnbox', type:'line', source:'scnbox', paint:{'line-color':'#ffd400', 'line-width':3, 'line-dasharray':[3, 2]}}); v3.addLayer({id:'scnpt', type:'circle', source:'scnbox', filter:['==', '$type', 'Point'], paint:{'circle-color':'#ffd400', 'circle-radius':6, 'circle-stroke-color':'#000', 'circle-stroke-width':1}}); }
+else v3.getSource('scnbox').setData({type:'FeatureCollection', features:F}); } catch(_){} }
+function renderScn(){ const el = $('scnList');
+el.innerHTML = state.scenes.length ? state.scenes.map((sc, i) => `<div class="arr"><div class="nm"><div>${escapeHtml(sc.name)}</div><div>${fmtT(scnDur(sc))} · объектов: ${scnItems(sc).length}</div></div><button data-i="${i}" data-a="open">Открыть</button><button class="eye" data-i="${i}" data-a="del">🗑</button></div>`).join('') : '<div class="empty">Сцен пока нет.</div>';
+el.querySelectorAll('button').forEach(b => b.onclick = () => { const sc = state.scenes[+b.dataset.i];
+if (b.dataset.a === 'open') openScene(sc); else askConfirm(`Удалить сцену «${sc.name}»? Объекты на карте останутся.`, 'Удалить', () => { state.scenes.splice(+b.dataset.i, 1); persist(); if (SC.cur === sc) closeScene(); renderScn(); }); }); }
+function openScene(sc){ $('v3scn').classList.remove('on'); SC.cur = sc; SC.T = scnDur(sc); $('tlR').max = SC.T; $('v3tl').classList.add('on'); $('tlN').textContent = sc.name;
+try { v3.jumpTo({center:sc.cam.c, zoom:sc.cam.z, pitch:sc.cam.p, bearing:sc.cam.br}); } catch(_){} ANIM.clear(); scnBox(); scnSet(0, true); }
+function closeScene(){ scnPause(); SC.cur = null; ANIM.clear(); $('v3tl').classList.remove('on'); scnBox(); scnRefresh(true); }
+$('v3scnBtn').onclick = () => { $('v3panel').classList.remove('on'); renderScn(); $('v3scn').classList.toggle('on'); };
+$('scnNew').onclick = () => { $('v3scn').classList.remove('on'); SC.pick = {pts:[]}; scnBox(); toast('Коснитесь 3D-карты в двух противоположных углах сцены'); };
+$('tlP').onclick = () => SC.raf ? scnPause() : scnPlay();
+$('tlR').oninput = e => { scnPause(); scnSet(+e.target.value, true); };
+$('tlM').querySelectorAll('button').forEach(b => b.onclick = () => { SC.mul = +b.dataset.m; $('tlM').querySelectorAll('button').forEach(q => q.classList.toggle('on', q === b)); });
+$('tlO').onchange = e => { SC.orbit = e.target.checked; };
+$('tlCam').onclick = () => { if (!SC.cur) return; SC.cur.cam = {c:v3.getCenter().toArray(), z:v3.getZoom(), p:v3.getPitch(), br:v3.getBearing()}; persist(); toast('Вид камеры сцены сохранён'); };
+$('tlX').onclick = closeScene;
+function scnPickTap(e){ SC.pick.pts.push([+e.lngLat.lng.toFixed(6), +e.lngLat.lat.toFixed(6)]); scnBox();
+if (SC.pick.pts.length < 2) return true;
+const [[x1, y1], [x2, y2]] = SC.pick.pts; SC.pick = null; const name = (prompt('Название сцены', `Сцена ${state.scenes.length + 1}`) || '').trim() || `Сцена ${state.scenes.length + 1}`;
+const sc = {id:Date.now(), name, b:[Math.min(x1, x2), Math.min(y1, y2), Math.max(x1, x2), Math.max(y1, y2)], cam:{c:v3.getCenter().toArray(), z:v3.getZoom(), p:v3.getPitch(), br:v3.getBearing()}};
+state.scenes.push(sc); persist(); openScene(sc); toast('Сцена создана. Объектам в ней задайте маршрут и время старта'); return true; }
+
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
 const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
@@ -3163,7 +3629,7 @@ mc.addEventListener('touchstart', e => {
 clearLP();
 if (e.touches.length !== 1 || session || tool.on) return;
 const t = e.touches[0]; lp = {x:t.clientX, y:t.clientY};
-lp.tm = setTimeout(() => { if (!lp) return; const r = mc.getBoundingClientRect(); const ll = map.mouseEventToLatLng({clientX:lp.x, clientY:lp.y}); const pos = {x:lp.x, y:lp.y}; lp = null; openRadial(pos.x, pos.y, ll); }, 550);
+lp.tm = setTimeout(() => { if (!lp) return; const r = mc.getBoundingClientRect(); const ll = map.mouseEventToLatLng({clientX:lp.x, clientY:lp.y}); const pos = {x:lp.x, y:lp.y}; lp = null; const h = hitPoint(pos.x, pos.y); if (h && h.ti != null && !document.querySelector('.modal.open')) openTextEd(h.a, h.ti); else if (h && !document.querySelector('.modal.open')) openObjMenu(h, pos.x, pos.y); else openRadial(pos.x, pos.y, ll); }, 550);
 }, {passive:true});
 mc.addEventListener('touchmove', e => { if (!lp) return; const t = e.touches[0]; if (e.touches.length > 1 || Math.hypot(t.clientX - lp.x, t.clientY - lp.y) > 10) clearLP(); }, {passive:true});
 mc.addEventListener('touchend', clearLP); mc.addEventListener('touchcancel', clearLP);
@@ -3185,7 +3651,7 @@ if (g2.mode === 'rot'){ e.stopPropagation(); map.setBearing(g2.b0 + rotSign * da
 const endG = e => { if (g2 && e.touches.length < 2){ if (g2.mode === 'rot'){ setTimeout(() => { redrawAll(); renderMarkers(); updCompass(); }, 50); } g2 = null; } };
 mc.addEventListener('touchend', endG, {capture:true}); mc.addEventListener('touchcancel', endG, {capture:true});
 }
-$('layBtn').onclick = () => { openModal('layModal'); renderLayers(); };
+$('layBtn').onclick = () => { openModal('layModal'); layTab('L'); renderLayers(); };
 $('setBtn').onclick = () => { renderSymList(); renderClUI(); openModal('setModal'); $('ver2').textContent = VERSION; pdbInfo(); renderRelUI(); };
 $('layNew').onclick = () => { closeModals(); openArrModal(); };
 $('impBtn').onclick = () => $('csvIn').click();
@@ -3211,6 +3677,7 @@ toast(`${r.lbl ? r.lbl + ': ' : ''}X ${pad5(s.x)}  Y ${pad5(s.y)}` + (session &&
 $('ver').textContent = VERSION;
 map.invalidateSize();
 sizeCanvas(); setLayer(state.layer); renderMarkers(); renderSheet(); updateReadout(); centerHeight();
+histSnap(); updUndo(); if (secMode) applySection(); else showLaunch();
 pdbLoad().then(() => { placeCache.clear(); drawPlaces(); ensureStartRegion(); });
 state.arrays.forEach(a => a.points.forEach(p => { if (p.h == null && !p.hManual && a.kind !== 'aux') fillHeight(p); }));
 </script></body></html>
