@@ -133,6 +133,7 @@ body:has(#v3d.on) .modal{z-index:2600}
 .crow button.on{box-shadow:0 0 0 2px var(--signal)}.cdv{line-height:1.4}.ctm{font:800 26px/1 "IBM Plex Sans Condensed",sans-serif;color:#ffd400}
 .boomic{position:relative;transform:translate(-50%,-50%);width:30px;height:30px}.boomic svg{width:30px;height:30px;filter:drop-shadow(0 0 2px #000)}.boomic b{position:absolute;right:-8px;top:-8px;background:#111;color:#fff;border-radius:9px;font:700 11px/16px sans-serif;min-width:16px;text-align:center;padding:0 3px}
 .ctgun,.cttgt{transform:translate(-50%,-50%);font:800 22px/1 sans-serif;color:#ff8a2a;text-shadow:0 0 3px #000;display:inline-block}.cttgt{color:#e2533f;font-size:28px}
+.proj{width:44px;height:14px;display:inline-block}.proj.rocket{width:56px}.proj svg{width:100%;height:100%;filter:drop-shadow(0 0 2px #000)}
 #compass{position:fixed;left:10px;bottom:calc(max(var(--sheet-h,0px), calc(var(--safe-b) + var(--badge))) + 12px);z-index:1000;width:48px;height:48px;min-height:0;padding:0;border-radius:50%;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center}
 #compass svg{width:30px;height:30px}
 #cross{position:fixed;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;z-index:460;pointer-events:none}
@@ -277,6 +278,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <button class="rb accent" id="newArrBtn" title="Добавить"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Добавить</button>
 <button class="rb" id="layBtn" title="Слои"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>Слои</button>
 <button class="rb" id="setBtn" title="Настройки"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Настр.</button>
+<button class="rb" id="planBtn" title="Плановые огневые задачи" style="display:none"><svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5z"/><path d="M8 9h8M8 13h8M8 17h5"/><circle cx="17" cy="17" r="3"/></svg>План ОЗ</button>
 <button class="rb" id="corrBtn" title="Корректировка огня" style="display:none"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>Корр.</button>
 <button class="rb" id="prnBtn" title="Печать в JPEG" style="display:none"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2"/><path d="M7 14h10v7H7z"/></svg>Печать</button>
 <button class="rb" id="searchBtn" title="Поиск по координатам"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>Поиск</button>
@@ -339,6 +341,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="sub-h">Тактические знаки</div>
 <div class="row" style="margin-bottom:8px"><button id="symAdd">Добавить знак</button><button class="ghost" id="symFavAll">Все в избранное</button></div>
 <p class="status">★ — избранное: в круговом меню показываются только эти знаки. Касание строки — изменить название, значок и оформление.</p>
+<label class="f"><input id="symQ" placeholder="Поиск знака по названию или категории" autocomplete="off"></label><div class="colors strip" id="symCats"></div>
 <div id="symList" style="max-height:46vh;overflow:auto"></div>
 <div class="sub-h">Кластеризация точек</div>
 <label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="clOn" style="width:22px;min-height:22px;margin:0"> Объединять близкие точки в кружок с числом</label>
@@ -419,6 +422,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="modal" id="ptModal"><div class="card big">
 <h3 id="ptTitle"></h3>
 <p class="status" id="ptInfo"></p>
+<div id="ptPlanW" style="display:none"><div class="duo"><label class="f">№ ТЗ<input id="ptTz" autocomplete="off" inputmode="numeric"></label><label class="f">Характер цели<input id="ptCh" list="chList" autocomplete="off"></label></div><datalist id="chList"></datalist><div class="row" style="margin-bottom:8px"><button id="ptSymB">Знак цели…</button></div><p class="status">Номер цели: зона + номер по характеру (31101; без зоны — 00101). Цвет точки — кто привлекается (название цвета из палитры попадает в таблицу).</p></div>
 <label class="f" id="ptNameL" style="display:none">Название точки<input id="ptName" autocomplete="off"></label>
 <div class="flabel">Цвет точки</div><div class="colors" id="ptColors"></div>
 <div id="ptFillW"><div class="flabel">Заливка знака (принадлежность)</div><div class="colors strip" id="ptFill"></div></div>
@@ -479,7 +483,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <button data-m="tp"><b>Боевой контур</b><small>Точки, массивы, маршруты, инструменты, таблицы Excel</small></button>
 <button data-m="mk"><b>Макет</b><small>3D-рельеф местности, модели, анимация</small></button></div></div>
 <div class="modal" id="addModal"><div class="card"><h3 id="addTitle">Добавить</h3><div class="addgrid" id="addGrid"></div><div class="row" style="margin-top:10px"><button class="ghost" data-close>Отмена</button></div></div></div>
-<div class="modal" id="spModal"><div class="card big"><h3>Знаки</h3><div class="spgrid" id="spGrid"></div><div class="row" style="margin-top:10px"><button class="ghost" data-close>Отмена</button></div></div></div>
+<div class="modal" id="spModal"><div class="card big"><h3>Знаки</h3><label class="f"><input id="spQ" placeholder="Поиск по названию или категории" autocomplete="off"></label><div class="colors strip" id="spCats"></div><div class="spgrid" id="spGrid"></div><div class="row" style="margin-top:10px"><button class="ghost" data-close>Отмена</button></div></div></div>
 <div class="modal" id="trashModal"><div class="card big"><h3>Корзина</h3><div id="trashList"></div><div class="row" style="margin-top:10px"><button class="danger" id="trashClr">Очистить корзину</button><button class="ghost" data-close>Закрыть</button></div></div></div>
 <div class="modal" id="rotModal"><div class="card"><h3>Поворот <small id="rotV"></small></h3><input type="range" id="rotR" min="0" max="359" step="1" style="width:100%"><div class="row" style="margin-top:12px"><button class="ok" id="rotOk">Готово</button></div></div></div>
 <div class="modal" id="txtModal"><div class="card big"><h3 id="txtTitle">Надпись</h3>
@@ -544,12 +548,13 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="flabel">Цвет подписи</div><div class="colors strip" id="prLc"></div>
 <div class="row"><button class="ok" id="prOk">Готово</button></div></div></div>
 <div id="corr" class="glass"></div>
+<div class="modal" id="planModal"><div class="card big"><h3>Плановые огневые задачи</h3><div id="planList"></div><div class="row" style="margin-top:10px"><button class="primary" id="planAdd">Добавить слой</button><button id="planZone">Добавить зону</button><button class="ghost" data-close>Закрыть</button></div><p class="status" style="margin-top:10px">Цели нумеруются с 101. Касание цели (удержание → «Карточка») — № ТЗ, характер цели, комментарий, цвет (кто привлекается). Группировка — в «Слоях» через «☑ Выбрать». Excel: № ТЗ, характер, № цели, X, Y, H, квадрат, н.п., комментарий, привлекается.</p></div></div>
 <div id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 5.3';
+const VERSION = 'версия 5.5';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -931,7 +936,7 @@ else html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div cla
 const m = L.marker([p.lat,p.lng], {icon:L.divIcon({className:'pt-wrap', html, iconSize:[0,0]}), draggable:editing, interactive:editing, keyboard:false});
 if (editing){
 m.on('drag', e => { if (a.kind === 'route'){ const ll = e.target.getLatLng(); p.lat = ll.lat; p.lng = ll.lng; routeLive(a); } });
-m.on('dragend', e => { const ll = e.target.getLatLng(); p.lat = ll.lat; p.lng = ll.lng;
+m.on('dragend', e => { const ll = e.target.getLatLng(); p.lat = ll.lat; p.lng = ll.lng; if (a.fplan) planNum(a, p);
 if (a.kind !== 'aux'){ if (!p.hManual){ p.h = null; fillHeight(p); } if (!p.placeManual){ p.place = ''; fillPlace(p); } }
 persist(); renderSheet(); });
 m.on('click', () => a.kind === 'aux' ? openAux(a, i) : openPoint(a, i));
@@ -1251,6 +1256,7 @@ const p = {lat:ll.lat, lng:ll.lng, h:null, place:''};
 if (session.sym){ p.sym = session.sym; if (session.side) p.side = session.side; }
 if (session.style && !sameSt(session.style, a.style)) p.style = copySt(session.style);
 a.points.push(p); fillHeight(p); fillPlace(p); persist(); renderMarkers(); renderSheet();
+if (a.fplan) planNew(a, p);
 }
 map.on('click', e => { if (CT && !session && !tool.on){ corrTap(e.latlng); return; } if (tblPending && tblPending.rows && !session){ const a = (tblPending.target && arrById(tblPending.target)) || textLayer(); if (!a.tables) a.tables = []; openTbEd(a, null, e.latlng); return; }
 if (textPending && !session){ const a = textLayer(); openTextEd(a, null, e.latlng); return; } if (session && session.mode === 'pick') addPoint(e.latlng); else if (!session && tool.on) toolAdd(e.latlng); });
@@ -1458,7 +1464,7 @@ $('tblXlsx').textContent = aux ? 'Скачать CSV' : 'Скачать Excel';
 $('tblXlsx').disabled = !rows.length; $('tblEdit').disabled = !rows.length;
 openModal('tblModal');
 }
-$('tblXlsx').onclick = () => { const a = arrById(tblId); a.kind === 'aux' ? exportAuxCsv(a) : exportXlsx([a], a.name); };
+$('tblXlsx').onclick = () => { const a = arrById(tblId); if (a.fplan){ exportPlanXlsx(a); return; } a.kind === 'aux' ? exportAuxCsv(a) : exportXlsx([a], a.name); };
 $('tblPick').onclick = () => { if (arrById(tblId).kind === 'shapes'){ closeModals(); openTools(tblId); } else startSession(tblId, 'pick'); };
 $('tblEdit').onclick = () => startSession(tblId, 'edit');
 $('tblNum').onclick = () => { closeModals(); openArrModal(tblId); };
@@ -1469,6 +1475,7 @@ ptRef = {a, i}; const p = a.points[i], s = GEO.toSK(p.lat, p.lng);
 $('ptTitle').textContent = labelOf(a,i);
 $('ptInfo').innerHTML = `X <b>${pad5(s.x)}</b>&ensp;Y <b>${pad5(s.y)}</b>&ensp;H <b>${p.h==null?'—':Math.round(p.h)}</b>${p.hManual?' (вручную)':''}&ensp;кв. <b>${sqOf(s)}</b>`;
 $('ptNameL').style.display = namedKind(a) ? '' : 'none';
+$('ptPlanW').style.display = a.fplan ? '' : 'none'; if (a.fplan){ $('ptTz').value = p.tz || ''; $('ptCh').value = p.ch || ''; $('chList').innerHTML = CHAR.map(c => `<option value="${c}">`).join(''); }
 $('ptName').value = namedKind(a) ? (p.name || '') : '';
 $('ptComL').firstChild.textContent = a.kind === 'desc' ? 'Примечание (пусто — ближайшая лесополоса)' : 'Комментарий (пусто — ближайший ориентир)';
 $('ptH').value = p.hManual ? Math.round(p.h) : '';
@@ -1482,7 +1489,8 @@ const psid = p.sym || a.sym; $('ptFillW').style.display = psid && SYM_BY[psid] &
 if (psid) renderFillPick($('ptFill'), p.fc || a.fc || null, c => { if (c) p.fc = c; else delete p.fc; persist(); renderMarkers(); });
 }
 $('ptDel').onclick = () => { ptRef.a.points.splice(ptRef.i,1); persist(); closeModals(); renderMarkers(); renderSheet(); if (!ptRef.a.points.length) setMode('pick'); };
-$('ptSave').onclick = () => { const a = ptRef.a, p = a.points[ptRef.i], v = $('ptH').value.trim().replace(',','.');
+$('ptSave').onclick = () => { if (ptRef.a.fplan){ const pp = ptRef.a.points[ptRef.i]; pp.tz = $('ptTz').value.trim(); pp.ch = $('ptCh').value.trim(); if (!pp.tz) delete pp.tz; if (!pp.ch) delete pp.ch; if (!planNum(ptRef.a, pp)){ toast('Не удалось определить характер — впишите его (например: живая сила, миномёт, танк) или выберите знак'); return; } }
+const a = ptRef.a, p = a.points[ptRef.i], v = $('ptH').value.trim().replace(',','.');
 if (namedKind(a)){ const nm = $('ptName').value.trim(); if (nm) p.name = nm; }
 if (v === ''){ if (p.hManual){ p.hManual = false; p.h = null; fillHeight(p); } } else if (!isNaN(+v)){ p.h = +v; p.hManual = true; }
 const pl = $('ptPlace').value.trim();
@@ -1965,7 +1973,7 @@ if (!tool.color) tool.color = copySt(state.palette.find(p => p.name === 'Ора�
 document.body.classList.add('picking'); map.doubleClickZoom.disable();
 drawTool(); renderTool();
 }
-function closeTools(){ tool.sym = null; tool.on = false; tool.pts = []; tool.r = 0; toolLayer.clearLayers(); document.body.classList.remove('picking'); map.doubleClickZoom.enable(); renderTool(); }
+function closeTools(){ tool.sym = null; tool.zone = false; tool.on = false; tool.pts = []; tool.r = 0; toolLayer.clearLayers(); document.body.classList.remove('picking'); map.doubleClickZoom.enable(); renderTool(); }
 function toolAdd(ll){
 const m = tool.mode;
 if (m === 'circle'){ if (!tool.pts.length || tool.r){ tool.pts = [ll]; tool.r = 0; } else tool.r = distM(tool.pts[0], ll); }
@@ -1980,6 +1988,7 @@ let a = (tool.target && arrById(tool.target)) || state.arrays.find(x => x.kind =
 if (a && !a.shapes) a.shapes = [];
 if (!a){ a = normArr({id:Date.now(), kind:'shapes', name:'Фигуры', ident:'Фигуры', style:copySt(tool.color), points:[], shapes:[]}); state.arrays.push(a); }
 const nm = ($('tName') && $('tName').value.trim()) || '';
+if (tool.zone){ const zn = prompt('Номер зоны (например, 31)', ''); if (zn === null) return; const nm = (prompt('Название зоны (необязательно)', '') || '').trim(); a.shapes.push({type:sh.type, pts:sh.pts.map(p => [+p.lat.toFixed(6), +p.lng.toFixed(6)]), r:0, color:'#e2533f', op:8, name:`Зона ${String(zn).trim()}${nm ? ' — ' + nm : ''}`, zn:String(zn).trim(), t:Date.now()}); tool.pts = []; persistNow(); state.arrays.forEach(L1 => { if (L1.fplan) L1.points.forEach(q => planNum(L1, q)); }); renderMarkers(); closeTools(); toast('Зона ' + zn + ' сохранена, номера целей пересчитаны'); return; }
 a.shapes.push({type:sh.type, pts:sh.pts.map(p => [+p.lat.toFixed(6), +p.lng.toFixed(6)]), r:sh.r || 0, color:tool.color.color, op:tool.op, name:nm || (tool.sym && SYM_BY[tool.sym] ? SYM_BY[tool.sym].n : ''), t:Date.now(), sym:tool.sym || undefined, scl:tool.scl ? 1 : 0, z0:map.getZoom()});
 tool.target = a.id; tool.pts = []; tool.r = 0;
 persistNow(); renderMarkers(); drawTool(); renderTool(); toast(`Сохранено в слой «${a.name}»`);
@@ -3087,7 +3096,8 @@ $('clR').onchange = e => { clCfg.r = +e.target.value; lsSet('skat_cl', clCfg); r
 const TYPE_N = {pt:'точечный', line:'линейный', area:'площадной'};
 function renderSymList(){
 const el = $('symList'); if (!el) return;
-el.innerHTML = SYMS.map(s => `<div class="arr" data-id="${s.id}"><span class="symico" style="color:#c0282a">${symSvg(s.id)}</span><div class="nm"><div>${escapeHtml(s.n)}</div><div>${TYPE_N[s.type] || ''}${s.ab ? ' · ' + escapeHtml(s.ab) : ''}</div></div><button class="eye ${isFav(s) ? 'lit' : 'dim'}" data-act="fav" title="Избранное" style="font-size:20px">★</button></div>`).join('');
+spQ = $('symQ') ? $('symQ').value : ''; if ($('symCats')) spChips($('symCats'), renderSymList);
+el.innerHTML = SYMS.filter(symMatch).map(s => `<div class="arr" data-id="${s.id}"><span class="symico" style="color:#c0282a">${symSvg(s.id)}</span><div class="nm"><div>${escapeHtml(s.n)}</div><div>${TYPE_N[s.type] || ''}${s.ab ? ' · ' + escapeHtml(s.ab) : ''}</div></div><button class="eye ${isFav(s) ? 'lit' : 'dim'}" data-act="fav" title="Избранное" style="font-size:20px">★</button></div>`).join('');
 el.querySelectorAll('.arr').forEach(r => { const s = SYM_BY[r.dataset.id];
 r.querySelector('[data-act=fav]').onclick = e => { e.stopPropagation(); toggleFav(s); renderSymList(); };
 r.onclick = () => openSymEd(s.id); });
@@ -3381,11 +3391,13 @@ row.addEventListener('touchend', () => { x0 = null; });
 }
 // ---- выбор знака из полного списка
 function openSymPick(types, cb, color, none, filt){
-const list = SYMS.filter(s => types.includes(s.type) && (!filt || filt(s))).sort((a, b) => (isFav(b) ? 1 : 0) - (isFav(a) ? 1 : 0));
+spQ = ''; spCat = ''; $('spQ').value = ''; const rerender = () => openSymPickR(types, cb, color, none, filt); $('spQ').oninput = e => { spQ = e.target.value; rerender(); }; spChips($('spCats'), rerender); openSymPickR(types, cb, color, none, filt); openModal('spModal'); }
+function openSymPickR(types, cb, color, none, filt){
+const list = SYMS.filter(s => types.includes(s.type) && (!filt || filt(s)) && symMatch(s)).sort((a, b) => (isFav(b) ? 1 : 0) - (isFav(a) ? 1 : 0));
 $('spGrid').innerHTML = (none ? `<button class="spi" data-id=""><span class="symb" style="display:grid;place-items:center;font-size:22px">∅</span>без знака</button>` : '') +
 list.map(s => `<button class="spi" data-id="${s.id}"><span class="symb" style="color:${symCol(s.id, color === SIDES.r.color ? 'r' : color === SIDES.b.color ? 'b' : '', color || '#c0282a')}">${symSvg(s.id)}</span>${escapeHtml(s.n)}</button>`).join('');
 $('spGrid').querySelectorAll('button').forEach(b => b.onclick = () => { closeModals(); cb(b.dataset.id || null); });
-openModal('spModal');
+
 }
 // ---- меню «Добавить»
 let addTarget = null;
@@ -3426,8 +3438,8 @@ $('tabF').appendChild($('mapList')); $('tabF').appendChild(fr);
 const fr2 = document.createElement('div'); fr2.className = 'row'; fr2.style.marginTop = '8px'; fr2.innerHTML = '<button id="impTblBtn">Импорт таблицы точек (Excel/CSV)</button><button id="expPtsBtn">Экспорт всех точек (CSV)</button>'; $('tabF').appendChild(fr2);
 const hint = document.createElement('p'); hint.className = 'status'; hint.style.marginTop = '10px'; hint.textContent = 'Загруженные карты (.mbtiles) — в списке выше. Ниже — загрузка файла карты, сессии, ориентиров CSV и базы населённых пунктов.'; $('tabF').appendChild(hint); }
 // ---- удержание на объекте: повернуть, подпись, знак, удалить
-function hitPoint(cx, cy){
-const r = map.getContainer().getBoundingClientRect(), x = cx - r.left, y = cy - r.top, z = map.getZoom(); let best = null, bd = 26;
+function hitPoint(cx, cy, R){
+const r = map.getContainer().getBoundingClientRect(), x = cx - r.left, y = cy - r.top, z = map.getZoom(); let best = null, bd = R || 26;
 state.arrays.forEach(a => { if (a.hidden) return; (a.tables || []).forEach((t, tbi) => { const q = map.latLngToContainerPoint([t.lat, t.lng]), d = Math.hypot(q.x - x, q.y - y); if (d < 40 && d < bd + 20){ bd = d - 20; best = {a, tbi}; } }); });
 state.arrays.forEach(a => { if (a.hidden) return; (a.texts || []).forEach((t, ti) => { const q = map.latLngToContainerPoint([t.lat, t.lng]), d = Math.hypot(q.x - x, q.y - y); if (d < bd + 8){ bd = d - 8; best = {a, ti}; } }); });
 state.arrays.forEach(a => { if (a.hidden || z < (a.minZ || 0)) return; a.points.forEach((p, i) => { const q = map.latLngToContainerPoint([p.lat, p.lng]), d = Math.hypot(q.x - x, q.y - y); if (d < bd){ bd = d; best = {a, i}; } }); });
@@ -3634,7 +3646,7 @@ if (!blob){ toast('Не хватило памяти — уменьшите фо�
 deliverFile(blob, `СКАТ_печать_${stamp()}.jpg`, `Лист готов: ${W}×${H} пикс.${miss ? ` Не загрузилось тайлов подложки: ${miss} (Яндекс в веб-версии не копируется — выберите Esri или Топо).` : ''}`);
 } catch(e){ netMsg(''); toast('Не удалось подготовить лист: ' + (e.message || e)); }
 };
-function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; }
+function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; }
 
 // ======== МАКЕТ: ОБЪЕКТЫ, КРУГОВОЕ МЕНЮ 3D, АНИМАЦИЯ ========
 const ENV_N = {trow:'Ряд деревьев', tpoly:'Роща', house:'Дом', flat:'Многоэтажка', wh:'Склад', hangar:'Ангар', tree_n:'Ель', tree_b:'Берёза', grove:'Роща', pw:'Опора ЛЭП', mast:'Мачта связи', wt:'Водонапорная башня', tank:'Цистерна'};
@@ -3872,9 +3884,11 @@ let tb = $('laySelBar'); if (!tb){ tb = document.createElement('div'); tb.id = '
 selBar();
 tagBar(); if (MKX === null) MKX = secMode !== 'mk'; ftaskSection(el);
 let nb = $('nolblBtn'); if (!nb){ nb = document.createElement('button'); nb.id = 'nolblBtn'; nb.className = 'ghost'; tb.appendChild(nb); } nb.textContent = NOLBL ? 'Подписи: выкл' : 'Подписи: вкл'; nb.onclick = () => { NOLBL = !NOLBL; lsSet('skat_nolbl', NOLBL); renderMarkers(); renderLayers(); };
+if (OBX.v === null) OBX.v = false; { const fr = el.querySelector('.arr[data-id]'); if (fr){ const oh = document.createElement('div'); oh.className = 'sub-h'; oh.style.cursor = 'pointer'; oh.style.marginTop = '0'; oh.textContent = `${OBX.v ? '▸' : '▾'} Обстановка (${state.arrays.filter(a => !isMk(a) && !a.fplan).length})`; oh.onclick = () => { OBX.v = !OBX.v; renderLayers(); }; el.insertBefore(oh, el.firstChild); } }
 const mh = [...el.querySelectorAll('.sub-h')].find(h => h.textContent.replace(/[▸▾\s\d()]/g, '') === 'Макет');
 if (mh){ const n = state.arrays.filter(isMk).length; mh.textContent = `${MKX ? '▸' : '▾'} Макет (${n})`; mh.style.cursor = 'pointer'; mh.onclick = () => { MKX = !MKX; renderLayers(); }; }
 el.querySelectorAll('.arr[data-id]').forEach(r => { const id = +r.dataset.id, a = arrById(id); if (!a) return;
+if (OBX.v && !isMk(a) && !a.fplan){ r.style.display = 'none'; return; }
 if ((MKX && isMk(a)) || (TAGF && !tagOk(a) && !layItems(a).some(x => (x.o.tags || []).includes(TAGF)))){ r.style.display = 'none'; return; }
 const tgb = document.createElement('button'); tgb.className = 'eye'; tgb.textContent = '#'; tgb.title = 'Теги слоя'; tgb.onclick = e => { e.stopPropagation(); const v = prompt('Теги слоя через запятую (например: 111 мсп, 1 мсб)', (a.tags || []).join(', ')); if (v === null) return; a.tags = parseTags(v); if (!a.tags.length) delete a.tags; persist(); renderLayers(); }; r.appendChild(tgb);
 if (a.tags && a.tags.length){ const nm = r.querySelector('.nm div:last-child'); if (nm) nm.innerHTML += a.tags.map(t => ` <small class="tg">#${escapeHtml(t)}</small>`).join(''); }
@@ -4061,11 +4075,12 @@ if (CT.gun) corrL.addLayer(L.marker([CT.gun.lat, CT.gun.lng], {interactive:false
 if (CT.tgt) corrL.addLayer(L.marker([CT.tgt.lat, CT.tgt.lng], {interactive:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:'<div class="cttgt">⊕</div>'})}));
 if (CT.gun && CT.tgt) corrL.addLayer(L.polyline([[CT.gun.lat, CT.gun.lng], [CT.tgt.lat, CT.tgt.lng]], {color:'#ff8a2a', weight:2, dashArray:'6 6', interactive:false}));
 (CT.bursts || []).forEach(b => corrL.addLayer(L.marker([b.lat, b.lng], {interactive:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:BOOM(b.n)})})));
-corrFly.forEach(f => { if (f.pts) corrL.addLayer(L.polyline(f.pts, {color:'#ffd400', weight:2, opacity:.8, interactive:false})); if (f.pos) corrL.addLayer(L.circleMarker(f.pos, {radius:4, color:'#111', weight:1, fillColor:'#ffd400', fillOpacity:1, interactive:false})); }); }
+corrFly.forEach(f => { if (f.pts) corrL.addLayer(L.polyline(f.pts, {color:'#ffd400', weight:2, opacity:.8, interactive:false})); if (f.pos){ const q1 = map.latLngToContainerPoint(f.pos), q2 = map.latLngToContainerPoint(f.pts[Math.min(30, (f.idx || 0) + 1)]), ang = Math.atan2(q2.y - q1.y, q2.x - q1.x) * 180 / Math.PI, pk = projOf(CT ? CT.sys : 'd30');
+corrL.addLayer(L.marker(f.pos, {interactive:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="proj ${pk}" style="transform:translate(-50%,-50%) rotate(${ang.toFixed(0)}deg)">${PROJ[pk]}</div>`})})); } if (false && f.pos) corrL.addLayer(L.circleMarker(f.pos, {radius:4, color:'#111', weight:1, fillColor:'#ffd400', fillOpacity:1, interactive:false})); }); }
 function corrPanel(){ const el = $('corr'); if (!CT){ el.classList.remove('on'); return; } el.classList.add('on'); const sys = SYS[CT.sys] || SYS.d30, last = (CT.bursts || []).slice(-1)[0];
 const d = CT.gun && CT.tgt ? distM(CT.gun, CT.tgt) : 0, fl = corrFly.length ? Math.max(...corrFly.map(f => f.left)) : 0;
-let dv = ''; if (last && CT.gun && CT.tgt){ const v = corrDev(last); dv = `<div class="cdv"><b>Разрыв ${last.n}:</b> ${devTxt(v)}<br>${v.along >= 0 ? 'Перелёт' : 'Недолёт'} ${Math.abs(Math.round(v.along))} м, ${v.lat >= 0 ? 'вправо' : 'влево'} ${Math.abs(Math.round(v.lat))} м (${v.mil >= 0 ? '+' : ''}${milStr(Math.abs(v.mil))})</div>`; }
-el.innerHTML = `<div class="crow"><b>${escapeHtml(CT.name)}</b><button data-c="x">✕</button></div>
+let dv = ''; if (last && CT.gun && CT.tgt){ const v = corrDev(last); dv = `<div class="cdv"><b>Разрыв ${last.n}:</b> ${devTxt(v)}</div>`; }
+el.innerHTML = `<div class="crow"><b>Цель ${escapeHtml(CT.name || '…')}${CT.obj ? ' · ' + escapeHtml(CT.obj) : ''}</b><button data-c="x">✕</button></div>
 <div class="crow"><button data-c="gun" class="${corrPick === 'gun' ? 'on' : ''}">Орудие${CT.gun ? ' ✓' : ''}</button><button data-c="tgt" class="${corrPick === 'tgt' ? 'on' : ''}">Цель${CT.tgt ? ' ✓' : ''}</button><select data-c="sys">${Object.entries(SYS).map(([k, v]) => `<option value="${k}"${k === CT.sys ? ' selected' : ''}>${v.n}</option>`).join('')}</select>${sys.rs ? `<select data-c="rs">${[1, 2, 4, 8, 12, 20, sys.rs].filter((v, i, ar) => v <= sys.rs && ar.indexOf(v) === i).map(v => `<option value="${v}"${v === (CT.rs || 4) ? ' selected' : ''}>${v} РС</option>`).join('')}</select>` : ''}</div>
 ${d ? `<div class="cdv">Дальность ${fmtDist(d)} · подлёт ${sysTof(CT.sys, d).toFixed(1)} с</div>` : '<div class="cdv">Выберите орудие и цель: кнопка, затем касание карты или знака</div>'}
 ${fl > 0 ? `<div class="ctm">⏱ ${fl.toFixed(1)} с</div>` : ''}${dv}
@@ -4074,11 +4089,11 @@ ${fl > 0 ? `<div class="ctm">⏱ ${fl.toFixed(1)} с</div>` : ''}${dv}
 el.querySelectorAll('[data-c]').forEach(b => { const c = b.dataset.c; if (b.tagName === 'SELECT') b.onchange = () => { if (c === 'sys') CT.sys = b.value; else CT.rs = +b.value; persist(); corrPanel(); };
 else b.onclick = () => { if (c === 'x'){ CT = null; corrPick = null; corrDraw(); corrPanel(); return; } if (c === 'gun' || c === 'tgt'){ corrPick = corrPick === c ? null : c; corrPanel(); toast(c === 'gun' ? 'Коснитесь огневой позиции или знака орудия' : 'Коснитесь цели'); return; }
 if (c === 'un'){ CT.bursts.pop(); persist(); corrDraw(); corrPanel(); return; } if (c === 'fire') corrFire(); }; }); }
-function newTask(){ const t = {id:Date.now(), name:`Цель ${state.ftasks.length + 1}`, sys:'d30', rs:4, bursts:[]}; state.ftasks.push(t); persist(); return t; }
+function newTask(){ const t = {id:Date.now(), name:'', sys:'d30', rs:4, bursts:[]}; state.ftasks.push(t); persist(); return t; }
 $('corrBtn').onclick = () => { if (CT){ CT = null; corrDraw(); corrPanel(); return; } CT = newTask(); corrPick = 'gun'; corrDraw(); corrPanel(); toast('Коснитесь огневой позиции или знака орудия'); };
-function corrTap(ll){ const h = hitPoint(...(() => { const q = map.latLngToContainerPoint(ll), r = map.getContainer().getBoundingClientRect(); return [q.x + r.left, q.y + r.top]; })()), at = h && h.i != null ? {lat:h.a.points[h.i].lat, lng:h.a.points[h.i].lng} : {lat:ll.lat, lng:ll.lng};
+function corrTap(ll){ const h = hitPoint(...(() => { const q = map.latLngToContainerPoint(ll), r = map.getContainer().getBoundingClientRect(); return [q.x + r.left, q.y + r.top, corrPick === 'tgt' ? 48 : 30]; })()), at = h && h.i != null ? {lat:h.a.points[h.i].lat, lng:h.a.points[h.i].lng} : {lat:ll.lat, lng:ll.lng};
 if (corrPick === 'gun'){ CT.gun = at; if (h && h.i != null){ const k = itKind(h.a, h.a.points[h.i]); CT.sys = k === 'mortar' ? 'm120' : k === 'rszo' ? 'grad' : k === 'tank' ? 'tank' : k === 'sau' ? 'sau' : CT.sys; } corrPick = CT.tgt ? null : 'tgt'; if (corrPick) toast('Коснитесь цели'); }
-else if (corrPick === 'tgt'){ CT.tgt = at; corrPick = null; const nm = prompt('Название цели', CT.name); if (nm && nm.trim()) CT.name = nm.trim(); }
+else if (corrPick === 'tgt'){ if (CT.tgt){ const prev = CT; CT = newTask(); CT.gun = prev.gun; CT.sys = prev.sys; CT.rs = prev.rs; } CT.tgt = at; { const sid0 = h && h.i != null ? (h.a.points[h.i].sym || h.a.sym) : null; let c0 = catOfSym(sid0); if (!c0){ c0 = catOfTxt(prompt('Характер цели (например: живая сила, миномёт, танк, РЭБ, ПВО)', '')) || 1; } CT.cat = c0; CT.name = tgtNo(at.lat, at.lng, c0, CT); } if (h && h.i != null) CT.obj = labelOf(h.a, h.i); corrPick = null; toast(`Цель ${CT.name}${CT.obj ? ' — ' + CT.obj : ''}. Разрывы считаются с 1`); }
 else { CT.bursts.push({lat:+ll.lat.toFixed(7), lng:+ll.lng.toFixed(7), n:CT.bursts.length + 1, t:Date.now()}); try { navigator.vibrate && navigator.vibrate(20); } catch(e){} }
 persist(); corrDraw(); corrPanel(); }
 function arcPts(g, t, k){ const out = [], [kx, ky] = mk(g.lat), dx = (t.lng - g.lng) * kx, dy = (t.lat - g.lat) * ky, D = Math.hypot(dx, dy) || 1, nx = -dy / D, ny = dx / D, bow = D * (k ? .18 : .1);
@@ -4087,16 +4102,18 @@ function corrFire(){ const sys = SYS[CT.sys] || SYS.d30, d = distM(CT.gun, CT.tg
 corrFly = Array.from({length:n}, (_, i) => ({d0:i * .5, tof, pts, pos:null, left:tof + i * .5}));
 cancelAnimationFrame(corrRaf); let lastUi = 0;
 const step = now => { const t = (now - t0) / 1000; let alive = false;
-corrFly.forEach(f => { const u = (t - f.d0) / f.tof; f.left = Math.max(0, f.tof + f.d0 - t); if (u >= 0 && u < 1){ alive = true; f.pos = f.pts[Math.min(30, Math.floor(u * 30))]; } else { f.pos = null; if (u < 0) alive = true; } });
+corrFly.forEach(f => { const u = (t - f.d0) / f.tof; f.left = Math.max(0, f.tof + f.d0 - t); if (u >= 0 && u < 1){ alive = true; f.idx = Math.min(29, Math.floor(u * 30)); f.pos = f.pts[f.idx]; } else { f.pos = null; if (u < 0) alive = true; } });
 corrDraw(); if (now - lastUi > 100){ lastUi = now; corrPanel(); }
 if (alive) corrRaf = requestAnimationFrame(step); else { corrFly = []; corrDraw(); corrPanel(); toast('Разрыв! Отметьте место касанием карты'); try { navigator.vibrate && navigator.vibrate([60, 40, 60]); } catch(e){} } };
 corrRaf = requestAnimationFrame(step); }
 // ---- огневые задачи в «Слоях»
 const FX = new Set();
-function ftaskSection(el){ if (!state.ftasks.length) return; const box = document.createElement('div');
-box.innerHTML = `<div class="sub-h">Огневые задачи (${state.ftasks.length})</div>` + state.ftasks.map((t, k) => `<div class="arr${t.hid ? ' off' : ''}" data-ft="${k}"><button class="eye" data-f="x">${FX.has(t.id) ? '▾' : '▸'}</button><span class="kth" style="color:#d9532c">⊕</span><div class="nm"><div>${escapeHtml(t.name)}</div><div>${escapeHtml((SYS[t.sys] || SYS.d30).n)} · разрывов: ${(t.bursts || []).length}</div></div><button data-f="open">Открыть</button><button class="eye" data-f="del">🗑</button></div>` +
-(FX.has(t.id) ? `<div class="kids">${(t.bursts || []).map(b => `<div class="kid"><span class="kth">🔥</span><span class="kn">Разрыв ${b.n}: ${t.tgt && t.gun ? devTxt((CT = CT, (() => { const keep = CT; CT = t; const v = corrDev(b); CT = keep; return v; })())) : ''}</span></div>`).join('') || '<div class="empty" style="padding:6px 0">Разрывов нет</div>'}</div>` : '')).join('');
-el.appendChild(box);
+function ftaskSection(el){ const pl = state.arrays.filter(a => a.fplan); if (!state.ftasks.length && !pl.length) return; if (FTX.v === null) FTX.v = secMode !== 'tp'; const box = document.createElement('div');
+box.innerHTML = `<div class="sub-h" id="ftH" style="cursor:pointer">${FTX.v ? '▸' : '▾'} Огневые задачи (${state.ftasks.length + pl.length})</div>` + (FTX.v ? '' :  state.ftasks.map((t, k) => `<div class="arr${t.hid ? ' off' : ''}" data-ft="${k}"><button class="eye" data-f="x">${FX.has(t.id) ? '▾' : '▸'}</button><span class="kth" style="color:#d9532c">⊕</span><div class="nm"><div>${escapeHtml(t.name)}</div><div>${escapeHtml((SYS[t.sys] || SYS.d30).n)} · разрывов: ${(t.bursts || []).length}</div></div><button data-f="open">Открыть</button><button class="eye" data-f="del">🗑</button></div>` +
+(FX.has(t.id) ? `<div class="kids">${(t.bursts || []).map(b => `<div class="kid"><span class="kth">🔥</span><span class="kn">Разрыв ${b.n}: ${t.tgt && t.gun ? devTxt((CT = CT, (() => { const keep = CT; CT = t; const v = corrDev(b); CT = keep; return v; })())) : ''}</span></div>`).join('') || '<div class="empty" style="padding:6px 0">Разрывов нет</div>'}</div>` : '')).join(''));
+box.innerHTML = box.innerHTML; const mh0 = [...el.querySelectorAll('.sub-h')].find(h => /Макет/.test(h.textContent)); if (mh0) el.insertBefore(box, mh0); else el.appendChild(box);
+$('ftH').onclick = () => { FTX.v = !FTX.v; renderLayers(); };
+if (!FTX.v) pl.forEach(a => { const r = el.querySelector(`.arr[data-id="${a.id}"]`); if (r){ const k = r.nextElementSibling && r.nextElementSibling.classList.contains('kids') ? r.nextElementSibling : null; box.appendChild(r); if (k) box.appendChild(k); } }); else pl.forEach(a => { const r = el.querySelector(`.arr[data-id="${a.id}"]`); if (r) r.style.display = 'none'; });
 box.querySelectorAll('[data-ft]').forEach(r => { const t = state.ftasks[+r.dataset.ft];
 r.querySelector('[data-f=x]').onclick = () => { FX.has(t.id) ? FX.delete(t.id) : FX.add(t.id); renderLayers(); };
 r.querySelector('[data-f=open]').onclick = () => { closeModals(); CT = t; corrPick = null; corrDraw(); corrPanel(); if (t.tgt) map.setView([t.tgt.lat, t.tgt.lng], Math.max(map.getZoom(), 14)); };
@@ -4107,6 +4124,67 @@ for (let i = 0; i <= 12; i++) out.push(destLL(b, az - 90 + 180 * i / 12, W));
 for (let i = 0; i <= 12; i++) out.push(destLL(a, az + 90 + 180 * i / 12, W)); out.push(out[0]); return out; }
 
 let NOLBL = lsGet('skat_nolbl', false);
+// ======== СНАРЯДЫ, НУМЕРАЦИЯ ЦЕЛЕЙ, ПЛАНОВЫЕ ОЗ ========
+const PROJ = {shell:'<svg viewBox="0 0 40 12"><path d="M2 3h24l10 3-10 3H2z" fill="#c9a24a" stroke="#222" stroke-width="1"/><path d="M6 3v6M9 3v6" stroke="#8a5a2b" stroke-width="1.6"/></svg>',
+mine:'<svg viewBox="0 0 40 16"><path d="M14 2c10 0 20 3 22 6-2 3-12 6-22 6-4 0-6-2-6-6s2-6 6-6z" fill="#5b6650" stroke="#222"/><path d="M8 8H1M4 3l-3 5 3 5" stroke="#333" stroke-width="1.6" fill="none"/></svg>',
+rocket:'<svg viewBox="0 0 56 12"><path d="M6 3h38l10 3-10 3H6z" fill="#7d8a6a" stroke="#222"/><path d="M6 3L1 0v12l5-3M14 3l-4-3M14 9l-4 3" stroke="#222" stroke-width="1.4" fill="#555"/><path d="M1 6h-1" stroke="#ff8a2a" stroke-width="4"/></svg>'};
+const projOf = sys => (SYS[sys] || {}).hi ? 'mine' : (SYS[sys] || {}).rs ? 'rocket' : 'shell';
+function nextTgtNo(){ let m = 100; state.ftasks.forEach(t => { const n = parseInt(t.name, 10); if (n > m) m = n; }); state.arrays.forEach(a => { if (a.fplan) a.points.forEach((p, i) => { const n = parseInt(labelOf(a, i), 10); if (n > m) m = n; }); }); return String(m + 1); }
+const OBX = {v:null}, FTX = {v:null};
+const CHAR = ['Живая сила', 'Огневая точка', 'Пулемёт', 'ПТРК', 'Миномёт', 'Артиллерия', 'Танк', 'БМП / БТР', 'Автомобили', 'НП', 'КНП', 'Блиндаж', 'Опорный пункт', 'Склад', 'Переправа', 'Расчёт БпЛА'];
+function planLayer(){ const n = prompt('Название слоя плановых огневых задач', `Плановые ОЗ ${state.arrays.filter(a => a.fplan).length + 1}`); if (n === null) return null;
+const a = normArr({id:Date.now(), kind:'main', fplan:true, name:n.trim() || 'Плановые ОЗ', ident:n.trim() || 'Плановые ОЗ', prefix:'', start:nextTgtNo(), step:1, style:copySt(state.palette.find(p => p.name === 'Оранжевый') || state.palette[0] || DEFAULT_PAL[2]), points:[], minZ:0, lblZ:10}); state.arrays.push(a); persist(); return a; }
+function renderPlan(){ const el = $('planList'), L1 = state.arrays.filter(a => a.fplan);
+el.innerHTML = L1.length ? L1.map(a => `<div class="arr" data-id="${a.id}"><span class="sw" style="background:${a.style.color}"></span><div class="nm"><div>${escapeHtml(a.name)}</div><div>целей: ${a.points.length}${a.points.length ? ` (${escapeHtml(labelOf(a, 0))}…${escapeHtml(labelOf(a, a.points.length - 1))})` : ''}</div></div><button data-p="add">＋ Цели</button><button data-p="tbl">Таблица</button><button class="eye" data-p="ren">✎</button></div>`).join('') : '<div class="empty">Слоёв плановых огневых задач нет — нажмите «Добавить слой».</div>';
+el.querySelectorAll('.arr').forEach(r => { const a = arrById(+r.dataset.id);
+r.querySelector('[data-p=add]').onclick = () => { closeModals(); startSession(a.id, 'pick'); toast('Касайтесь целей на карте — номера ставятся по порядку; в конце ✓'); };
+r.querySelector('[data-p=tbl]').onclick = () => { closeModals(); openTable(a.id); };
+r.querySelector('[data-p=ren]').onclick = () => { const v = prompt('Название слоя', a.name); if (v && v.trim()){ a.name = v.trim(); persist(); renderPlan(); } }; }); }
+$('planBtn').onclick = () => { renderPlan(); openModal('planModal'); };
+$('planAdd').onclick = () => { const a = planLayer(); if (a){ renderPlan(); toast('Слой создан — «＋ Цели» для нанесения'); } };
+async function exportPlanXlsx(a){
+if (typeof XLSX === 'undefined'){ toast('Модуль Excel не загрузился'); return; }
+const miss = a.points.filter(p => !p.place && !p.placeManual); if (miss.length){ toast('Определяю населённые пункты…'); await Promise.race([Promise.all(miss.map(fillPlace)), new Promise(r => setTimeout(r, 10000))]); }
+const aoa = [['№ ТЗ', 'Зона', 'Категория', 'Характер цели', '№ цели', 'X', 'Y', 'H', 'Квадрат', 'Населённый пункт', 'Комментарий', 'Привлекается (цвет)']];
+rowsOf(a).forEach((r, i) => { const p = a.points[i]; const ct = planCat(p); aoa.push([p.tz || '', p.tno ? p.tno.slice(0, 2) : '', ct ? TCAT[ct - 1][1] : '', p.ch || '', p.tno || r.id, r.x, r.y, r.h === '' ? '' : r.h, r.sq, r.place, r.comment, styleText(r.st)]); });
+const ws = XLSX.utils.aoa_to_sheet(aoa); for (let r = 2; r <= aoa.length; r++) ['A', 'B', 'E', 'F', 'G', 'I'].forEach(c => { const cell = ws[c + r]; if (cell){ cell.t = 's'; cell.v = String(cell.v); cell.z = '@'; } });
+ws['!cols'] = [{wch:7}, {wch:6}, {wch:24}, {wch:16}, {wch:8}, {wch:8}, {wch:8}, {wch:6}, {wch:9}, {wch:18}, {wch:24}, {wch:18}];
+const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Плановые ОЗ');
+deliverFile(new Blob([XLSX.write(wb, {bookType:'xlsx', type:'array'})], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), `${safeName(a.name)}_${stamp()}.xlsx`, 'Таблица плановых огневых задач готова');
+}
+
+// ======== НУМЕРАЦИЯ ЦЕЛЕЙ ПО ХАРАКТЕРУ И ЗОНАМ, ПОИСК ЗНАКОВ ========
+const TCAT = [[1, 'Живая сила, укрепления, НП', /^(ls|zhs|pesh|sekret|blind|ubezh|ukr|op|okop|nab|np|zasada|dot|shchel)/, /живая|блиндаж|опорн|наблюд|\bнп\b|окоп|укрыт|траншe|дот|засад/],
+[2, 'Пункты управления, ПУ БпЛА', /^(pu($|_)|kp|knp)/, /пункт управ|\bпу\b|\bкп\b|\bкнп\b|бпла|штаб/],
+[3, 'Разведка, РЛС, РЭБ', /^(rls|reb|razv|radio)/, /развед|рлс|рэб|радиол|радиост/],
+[4, 'Артиллерия, РСЗО, миномёты', /^(art|sau|rszo|min($|_)|ptp|bat_|sam_min|ognem)/, /артил|рсзо|миномет|миномёт|гаубиц|орудие|сау|пушк/],
+[5, 'Средства нападения, техника', /^(tank|bmp|btr|brm|brdm|auto|tyag|dozor|pick|vert)/, /танк|бтр|бмп|пикап|авто|техник|машин|вертол/],
+[6, 'Резерв (МТО, ПВД)', /^(mto|pvd|sklad|med)/, /резерв|мто|пвд|склад|тыл/],
+[7, 'Средства ПВО', /^(zpu|zrk|pvo|zsu)/, /пво|зрк|зпу|зенит|зсу/]];
+const catOfSym = sid => { if (!sid) return 0; const c = TCAT.find(x => x[2].test(sid)); return c ? c[0] : 0; };
+const catOfTxt = t => { t = String(t || '').toLowerCase(); if (!t) return 0; const c = TCAT.find(x => x[3].test(t)); return c ? c[0] : 0; };
+function zoneLayer(){ let a = state.arrays.find(x => x.zones); if (!a){ a = normArr({id:Date.now(), kind:'shapes', zones:true, name:'Зоны поражения', ident:'Зоны', style:{color:'#e2533f', name:'Красный', glyph:''}, points:[], shapes:[], minZ:0, lblZ:9}); state.arrays.push(a); } return a; }
+function zoneOf(lat, lng){ const z = state.arrays.find(x => x.zones); if (!z) return null; const sh = (z.shapes || []).find(s0 => s0.zn && s0.pts && inRing(lng, lat, s0.pts.map(q => [q[1] ?? q.lng, q[0] ?? q.lat]).concat([[s0.pts[0][1] ?? s0.pts[0].lng, s0.pts[0][0] ?? s0.pts[0].lat]]))); return sh ? sh.zn : null; }
+function usedNos(skip){ const u = new Set(); state.arrays.forEach(a => { if (a.fplan) a.points.forEach(p => { if (p !== skip && p.tno) u.add(p.tno); }); }); state.ftasks.forEach(t => { if (t !== skip && /^\d{5}$/.test(t.name)) u.add(t.name); }); return u; }
+function tgtNo(lat, lng, cat, skip){ const zn = zoneOf(lat, lng), zz = zn != null ? String(zn).padStart(2, '0').slice(-2) : '00', u = usedNos(skip);
+for (let k = cat * 100 + 1; k < cat * 100 + 100; k++){ const no = zz + String(k).padStart(3, '0'); if (!u.has(no)) return no; } return zz + String(cat * 100 + 99); }
+function planCat(p){ return catOfTxt(p.ch) || catOfSym(p.sym) || catOfSym(p.osym); }
+function planNum(a, p){ const c = planCat(p); if (!c){ delete p.tno; return false; } const zz = zoneOf(p.lat, p.lng), keep = p.tno && p.tno.slice(0, 2) === (zz != null ? String(zz).padStart(2, '0').slice(-2) : '00') && Math.floor(+p.tno.slice(2) / 100) === c;
+if (!keep) p.tno = tgtNo(p.lat, p.lng, c, p); p.lbl = p.tno; return true; }
+function planNew(a, p){ const q = map.latLngToContainerPoint([p.lat, p.lng]), r = map.getContainer().getBoundingClientRect(), h = hitPoint(q.x + r.left, q.y + r.top, 40);
+if (h && h.i != null && h.a !== a){ const o = h.a.points[h.i]; p.osym = o.sym || h.a.sym || undefined; if (!p.comment) p.comment = labelOf(h.a, h.i); p.lat = o.lat; p.lng = o.lng; }
+if (!planNum(a, p)){ p.lbl = '?'; persist(); renderMarkers(); setTimeout(() => { openPoint(a, a.points.indexOf(p)); toast('Укажите характер цели или выберите знак — по нему определится номер'); }, 150); }
+else { persist(); renderMarkers(); toast('Цель ' + p.tno); } }
+$('planZone').onclick = () => { const z = zoneLayer(); closeModals(); openTools(z.id); tool.mode = 'poly'; tool.zone = true; tool.op = 8; tool.color = {color:'#e2533f', name:'Красный', glyph:''}; drawTool(); renderTool(); toast('Касайтесь контура зоны, затем «Сохранить фигуру»'); };
+$('ptSymB').onclick = () => { const a = ptRef.a, p = a.points[ptRef.i]; closeModals(); openSymPick(['pt'], id => { if (id){ p.sym = id; if (a.fplan) planNum(a, p); persist(); renderMarkers(); } openPoint(a, a.points.indexOf(p)); }, null, true); };
+// ---- поиск и категории знаков
+const SPCAT = [['', 'Все']].concat(TCAT.map(c => ['c' + c[0], c[1]]), [['line', 'Линии'], ['area', 'Зоны'], ['other', 'Прочие']]);
+let spCat = '', spQ = '';
+function symMatch(s){ const q = spQ.trim().toLowerCase(); if (q && !(s.n.toLowerCase().includes(q) || (s.ab || '').toLowerCase().includes(q) || (TCAT.find(c => c[0] === catOfSym(s.id)) || [0, ''])[1].toLowerCase().includes(q))) return false;
+if (!spCat) return true; if (spCat === 'line' || spCat === 'area') return s.type === spCat; const c = catOfSym(s.id); if (spCat === 'other') return s.type === 'pt' && !c; return 'c' + c === spCat; }
+function spChips(el, after){ el.innerHTML = SPCAT.map(([k, n]) => `<button class="same ${spCat === k ? 'on' : ''}" data-k="${k}">${n}</button>`).join(''); el.querySelectorAll('button').forEach(b => b.onclick = () => { spCat = b.dataset.k; spChips(el, after); after(); }); }
+
+$('symQ').oninput = () => renderSymList();
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
 const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
