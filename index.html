@@ -113,13 +113,21 @@ body:has(#v3d.on) .modal{z-index:2600}
 #v3scn{position:absolute;right:10px;top:calc(var(--safe-t) + var(--tg) + 56px);z-index:6;padding:10px 14px;display:none;flex-direction:column;gap:8px;max-height:60vh;overflow:auto;min-width:260px;color:var(--ink)}
 #v3scn.on{display:flex}
 #v3tl{position:absolute;left:10px;right:70px;bottom:calc(var(--safe-b) + 74px);z-index:6;display:none;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;color:var(--ink);flex-wrap:wrap}
-#v3tl.on{display:flex}#v3tl input[type=range]{flex:1;min-width:140px}#v3tl button{min-height:36px;padding:4px 10px}
+#v3tl.on{display:flex}
+#tlTracks{flex-basis:100%;max-height:28vh;overflow:auto;background:rgba(0,0,0,.25);border-radius:10px}
+.tlin{position:relative;min-height:30px;padding:4px 0}.tlph{position:absolute;top:0;bottom:0;width:2px;background:#ffd400;z-index:3;pointer-events:none}
+.tlrow{position:relative;height:30px}.tln{position:absolute;left:6px;top:7px;width:100px;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mute)}
+.tlclip{position:absolute;top:3px;height:24px;border-radius:6px;background:#3a7bd5;color:#fff;font-size:11px;line-height:24px;padding-left:6px;overflow:hidden;white-space:nowrap;touch-action:none}.tlclip.fire{background:#d9532c}
+.tlclip .rh{position:absolute;right:0;top:0;bottom:0;width:14px;background:rgba(255,255,255,.35)}
+#v3act select{min-height:36px;border-radius:10px;background:var(--panel2);color:var(--ink);border:0;padding:0 6px}#v3tl input[type=range]{flex:1;min-width:140px}#v3tl button{min-height:36px;padding:4px 10px}
 .mtb{border-collapse:collapse;white-space:nowrap}.mtb td,.mtb th{padding:2px 6px;text-align:left}.mtbw{transform:translate(-50%,-50%);display:inline-block;pointer-events:none}
 .kids{margin:0 0 6px 30px;border-left:2px solid var(--line);padding-left:8px}
 .kid,.grp{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px}.kid .kn,.grp .kn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .grp .kn{font-weight:700;cursor:pointer}.gkids{margin-left:14px}.kid.off{opacity:.5}
 .selcb{width:20px;height:20px;margin:0;flex:none}
 #laySelBar{flex-wrap:wrap}#laySelBar button{flex:0 1 auto;min-height:36px;padding:4px 10px;font-size:13.5px}
+.kth{width:24px;height:24px;flex:none;display:grid;place-items:center;background:#f2f2ec;border-radius:6px;color:#333;font-size:14px}.kth svg{width:20px;height:20px}.kth i{width:11px;height:11px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+.tg{color:var(--signal);font-weight:600}
 #compass{position:fixed;left:10px;bottom:calc(max(var(--sheet-h,0px), calc(var(--safe-b) + var(--badge))) + 12px);z-index:1000;width:48px;height:48px;min-height:0;padding:0;border-radius:50%;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center}
 #compass svg{width:30px;height:30px}
 #cross{position:fixed;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;z-index:460;pointer-events:none}
@@ -302,7 +310,8 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 </div></div>
 <div class="modal" id="layModal"><div class="card big">
 <h3>Слои <small id="ver"></small></h3>
-<div class="seg" id="layTabs"><button data-t="L" class="on">Слои</button><button data-t="M">Карты</button><button data-t="F">Файлы</button></div>
+<div class="seg" id="layTabs"><button data-t="L" class="on">Слои</button><button data-t="M">Карты</button><button data-t="F">Файлы</button><button data-t="C">Кэш</button></div>
+<div class="colors strip" id="tagBar" style="display:none;margin-bottom:8px"></div>
 <div id="tabL">
 <div id="layList"></div>
 <div class="row" style="margin-top:12px"><button class="primary" id="layNew">Новый слой</button></div>
@@ -312,6 +321,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 </div>
 <div id="tabM" style="display:none"><div class="flabel">Подложка</div><div id="baseList" class="baselist"></div></div>
 <div id="tabF" style="display:none"></div>
+<div id="tabC" style="display:none"></div>
 <div class="row" style="margin-top:12px"><button class="ghost" data-close>Закрыть</button></div>
 <input type="file" id="csvIn" accept=".csv,.txt,text/csv,text/plain" style="display:none">
 <input type="file" id="sesIn" accept=".json,application/json,text/plain" style="display:none">
@@ -416,6 +426,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <label class="f">Координаты<input id="sQ" autocomplete="off" placeholder="74555 06256"></label>
 <p class="status">Можно ввести: сокращённые СК-42 <b>74555 06256</b> (ищутся рядом с текущим видом), полные <b>6174555 7406256</b>, квадрат <b>5406</b> или с улиткой <b>5406-9</b>, широту и долготу <b>55.7539 37.6208</b>.</p>
 <p class="status" id="sErr" style="color:#ff9b8a"></p>
+<div id="sRes" style="max-height:40vh;overflow:auto;margin-bottom:8px"></div>
 <div class="row"><button class="ghost" data-close>Отмена</button><button class="primary" id="sGo">Найти</button></div>
 </div></div>
 <div class="modal" id="palModal"><div class="card big">
@@ -448,13 +459,13 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="row"><button class="ghost" id="cfNo">Отмена</button><button class="primary" id="cfYes" style="background:#e2533f;color:#fff">Удалить</button></div>
 </div></div>
 <div id="v3d"><div id="v3map"></div>
-<div id="v3top"><button id="v3close" class="glass">✕ 2D</button><select id="v3base" class="glass"></select><label class="glass" id="v3exl">Рельеф: <span id="v3exv">Реальный</span><input type="range" id="v3ex" min="1" max="5" step="0.5" value="1"></label><button id="v3lay" class="glass">Слои</button><button id="v3play" class="glass" style="display:none">▶ Все</button><button id="v3scnBtn" class="glass" style="display:none">Сцены</button><button id="v3myBtn" class="glass">Мои слои</button></div>
-<div id="v3panel" class="glass"><label><input type="checkbox" data-k="places"> Населённые пункты</label><label><input type="checkbox" data-k="aux"> Ориентиры с подписями</label><label><input type="checkbox" data-k="shapes"> Фигуры, линии, маршруты</label><label><input type="checkbox" data-k="tac"> Тактические знаки и точки</label><label style="padding-left:26px"><input type="checkbox" data-k="tacLbl"> подписи знаков</label><label><input type="checkbox" data-k="mdl"> 3D-модели знаков</label><label style="flex-direction:column;align-items:stretch;gap:4px">Масштаб моделей: <span id="v3msv"></span><input type="range" id="v3ms" min="1" max="12" step="1" style="width:100%;height:auto"></label><label style="flex-direction:column;align-items:stretch;gap:4px">Высота БПЛА, м: <span id="v3altv"></span><input type="range" id="v3alt" min="10" max="500" step="10" style="width:100%;height:auto"></label><label><input type="checkbox" data-k="bld"> Здания</label><label><input type="checkbox" data-k="towers"> Вышки и мачты</label><label><input type="checkbox" data-k="forest"> Леса и лесополосы</label><label style="flex-direction:column;align-items:stretch;gap:4px">Деревья макета: <span id="v3mdenv"></span><input type="range" id="v3mden" min="0.1" max="1.5" step="0.1" style="width:100%;height:auto"></label><label><input type="checkbox" data-k="brg"> Мосты, броды, паромы</label><label style="flex-direction:column;align-items:stretch;gap:4px">Плотность деревьев: <span id="v3denv"></span><input type="range" id="v3den" min="0.2" max="3" step="0.1" style="width:100%;height:auto"></label><small style="color:var(--mute);max-width:220px;line-height:1.3">Объекты грузятся участками ~3×3 км вокруг центра на крупном масштабе и сохраняются для работы без интернета.</small></div>
+<div id="v3top"><button id="v3close" class="glass">✕ 2D</button><select id="v3base" class="glass"></select><label class="glass" id="v3exl">Рельеф: <span id="v3exv">Реальный</span><input type="range" id="v3ex" min="1" max="5" step="0.5" value="1"></label><button id="v3lay" class="glass">Слои</button><button id="v3play" class="glass" style="display:none">▶ Все</button><button id="v3scnBtn" class="glass" style="display:none">Сценарий</button><select id="camSel" class="glass"><option value="free">Камера: свободная</option><option value="top">Сверху</option><option value="third">От 3-го лица</option><option value="copter">С коптера</option><option value="plane">С БПЛА-самолёта</option><option value="fpv">От 1-го лица</option></select><button id="v3myBtn" class="glass">Мои слои</button></div>
+<div id="v3panel" class="glass"><label><input type="checkbox" data-k="places"> Населённые пункты</label><label><input type="checkbox" data-k="aux"> Ориентиры с подписями</label><label><input type="checkbox" data-k="shapes"> Фигуры, линии, маршруты</label><label><input type="checkbox" data-k="tac"> Тактические знаки и точки</label><label style="padding-left:26px"><input type="checkbox" data-k="tacLbl"> подписи знаков</label><label><input type="checkbox" data-k="mdl"> 3D-модели знаков</label><label style="flex-direction:column;align-items:stretch;gap:4px">Масштаб моделей: <span id="v3msv"></span><input type="range" id="v3ms" min="1" max="12" step="1" style="width:100%;height:auto"></label><label style="flex-direction:column;align-items:stretch;gap:4px">Высота БПЛА, м: <span id="v3altv"></span><input type="range" id="v3alt" min="10" max="500" step="10" style="width:100%;height:auto"></label><label><input type="checkbox" data-k="bld"> Здания</label><label><input type="checkbox" data-k="towers"> Вышки и мачты</label><label><input type="checkbox" data-k="forest"> Леса и лесополосы</label><label><input type="checkbox" data-k="paths"> Маршруты анимации</label><label><input type="checkbox" data-k="traj"> Траектории огня</label><label style="flex-direction:column;align-items:stretch;gap:4px">Деревья макета: <span id="v3mdenv"></span><input type="range" id="v3mden" min="0.1" max="1.5" step="0.1" style="width:100%;height:auto"></label><label><input type="checkbox" data-k="brg"> Мосты, броды, паромы</label><label style="flex-direction:column;align-items:stretch;gap:4px">Плотность деревьев: <span id="v3denv"></span><input type="range" id="v3den" min="0.2" max="3" step="0.1" style="width:100%;height:auto"></label><small style="color:var(--mute);max-width:220px;line-height:1.3">Объекты грузятся участками ~3×3 км вокруг центра на крупном масштабе и сохраняются для работы без интернета.</small></div>
 <div id="v3my" class="glass"><b>Мои слои и объекты</b><div id="myList"></div></div>
-<div id="v3scn" class="glass"><b>Сцены</b><div id="scnList"></div><button class="primary" id="scnNew">Новая сцена</button><small style="color:var(--mute);line-height:1.3">Сцена — участок местности. Объекты в нём проигрываются по общему времени: у каждого маршрут, скорость и время старта «Ч+».</small></div>
+<div id="v3scn" class="glass"><b>Сценарии</b><div id="scnList"></div><button class="primary" id="scnNew">Новый сценарий</button><small style="color:var(--mute);line-height:1.3">Сцена — участок местности. Объекты в нём проигрываются по общему времени: у каждого маршрут, скорость и время старта «Ч+».</small></div>
 <div id="v3tl" class="glass"><b id="tlN" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></b><button id="tlP">▶</button><input type="range" id="tlR" min="0" max="60" step="0.1" value="0"><span id="tlT" style="white-space:nowrap;font-variant-numeric:tabular-nums"></span>
 <div class="seg" id="tlM" style="margin:0"><button data-m="1" class="on">×1</button><button data-m="5">×5</button><button data-m="20">×20</button></div>
-<label style="display:flex;align-items:center;gap:6px;white-space:nowrap"><input type="checkbox" id="tlO" style="width:20px;height:20px;margin:0"> облёт</label><button id="tlCam" title="Запомнить вид">📷</button><button id="tlX">✕</button></div>
+<label style="display:flex;align-items:center;gap:6px;white-space:nowrap"><input type="checkbox" id="tlO" style="width:20px;height:20px;margin:0"> облёт</label><button id="tlCam" title="Запомнить вид">📷</button><button id="tlZo">−</button><button id="tlZi">＋</button><button id="tlX">✕</button><div id="tlTracks"></div></div>
 <div id="v3msg"></div><div id="v3act" class="glass"></div></div>
 <div id="radial"></div>
 <div id="launch"><div class="lc"><h2>СКАТ</h2><p>Выберите раздел</p>
@@ -473,6 +484,9 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="flabel">Цвет текста</div><div class="colors strip" id="tCol"></div>
 <div class="duo"><label class="f">Обводка<select id="tSC"><option value="#ffffff">белая</option><option value="#111111">чёрная</option><option value="#ffe066">жёлтая</option><option value="">без обводки</option></select></label><label class="f">Толщина: <span id="tSWV"></span><input type="range" id="tSW" min="0" max="6" step="0.5" style="width:100%"></label></div>
 <div class="duo"><label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="tB" style="width:22px;min-height:22px;margin:0"> Жирный</label><label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="tI" style="width:22px;min-height:22px;margin:0"> Курсив</label></div>
+<div class="duo"><label class="f">Выравнивание<select id="tAl"><option value="left">слева</option><option value="center">по центру</option><option value="right">справа</option></select></label><label class="f">Рамка<select id="tFr"><option value="0">без рамки</option><option value="1">тонкая</option><option value="2">средняя</option><option value="3">толстая</option></select></label></div>
+<div class="duo"><label class="f">Межстрочный<input type="range" id="tLh" min="0.9" max="2" step="0.05" style="width:100%"></label><label class="f">Разрядка<input type="range" id="tLsp" min="0" max="10" step="0.5" style="width:100%"></label></div>
+<div class="duo"><label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="tU" style="width:22px;min-height:22px;margin:0"> Подчёркнутый</label><label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="tShd" style="width:22px;min-height:22px;margin:0"> Тень</label></div>
 <label class="f">Поворот: <span id="tRotV"></span><input type="range" id="tRot" min="0" max="359" step="1" style="width:100%"></label>
 <div class="row"><button class="danger" id="tDel">Удалить</button><button class="ghost" data-close>Отмена</button><button class="ok" id="tSave">Сохранить</button></div>
 </div></div>
@@ -502,6 +516,9 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <label class="f">Непрозрачность фона: <span id="tbOpV"></span><input type="range" id="tbOp" min="0" max="100" step="5" style="width:100%"></label>
 <div class="flabel">Цвет текста</div><div class="colors strip" id="tbCol"></div>
 <div class="duo"><label class="f">Рамка<select id="tbBd"><option value="#333333">тёмная</option><option value="#ffffff">белая</option><option value="#e0302a">красная</option><option value="">без рамки</option></select></label><label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="tbHdr" style="width:22px;min-height:22px;margin:0"> Первая строка — заголовок</label></div>
+<div class="flabel">Фон заголовка</div><div class="colors strip" id="tbHbg"></div>
+<div class="duo"><label class="f">Выравнивание<select id="tbAl"><option value="left">слева</option><option value="center">по центру</option><option value="right">справа</option></select></label><label class="f">Отступы в ячейках<input type="range" id="tbPd" min="0" max="8" step="1" style="width:100%"></label></div>
+<label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="tbZb" style="width:22px;min-height:22px;margin:0"> Чередование строк</label>
 <div class="row"><button class="danger" id="tbDel">Удалить</button><button class="ghost" data-close>Отмена</button><button class="ok" id="tbSave">Сохранить</button></div>
 <input type="file" id="tbAddIn" accept=".xlsx,.xls,.csv" style="display:none"></div></div>
 <div class="modal" id="batModal"><div class="card big"><h3>Изменить выбранные</h3>
@@ -510,13 +527,21 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="flabel">Заливка знака</div><div class="colors strip" id="batFill"></div>
 <label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="batRotOn" style="width:22px;min-height:22px;margin:0"> Поворот: <span id="batRotV"></span></label><input type="range" id="batRot" min="0" max="359" step="1" style="width:100%">
 <label class="f">Перенести в слой<select id="batTo"></select></label>
+<label class="f">Теги (через запятую, пусто — без изменений)<input id="batTags" autocomplete="off" placeholder="например: 111 мсп"></label>
 <div class="row"><button class="ghost" data-close>Отмена</button><button class="ok" id="batOk">Применить</button></div></div></div>
+<div class="modal" id="propModal"><div class="card big"><h3>Свойства знака</h3>
+<label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="prPlan" style="width:22px;min-height:22px;margin:0"> Планируется (знак пунктиром)</label>
+<label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="prFake" style="width:22px;min-height:22px;margin:0"> Ложная (знак зелёным)</label>
+<div class="duo"><label class="f">Размер знака: <span id="prSzV"></span><input type="range" id="prSz" min="0.5" max="3" step="0.1" style="width:100%"></label><label class="f">Толщина линий: <span id="prLwV"></span><input type="range" id="prLw" min="1" max="5" step="0.2" style="width:100%"></label></div>
+<div class="duo"><label class="f">Шрифт подписи<select id="prLf"></select></label><label class="f">Размер подписи: <span id="prLsV"></span><input type="range" id="prLs" min="8" max="30" step="0.5" style="width:100%"></label></div>
+<div class="flabel">Цвет подписи</div><div class="colors strip" id="prLc"></div>
+<div class="row"><button class="ok" id="prOk">Готово</button></div></div></div>
 <div id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 4.8';
+const VERSION = 'версия 5.2';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -617,7 +642,7 @@ L.DomEvent.on(img, 'error', L.Util.bind(this._tileOnError, this, done, img));
 const url = this.getTileUrl(coords);
 const show = b => { const o = URL.createObjectURL(b); img.addEventListener('load', () => URL.revokeObjectURL(o), {once:true}); img.src = o; };
 keysReady.then(async () => {
-if (savedKeys.has(url)){ const b = await tileGetFast(url); if (b){ show(b); return; } }
+if (savedKeys.has(url) && !cOff(url)){ const b = await tileGetFast(url); if (b){ show(b); return; } }
 if (url.startsWith('mb:')) return;
 if (navigator.onLine === false){ img.src = url; return; }
 if (savedKeys.size < 150000){ try { const b = await netBlob(url); show(b); queuePut(url, b); return; } catch(e){} }
@@ -873,8 +898,8 @@ const active = session && session.arrId === a.id, editing = active && session.mo
 const op = session && !active ? .45 : 1;
 if (a.hidden && !active) return;
 envMarkers(a);
-(a.tables || []).forEach(T => { if (!T.hid) markers.addLayer(L.marker([T.lat, T.lng], {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="mtbw">${tblHtml(T)}</div>`})})); });
-(a.texts || []).filter(t => !t.hid).forEach(t => markers.addLayer(L.marker([t.lat, t.lng], {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:txtHtml(t)})})));
+(a.tables || []).forEach(T => { if (!T.hid && tagOk(a, T)) markers.addLayer(L.marker([T.lat, T.lng], {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="mtbw">${tblHtml(T)}</div>`})})); });
+(a.texts || []).filter(t => !t.hid && tagOk(a, t)).forEach(t => markers.addLayer(L.marker([t.lat, t.lng], {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:txtHtml(t)})})));
 if (a.kind === 'shapes'){ if (z < (a.minZ || 0)) return; drawShapes(a, z >= (a.lblZ ?? DEF_LBLZ)); return; }
 if (a.shapes && a.shapes.length && z >= (a.minZ || 0)) drawShapes(a, z >= (a.lblZ ?? DEF_LBLZ));
 if (a.opt && !active) return;
@@ -882,7 +907,7 @@ if (!active && z < (a.minZ || 0)) return;
 const showLb = editing || active || z >= (a.lblZ ?? DEF_LBLZ);
 if (a.kind === 'route' && a.points.length > 1){ const pl = L.polyline(a.points.map(p => [p.lat,p.lng]), {color:a.style.color, weight:3.5, opacity:0.9*op, interactive:false}); pl._rtId = a.id; markers.addLayer(pl); }
 a.points.forEach((p,i) => {
-if (p.hid) return;
+if (p.hid || !tagOk(a, p)) return;
 if (!active && (p.lat < S || p.lat > N || p.lng < Wd || p.lng > Ed)) return;
 if (!active && curCl && curCl.skip.has(a.id + ':' + i)) return;
 let html;
@@ -892,7 +917,7 @@ if (!icon && !showLb) return;
 html = `<div class="ax${editing?' edit':''}${icon?'':' noicon'}" style="opacity:${op}">${icon ? `<div class="tr">${TREE(a.style.color)}</div>` : ''}${showLb ? `<div class="lb">${escapeHtml(p.name)}</div>` : ''}</div>`;
 } else {
 const st = styleOf(a,p), ex = a.kind === 'desc', g = ex ? '!' : (st.glyph||''), sid = p.sym === '_none' ? null : (p.sym || a.sym);
-if (sid && SYM_BY[sid]) html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="sym" style="color:${symCol(sid, sideOf(a, p), st.color)}${p.rot ? `;transform:rotate(${p.rot}deg)` : ''}">${symSvg(sid, p.fc || a.fc)}</div>${showLb ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
+if (sid && SYM_BY[sid]) html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="sym" style="color:${p.fake ? FAKE : symCol(sid, sideOf(a, p), st.color)}${p.rot || p.ssz ? `;transform:${p.rot ? `rotate(${p.rot}deg)` : ''} ${p.ssz ? `scale(${p.ssz})` : ''}` : ''}">${symSvg(sid, p.fc || a.fc, symOpt(p))}</div>${showLb ? `<div class="lb"${lbStyle(p)}>${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
 else html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="dot${g?' g':''}${ex?' ex':''}" style="background:${st.color};color:${ink(st.color)}">${escapeHtml(g)}</div>${showLb ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
 }
 const m = L.marker([p.lat,p.lng], {icon:L.divIcon({className:'pt-wrap', html, iconSize:[0,0]}), draggable:editing, interactive:editing, keyboard:false});
@@ -937,7 +962,7 @@ a.points.forEach((p,i) => { const q = map.latLngToLayerPoint([p.lat,p.lng]).subt
 ctx2.strokeStyle = a.style.color; ctx2.lineWidth = 3.5; ctx2.stroke();
 }
 a.points.forEach((p,i) => {
-if (p.hid) return;
+if (p.hid || !tagOk(a, p)) return;
 if (p.lat < S || p.lat > N || p.lng < Wd || p.lng > Ed) return;
 if (curCl && curCl.skip.has(a.id + ':' + i)) return;
 const q = map.latLngToLayerPoint([p.lat,p.lng]).subtract(BX.o);
@@ -951,7 +976,7 @@ if (showLb) lbl(p.name, q.x+11, q.y-3, true, false);
 return;
 }
 const st = styleOf(a,p), g = a.kind === 'desc' ? '!' : (st.glyph||''), r = g ? 10 : 6, sid = p.sym === '_none' ? null : (p.sym || a.sym);
-if (sid && SYM_BY[sid]){ if (p.rot){ ctx2.save(); ctx2.translate(q.x, q.y); ctx2.rotate(p.rot * Math.PI / 180); drawSym(ctx2, sid, 0, 0, symCol(sid, sideOf(a, p), st.color), p.fc || a.fc); ctx2.restore(); } else drawSym(ctx2, sid, q.x, q.y, symCol(sid, sideOf(a, p), st.color), p.fc || a.fc); if (showLb) lbl(labelOf(a,i), q.x+17, q.y-16, false, false); return; }
+if (sid && SYM_BY[sid]){ if (p.rot){ ctx2.save(); ctx2.translate(q.x, q.y); ctx2.rotate(p.rot * Math.PI / 180); drawSym(ctx2, sid, 0, 0, p.fake ? FAKE : symCol(sid, sideOf(a, p), st.color), p.fc || a.fc, 0, p.ssz, symOpt(p)); ctx2.restore(); } else drawSym(ctx2, sid, q.x, q.y, p.fake ? FAKE : symCol(sid, sideOf(a, p), st.color), p.fc || a.fc, 0, p.ssz, symOpt(p)); if (showLb) lbl(labelOf(a,i), q.x+17, q.y-16, false, false); return; }
 ctx2.beginPath(); ctx2.arc(q.x, q.y, r, 0, Math.PI*2); ctx2.fillStyle = st.color; ctx2.fill();
 ctx2.strokeStyle = '#fff'; ctx2.lineWidth = 2; ctx2.stroke();
 if (g){ ctx2.fillStyle = ink(st.color); ctx2.font = `800 ${g === '!' ? 13 : 10}px "IBM Plex Sans Condensed", sans-serif`; ctx2.textAlign = 'center'; ctx2.textBaseline = 'middle'; ctx2.fillText(g, q.x, q.y+0.5); ctx2.textAlign = 'left'; }
@@ -1812,7 +1837,7 @@ $('pdbExp').onclick = () => { closeModals(); exportPlaces(); };
 $('pdbImp').onclick = () => $('offIn').click();
 // ======== ИНСТРУМЕНТЫ ========
 const SHAPE_NAMES = {line:'Линия', poly:'Многоугольник', rect:'Прямоугольник', circle:'Круг'};
-const MODE_NAMES = {line:'Линейка', poly:'Многоугольник', rect:'Прямоугольник', circle:'Круг'};
+const MODE_NAMES = {line:'Линейка', poly:'Многоугольник', rect:'Прямоугольник', circle:'Круг', sector:'Сектор', oval:'Овалы (массив)'};
 const tool = {on:false, mode:'line', pts:[], r:0, color:null, op:35, mini:false, target:null};
 const toolLayer = L.layerGroup().addTo(map);
 const fmtDist = d => d < 1000 ? `${Math.round(d)} м` : `${(d/1000).toFixed(2).replace('.', ',')} км`;
@@ -1846,6 +1871,8 @@ if (m === 'line') return p.length >= 2 ? {type:'line', pts:p} : null;
 if (m === 'poly') return p.length >= 3 ? {type:'poly', pts:p} : null;
 if (m === 'rect') return p.length === 2 ? {type:'rect', pts:rectPts(p[0], p[1])} : null;
 if (m === 'circle') return p.length && tool.r > 0 ? {type:'circle', pts:[p[0]], r:tool.r} : null;
+if (m === 'sector') return p.length === 2 ? {type:'poly', pts:sectorPts(p[0], p[1])} : null;
+if (m === 'oval') return p.length === 2 ? {type:'poly', pts:ovalPts(p[0], p[1])} : null;
 }
 function shapeLayer(sh, color, op, extra){
 const o = Object.assign({color, weight:2.5, opacity:.95, fillColor:color, fillOpacity:sh.type === 'line' ? 0 : op, interactive:false}, extra || {});
@@ -1854,7 +1881,7 @@ return sh.type === 'circle' ? L.circle(pts[0], Object.assign(o, {radius:sh.r})) 
 }
 function drawShapes(a, lbl){
 (a.shapes || []).forEach(sh => {
-if (sh.hid) return;
+if (sh.hid || !tagOk(a, sh)) return;
 markers.addLayer(shapeLayer(sh, sh.color || a.style.color, (sh.op ?? 35) / 100, symExtra(sh)));
 if (lbl && sh.name){ const c = shapeGeo(sh).c; markers.addLayer(L.marker(c, {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="shl">${escapeHtml(sh.name)}</div>`})})); }
 });
@@ -1873,6 +1900,9 @@ toolLayer.addLayer(L.marker([(a.lat + b.lat) / 2, (a.lng + b.lng) / 2], {interac
 }
 function toolSummary(){
 const sh = curShape(), m = tool.mode;
+if (m === 'sector' && tool.pts.length === 2){ const g0 = segInfo(tool.pts[0], tool.pts[1], GEO.toSK(tool.pts[0].lat, tool.pts[0].lng).zone); return `Радиус <b>${fmtDist(g0.d)}</b> · ДУ <b>${milStr(g0.mil)}</b> · аз. ${g0.az.toFixed(1).replace('.', ',')}° · ширина ${tool.sw || 30}° (${milStr(Math.round((tool.sw || 30) / 360 * 6000))})`; }
+if (m === 'sector') return tool.pts.length ? 'Коснитесь точки на краю — радиус и направление' : 'Коснитесь центра сектора';
+if (m === 'oval') return 'Касайтесь двух концов каждой области — овал сохраняется сразу; можно ставить подряд';
 if (!sh) return m === 'line' ? 'Ставьте точки: от первой до последней' : m === 'poly' ? 'Ставьте вершины (не меньше трёх)' : m === 'rect' ? 'Поставьте два противоположных угла' : tool.pts.length ? 'Коснитесь края круга или введите радиус' : 'Коснитесь центра круга';
 const g = shapeGeo(sh);
 if (m === 'line'){ const last = g.segs[g.segs.length-1]; return `Длина <b>${fmtDist(g.len)}</b> · отрезков ${g.segs.length}${g.segs.length === 1 ? ` · ДУ <b>${milStr(last.mil)}</b>` : ''}`; }
@@ -1894,7 +1924,7 @@ el.innerHTML = `<h2>Инструменты <span><button class="ghost" id="tX" s
 <p class="res">${toolSummary()}</p>
 ${tool.sym && SYM_BY[tool.sym] ? `<p class="status">Знак: <b>${escapeHtml(SYM_BY[tool.sym].n)}</b></p><label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="tScl" ${tool.scl ? 'checked' : ''} style="width:22px;min-height:22px;margin:0"> Масштабировать с картой</label>` : ''}
 ${segs ? `<div class="segs">${segs}</div>` : ''}
-${m === 'circle' && tool.pts.length ? `<label class="f">Радиус, м<input id="tR" inputmode="decimal" value="${tool.r ? Math.round(tool.r) : ''}" placeholder="например, 500"></label>` : ''}
+${m === 'sector' ? `<label class="f">Ширина сектора, °<input id="tSw" inputmode="decimal" value="${tool.sw || 30}"></label>` : ''}${m === 'oval' ? `<label class="f">Ширина овала, м<input id="tOw" inputmode="decimal" value="${tool.ow || 30}"></label>` : ''}${m === 'circle' && tool.pts.length ? `<label class="f">Радиус, м<input id="tR" inputmode="decimal" value="${tool.r ? Math.round(tool.r) : ''}" placeholder="например, 500"></label>` : ''}
 <div class="row" style="margin-bottom:8px"><button id="tUndo" ${tool.pts.length ? '' : 'disabled'}>↶ Убрать</button><button id="tCross">⊕ В прицел</button><button class="ghost" id="tClear" ${tool.pts.length ? '' : 'disabled'}>Сброс</button>${line ? `<button id="tProf" ${sh ? '' : 'disabled'}>Профиль высот</button>` : ''}</div>
 <div class="flabel">Цвет</div><div class="colors strip" id="tCol"></div>
 ${line ? '' : `<label class="f">Прозрачность заливки: <span id="tOpV">${tool.op}%</span><input type="range" id="tOp" min="0" max="90" step="5" value="${tool.op}"></label>`}
@@ -1905,6 +1935,8 @@ $('tSeg').querySelectorAll('button').forEach(b => b.onclick = () => { tool.sym =
 const pickC = st => { tool.color = st; renderPalette($('tCol'), tool.color, pickC); drawTool(); };
 renderPalette($('tCol'), tool.color, pickC);
 if ($('tOp')) $('tOp').oninput = e => { tool.op = +e.target.value; $('tOpV').textContent = tool.op + '%'; drawTool(); };
+if ($('tSw')) $('tSw').onchange = e => { const v = parseFloat(String(e.target.value).replace(',', '.')); if (v > 0 && v < 360){ tool.sw = v; drawTool(); renderTool(); } };
+if ($('tOw')) $('tOw').onchange = e => { const v = parseFloat(String(e.target.value).replace(',', '.')); if (v > 0){ tool.ow = v; } };
 if ($('tR')) $('tR').onchange = e => { const v = parseFloat(String(e.target.value).replace(',', '.')); if (v > 0){ tool.r = v; drawTool(); renderTool(); } };
 if ($('tClear')) $('tClear').onclick = () => { tool.pts = []; tool.r = 0; drawTool(); renderTool(); };
 if ($('tProf')) $('tProf').onclick = () => showProfile(tool.pts.slice());
@@ -1928,7 +1960,8 @@ function closeTools(){ tool.sym = null; tool.on = false; tool.pts = []; tool.r =
 function toolAdd(ll){
 const m = tool.mode;
 if (m === 'circle'){ if (!tool.pts.length || tool.r){ tool.pts = [ll]; tool.r = 0; } else tool.r = distM(tool.pts[0], ll); }
-else if (m === 'rect'){ if (tool.pts.length >= 2) tool.pts = []; tool.pts.push(ll); }
+else if (m === 'rect' || m === 'sector'){ if (tool.pts.length >= 2) tool.pts = []; tool.pts.push(ll); }
+else if (m === 'oval'){ tool.pts.push(ll); if (tool.pts.length === 2){ drawTool(); saveShape(); return; } }
 else tool.pts.push(ll);
 drawTool(); renderTool();
 }
@@ -2133,13 +2166,13 @@ terrain:{source:'dem', exaggeration:ex}}});
 v3.addControl(new ml.NavigationControl({visualizePitch:true}), 'bottom-right');
 v3.on('styleimagemissing', e => { try { if (!v3.hasImage(e.id)){ const im = v3img(e.id); if (im) v3.addImage(e.id, im, {pixelRatio:2}); } } catch(_){} });
 ['fill', 'outl', 'line'].forEach(id => { try { v3.setLayoutProperty(id, 'visibility', v3cfg.shapes ? 'visible' : 'none'); } catch(_){} });
-v3.on('load', ensureObjs); v3.on('load', envInit); v3.on('moveend', ensureObjs); v3.on('click', v3tap);
+v3.on('load', ensureObjs); v3.on('load', envInit); v3.on('load', fxInit); v3.on('moveend', ensureObjs); v3.on('click', v3tap);
 v3.on('load', () => { $('v3msg').textContent = 'Наклон — двумя пальцами вверх/вниз, поворот — двумя пальцами по кругу. Компас справа — север вверх.'; });
 v3.on('error', () => {});
 } catch(e){ el.classList.remove('on'); toast('Устройство не поддерживает 3D (WebGL)'); }
 }
 // ---- 3D: подписи и знаки как картинки (работают без интернета)
-const v3cfg = Object.assign({places:true, aux:true, shapes:true, tac:false, tacLbl:false, bld:false, towers:false, forest:false, brg:true, den:0.6, mdl:true, ms:4, alt:60}, lsGet('skat_v3', {}));
+const v3cfg = Object.assign({places:true, aux:true, shapes:true, tac:false, tacLbl:false, bld:false, towers:false, forest:false, brg:true, den:0.6, mdl:true, ms:4, alt:60, paths:true, traj:true}, lsGet('skat_v3', {}));
 let v3center = null;
 const V3SYM = {'icon-image':['get', 'img'], 'icon-anchor':'bottom', 'icon-pitch-alignment':'viewport', 'icon-rotation-alignment':'viewport', 'icon-allow-overlap':false, 'icon-padding':1};
 const clean = t => String(t || '').replace(/\|/g, '/');
@@ -2153,7 +2186,7 @@ function v3aux(){ const F = []; state.arrays.forEach(a => { if (a.kind !== 'aux'
 function v3tac(c){
 const F = [];
 state.arrays.forEach(a => { if (a.hidden || a.kind === 'aux' || a.kind === 'shapes') return;
-a.points.forEach((p, i) => { if (p.hid) return; const sid = p.sym || a.sym, col = sid ? symCol(sid, sideOf(a, p), styleOf(a, p).color) : styleOf(a, p).color, fcol = p.fc || a.fc || '', lb = v3cfg.tacLbl ? clean(labelOf(a, i)) : '';
+a.points.forEach((p, i) => { if (p.hid || !tagOk(a, p)) return; const sid = p.sym || a.sym, col = sid ? symCol(sid, sideOf(a, p), styleOf(a, p).color) : styleOf(a, p).color, fcol = p.fc || a.fc || '', lb = v3cfg.tacLbl ? clean(labelOf(a, i)) : '';
 if (v3cfg.mdl && sid && MDL_OF[sid]) return; F.push({d:Math.abs(p.lat - c.lat) + Math.abs(p.lng - c.lng), f:{type:'Feature', properties:{ai:state.arrays.indexOf(a), pi:i, img:sid && SYM_BY[sid] ? `ts|${sid}|${col}|${lb}|${fcol}` : `td|${col}|${lb}`}, geometry:{type:'Point', coordinates:[p.lng, p.lat]}}}); }); });
 F.sort((x, y) => x.d - y.d);
 return {type:'FeatureCollection', features:F.slice(0, 500).map(x => x.f)};
@@ -2208,12 +2241,12 @@ function v3mdl(c){ const F = []; if (!v3cfg.mdl) return {type:'FeatureCollection
 state.arrays.forEach(a => { if (a.hidden || a.kind === 'aux') return;
 if (a.shapes && a.shapes.length){ (a.shapes || []).forEach(sh => { const sy = sh.sym && SYM_BY[sh.sym]; if (!sy || !sh.pts || sh.pts.length < 2) return;
 if (/trench|rub_obor|a_obor|teeth/.test(sy.style)){ let L = sh.pts.map(p => [p[1] ?? p.lng, p[0] ?? p.lat]); if (sy.type !== 'area') L = wavyLL(L, 2.2 * (S / 4 + .5), 26); if (sy.type === 'area') L.push(L[0]); mdlTrench(F, L, S); } }); if (a.kind === 'shapes') return; }
-a.points.forEach((p, pi) => { if (p.hid) return; const ov = ANIM.get(a.id + ':' + pi); if (ov) p = Object.assign({}, p, ov); const sid = p.sym || a.sym, key = sid && MDL_OF[sid]; if (!key || n > 400) return; const f0 = F.length, ai = state.arrays.indexOf(a); if (Math.abs(p.lat - c.lat) > 0.3 || Math.abs(p.lng - c.lng) > 0.45) return; n++;
+a.points.forEach((p, pi) => { if (p.hid || !tagOk(a, p)) return; const ov = ANIM.get(a.id + ':' + pi); if (ov) p = Object.assign({}, p, ov); const sid = p.sym || a.sym, key = sid && MDL_OF[sid]; if (!key || n > 400) return; const f0 = F.length, ai = state.arrays.indexOf(a); if (Math.abs(p.lat - c.lat) > 0.3 || Math.abs(p.lng - c.lng) > 0.45) return; n++;
 const col = sid === 'lozh' ? SCOL.g : symCol(sid, sideOf(a, p), styleOf(a, p).color), ang = -((p.rot ?? a.rot) ?? (sideOf(a, p) === 'b' ? 180 : 0)) * Math.PI / 180;
 if (key === 'op' || key === 'trSeg'){ const [kx, ky] = mk(p.lat), R = key === 'op' ? 9 * S : 4 * S, L = []; const n2 = key === 'op' ? 24 : 6;
 for (let i = 0; i <= n2; i++){ const q = key === 'op' ? i / n2 * 2 * Math.PI : Math.PI * (0.65 + i / n2 * 0.7); L.push([p.lng + Math.cos(q + ang) * R / kx, p.lat + Math.sin(q + ang) * R / ky]); }
 mdlTrench(F, L, S); if (key === 'op') [[-.4, .3], [.35, -.2], [0, .45]].forEach(([u, v]) => mdlParts(F, p.lng + u * R / kx, p.lat + v * R / ky, 'inf', col, S * .7, 0, 0)); return; }
-mdlParts(F, p.lng, p.lat, key, col, MDL_AIR[key] ? Math.max(2, S * .8) : S, ang, MDL_AIR[key] ? (v3cfg.alt || 60) : 0, true); for (let k = f0; k < F.length; k++){ F[k].properties.ai = ai; F[k].properties.pi = pi; } }); });
+mdlParts(F, p.lng, p.lat, key, col, (MDL_AIR[key] ? Math.max(2, S * .8) : S) * (p.msc || 1), ang, MDL_AIR[key] ? (p.alt ?? (v3cfg.alt || 60)) : 0, true); for (let k = f0; k < F.length; k++){ F[k].properties.ai = ai; F[k].properties.pi = pi; } }); });
 return {type:'FeatureCollection', features:F}; }
 function txtCanvas(w, h){ const c = document.createElement('canvas'); c.width = Math.ceil(w * 2); c.height = Math.ceil(h * 2); const g = c.getContext('2d'); g.scale(2, 2); return [c, g]; }
 function haloText(g, t, x, y, fs, col, bold){ g.font = `${bold ? 700 : 600} ${fs}px "IBM Plex Sans Condensed", sans-serif`; g.textBaseline = 'alphabetic'; g.lineJoin = 'round'; g.lineWidth = 3.5; g.strokeStyle = 'rgba(0,0,0,.85)'; g.strokeText(t, x, y); g.fillStyle = col; g.fillText(t, x, y); }
@@ -2261,7 +2294,7 @@ return await blob.arrayBuffer();
 function v3apply(){
 if (!v3) return; lsSet('skat_v3', v3cfg);
 const vis = (id, on) => { try { v3.setLayoutProperty(id, 'visibility', on ? 'visible' : 'none'); } catch(_){} };
-vis('plc', v3cfg.places); vis('bg', v3cfg.brg); ['bw', 'bwi', 'br', 'mt'].forEach(id => vis(id, v3cfg.bld)); ['tl', 'ts'].forEach(id => vis(id, v3cfg.towers)); vis('trees', v3cfg.forest); ensureObjs(); vis('aux3', v3cfg.aux); vis('tac', v3cfg.tac); ['fill', 'outl', 'line'].forEach(id => vis(id, v3cfg.shapes));
+vis('plc', v3cfg.places); vis('apath', v3cfg.paths !== false); vis('bg', v3cfg.brg); ['bw', 'bwi', 'br', 'mt'].forEach(id => vis(id, v3cfg.bld)); ['tl', 'ts'].forEach(id => vis(id, v3cfg.towers)); vis('trees', v3cfg.forest); ensureObjs(); vis('aux3', v3cfg.aux); vis('tac', v3cfg.tac); ['fill', 'outl', 'line'].forEach(id => vis(id, v3cfg.shapes));
 try { if (v3cfg.tac) v3.getSource('tac').setData(v3tac(v3.getCenter())); } catch(_){}
 try { v3.getSource('mdl').setData(v3mdl(v3.getCenter())); } catch(_){}
 }
@@ -2414,7 +2447,7 @@ if (objCells.has(key)) return;
 objBusy = true;
 try {
 let txt = null;
-if (savedKeys.has(key)){ const b = await tileGetFast(key); if (b) txt = typeof b === 'string' ? b : await b.text(); }
+if (savedKeys.has(key) && !cacheOff.has('obj')){ const b = await tileGetFast(key); if (b) txt = typeof b === 'string' ? b : await b.text(); }
 if (!txt && navigator.onLine === false && savedKeys.has(key2)){ const b = await tileGetFast(key2); if (b) txt = typeof b === 'string' ? b : await b.text(); }
 if (!txt){
 if (navigator.onLine === false) throw new Error('offline');
@@ -2435,7 +2468,7 @@ let v3sel = null, v3move = false;
 function v3upd(){ envRefresh(); persist(); renderMarkers(); renderSheet(); try { v3.getSource('pts').setData(v3data()); } catch(_){} v3apply(); try { if (!v3cfg.tac) v3.getSource('tac').setData(v3tac(v3.getCenter())); } catch(_){} }
 function v3bar(){ const el = $('v3act'); if (!v3sel){ el.classList.remove('on'); el.innerHTML = ''; return; }
 const a = state.arrays[v3sel.ai], p = a && v3item(a); if (!p){ v3sel = null; return v3bar(); }
-el.innerHTML = `<b>${escapeHtml(v3sel.ei != null ? ENV_N[p.k] || 'Объект' : labelOf(a, v3sel.pi))}${v3move ? ' — коснитесь нового места' : ''}</b><button data-a="card">Карточка</button><button data-a="move" class="${v3move ? 'on' : ''}">Переместить</button><button data-a="l">↺ 15°</button><button data-a="r">↻ 15°</button>${v3route ? `<button data-a="rok" class="on">Готово (${v3route.pts.length})</button><button data-a="rx">Сброс</button>` : `<button data-a="route">Маршрут</button>${p.path ? `<button data-a="play">▶</button><button data-a="t0">Старт ${fmtT(p.t0 || 0)}</button><select data-a="spd">${[5, 10, 20, 40, 60].map(v => `<option value="${v}"${(p.spd || 20) === v ? ' selected' : ''}>${v} км/ч</option>`).join('')}</select>` : ''}`}<button data-a="del">Удалить</button><button data-a="x">✕</button>`;
+el.innerHTML = `<b>${escapeHtml(v3sel.ei != null ? ENV_N[p.k] || 'Объект' : labelOf(a, v3sel.pi))}${v3move ? ' — коснитесь нового места' : ''}</b><button data-a="card">Карточка</button><button data-a="move" class="${v3move ? 'on' : ''}">Переместить</button><button data-a="l">↺ 15°</button><button data-a="r">↻ 15°</button>${v3route ? `<button data-a="rok" class="on">Готово (${v3route.pts.length})</button><button data-a="rx">Сброс</button>` : `<button data-a="route">Маршрут</button>${p.path ? `<button data-a="play">▶</button><button data-a="t0">Старт ${fmtT(p.t0 || 0)}</button><select data-a="spd">${[5, 10, 20, 40, 60].map(v => `<option value="${v}"${(p.spd || 20) === v ? ' selected' : ''}>${v} км/ч</option>`).join('')}</select>` : ''}`}${extraBar(a, p)}<button data-a="del">Удалить</button><button data-a="x">✕</button>`;
 const sp = el.querySelector('[data-a=spd]'); if (sp) sp.onchange = e => { p.spd = +e.target.value; persist(); };
 el.classList.add('on'); }
 $('v3act').onclick = e => { const b = e.target.closest('button'); if (!b || !v3sel) return; const a = state.arrays[v3sel.ai], p = a && v3item(a); if (!p) return;
@@ -2452,6 +2485,7 @@ if (A === 'l' || A === 'r'){ p.rot = ((((p.rot ?? a.rot) ?? (v3sel.ei == null &&
 if (A === 'del'){ if (!confirm(`Удалить «${labelOf(a, v3sel.pi)}»?`)) return; if (v3sel.ei != null) a.env.splice(v3sel.ei, 1); else a.points.splice(v3sel.pi, 1); envRefresh(); v3sel = null; v3move = false; v3bar(); v3upd(); return; }
 v3sel = null; v3move = false; v3route = null; envRefresh(); v3bar(); };
 function v3tap(e){
+if (fireMode){ fireTap(e); return; }
 if (v3draw){ v3draw.pts.push([+e.lngLat.lng.toFixed(7), +e.lngLat.lat.toFixed(7)]); envRefresh(); drawBar(); return; }
 if (SC.pick){ scnPickTap(e); return; }
 if (v3route){ v3route.pts.push([+e.lngLat.lng.toFixed(7), +e.lngLat.lat.toFixed(7)]); envRefresh(); v3bar(); return; }
@@ -2776,13 +2810,13 @@ dasharrow:'<path d="M3 24L25 10.5" stroke-dasharray="4 3"/><path d="M29 8l-8.5 1
 const APREV = {zone:'<path d="M5 7h22v18H5z" fill="currentColor" fill-opacity=".22" stroke-dasharray="4 3"/>', solid:'<path d="M5 7h22v18H5z" fill="currentColor" fill-opacity=".3"/>',
 hatch:'<path d="M5 7h22v18H5z"/><path d="M5 15l8-8M5 23l16-16M11 25l16-16M19 25l8-8" stroke-width="1.6"/>',
 dotsArea:'<path d="M5 7h22v18H5z" stroke-dasharray="4 3"/><circle cx="11" cy="13" r="2.2" fill="currentColor"/><circle cx="20" cy="13" r="2.2" fill="currentColor"/><circle cx="15.5" cy="20" r="2.2" fill="currentColor"/>'};
-function symSvg(sid, fc){
+function symSvg(sid, fc, o){
 const s = SYM_BY[sid]; if (!s) return '';
 if (s.img) return `<span class="symimg" style="-webkit-mask-image:url(${s.img});mask-image:url(${s.img})"></span>`;
 if (s.type === 'line') return SVGH + (LPREV[s.style] || (LSPEC[s.style] && (LPREV[s.style] = lprev(s.style))) || LPREV.plain) + '</svg>';
 if (s.type === 'area') return SVGH + (APREV[s.style] || (LSPEC[s.style] && (APREV[s.style] = lprev(s.style))) || APREV.zone) + '</svg>';
 const dk = s.dk || [], fk = s.fk || [], sc = k => symC(k, 'currentColor');
-return SVGH + (fc ? (s.z || []).map(x => `<path d="${x}" fill="${fc}" stroke="none"/>`).join('') : '') + (s.f || []).map((x, i) => fk[i] === 'y' ? `<path d="${x}" fill="${SCOL.y}" stroke="none"/>` : '').join('') + s.d.map((x, i) => `<path d="${x}"${dk[i] ? ` stroke="${sc(dk[i])}"` : ''}/>`).join('') + (s.f || []).map((x, i) => fk[i] === 'y' ? '' : `<path d="${x}" fill="${sc(fk[i])}" stroke="none"/>`).join('') + (s.tx || []).map(t => `<text x="${t.x}" y="${t.y}" font-size="${t.s}" font-weight="700" font-family="sans-serif" text-anchor="middle" dominant-baseline="central" fill="currentColor" stroke="none">${escapeHtml(t.t)}</text>`).join('') + '</svg>';
+return (o ? SVGH.replace('stroke-width="2.6"', `stroke-width="${o.lw || 2.6}"${o.dash ? ' stroke-dasharray="3 2.5"' : ''}`) : SVGH) + (fc ? (s.z || []).map(x => `<path d="${x}" fill="${fc}" stroke="none"/>`).join('') : '') + (s.f || []).map((x, i) => fk[i] === 'y' ? `<path d="${x}" fill="${SCOL.y}" stroke="none"/>` : '').join('') + s.d.map((x, i) => `<path d="${x}"${dk[i] ? ` stroke="${sc(dk[i])}"` : ''}/>`).join('') + (s.f || []).map((x, i) => fk[i] === 'y' ? '' : `<path d="${x}" fill="${sc(fk[i])}" stroke="none"/>`).join('') + (s.tx || []).map(t => `<text x="${t.x}" y="${t.y}" font-size="${t.s}" font-weight="700" font-family="sans-serif" text-anchor="middle" dominant-baseline="central" fill="currentColor" stroke="none">${escapeHtml(t.t)}</text>`).join('') + '</svg>';
 }
 function symImgCanvas(s, color){
 const key = s.id + '|' + color; let c = symImgs[key]; if (c) return c.ready ? c.cv : null;
@@ -2793,7 +2827,7 @@ return null;
 function sideOf(a, p){ if (p && p.side) return p.side; if (a.symSide) return a.symSide; const c = styleOf(a, p).color; return c === SIDES.r.color ? 'r' : c === SIDES.b.color ? 'b' : ''; }
 function symCol(sid, side, def){ const s = SYM_BY[sid]; if (!s) return def; return side === 'r' ? (s.cR || SIDES.r.color) : side === 'b' ? (s.cB || SIDES.b.color) : def; }
 const symC = (k, c) => !k ? c : k === 'y' ? SCOL.y : k === 'w' ? '#ffffff' : k === 'k' ? SCOL.k : k === 'g' ? SCOL.g : k === 'b' ? SIDES.b.color : SIDES.r.color;
-function drawSym(g, sid, x, y, color, fc, rot, sc){
+function drawSym(g, sid, x, y, color, fc, rot, sc, o){
 const s = SYM_BY[sid]; if (!s) return;
 if (s.img){ const cv = symImgCanvas(s, color); if (cv) g.drawImage(cv, x - 16, y - 16, 32, 32); return; }
 if (!symPaths[sid]) symPaths[sid] = {d:s.d.map(mkP), f:(s.f || []).map(mkP), z:(s.z || []).map(mkP)};
@@ -2802,7 +2836,7 @@ g.save(); g.translate(x, y); if (rot) g.rotate(rot); if (sc) g.scale(sc, sc); g.
 g.strokeStyle = '#fff'; g.lineWidth = 6; P.d.forEach(v => g.stroke(v)); P.f.forEach(v => g.stroke(v));
 if (fc){ g.fillStyle = fc; P.z.forEach(v => g.fill(v)); }
 P.f.forEach((v, i) => { if (fk[i] === 'y'){ g.fillStyle = SCOL.y; g.fill(v); } });
-g.lineWidth = 2.6; P.d.forEach((v, i) => { g.strokeStyle = cc(dk[i]); g.stroke(v); });
+g.lineWidth = (o && o.lw) || 2.6; if (o && o.dash) g.setLineDash([3, 2.5]); P.d.forEach((v, i) => { g.strokeStyle = cc(dk[i]); g.stroke(v); }); g.setLineDash([]);
 P.f.forEach((v, i) => { if (fk[i] !== 'y'){ g.fillStyle = cc(fk[i]); g.fill(v); } });
 (s.tx || []).forEach(t => { g.font = `700 ${t.s}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 3; g.strokeStyle = '#fff'; g.strokeText(t.t, t.x, t.y); g.fillStyle = cc(t.c); g.fillText(t.t, t.x, t.y); });
 g.restore();
@@ -3362,11 +3396,12 @@ $('addGrid').querySelectorAll('button').forEach(b => b.onclick = () => { const s
 openSymPick(['pt'], sid => { if (!sid) return; const L1 = a || symObjLayer(side); startSession(L1.id, 'pick'); session.sym = sid; session.side = side; renderSheet(); toast(`${SYM_BY[sid].n}: касайтесь карты, в конце ✓`); }, SIDES[side].color); });
 openModal('addModal'); return; }
 if (a){ startSession(a.id, 'pick'); toast('Касайтесь карты, чтобы ставить точки, в конце ✓'); return; }
-openArrModal(); if (k !== 'layer') setKind(k === 'pts' ? 'pts' : k);
+if (k === 'layer'){ quickLayer(); return; }
+openArrModal(); setKind(k === 'pts' ? 'pts' : k);
 }
 $('newArrBtn').onclick = () => openAdd(null);
 // ---- вкладки «Слои / Карты / Файлы»
-function layTab(t){ $('layTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); ['L', 'M', 'F'].forEach(x => { $('tab' + x).style.display = x === t ? '' : 'none'; }); if (t === 'M') renderBaseList(); if (t !== 'L') pdbInfo(); }
+function layTab(t){ $('layTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); if (t === 'C') renderCache(); ['L', 'M', 'F', 'C'].forEach(x => { $('tab' + x).style.display = x === t ? '' : 'none'; }); if (t === 'M') renderBaseList(); if (t !== 'L') pdbInfo(); }
 $('layTabs').querySelectorAll('button').forEach(b => b.onclick = () => layTab(b.dataset.t));
 function renderBaseList(){ const el = $('baseList');
 el.innerHTML = Object.entries(LAYERS).map(([k, d]) => `<button class="baseit${k === state.layer ? ' on' : ''}" data-k="${k}">${escapeHtml(d.name)}</button>`).join('');
@@ -3394,7 +3429,8 @@ radPush(labelOf(a, i), [
 {t:'Повернуть', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v5h-5"/></svg>', go:() => { closeRadial(); openRot(a, p); }},
 {t:'Подпись', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>', go:() => { closeRadial(); const v = prompt('Подпись объекта (пусто — как было)', p.lbl || labelOf(a, i)); if (v === null) return; if (v.trim() && v.trim() !== labelOf(a, i)) p.lbl = v.trim(); else delete p.lbl; persist(); renderMarkers(); }},
 {t:'Знак', ic:IC.obj, go:() => { closeRadial(); const side = sideOf(a, p); openSymPick(['pt'], sid => { if (sid) p.sym = sid; else { delete p.sym; if (a.sym) p.sym = '_none'; } persist(); renderMarkers(); }, side ? SIDES[side].color : null, true); }},
-{t:'Свойства', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>', go:() => { closeRadial(); openPoint(a, i); }},
+{t:'Свойства', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/><circle cx="18" cy="15" r="3"/></svg>', go:() => { closeRadial(); openProp(a, p); }},
+{t:'Карточка', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>', go:() => { closeRadial(); openPoint(a, i); }},
 {t:'Удалить', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>', color:'#e2533f', go:() => { closeRadial(); trashPoint(a, i); }}]);
 }
 let rotRef = null;
@@ -3407,7 +3443,7 @@ const FONTS = [['Roboto Condensed', 'Compact Bold (Roboto Condensed)'], ['IBM Pl
 const TXT_BG = [['', 'без подложки'], ['#ffffff', 'белая'], ['rgba(255,255,255,.7)', 'полупрозрачная'], ['#ffe066', 'жёлтая'], ['#111111', 'чёрная']];
 let textPending = null, txtRef = null;
 function txtShadow(t){ const w = +t.sw || 0; if (!w || !t.sc) return 'none'; const out = []; for (let a = 0; a < 16; a++){ const r = a / 16 * 2 * Math.PI; out.push(`${(Math.cos(r) * w).toFixed(1)}px ${(Math.sin(r) * w).toFixed(1)}px 0 ${t.sc}`); } return out.join(','); }
-function txtHtml(t){ return `<div class="txl" style="font-family:'${t.f}',sans-serif;font-size:${t.s}px;color:${t.c};font-weight:${t.b ? 700 : 500};font-style:${t.i ? 'italic' : 'normal'};text-shadow:${txtShadow(t)};${t.bg ? `background:${t.bg};padding:2px 6px;border-radius:4px;` : ''}transform:translate(-50%,-50%) rotate(${t.r || 0}deg)">${escapeHtml(t.t).replace(/\n/g, '<br>')}</div>`; }
+function txtHtml(t){ return `<div class="txl" style="text-align:${t.al || 'center'};line-height:${t.lh || 1.15};letter-spacing:${t.lsp || 0}px;${t.u ? 'text-decoration:underline;' : ''}${t.fr ? `border:${t.fr}px solid ${t.c};padding:2px 6px;` : ''}${t.shd ? 'filter:drop-shadow(2px 3px 2px rgba(0,0,0,.6));' : ''}font-family:'${t.f}',sans-serif;font-size:${t.s}px;color:${t.c};font-weight:${t.b ? 700 : 500};font-style:${t.i ? 'italic' : 'normal'};text-shadow:${txtShadow(t)};${t.bg ? `background:${t.bg};padding:2px 6px;border-radius:4px;` : ''}transform:translate(-50%,-50%) rotate(${t.r || 0}deg)">${escapeHtml(t.t).replace(/\n/g, '<br>')}</div>`; }
 function textLayer(){ let a = (textPending && textPending.target && arrById(textPending.target)) || state.arrays.find(x => x.name === 'Надписи' && x.kind === 'shapes');
 if (!a){ a = normArr({id:Date.now(), kind:'shapes', name:'Надписи', ident:'Надписи', style:{color:'#111111', name:'Чёрный', glyph:''}, points:[], shapes:[], texts:[]}); state.arrays.push(a); }
 if (!a.texts) a.texts = []; return a; }
@@ -3416,14 +3452,15 @@ const t = ti != null ? a.texts[ti] : {t:'', f:'IBM Plex Sans Condensed', s:18, c
 txtRef = {a, ti, t:Object.assign({}, t)};
 $('txtTitle').textContent = ti != null ? 'Надпись' : 'Новая надпись';
 $('tTxt').value = t.t; $('tFont').value = t.f; $('tSize').value = t.s; $('tSC').value = t.sc || ''; $('tSW').value = t.sw || 0; $('tB').checked = !!t.b; $('tI').checked = !!t.i; $('tBg').value = t.bg || ''; $('tRot').value = t.r || 0;
+$('tAl').value = t.al || 'center'; $('tLh').value = t.lh || 1.15; $('tLsp').value = t.lsp || 0; $('tU').checked = !!t.u; $('tShd').checked = !!t.shd; $('tFr').value = t.fr || 0;
 $('tDel').style.display = ti != null ? '' : 'none';
 renderFillPick($('tCol'), t.c, c => { txtRef.t.c = c || '#111111'; txtPrev(); });
 txtPrev(); openModal('txtModal'); setTimeout(() => $('tTxt').focus(), 60);
 }
-function txtRead(){ const t = txtRef.t; t.t = $('tTxt').value; t.f = $('tFont').value; t.s = +$('tSize').value; t.sc = $('tSC').value; t.sw = +$('tSW').value; t.b = $('tB').checked; t.i = $('tI').checked; t.bg = $('tBg').value; t.r = +$('tRot').value; }
+function txtRead(){ const t = txtRef.t; t.al = $('tAl').value; t.lh = +$('tLh').value; t.lsp = +$('tLsp').value; t.u = $('tU').checked; t.shd = $('tShd').checked; t.fr = +$('tFr').value; t.t = $('tTxt').value; t.f = $('tFont').value; t.s = +$('tSize').value; t.sc = $('tSC').value; t.sw = +$('tSW').value; t.b = $('tB').checked; t.i = $('tI').checked; t.bg = $('tBg').value; t.r = +$('tRot').value; }
 function txtPrev(){ txtRead(); const t = txtRef.t; $('tSizeV').textContent = t.s; $('tSWV').textContent = t.sw; $('tRotV').textContent = t.r + '°';
 $('tPrev').innerHTML = `<div style="position:relative;height:100%">${txtHtml(Object.assign({}, t, {t:t.t || 'Пример надписи'})).replace('class="txl" style="', 'class="txl" style="left:50%;top:50%;')}</div>`; }
-['tTxt', 'tFont', 'tSize', 'tSC', 'tSW', 'tB', 'tI', 'tBg', 'tRot'].forEach(id => { $(id).addEventListener('input', txtPrev); $(id).addEventListener('change', txtPrev); });
+['tTxt', 'tFont', 'tSize', 'tSC', 'tSW', 'tB', 'tI', 'tBg', 'tRot', 'tAl', 'tLh', 'tLsp', 'tU', 'tShd', 'tFr'].forEach(id => { $(id).addEventListener('input', txtPrev); $(id).addEventListener('change', txtPrev); });
 $('tSave').onclick = () => { txtRead(); const {a, ti, t} = txtRef; if (!t.t.trim()){ $('tTxt').focus(); return; } if (ti != null) a.texts[ti] = t; else a.texts.push(t); textPending = null; persist(); closeModals(); renderMarkers(); };
 $('tDel').onclick = () => { const {a, ti} = txtRef; a.texts.splice(ti, 1); persist(); closeModals(); renderMarkers(); toast('Надпись удалена (↶ — вернуть)'); };
 $('tFont').innerHTML = FONTS.map(([v, n]) => `<option value="${v}" style="font-family:'${v}'">${n}</option>`).join('');
@@ -3489,7 +3526,8 @@ const title = $('prnTitle').value.trim(), legend = $('prnLeg').checked, grid = $
 closeModals(); netMsg('Готовлю лист для печати…');
 try {
 const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
-const mg = mm(10), th = title ? mm(12) : 0, fh = mm(8), ix0 = mg, iy0 = mg + th, iw = W - 2 * mg, ih = H - 2 * mg - th - fh;
+const mg = mm(8), th = title ? mm(11) : 0, fh = mm(7), ox0 = mg, oy0 = mg + th, ow = W - 2 * mg, oh = H - 2 * mg - th - fh, fb = grid ? mm(9) : 0, ix0 = ox0 + fb, iy0 = oy0 + fb, iw = ow - 2 * fb, ih = oh - 2 * fb;
+let FRAME = null;
 const Ws = map.getSize().x, Hs = map.getSize().y, c = map.getCenter(), a0 = map.containerPointToLatLng([Ws / 2 - 50, Hs / 2]), a1 = map.containerPointToLatLng([Ws / 2 + 50, Hs / 2]), mpp = distM(a0, a1) / 100;
 let wm = Ws * mpp, hm = Hs * mpp; if (iw / ih > wm / hm) hm = wm * ih / iw; else wm = hm * iw / ih;
 const def = LAYERS[state.layer], crs = crsOf(state.layer), z0 = map.getZoom();
@@ -3505,13 +3543,15 @@ for (let q = 0; q < jobs.length; q += 8){ netMsg(`Готовлю лист: по�
 const part = await Promise.all(jobs.slice(q, q + 8).map(async ([tpl, tx, ty]) => [tx, ty, await tileBmp(tpl.replace('{s}', 'abc'[(tx + ty) % 3]).replace('{x}', tx).replace('{y}', ty).replace('{z}', zt))]));
 part.forEach(([tx, ty, bm]) => { if (bm) g.drawImage(bm, ix0 + (tx * 256 - bx0) * f, iy0 + (ty * 256 - by0) * f, 256 * f + 1, 256 * f + 1); else miss++; }); }
 const sc = dpi / 110;
-if (grid){ const sw = map.options.crs === crs ? null : null; const corners = [[0, 0], [1, 0], [0, 1], [1, 1]].map(([u, v]) => crs.pointToLatLng(L.point(bx0 + u * 2 * hw, by0 + v * 2 * hh), zt)), ref = GEO.toSK(c.lat, c.lng), zone = ref.zone;
+if (grid){
+const corners = [[0, 0], [1, 0], [0, 1], [1, 1]].map(([u, v]) => crs.pointToLatLng(L.point(bx0 + u * 2 * hw, by0 + v * 2 * hh), zt)), zone = GEO.toSK(c.lat, c.lng).zone;
 const S1 = corners.map(q => GEO.toSK(q.lat, q.lng, zone)), X0 = Math.min(...S1.map(q => q.x)), X1 = Math.max(...S1.map(q => q.x)), Y0 = Math.min(...S1.map(q => q.y)), Y1 = Math.max(...S1.map(q => q.y)), st = (X1 - X0) > 20000 ? 5000 : (X1 - X0) > 9000 ? 2000 : 1000;
-g.strokeStyle = 'rgba(20,20,20,.75)'; g.lineWidth = Math.max(1, sc * .9); g.font = `600 ${Math.round(11 * sc)}px sans-serif`; g.fillStyle = '#111';
-for (let x = Math.ceil(X0 / st) * st; x <= X1; x += st){ g.beginPath(); for (let t = 0; t <= 10; t++){ const yy = Y0 + (Y1 - Y0) * t / 10, ll = GEO.fromSK(x, yy, zone), [px, py] = toC(ll); t ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
-for (let y = Math.ceil(Y0 / st) * st; y <= Y1; y += st){ g.beginPath(); for (let t = 0; t <= 10; t++){ const xx = X0 + (X1 - X0) * t / 10, ll = GEO.fromSK(xx, y, zone), [px, py] = toC(ll); t ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
-for (let x = Math.ceil(X0 / st) * st; x <= X1; x += st) for (let y = Math.ceil(Y0 / st) * st; y <= Y1; y += st){ const [px, py] = toC(GEO.fromSK(x, y, zone)); g.lineWidth = 3 * sc; g.strokeStyle = 'rgba(255,255,255,.85)'; const t = pad2(Math.round(x / 1000)) + pad2(Math.round(y / 1000)); g.strokeText(t, px + 3 * sc, py - 3 * sc); g.fillText(t, px + 3 * sc, py - 3 * sc); }
-g.lineWidth = Math.max(1, sc * .9); }
+g.strokeStyle = 'rgba(20,20,20,.8)'; g.lineWidth = Math.max(1, sc * .8);
+const xs = [], ys = [];
+for (let y = Math.ceil(Y0 / st) * st; y <= Y1; y += st){ const a1 = toC(GEO.fromSK(X0, y, zone)), b1 = toC(GEO.fromSK(X1, y, zone)); g.beginPath(); g.moveTo(...a1); g.lineTo(...b1); g.stroke(); ys.push([y, a1, b1]); }
+for (let x = Math.ceil(X0 / st) * st; x <= X1; x += st){ const a1 = toC(GEO.fromSK(x, Y0, zone)), b1 = toC(GEO.fromSK(x, Y1, zone)); g.beginPath(); g.moveTo(...a1); g.lineTo(...b1); g.stroke(); xs.push([x, a1, b1]); }
+FRAME = {xs, ys, corners};
+}
 const used = new Map();
 state.arrays.forEach(a => { if (a.hidden) return;
 (a.shapes || []).forEach(sh => { const col = sh.color || a.style.color, pts = sh.type === 'circle' ? circlePoly(LL(sh.pts[0]), sh.r).map(q => [q[1], q[0]]) : sh.pts.map(q => [q[0] ?? q.lat, q[1] ?? q.lng]);
@@ -3539,11 +3579,44 @@ g.fillStyle = 'rgba(255,255,255,.92)'; g.fillRect(bx, by, bw, bh); g.strokeStyle
 g.fillStyle = '#111'; g.font = `700 ${Math.round(12 * sc)}px sans-serif`; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText('Условные обозначения', bx + 8 * sc, by + 14 * sc);
 items.forEach(([sid, col], k2) => { const yy = by + 30 * sc + k2 * rh + rh / 2; g.save(); g.translate(bx + 22 * sc, yy); g.scale(sc * .7, sc * .7); drawSym(g, sid, 0, 0, col, null); g.restore(); g.fillStyle = '#111'; g.font = `500 ${Math.round(11 * sc)}px sans-serif`; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(SYM_BY[sid].n, bx + 42 * sc, yy); }); }
 g.restore();
-g.strokeStyle = '#111'; g.lineWidth = Math.max(2, 1.5 * sc); g.strokeRect(ix0, iy0, iw, ih);
+// ---- рамка листа по образцу топографической карты
+g.strokeStyle = '#111'; g.lineWidth = Math.max(1.2, .9 * sc); g.strokeRect(ix0, iy0, iw, ih);
+const mb = mm(1.4), fo = mm(.9);
+g.strokeRect(ix0 - mb, iy0 - mb, iw + 2 * mb, ih + 2 * mb);
+g.lineWidth = Math.max(2.5, 2.2 * sc); g.strokeRect(ox0, oy0, ow, oh);
+if (FRAME){
+const tl = crs.pointToLatLng(L.point(bx0, by0), zt), br = crs.pointToLatLng(L.point(bx0 + 2 * hw, by0 + 2 * hh), zt);
+const dms = (v, lat) => { const d = Math.floor(Math.abs(v)), m = Math.round((Math.abs(v) - d) * 60); return `${d}°${String(m === 60 ? 0 : m).padStart(2, '0')}′`; };
+g.fillStyle = '#111';
+for (let m = Math.floor(br.lat * 60); m < tl.lat * 60; m++){ const y1 = toC([m / 60, tl.lng])[1], y2 = toC([(m + 1) / 60, tl.lng])[1], ya = Math.max(iy0, Math.min(y1, y2)), yb = Math.min(iy0 + ih, Math.max(y1, y2));
+if (yb > ya && (m % 2 === 0)){ g.fillRect(ix0 - mb, ya, mb, yb - ya); g.fillRect(ix0 + iw, ya, mb, yb - ya); } }
+for (let m = Math.floor(tl.lng * 60); m < br.lng * 60; m++){ const x1 = toC([tl.lat, m / 60])[0], x2 = toC([tl.lat, (m + 1) / 60])[0], xa = Math.max(ix0, Math.min(x1, x2)), xb = Math.min(ix0 + iw, Math.max(x1, x2));
+if (xb > xa && (m % 2 === 0)){ g.fillRect(xa, iy0 - mb, xb - xa, mb); g.fillRect(xa, iy0 + ih, xb - xa, mb); } }
+const big = Math.round(mm(3.2)), small = Math.round(mm(2.2)), gap = mm(1.2);
+const lab = (hi, lo, x, y, align, base) => { g.textBaseline = base; g.font = `700 ${big}px sans-serif`; const wB = g.measureText(lo).width; g.font = `500 ${small}px sans-serif`; const wS = hi ? g.measureText(hi).width : 0, tot = wB + wS;
+let x0 = align === 'center' ? x - tot / 2 : align === 'right' ? x - tot : x; g.textAlign = 'left';
+if (hi){ g.font = `500 ${small}px sans-serif`; g.fillText(hi, x0, y); } g.font = `700 ${big}px sans-serif`; g.fillText(lo, x0 + wS, y); };
+const kmS = v => { const k = Math.round(v / 1000), s0 = String(k); return [s0.slice(0, -2), s0.slice(-2)]; };
+const ys = FRAME.ys.filter(([, a1, b1]) => true), xs = FRAME.xs;
+const crossX = (p, q, Y) => p[0] + (q[0] - p[0]) * ((Y - p[1]) / ((q[1] - p[1]) || 1e-9));
+const crossY = (p, q, X) => p[1] + (q[1] - p[1]) * ((X - p[0]) / ((q[0] - p[0]) || 1e-9));
+const vy = ys.map(([y, a1, b1]) => [y, crossX(a1, b1, iy0), crossX(a1, b1, iy0 + ih)]).filter(([, t, b]) => t > ix0 + 1 && t < ix0 + iw - 1);
+vy.forEach(([y, t, b], k) => { const [hi, lo] = kmS(y), full = k === 0 || k === vy.length - 1;
+g.beginPath(); g.moveTo(t, iy0 - mb); g.lineTo(t, iy0 - mb - gap); g.moveTo(b, iy0 + ih + mb); g.lineTo(b, iy0 + ih + mb + gap); g.lineWidth = Math.max(1, .8 * sc); g.stroke();
+lab(full ? hi : '', lo, t, iy0 - mb - gap * 1.3, 'center', 'bottom'); lab(full ? hi : '', lo, b, iy0 + ih + mb + gap * 1.3, 'center', 'top'); });
+const hx = xs.map(([x, a1, b1]) => [x, crossY(a1, b1, ix0), crossY(a1, b1, ix0 + iw)]).filter(([, l, r]) => l > iy0 + 1 && l < iy0 + ih - 1);
+hx.forEach(([x, l, r], k) => { const [hi, lo] = kmS(x), full = k === 0 || k === hx.length - 1;
+g.beginPath(); g.moveTo(ix0 - mb, l); g.lineTo(ix0 - mb - gap, l); g.moveTo(ix0 + iw + mb, r); g.lineTo(ix0 + iw + mb + gap, r); g.lineWidth = Math.max(1, .8 * sc); g.stroke();
+lab(full ? hi : '', lo, ix0 - mb - gap * 1.4, l, 'right', 'middle'); lab(full ? hi : '', lo, ix0 + iw + mb + gap * 1.4, r, 'left', 'middle'); });
+g.font = `500 ${small}px sans-serif`; g.fillStyle = '#111';
+const cl = [[ix0 - mb, iy0 - mb, tl.lat, tl.lng, 'right', 'bottom'], [ix0 + iw + mb, iy0 - mb, tl.lat, br.lng, 'left', 'bottom'], [ix0 - mb, iy0 + ih + mb, br.lat, tl.lng, 'right', 'top'], [ix0 + iw + mb, iy0 + ih + mb, br.lat, br.lng, 'left', 'top']];
+cl.forEach(([x, y, la, lo, al, bs]) => { g.textAlign = al; g.textBaseline = bs; const dx = al === 'right' ? -gap : gap; g.fillText(dms(la, true), x + dx, y + (bs === 'bottom' ? -gap * 4.5 : gap * 4.5)); g.fillText(dms(lo, false), x + dx, y + (bs === 'bottom' ? -gap * .3 : gap * .3)); });
+}
+
 g.fillStyle = '#111'; g.textAlign = 'center'; g.textBaseline = 'middle';
 if (title){ g.font = `700 ${Math.round(mm(6))}px sans-serif`; g.fillText(title, W / 2, mg + th / 2); }
 const scale = Math.round(wm / (iw / dpi * 0.0254) / 100) * 100;
-g.font = `500 ${Math.round(mm(3.2))}px sans-serif`; g.textAlign = 'left'; g.fillText(`Масштаб ~1:${scale.toLocaleString('ru-RU')} · СК-42 · ${new Date().toLocaleDateString('ru-RU')}`, ix0, iy0 + ih + fh / 2); g.textAlign = 'right'; g.fillText('СКАТ', ix0 + iw, iy0 + ih + fh / 2);
+g.font = `500 ${Math.round(mm(3.2))}px sans-serif`; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(`Масштаб ~1:${scale.toLocaleString('ru-RU')} · СК-42, зона ${GEO.toSK(c.lat, c.lng).zone} · сетка ${grid ? 'через ' + (FRAME && FRAME.xs.length > 1 ? Math.round(Math.abs((FRAME.xs[1][0] - FRAME.xs[0][0]) / 1000)) : 1) + ' км' : 'нет'} · ${new Date().toLocaleDateString('ru-RU')}`, ox0, oy0 + oh + fh / 2); g.textAlign = 'right'; g.fillText('СКАТ', ox0 + ow, oy0 + oh + fh / 2);
 const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.92)); netMsg('');
 if (!blob){ toast('Не хватило памяти — уменьшите формат или разрешение'); return; }
 deliverFile(blob, `СКАТ_печать_${stamp()}.jpg`, `Лист готов: ${W}×${H} пикс.${miss ? ` Не загрузилось тайлов подложки: ${miss} (Яндекс в веб-версии не копируется — выберите Esri или Топо).` : ''}`);
@@ -3560,8 +3633,9 @@ function rotFeats(F, c, deg){ if (!deg) return; const r = -deg * Math.PI / 180, 
 F.forEach(f => { f.geometry.coordinates = f.geometry.coordinates.map(ring => ring.map(([x, y]) => { const u = (x - c[0]) * kx, v = (y - c[1]) * ky; return [c[0] + (u * cr - v * sr) / kx, c[1] + (u * sr + v * cr) / ky]; })); }); }
 function envFeatures(){
 const out = [];
-state.arrays.forEach((a, ai) => { if (a.hidden || !a.env) return; a.env.forEach((o0, ei) => { if (o0.hid) return; const ov = ANIM.get('e' + a.id + ':' + ei), o = ov ? Object.assign({}, o0, ov) : o0, c = [o.lng, o.lat], d = Object.assign({}, ENV_D[o.k] || {}, o), F = [];
-if (o.k === 'trow' && o.line) buildObjs([{t:'row', line:o.line, lf:o.lf}], v3cfg.mden ?? .3).features.forEach(f => F.push(f));
+state.arrays.forEach((a, ai) => { if (a.hidden || !a.env) return; a.env.forEach((o0, ei) => { if (o0.hid || !tagOk(a, o0)) return; const ov = ANIM.get('e' + a.id + ':' + ei), o = ov ? Object.assign({}, o0, ov) : o0, c = [o.lng, o.lat], d = Object.assign({}, ENV_D[o.k] || {}, o), F = [];
+if (treeGen(o, F)){}
+else if (o.k === 'trow' && o.line) buildObjs([{t:'row', line:o.line, lf:o.lf}], v3cfg.mden ?? .3).features.forEach(f => F.push(f));
 else if (o.k === 'tpoly' && o.ring) buildObjs([{t:'f', ring:o.ring, lf:o.lf || 'm'}], v3cfg.mden ?? .3).features.forEach(f => F.push(f));
 else if (o.k === 'tree_n' || o.k === 'tree_b') addTree(F, o.lng, o.lat, o.k === 'tree_n' ? 'n' : 'b', 1.1, false);
 else if (o.k === 'grove'){ const [kx, ky] = mk(o.lat); for (let i = 0; i < Math.max(3, Math.round(14 * (v3cfg.mden ?? .3) / .6)); i++){ const r = 4 + hsh(i, 3) * 14, q = hsh(i, 7) * 6.28; addTree(F, o.lng + Math.cos(q) * r / kx, o.lat + Math.sin(q) * r / ky, hsh(i, 5) < .5 ? 'n' : 'b', 1, false); } }
@@ -3569,7 +3643,7 @@ else { let raw;
 if (['house', 'flat', 'wh', 'hangar'].includes(o.k)) raw = {t:'b', ring:rectR(c, d.l / 2, d.w / 2), h:d.h, id:ei + 3, lv:o.k === 'flat' ? 5 : 0};
 else if (o.k === 'tank') raw = {t:'tank', c, r:d.r, h:d.h}; else raw = {t:o.k, c, h:d.h};
 buildObjs([raw], 1).features.forEach(f => F.push(f)); }
-rotFeats(F, c, o.rot || 0); F.forEach(f => { f.properties.ai = ai; f.properties.ei = ei; out.push(f); }); }); });
+rotFeats(F, c, o.rot || 0); scaleFeats(F, c, o.msc || 1); F.forEach(f => { f.properties.ai = ai; f.properties.ei = ei; out.push(f); }); }); });
 return {type:'FeatureCollection', features:out};
 }
 function v3item(a){ return v3sel.ei != null ? (a.env || [])[v3sel.ei] : a.points[v3sel.pi]; }
@@ -3636,13 +3710,14 @@ const SC = {cur:null, t:0, T:0, mul:1, raf:0, last:0, prev:0, orbit:false, pick:
 const fmtT = t => `Ч+${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
 function pathLen(P){ let L1 = 0; for (let i = 1; i < P.length; i++){ const [kx, ky] = mk(P[i][1]); L1 += Math.hypot((P[i][0] - P[i-1][0]) * kx, (P[i][1] - P[i-1][1]) * ky); } return L1; }
 function scnItems(sc){ const [w, s0, e, n] = sc.b; return allAnimItems().filter(x => { const q = x.it.path && x.it.path.length ? {lng:x.it.path[0][0], lat:x.it.path[0][1]} : x.it; return q.lng >= w && q.lng <= e && q.lat >= s0 && q.lat <= n; }); }
-function scnDur(sc){ let T = 0; scnItems(sc).forEach(x => { const it = x.it; if (it.path && it.path.length > 1) T = Math.max(T, (it.t0 || 0) + pathLen(it.path) / ((it.spd || 20) / 3.6)); }); return Math.max(10, Math.ceil(T + 3)); }
+function scnDur(sc){ let T = 0; scnItems(sc).forEach(x => { const it = x.it; if (it.path && it.path.length > 1) T = Math.max(T, (it.t0 || 0) + pathLen(it.path) / ((it.spd || 20) / 3.6)); (it.fires || []).forEach(f => { const k = FIRE_K[f.k] || FIRE_K.gun; T = Math.max(T, (f.t0 || 0) + (f.n || k.n) * (f.ev || k.ev) + (f.tof || k.tof) + 3); }); }); return Math.max(10, Math.ceil(T + 3)); }
 function scnRefresh(force){ const now = performance.now(); if (!force && now - SC.last < 60) return; SC.last = now; try { v3.getSource('mdl').setData(v3mdl(v3.getCenter())); } catch(_){} envRefresh(); }
 function scnSet(t, force){ if (!SC.cur) return; SC.t = Math.max(0, Math.min(SC.T, t));
 scnItems(SC.cur).forEach(x => { const it = x.it; if (!it.path || it.path.length < 2) return; const loc = Math.max(0, SC.t - (it.t0 || 0)); ANIM.set(x.key, pathPos(it.path, loc * (it.spd || 20) / 3.6)); });
-$('tlR').value = SC.t; $('tlT').textContent = `${fmtT(SC.t)} / ${fmtT(SC.T)}`; scnRefresh(force); }
+$('tlR').value = SC.t; $('tlT').textContent = `${fmtT(SC.t)} / ${fmtT(SC.T)}`; scnRefresh(force); fireFx(SC.t); const ph = document.querySelector('.tlph'); if (ph) ph.style.left = (SC.t * tlZoom + 110) + 'px'; }
 function scnLoop(now){ const dt = SC.prev ? (now - SC.prev) / 1000 : 0; SC.prev = now;
-if (SC.orbit) try { v3.setBearing(v3.getBearing() + dt * 4); } catch(_){}
+if (SC.orbit && camMode === 'free') try { v3.setBearing(v3.getBearing() + dt * 4); } catch(_){}
+applyCam(dt);
 scnSet(SC.t + dt * SC.mul);
 if (SC.t >= SC.T){ scnPause(); toast('Сцена завершена'); return; } SC.raf = requestAnimationFrame(scnLoop); }
 function scnPlay(){ if (!SC.cur) return; if (SC.t >= SC.T) SC.t = 0; SC.prev = 0; $('tlP').textContent = '⏸'; SC.raf = requestAnimationFrame(scnLoop); }
@@ -3657,8 +3732,8 @@ el.innerHTML = state.scenes.length ? state.scenes.map((sc, i) => `<div class="ar
 el.querySelectorAll('button').forEach(b => b.onclick = () => { const sc = state.scenes[+b.dataset.i];
 if (b.dataset.a === 'open') openScene(sc); else askConfirm(`Удалить сцену «${sc.name}»? Объекты на карте останутся.`, 'Удалить', () => { state.scenes.splice(+b.dataset.i, 1); persist(); if (SC.cur === sc) closeScene(); renderScn(); }); }); }
 function openScene(sc){ $('v3scn').classList.remove('on'); SC.cur = sc; SC.T = scnDur(sc); $('tlR').max = SC.T; $('v3tl').classList.add('on'); $('tlN').textContent = sc.name;
-try { v3.jumpTo({center:sc.cam.c, zoom:sc.cam.z, pitch:sc.cam.p, bearing:sc.cam.br}); } catch(_){} ANIM.clear(); scnBox(); scnSet(0, true); }
-function closeScene(){ scnPause(); SC.cur = null; ANIM.clear(); $('v3tl').classList.remove('on'); scnBox(); scnRefresh(true); }
+try { v3.jumpTo({center:sc.cam.c, zoom:sc.cam.z, pitch:sc.cam.p, bearing:sc.cam.br}); } catch(_){} ANIM.clear(); scnBox(); fxInit(); scnSet(0, true); tlRender(); }
+function closeScene(){ scnPause(); SC.cur = null; ANIM.clear(); fireFx(-999); tlRender(); $('v3tl').classList.remove('on'); scnBox(); scnRefresh(true); }
 $('v3scnBtn').onclick = () => { $('v3panel').classList.remove('on'); $('v3my').classList.remove('on'); renderScn(); $('v3scn').classList.toggle('on'); };
 $('scnNew').onclick = () => { $('v3scn').classList.remove('on'); SC.pick = {pts:[]}; scnBox(); toast('Коснитесь 3D-карты в двух противоположных углах сцены'); };
 $('tlP').onclick = () => SC.raf ? scnPause() : scnPlay();
@@ -3687,7 +3762,7 @@ v3draw = null; drawBar(); envRefresh(); }, true);
 const ENV_IC = {house:'⌂', flat:'▥', wh:'▭', hangar:'⌓', tree_n:'▲', tree_b:'●', grove:'♣', pw:'ᛉ', mast:'⊥', wt:'♜', tank:'◉'};
 function envMarkers(a, z){ if (!a.env) return;
 a.env.forEach(o => {
-if (o.hid) return;
+if (o.hid || !tagOk(a, o)) return;
 if (o.k === 'trow' && o.line) markers.addLayer(L.polyline(o.line.map(q => [q[1], q[0]]), {color:'#2f7a34', weight:5, dashArray:'2 6', lineCap:'round', interactive:false}));
 else if (o.k === 'tpoly' && o.ring) markers.addLayer(L.polygon(o.ring.map(q => [q[1], q[0]]), {color:'#2f7a34', weight:2, fillColor:'#3f8f3a', fillOpacity:.25, interactive:false}));
 else markers.addLayer(L.marker([o.lat, o.lng], {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="envic" style="transform:translate(-50%,-50%) rotate(${o.rot || 0}deg)">${ENV_IC[o.k] || '■'}</div>`})}));
@@ -3721,7 +3796,7 @@ if (L1.length) out.push(L1[L1.length-1]); return out; }
 // ---- таблицы Excel на карте
 let tblPending = null, tbRef = null;
 function tblHtml(T){ const rows = T.rows.slice(0, 40), al = T.op ?? 1, bg = T.bg ? T.bg : 'transparent';
-return `<table class="mtb" style="font-family:'${T.f}',sans-serif;font-size:${T.s}px;color:${T.c};background:${bg === 'transparent' ? 'transparent' : hexA(bg, al)};${T.bd ? `border:${T.bw || 1}px solid ${T.bd};` : ''}">${rows.map((r, ri) => `<tr>${r.slice(0, 10).map(c => `<${ri === 0 && T.hdr ? 'th' : 'td'} style="${T.bd ? `border:${T.bw || 1}px solid ${T.bd};` : ''}">${escapeHtml(String(c))}</${ri === 0 && T.hdr ? 'th' : 'td'}>`).join('')}</tr>`).join('')}</table>`; }
+return `<table class="mtb" style="font-family:'${T.f}',sans-serif;font-size:${T.s}px;color:${T.c};background:${bg === 'transparent' ? 'transparent' : hexA(bg, al)};${T.bd ? `border:${T.bw || 1}px solid ${T.bd};` : ''}">${rows.map((r, ri) => `<tr>${r.slice(0, 10).map(c => `<${ri === 0 && T.hdr ? 'th' : 'td'} style="text-align:${T.al || 'left'};padding:${T.pd ?? 2}px ${(T.pd ?? 2) * 3}px;${ri === 0 && T.hdr && T.hbg ? `background:${T.hbg};` : (T.zb && ri % 2 ? 'background:rgba(0,0,0,.07);' : '')}${T.bd ? `border:${T.bw || 1}px solid ${T.bd};` : ''}">${escapeHtml(String(c))}</${ri === 0 && T.hdr ? 'th' : 'td'}>`).join('')}</tr>`).join('')}</table>`; }
 function hexA(h, a){ if (!/^#[0-9a-f]{6}$/i.test(h)) return h; const n = parseInt(h.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; }
 $('tbAddIn').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f || typeof XLSX === 'undefined') return;
 try { const wb = XLSX.read(await f.arrayBuffer(), {type:'array'}), rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1, raw:false, defval:''}).filter(r => r.some(c => String(c).trim()));
@@ -3731,9 +3806,10 @@ const T = ti != null ? a.tables[ti] : {rows:tblPending.rows, f:'IBM Plex Sans Co
 tbRef = {a, ti, t:JSON.parse(JSON.stringify(T))}; tblPending = null;
 $('tbFont').innerHTML = FONTS.map(([v, n]) => `<option value="${v}">${n}</option>`).join(''); $('tbFont').value = T.f; $('tbSize').value = T.s; $('tbOp').value = Math.round((T.op ?? 1) * 100); $('tbBd').value = T.bd || ''; $('tbHdr').checked = !!T.hdr;
 renderFillPick($('tbBg'), T.bg || null, c => { tbRef.t.bg = c || ''; tbPrev(); }); renderFillPick($('tbCol'), T.c, c => { tbRef.t.c = c || '#111111'; tbPrev(); });
+$('tbAl').value = T.al || 'left'; $('tbPd').value = T.pd ?? 2; $('tbZb').checked = !!T.zb; renderFillPick($('tbHbg'), T.hbg || null, c => { tbRef.t.hbg = c || ''; tbPrev(); });
 $('tbDel').style.display = ti != null ? '' : 'none'; tbPrev(); openModal('tbModal'); }
-function tbPrev(){ const t = tbRef.t; t.f = $('tbFont').value; t.s = +$('tbSize').value; t.op = +$('tbOp').value / 100; t.bd = $('tbBd').value; t.hdr = $('tbHdr').checked; $('tbOpV').textContent = $('tbOp').value + '%'; $('tbPrev').innerHTML = tblHtml(Object.assign({}, t, {rows:t.rows.slice(0, 6)})); }
-['tbFont', 'tbSize', 'tbOp', 'tbBd', 'tbHdr'].forEach(id => { $(id).addEventListener('input', tbPrev); $(id).addEventListener('change', tbPrev); });
+function tbPrev(){ const t = tbRef.t; t.al = $('tbAl').value; t.pd = +$('tbPd').value; t.zb = $('tbZb').checked; t.f = $('tbFont').value; t.s = +$('tbSize').value; t.op = +$('tbOp').value / 100; t.bd = $('tbBd').value; t.hdr = $('tbHdr').checked; $('tbOpV').textContent = $('tbOp').value + '%'; $('tbPrev').innerHTML = tblHtml(Object.assign({}, t, {rows:t.rows.slice(0, 6)})); }
+['tbFont', 'tbSize', 'tbOp', 'tbBd', 'tbHdr', 'tbAl', 'tbPd', 'tbZb'].forEach(id => { $(id).addEventListener('input', tbPrev); $(id).addEventListener('change', tbPrev); });
 $('tbSave').onclick = () => { const {a, ti, t} = tbRef; if (!a.tables) a.tables = []; if (ti != null) a.tables[ti] = t; else a.tables.push(t); persist(); closeModals(); renderMarkers(); };
 $('tbDel').onclick = () => { const {a, ti} = tbRef; a.tables.splice(ti, 1); persist(); closeModals(); renderMarkers(); toast('Таблица удалена (↶ — вернуть)'); };
 // ---- раскрывающиеся слои, группы, выбор
@@ -3748,7 +3824,7 @@ return L1; }
 const ARRK = {p:'points', s:'shapes', x:'texts', tb:'tables', e:'env'};
 function itPos(t, o){ if (t === 's'){ const q = o.pts[0]; return [q[0] ?? q.lat, q[1] ?? q.lng]; } return [o.lat, o.lng]; }
 function kidsHtml(a){ const its = layItems(a), groups = {}; its.forEach(x => { const g = x.o.g || ''; (groups[g] = groups[g] || []).push(x); });
-const row = x => `<div class="kid${x.o.hid ? ' off' : ''}" data-k="${a.id}|${x.t}|${x.i}">${SELM.on ? `<input type="checkbox" class="selcb" data-sel="${a.id}|${x.t}|${x.i}" ${SELM.sel.has(`${a.id}|${x.t}|${x.i}`) ? 'checked' : ''}>` : ''}<span class="kn">${escapeHtml(x.n)}</span><button class="eye" data-hid="1">${x.o.hid ? EYE_OFF : EYE_ON}</button></div>`;
+const row = x => `<div class="kid${x.o.hid ? ' off' : ''}" data-k="${a.id}|${x.t}|${x.i}">${SELM.on ? `<input type="checkbox" class="selcb" data-sel="${a.id}|${x.t}|${x.i}" ${SELM.sel.has(`${a.id}|${x.t}|${x.i}`) ? 'checked' : ''}>` : ''}${thumb(a, x)}<span class="kn">${escapeHtml(x.n)}${(x.o.tags || []).map(t => ` <small class="tg">#${escapeHtml(t)}</small>`).join('')}</span><button class="eye" data-hid="1">${x.o.hid ? EYE_OFF : EYE_ON}</button></div>`;
 let h = (groups[''] || []).map(row).join('');
 Object.keys(groups).filter(g => g).forEach(g => { const open = !GX.has(a.id + '|' + g);
 h += `<div class="grp" data-g="${escapeHtml(g)}">${SELM.on ? `<input type="checkbox" class="selcb" data-selg="${escapeHtml(g)}">` : ''}<span class="kn">${open ? '▾' : '▸'} ${escapeHtml(g)} (${groups[g].length})</span><button class="eye" data-ga="hid">👁</button><button class="eye" data-ga="ren">✎</button></div>` + (open ? `<div class="gkids">${groups[g].map(row).join('')}</div>` : ''); });
@@ -3782,7 +3858,13 @@ function decorateLayers(){
 const el = $('layList'); if (!el) return;
 let tb = $('laySelBar'); if (!tb){ tb = document.createElement('div'); tb.id = 'laySelBar'; tb.className = 'row'; tb.style.marginBottom = '8px'; el.parentNode.insertBefore(tb, el); }
 selBar();
+tagBar(); if (MKX === null) MKX = secMode !== 'mk';
+const mh = [...el.querySelectorAll('.sub-h')].find(h => h.textContent.replace(/[▸▾\s\d()]/g, '') === 'Макет');
+if (mh){ const n = state.arrays.filter(isMk).length; mh.textContent = `${MKX ? '▸' : '▾'} Макет (${n})`; mh.style.cursor = 'pointer'; mh.onclick = () => { MKX = !MKX; renderLayers(); }; }
 el.querySelectorAll('.arr[data-id]').forEach(r => { const id = +r.dataset.id, a = arrById(id); if (!a) return;
+if ((MKX && isMk(a)) || (TAGF && !tagOk(a) && !layItems(a).some(x => (x.o.tags || []).includes(TAGF)))){ r.style.display = 'none'; return; }
+const tgb = document.createElement('button'); tgb.className = 'eye'; tgb.textContent = '#'; tgb.title = 'Теги слоя'; tgb.onclick = e => { e.stopPropagation(); const v = prompt('Теги слоя через запятую (например: 111 мсп, 1 мсб)', (a.tags || []).join(', ')); if (v === null) return; a.tags = parseTags(v); if (!a.tags.length) delete a.tags; persist(); renderLayers(); }; r.appendChild(tgb);
+if (a.tags && a.tags.length){ const nm = r.querySelector('.nm div:last-child'); if (nm) nm.innerHTML += a.tags.map(t => ` <small class="tg">#${escapeHtml(t)}</small>`).join(''); }
 const tg = document.createElement('button'); tg.className = 'eye'; tg.textContent = LX.has(id) ? '▾' : '▸'; tg.title = 'Объекты слоя'; tg.onclick = e => { e.stopPropagation(); LX.has(id) ? LX.delete(id) : LX.add(id); renderLayers(); }; r.insertBefore(tg, r.firstChild);
 if (SELM.on){ const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'selcb'; cb.checked = SELM.sel.has('L:' + id); cb.onchange = () => { cb.checked ? SELM.sel.add('L:' + id) : SELM.sel.delete('L:' + id); selBar(); }; r.insertBefore(cb, r.firstChild); }
 const rn = document.createElement('button'); rn.className = 'eye'; rn.textContent = '✎'; rn.title = 'Переименовать'; rn.onclick = e => { e.stopPropagation(); const v = prompt('Название слоя', a.name); if (v && v.trim()){ a.name = v.trim(); persist(); renderLayers(); } }; r.appendChild(rn);
@@ -3800,7 +3882,152 @@ $('batOk').onclick = () => { const its = selItems(), side = $('batSide').value, 
 its.forEach(x => { const o = x.o; if (x.t === 'p'){ if (bat.sym !== undefined){ if (bat.sym) o.sym = bat.sym; else delete o.sym; } if (side) o.side = side; if (bat.fc !== undefined){ if (bat.fc) o.fc = bat.fc; else delete o.fc; } }
 if (rot != null && (x.t === 'p' || x.t === 'e' || x.t === 'x')) { if (x.t === 'x') o.r = rot; else o.rot = rot; } });
 if (to){ its.filter(x => x.a !== to).sort((x, y) => y.i - x.i).forEach(x => { const k = ARRK[x.t]; const o = x.a[k].splice(x.i, 1)[0]; if (!to[k]) to[k] = []; to[k].push(o); }); }
+const tg = parseTags($('batTags').value); if (tg.length) its.forEach(x => { x.o.tags = [...new Set((x.o.tags || []).concat(tg))]; }); $('batTags').value = '';
 SELM.sel.clear(); persist(); renderMarkers(); closeModals(); openModal('layModal'); renderLayers(); toast('Изменено: ' + its.length); };
+
+// ======== СЛОИ: ТЕГИ, МИНИАТЮРЫ, КЭШ, БЫСТРОЕ СОЗДАНИЕ ========
+let TAGF = null, MKX = null;
+function tagOk(a, o){ if (!TAGF) return true; return (a.tags || []).includes(TAGF) || !!(o && (o.tags || []).includes(TAGF)); }
+function allTags(){ const t = new Set(); state.arrays.forEach(a => { (a.tags || []).forEach(x => t.add(x)); ['points', 'shapes', 'texts', 'tables', 'env'].forEach(k => (a[k] || []).forEach(o => (o.tags || []).forEach(x => t.add(x)))); }); return [...t].sort(); }
+const parseTags = v => [...new Set(String(v || '').split(',').map(x => x.trim()).filter(Boolean))];
+function quickLayer(){ const n = prompt('Название нового слоя', `Слой ${state.arrays.length + 1}`); if (n === null) return null; const name = n.trim() || `Слой ${state.arrays.length + 1}`;
+const a = normArr({id:Date.now(), kind:'pts', name, ident:name, style:copySt(state.palette[0] || DEFAULT_PAL[0]), points:[], shapes:[]}); state.arrays.push(a); persist(); LX.add(a.id);
+closeModals(); openModal('layModal'); layTab('L'); renderLayers(); toast(`Слой «${name}» создан — «＋» у слоя добавляет в него объекты`); return a; }
+function thumb(a, x){ const o = x.o;
+if (x.t === 'p'){ const sid = o.sym === '_none' ? null : (o.sym || a.sym), col = sid ? symCol(sid, sideOf(a, o), styleOf(a, o).color) : styleOf(a, o).color;
+return sid && SYM_BY[sid] ? `<span class="kth" style="color:${col}">${symSvg(sid, o.fc || a.fc)}</span>` : `<span class="kth"><i style="background:${col}"></i></span>`; }
+if (x.t === 's'){ const c = o.color || a.style.color; return `<span class="kth" style="color:${c}">${o.sym && SYM_BY[o.sym] ? symSvg(o.sym) : o.type === 'circle' ? IC.circle : o.type === 'line' ? IC.line : o.type === 'rect' ? IC.rect : IC.poly}</span>`; }
+if (x.t === 'x') return `<span class="kth" style="font:700 15px/1 '${o.f}',sans-serif;color:${o.c}">Т</span>`;
+if (x.t === 'tb') return '<span class="kth">▦</span>';
+return `<span class="kth" style="color:#2f7a34">${ENV_IC[o.k] || '■'}</span>`; }
+function tagBar(){ const el = $('tagBar'); if (!el) return; const tags = allTags();
+el.style.display = tags.length ? '' : 'none';
+el.innerHTML = tags.length ? `<button class="same ${TAGF ? '' : 'on'}" data-t="">все</button>` + tags.map(t => `<button class="same ${TAGF === t ? 'on' : ''}" data-t="${escapeHtml(t)}">#${escapeHtml(t)}</button>`).join('') : '';
+el.querySelectorAll('button').forEach(b => b.onclick = () => { TAGF = b.dataset.t || null; renderMarkers(); renderLayers(); toast(TAGF ? 'Показано только #' + TAGF : 'Показаны все'); }); }
+// ---- кэш
+function cacheGroups(){ const G = [];
+Object.entries(LAYERS).forEach(([k, d]) => { if (d.local) return; const res = d.urls.map(tmplRe); G.push({id:k, n:'Подложка: ' + d.name, test:u => res.some(r => r.test(u))}); });
+G.push({id:'dem', n:'Матрица высот', test:u => u.includes('elevation-tiles')});
+G.push({id:'obj', n:'3D-объекты (здания, леса, вышки)', test:u => /^obj\d?:/.test(u)});
+mbMaps.forEach(m => G.push({id:'mb_' + m.id, n:'Файл карты: ' + m.name, test:u => u.startsWith(`mb:${m.id}/`), map:m}));
+const cnt = {}; G.forEach(g => cnt[g.id] = 0); for (const k of savedKeys){ const g = G.find(x => x.test(k)); if (g) cnt[g.id]++; }
+G.forEach(g => g.n2 = cnt[g.id]); return G.filter(g => g.n2 || g.map); }
+const cacheOff = new Set(lsGet('skat_cache_off', []));
+let cOffRe = null;
+function cOff(u){ if (!cacheOff.size) return false; if (!cOffRe) cOffRe = cacheGroups().filter(g => cacheOff.has(g.id)); return cOffRe.some(g => g.test(u)); }
+function renderCache(){ const el = $('tabC'), G = cacheGroups();
+el.innerHTML = '<p class="status">Сохранённые на устройстве данные. «Скрыть» — не использовать (без удаления), «Удалить» — освободить память.</p>' + (G.length ? G.map(g => `<div class="arr${cacheOff.has(g.id) ? ' off' : ''}"><div class="nm"><div>${escapeHtml(g.n)}</div><div>${g.n2.toLocaleString('ru-RU')} шт.${cacheOff.has(g.id) ? ' · скрыто' : ''}</div></div><button data-id="${g.id}" data-a="hide">${cacheOff.has(g.id) ? 'Показать' : 'Скрыть'}</button><button class="eye" data-id="${g.id}" data-a="del">🗑</button></div>`).join('') : '<div class="empty">Кэш пуст.</div>');
+el.querySelectorAll('button').forEach(b => b.onclick = async () => { const g = G.find(x => x.id === b.dataset.id);
+if (b.dataset.a === 'hide'){ cacheOff.has(g.id) ? cacheOff.delete(g.id) : cacheOff.add(g.id); lsSet('skat_cache_off', [...cacheOff]); cOffRe = null; setLayer(state.layer); renderCache(); return; }
+askConfirm(`Удалить «${g.n}» (${g.n2} шт.) из памяти устройства?`, 'Удалить', async () => {
+if (g.map){ await deleteMap(g.map); openModal('layModal'); layTab('C'); return; }
+const keys = [...savedKeys].filter(g.test); await idbReady;
+for (let i = 0; i < keys.length; i += 500){ await new Promise(res => { try { const tx = idb.transaction('tiles', 'readwrite'), st = tx.objectStore('tiles'); keys.slice(i, i + 500).forEach(k => st.delete(k)); tx.oncomplete = res; tx.onerror = res; } catch(e){ res(); } }); }
+keys.forEach(k => savedKeys.delete(k)); if (g.id === 'obj') objCells.clear(); toast(`Удалено: ${keys.length}`); openModal('layModal'); layTab('C'); }); }); }
+
+// ======== ОПЕРАТОР: СВОЙСТВА ЗНАКА ========
+const FAKE = '#2aa84a';
+function symOpt(p){ return p && (p.plan || p.slw) ? {dash:!!p.plan, lw:p.slw || 2.6} : null; }
+function lbStyle(p){ if (!p || !(p.lf || p.ls || p.lc)) return ''; return ` style="${p.lf ? `font-family:'${p.lf}',sans-serif;` : ''}${p.ls ? `font-size:${p.ls}px;` : ''}${p.lc ? `color:${p.lc};` : ''}"`; }
+let propRef = null;
+function openProp(a, p){ propRef = {a, p};
+$('prPlan').checked = !!p.plan; $('prFake').checked = !!p.fake; $('prSz').value = p.ssz || 1; $('prLw').value = p.slw || 2.6; $('prLs').value = p.ls || 12.5;
+$('prLf').innerHTML = '<option value="">как обычно</option>' + FONTS.map(([v, n]) => `<option value="${v}">${n}</option>`).join(''); $('prLf').value = p.lf || '';
+renderFillPick($('prLc'), p.lc || null, c => { if (c) p.lc = c; else delete p.lc; renderMarkers(); }); prV(); openModal('propModal'); }
+function prV(){ $('prSzV').textContent = '×' + $('prSz').value; $('prLwV').textContent = $('prLw').value; $('prLsV').textContent = $('prLs').value; }
+['prPlan', 'prFake', 'prSz', 'prLw', 'prLf', 'prLs'].forEach(id => $(id).addEventListener('input', () => { const p = propRef.p;
+p.plan = $('prPlan').checked || undefined; p.fake = $('prFake').checked || undefined; const sz = +$('prSz').value, lw = +$('prLw').value, ls = +$('prLs').value;
+if (sz !== 1) p.ssz = sz; else delete p.ssz; if (lw !== 2.6) p.slw = lw; else delete p.slw; if (ls !== 12.5) p.ls = ls; else delete p.ls; if ($('prLf').value) p.lf = $('prLf').value; else delete p.lf;
+['plan', 'fake'].forEach(k => { if (!p[k]) delete p[k]; }); prV(); renderMarkers(); }));
+$('prOk').onclick = () => { persist(); closeModals(); renderMarkers(); };
+// ======== ПОИСК НАСЕЛЁННЫХ ПУНКТОВ ПО БАЗЕ НА УСТРОЙСТВЕ ========
+function nameSearch(q){ q = q.trim().toLowerCase().replace(/ё/g, 'е'); const out = [], seen = new Set(), norm = t => String(t).toLowerCase().replace(/ё/g, 'е');
+pdb.forEach(r => regItems(r).forEach(p => { const n = norm(p.name), k = p.name + Math.round(p.lat * 200) + Math.round(p.lng * 200); if (seen.has(k) || !n.includes(q)) return; seen.add(k); out.push({n:p.name, sub:{city:'город', town:'посёлок гор. типа', village:'село', hamlet:'деревня'}[p.type] || 'н.п.', lat:p.lat, lng:p.lng, sc:(n.startsWith(q) ? 0 : 1) + (PLC_RANK[p.type] ?? 3) * .1}); }));
+state.arrays.forEach(a => a.points.forEach((p, i) => { const n = labelOf(a, i); if (norm(n).includes(q)) out.push({n, sub:a.name, lat:p.lat, lng:p.lng, sc:2}); }));
+return out.sort((x, y) => x.sc - y.sc || x.n.localeCompare(y.n)).slice(0, 40); }
+$('sQ').addEventListener('input', () => { const q = $('sQ').value, el = $('sRes'); if (!/[а-яёa-z]{2,}/i.test(q)){ el.innerHTML = ''; return; }
+const R = nameSearch(q); el.innerHTML = R.length ? R.map((r, k) => `<div class="arr" data-k="${k}"><div class="nm"><div>${escapeHtml(r.n)}</div><div>${escapeHtml(r.sub)}</div></div></div>`).join('') : `<div class="empty">Не найдено. База н.п. на устройстве: ${pdb.reduce((s0, r) => s0 + r.items.length, 0)} пунктов — дополните её в «Слои» → «Карты».</div>`;
+el.querySelectorAll('.arr').forEach(d => d.onclick = () => { const r = R[+d.dataset.k]; closeModals(); map.setView([r.lat, r.lng], Math.max(map.getZoom(), 14));
+if (srchMk) map.removeLayer(srchMk); srchMk = L.marker([r.lat, r.lng], {icon:L.divIcon({className:'', html:'<div class="srchmk"></div>', iconSize:[0,0]}), interactive:false, keyboard:false}).addTo(map); toast(r.n); }); });
+// ======== ИНСТРУМЕНТЫ: СЕКТОР И ОВАЛЫ МАССИВОМ ========
+function destLL(c, az, r){ const R0 = 6371008.8, d = r / R0, la = c.lat * Math.PI / 180, lo = c.lng * Math.PI / 180, b = az * Math.PI / 180;
+const la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b)), lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(la2)); return L.latLng(la2 * 180 / Math.PI, lo2 * 180 / Math.PI); }
+function sectorPts(c, p1){ const r = distM(c, p1), az = segInfo(c, p1, GEO.toSK(c.lat, c.lng).zone).az, w = tool.sw || 30, out = [c];
+for (let i = 0; i <= 24; i++) out.push(destLL(c, az - w / 2 + w * i / 24, r)); out.push(c); return out; }
+function ovalPts(a, b){ const c = L.latLng((a.lat + b.lat) / 2, (a.lng + b.lng) / 2), L0 = distM(a, b) / 2, W = (tool.ow || 30) / 2, az = segInfo(a, b, GEO.toSK(a.lat, a.lng).zone).az, out = [];
+for (let i = 0; i <= 36; i++){ const t = i / 36 * 2 * Math.PI, x = Math.cos(t) * (L0 + W * .4), y = Math.sin(t) * W, r = Math.hypot(x, y), q = Math.atan2(y, x) * 180 / Math.PI; out.push(destLL(c, az + q, r)); } return out; }
+
+// ======== МАКЕТ: СЦЕНАРИЙ (МОНТАЖ), КАМЕРЫ, ОГОНЬ, НАСТРОЙКИ ОБЪЕКТОВ ========
+const FIRE_K = {gun:{tof:28, ev:6, n:6}, sau:{tof:30, ev:6, n:6}, rszo:{tof:25, ev:.5, n:12}, mortar:{tof:18, ev:5, n:8}, tank:{tof:1.5, ev:8, n:5}};
+let fireMode = null, camMode = 'free', camAng = 0, tlZoom = 8;
+const fxSrc = () => { try { return v3.getSource('fx'); } catch(e){ return null; } };
+function fxInit(){ try { if (!v3.getSource('fx')){ v3.addSource('fx', {type:'geojson', data:{type:'FeatureCollection', features:[]}});
+v3.addLayer({id:'fx', type:'fill-extrusion', source:'fx', paint:{'fill-extrusion-color':['get', 'c'], 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h'], 'fill-extrusion-opacity':.9}}); }
+v3.setLayoutProperty('apath', 'visibility', v3cfg.paths === false ? 'none' : 'visible'); } catch(e){} }
+function itKind(a, it){ const sid = it.sym || a.sym; return sid && MDL_OF[sid]; }
+function fireFx(t){ const F = [];
+state.arrays.forEach(a => a.points.forEach((p, pi) => { (p.fires || []).forEach(f => { const k = FIRE_K[f.k] || FIRE_K.gun, ov = ANIM.get(a.id + ':' + pi) || p;
+for (let i = 0; i < (f.n || k.n); i++){ const ts = (f.t0 || 0) + i * (f.ev || k.ev), dt = t - ts, tof = f.tof || k.tof, hsx = hsh(i * 3.1, f.t0 + 1), hsy = hsh(i * 7.7, f.t0 + 2);
+const tx = f.tx + (hsx - .5) * 50 / mk(f.ty)[0], ty = f.ty + (hsy - .5) * 50 / 111320;
+if (dt >= 0 && dt < tof){ const u = dt / tof, x = ov.lng + (tx - ov.lng) * u, y = ov.lat + (ty - ov.lat) * u, Hm = f.k === 'tank' ? 3 : Math.max(60, distM({lat:ov.lat, lng:ov.lng}, {lat:ty, lng:tx}) * .25), z = 4 * Hm * u * (1 - u) + 2;
+F.push({type:'Feature', properties:{c:'#ffd27a', b:z, h:z + 1.5}, geometry:{type:'Polygon', coordinates:[ngon([x, y], .8, 6)]}});
+if (v3cfg.traj !== false) for (let q = 1; q < 24; q++){ const w = q / 24; if (w > u) break; const zz = 4 * Hm * w * (1 - w) + 2; F.push({type:'Feature', properties:{c:'#ff8a2a', b:zz, h:zz + .4}, geometry:{type:'Polygon', coordinates:[ngon([ov.lng + (tx - ov.lng) * w, ov.lat + (ty - ov.lat) * w], .35, 4)]}}); } }
+const de = dt - tof; if (de >= 0 && de < 3){ const r = 4 + de * 9, hh = de < .6 ? 14 + de * 20 : 26 - de * 4; F.push({type:'Feature', properties:{c:de < .6 ? '#ffb02e' : '#6d6a64', b:0, h:Math.max(2, hh)}, geometry:{type:'Polygon', coordinates:[ngon([tx, ty], r, 12, i)]}}); }
+} }); }));
+const s0 = fxSrc(); if (s0) s0.setData({type:'FeatureCollection', features:F}); }
+function camTarget(){ let it = null, key = null;
+if (v3sel){ const a = state.arrays[v3sel.ai]; if (a){ it = v3item(a); key = (v3sel.ei != null ? 'e' : '') + a.id + ':' + (v3sel.ei != null ? v3sel.ei : v3sel.pi); } }
+if (!it && SC.cur){ const x = scnItems(SC.cur).find(z => z.it.path); if (x){ it = x.it; key = x.key; } }
+if (!it) return null; const ov = ANIM.get(key); return {lat:(ov || it).lat, lng:(ov || it).lng, hd:(((ov || it).rot ?? 180) - 90 + 360) % 360}; }
+function applyCam(dt){ if (camMode === 'free' || !v3) return; const T = camTarget(); if (!T && camMode !== 'top') return; const c0 = T ? [T.lng, T.lat] : v3.getCenter().toArray();
+try { if (camMode === 'top') v3.jumpTo({center:c0, pitch:0, bearing:0, zoom:Math.max(15, v3.getZoom())});
+else if (camMode === 'third') v3.jumpTo({center:c0, pitch:62, bearing:T.hd, zoom:18});
+else if (camMode === 'copter'){ camAng += (dt || .016) * 6; v3.jumpTo({center:c0, pitch:50, bearing:camAng, zoom:17.2}); }
+else if (camMode === 'plane'){ camAng += (dt || .016) * 9; const [kx, ky] = mk(T.lat), r = 500, q = camAng * Math.PI / 180; v3.jumpTo({center:[T.lng + Math.cos(q) * r * .25 / kx, T.lat + Math.sin(q) * r * .25 / ky], pitch:68, bearing:(90 - camAng + 360) % 360, zoom:15.6}); }
+else if (camMode === 'fpv'){ const [kx, ky] = mk(T.lat), h = T.hd * Math.PI / 180; v3.jumpTo({center:[T.lng + Math.sin(h) * 25 / kx, T.lat + Math.cos(h) * 25 / ky], pitch:84, bearing:T.hd, zoom:19.6}); } } catch(e){} }
+$('camSel').onchange = e => { camMode = e.target.value; camAng = v3 ? v3.getBearing() : 0; applyCam(); toast({free:'Свободная камера', top:'Вид сверху', third:'От третьего лица — за выбранным объектом', copter:'С коптера — облёт объекта', plane:'С самолётного БПЛА — круг над объектом', fpv:'От первого лица'}[camMode]); };
+// ---- монтажные дорожки
+function tlRender(){ const el = $('tlTracks'); if (!SC.cur){ el.innerHTML = ''; return; } const its = scnItems(SC.cur), pxs = tlZoom, W1 = Math.max(300, SC.T * pxs + 40);
+const rows = []; its.forEach(x => { const a = state.arrays.find(q => x.key.replace(/^e/, '').startsWith(q.id + ':')); const nm = x.it.k ? (ENV_N[x.it.k] || 'Объект') : (x.it.lbl || x.it.name || 'Объект');
+if (x.it.path && x.it.path.length > 1){ const dur = pathLen(x.it.path) / ((x.it.spd || 20) / 3.6); rows.push({nm, it:x.it, t0:x.it.t0 || 0, dur, cls:'mv'}); }
+(x.it.fires || []).forEach((f, fi) => { const k = FIRE_K[f.k] || FIRE_K.gun; rows.push({nm:nm + ' · огонь', it:f, t0:f.t0 || 0, dur:(f.n || k.n) * (f.ev || k.ev) + (f.tof || k.tof), cls:'fire'}); }); });
+el.innerHTML = `<div class="tlin" style="width:${W1}px"><div class="tlph" style="left:${SC.t * pxs + 110}px"></div>${rows.map((r, k) => `<div class="tlrow"><span class="tln">${escapeHtml(r.nm)}</span><div class="tlclip ${r.cls}" data-k="${k}" style="left:${r.t0 * pxs + 110}px;width:${Math.max(14, r.dur * pxs)}px">${fmtT(r.t0)}<i class="rh"></i></div></div>`).join('') || '<div class="empty" style="padding:8px">В сцене нет объектов с маршрутом или огнём.</div>'}</div>`;
+el.querySelectorAll('.tlclip').forEach(c => { const r = rows[+c.dataset.k]; let x0 = null, mode = null, b0 = 0, w0 = 0;
+c.addEventListener('touchstart', e => { e.stopPropagation(); x0 = e.touches[0].clientX; mode = e.target.classList.contains('rh') ? 'rs' : 'mv'; b0 = r.t0; w0 = r.dur; }, {passive:true});
+c.addEventListener('touchmove', e => { if (x0 == null) return; e.preventDefault(); const d = (e.touches[0].clientX - x0) / pxs;
+if (mode === 'mv'){ r.it.t0 = Math.max(0, Math.round((b0 + d) * 2) / 2); c.style.left = (r.it.t0 * pxs + 110) + 'px'; c.firstChild.textContent = fmtT(r.it.t0); }
+else if (r.cls === 'mv'){ const nd = Math.max(2, w0 + d); r.it.spd = Math.max(1, Math.round(pathLen(r.it.path) / nd * 3.6)); c.style.width = (nd * pxs) + 'px'; } }, {passive:false});
+c.addEventListener('touchend', () => { if (x0 == null) return; x0 = null; persist(); SC.T = scnDur(SC.cur); $('tlR').max = SC.T; scnSet(SC.t, true); tlRender(); }); });
+el.querySelector('.tlin').onclick = e => { if (e.target.closest('.tlclip')) return; const r0 = el.querySelector('.tlin').getBoundingClientRect(); scnPause(); scnSet((e.clientX - r0.left - 110) / pxs, true); };
+}
+$('tlZi').onclick = () => { tlZoom = Math.min(40, tlZoom * 1.5); tlRender(); }; $('tlZo').onclick = () => { tlZoom = Math.max(1, tlZoom / 1.5); tlRender(); };
+// ---- размер моделей, параметры деревьев, высота БПЛА, огонь
+function treeGen(o, F){ const st = o.step || 7, sp = o.sp ?? .3, kind = (x, y) => o.lf === 'n' || o.lf === 'b' ? o.lf : (hsh(x * 1e5, y * 1e5) < .5 ? 'n' : 'b');
+if (o.k === 'trow' && o.line){ const W2 = o.w || 8, nr = Math.max(1, Math.round(W2 / 4)), offs = Array.from({length:nr}, (_, i) => nr === 1 ? 0 : -W2 / 2 + W2 * i / (nr - 1));
+for (let i = 1; i < o.line.length; i++){ const [x1, y1] = o.line[i-1], [x2, y2] = o.line[i], [kx, ky] = mk(y1), dx = (x2 - x1) * kx, dy = (y2 - y1) * ky, L0 = Math.hypot(dx, dy); if (!L0) continue; const nx = -dy / L0, ny = dx / L0;
+for (let t = 0; t < L0; t += st) offs.forEach((of, q) => { const tt = t + (q % 2 ? st / 2 : 0) + (hsh(t, q) - .5) * st * sp, oo = of + (hsh(q, t) - .5) * st * sp; if (tt > L0) return; const px = x1 + (dx * tt / L0 + nx * oo) / kx, py = y1 + (dy * tt / L0 + ny * oo) / ky; addTree(F, px, py, kind(px, py), o.ts || 1, true); }); } return true; }
+if (o.k === 'tpoly' && o.ring){ let x0 = 180, x1 = -180, y0 = 90, y1 = -90; o.ring.forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }); const [kx, ky] = mk(y0), sx = st / kx, sy = st / ky; let n = 0;
+for (let y = y0 + sy / 2; y < y1 && n < 4000; y += sy) for (let x = x0 + sx / 2; x < x1 && n < 4000; x += sx){ const jx = x + (hsh(x * 1e4, y * 1e4) - .5) * sx * sp * 2, jy = y + (hsh(y * 1e4, x * 1e4) - .5) * sy * sp * 2; if (!inRing(jx, jy, o.ring)) continue; addTree(F, jx, jy, kind(jx, jy), o.ts || 1, true); n++; } return true; }
+if (o.k === 'grove' && (o.n || o.r)){ const [kx, ky] = mk(o.lat), N = o.n || 14, R = o.r || 18; for (let i = 0; i < N; i++){ const r = R * Math.sqrt(hsh(i, 3)), q = hsh(i, 7) * 6.28; addTree(F, o.lng + Math.cos(q) * r / kx, o.lat + Math.sin(q) * r / ky, kind(i, q), o.ts || 1, false); } return true; }
+return false; }
+function scaleFeats(F, c, s){ if (!s || s === 1) return; const [kx, ky] = mk(c[1]); F.forEach(f => { f.geometry.coordinates = f.geometry.coordinates.map(r => r.map(([x, y]) => [c[0] + (x - c[0]) * s, c[1] + (y - c[1]) * s])); f.properties.h *= s; f.properties.b *= s; }); }
+const optSel = (a, vals, cur, fmt) => `<select data-o="${a}">${vals.map(v => `<option value="${v}"${+cur === v ? ' selected' : ''}>${fmt(v)}</option>`).join('')}</select>`;
+function extraBar(a, p){ let h = optSel('msc', [.5, .75, 1, 1.5, 2, 3], p.msc || 1, v => 'размер ×' + v);
+const key = v3sel.ei == null ? itKind(a, p) : null;
+if (key && MDL_AIR[key]) h += optSel('alt', [20, 40, 60, 100, 150, 240, 400, 600], p.alt ?? (v3cfg.alt || 60), v => 'высота ' + v + ' м');
+if (v3sel.ei != null && ['trow', 'tpoly', 'grove'].includes(p.k)){ if (p.k !== 'grove') h += optSel('step', [3, 5, 7, 10, 15, 25], p.step || 7, v => 'шаг ' + v + ' м'); if (p.k === 'trow') h += optSel('w', [3, 6, 8, 12, 20, 40], p.w || 8, v => 'ширина ' + v + ' м');
+if (p.k === 'grove'){ h += optSel('n', [5, 10, 14, 25, 40, 80], p.n || 14, v => v + ' деревьев'); h += optSel('r', [8, 12, 18, 30, 50], p.r || 18, v => 'радиус ' + v + ' м'); }
+h += optSel('sp', [0, .2, .4, .7, 1], p.sp ?? .3, v => 'рассеивание ' + v); h += optSel('lf', ['m', 'n', 'b'].map((x, i) => i), ['m', 'n', 'b'].indexOf(p.lf || 'm'), v => ['смешанные', 'ели', 'берёзы'][v]); }
+if (key && FIRE_K[key]) h += `<button data-x="fire">Огонь${p.fires && p.fires.length ? ' (' + p.fires.length + ')' : ''}</button>${p.fires && p.fires.length ? '<button data-x="fclr">Сброс огня</button>' : ''}`;
+return h; }
+$('v3act').addEventListener('change', e => { const sl = e.target.closest('select[data-o]'); if (!sl || !v3sel) return; const a = state.arrays[v3sel.ai], p = a && v3item(a); if (!p) return; const k = sl.dataset.o, v = +sl.value;
+if (k === 'lf') p.lf = ['m', 'n', 'b'][v]; else if (k === 'msc' && v === 1) delete p.msc; else p[k] = v; persist(); v3upd(); });
+$('v3act').addEventListener('click', e => { const b = e.target.closest('button[data-x]'); if (!b || !v3sel) return; e.stopPropagation(); const a = state.arrays[v3sel.ai], p = a && v3item(a); if (!p) return;
+if (b.dataset.x === 'fire'){ fireMode = {a, p}; toast('Коснитесь цели на 3D-карте'); }
+if (b.dataset.x === 'fclr'){ delete p.fires; persist(); fireFx(SC.t); v3bar(); if (SC.cur) tlRender(); } }, true);
+function fireTap(e){ const {a, p} = fireMode, key = itKind(a, p) || 'gun', k = FIRE_K[key] || FIRE_K.gun; fireMode = null;
+(p.fires = p.fires || []).push({tx:+e.lngLat.lng.toFixed(6), ty:+e.lngLat.lat.toFixed(6), t0:Math.round((SC.cur ? SC.t : 0) * 2) / 2, k:key, n:k.n, ev:k.ev, tof:k.tof});
+persist(); v3bar(); if (SC.cur){ SC.T = scnDur(SC.cur); $('tlR').max = SC.T; tlRender(); } toast(`Огневое поражение: ${k.n} выстр., подлёт ${k.tof} с. Сдвиньте начало на шкале сценария`); }
 
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
@@ -3833,7 +4060,7 @@ mc.addEventListener('touchend', endG, {capture:true}); mc.addEventListener('touc
 }
 $('layBtn').onclick = () => { openModal('layModal'); layTab('L'); renderLayers(); };
 $('setBtn').onclick = () => { renderSymList(); renderClUI(); openModal('setModal'); $('ver2').textContent = VERSION; pdbInfo(); renderRelUI(); };
-$('layNew').onclick = () => { closeModals(); openArrModal(); };
+$('layNew').onclick = () => quickLayer();
 $('impBtn').onclick = () => $('csvIn').click();
 $('csvIn').onchange = async e => {
 const f = e.target.files[0]; e.target.value = '';
@@ -3844,6 +4071,7 @@ closeModals(); importCsv(text, f.name.replace(/\.[^.]+$/, ''));
 };
 let srchMk = null;
 function doSearch(){
+if (/[а-яёa-z]{2,}/i.test($('sQ').value)){ const r0 = $('sRes').querySelector('.arr'); if (r0) r0.click(); return; }
 try {
 const r = parseQuery($('sQ').value);
 closeModals();
