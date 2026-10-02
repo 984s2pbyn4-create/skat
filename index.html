@@ -415,7 +415,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 4.1';
+const VERSION = 'версия 4.2';
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
 document.documentElement.style.setProperty('--badge', framed ? '64px' : '10px');
@@ -2224,7 +2224,8 @@ return R;
 function addTree(F, x, y, kind, s, lite){
 const add = (ring, b, h, c) => F.push({type:'Feature', properties:{k:'tr', b, h, c}, geometry:{type:'Polygon', coordinates:[ring]}});
 const c = [x, y], j = hsh(x * 1e4, y * 1e4), sc = (0.8 + j * 0.45) * s;
-if (lite){ if (kind === 'n') add(ngon(c, 2.2 * sc, 5, j), 0.5, 12 * sc, ['#1f4b2a', '#235631', '#1c4426'][Math.floor(j * 3)]); else add(ngon(c, 2.4 * sc, 6, j), 1.6, 11 * sc, ['#4f8738', '#5a9340', '#467c32'][Math.floor(j * 3)]); return; }
+if (lite){ if (kind === 'n'){ const h = 12 * sc; add(ngon(c, 2.4 * sc, 6, j), 0.5, h * .55, ['#1f4b2a', '#21502d', '#1c4426'][Math.floor(j * 3)]); add(ngon(c, 1.3 * sc, 6, j + .5), h * .55, h, '#2a6538'); }
+else { const h = 11 * sc; add(ngon(c, 0.3, 4, 0), 0, h * .4, '#e7e2d6'); add(ngon(c, 2.4 * sc, 7, j), h * .4, h, ['#4f8738', '#5a9340', '#467c32'][Math.floor(j * 3)]); } return; }
 if (kind === 'n'){ const h = 12 * sc; add(ngon(c, 2.5 * sc, 6, j), 0.6, h * .42, '#1f4b2a'); add(ngon(c, 1.8 * sc, 6, j + .5), h * .42, h * .72, '#235631'); add(ngon(c, 1 * sc, 6, j), h * .72, h, '#2a6538'); }
 else { const h = 11 * sc; add(ngon(c, 0.3, 4, 0), 0, h * .42, '#e7e2d6'); add(ngon(c, 2.4 * sc, 7, j), h * .42, h, ['#5a9340', '#4f8738', '#6aa34a'][Math.floor(j * 3)]); }
 }
@@ -2249,23 +2250,22 @@ const F = [], add = (ring, k, b, h, c) => F.push({type:'Feature', properties:{k,
 const rows = R.filter(o => o.t === 'row'), allF = R.filter(o => o.t === 'f');
 allF.forEach(o => { if (o.w == null){ const A = areaM(o.ring), P = perM(o.ring); o.w = P ? 2 * A / P : 999; } });
 const strips = allF.filter(o => o.w < 45), fors = allF.filter(o => o.w >= 45);
-let budget = Math.round(3500 * d * Math.max(1, objCells.size));
-const rd = 5 / Math.sqrt(d), offs = d >= 0.8 ? [-4, 0, 4] : [-2.5, 2.5];
+const rowW = d >= 0.8 ? 10 : 7, kindOf = (lf, x, y) => lf === 'n' || lf === 'b' ? lf : (hsh(x * 1e5, y * 1e5) < .5 ? 'n' : 'b');
+const rowLen = rows.reduce((a0, o) => { let L1 = 0; for (let i = 1; i < o.line.length; i++){ const [kx, ky] = mk(o.line[i][1]); L1 += Math.hypot((o.line[i][0] - o.line[i-1][0]) * kx, (o.line[i][1] - o.line[i-1][1]) * ky); } return a0 + L1; }, 0);
+const areaT = allF.reduce((a0, o) => a0 + areaM(o.ring), 0) + rowLen * rowW;
+let budget = Math.round(15000 * d * Math.max(1, objCells.size));
+const S = Math.max(6 / Math.sqrt(d), Math.sqrt(areaT / Math.max(1, budget))), offs = rowW === 10 ? [-3.5, 0, 3.5] : [-2.2, 2.2], rs = S * offs.length * 2.2 / rowW;
 rows.forEach(o => { for (let i = 1; i < o.line.length && budget > 0; i++){ const [x1, y1] = o.line[i-1], [x2, y2] = o.line[i], [kx, ky] = mk(y1), dx = (x2 - x1) * kx, dy = (y2 - y1) * ky, L0 = Math.hypot(dx, dy); if (!L0) continue;
-const nx = -dy / L0, ny = dx / L0; for (let t = 0, r = 0; t < L0 && budget > 0; t += rd, r++){ offs.forEach((o2, q) => { if (budget <= 0) return; const tt = t + (q % 2 ? rd / 2 : 0); if (tt > L0) return; const px = x1 + (dx * tt / L0 + nx * o2) / kx, py = y1 + (dy * tt / L0 + ny * o2) / ky;
-addTree(F, px, py, hsh(px * 1e5, py * 1e5) < .5 ? 'b' : 'n', 0.9); budget--; }); } } });
-strips.forEach(o => { if (budget <= 0) return; let x0 = 180, x1 = -180, y0 = 90, y1 = -90; o.ring.forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); });
-const st = Math.max(3.5, Math.min(rd, o.w / 2.2)), [kx, ky] = mk(y0), sx = st / kx, sy = st / ky;
-for (let y = y0 + sy / 2; y < y1 && budget > 0; y += sy) for (let x = x0 + sx / 2; x < x1 && budget > 0; x += sx){
-const jx = x + (hsh(x * 1e4, y * 1e4) - .5) * sx * .7, jy = y + (hsh(y * 1e4, x * 1e4) - .5) * sy * .7;
-if (!inRing(jx, jy, o.ring)) continue; addTree(F, jx, jy, o.lf === 'm' ? (hsh(jx * 1e5, jy * 1e5) < .5 ? 'n' : 'b') : o.lf, .9); budget--; } });
-budget = Math.round(12000 * d * Math.max(1, objCells.size));
-const tot = fors.reduce((a, o) => a + areaM(o.ring), 0), S = Math.max(9 / Math.sqrt(d), Math.sqrt(tot / Math.max(1, budget)));
-fors.forEach(o => { let x0 = 180, x1 = -180, y0 = 90, y1 = -90; o.ring.forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); });
-const [kx, ky] = mk(y0), sx = S / kx, sy = S / ky;
+const nx = -dy / L0, ny = dx / L0, st = Math.max(S * S / (rowW * 1), 3.2);
+for (let t = 0; t < L0 && budget > 0; t += st) offs.forEach((o2, q) => { if (budget <= 0) return; const tt = t + (q % 2 ? st / 2 : 0); if (tt > L0) return;
+const px = x1 + (dx * tt / L0 + nx * o2) / kx, py = y1 + (dy * tt / L0 + ny * o2) / ky; if (hsh(px * 3e4, py * 3e4) > Math.min(1, (st * rowW) / (S * S * offs.length))) return;
+addTree(F, px, py, kindOf('m', px, py), .95, true); budget--; }); } });
+allF.forEach(o => { if (budget <= 0) return; let x0 = 180, x1 = -180, y0 = 90, y1 = -90; o.ring.forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); });
+const g = o.w < 45 ? Math.max(3, Math.min(S, o.w / 1.6)) : S, keep = (g / S) * (g / S), [kx, ky] = mk(y0), sx = g / kx, sy = g / ky;
 for (let y = y0 + sy / 2; y < y1 && budget > 0; y += sy) for (let x = x0 + sx / 2; x < x1 && budget > 0; x += sx){
 const jx = x + (hsh(x * 1e4, y * 1e4) - .5) * sx * .8, jy = y + (hsh(y * 1e4, x * 1e4) - .5) * sy * .8;
-if (!inRing(jx, jy, o.ring)) continue; addTree(F, jx, jy, o.lf === 'm' ? (hsh(jx * 1e5, jy * 1e5) < .5 ? 'n' : 'b') : o.lf, 1, true); budget--; } });
+if (keep < 1 && hsh(jx * 3e4, jy * 3e4) > keep) continue;
+if (!inRing(jx, jy, o.ring)) continue; addTree(F, jx, jy, kindOf(o.lf, jx, jy), 1, true); budget--; } });
 R.forEach(o => { switch (o.t){
 case 'b': { const wc = WALLS[o.id % WALLS.length], ar = areaM(o.ring), fl = Math.min(30, o.lv || Math.max(1, Math.round((o.h - 1) / 3)));
 if (ar < 25 || o.h < 2.6) add(o.ring, 'bw', 0, o.h, wc); else { const fh = (o.h - (o.h > fl * 3 ? 1 : 0)) / fl, wr = scaleRing(o.ring, ar < 150 ? .97 : .99); let z = 0;
