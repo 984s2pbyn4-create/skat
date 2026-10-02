@@ -55,6 +55,9 @@ radial-gradient(ellipse 18% 6% at 74% 16%, rgba(255,255,255,.65), rgba(255,255,2
 radial-gradient(ellipse 30% 6% at 45% 26%, rgba(255,255,255,.45), rgba(255,255,255,0) 70%),
 radial-gradient(ellipse 20% 5% at 90% 24%, rgba(255,255,255,.5), rgba(255,255,255,0) 70%),
 linear-gradient(#4f86c9 0%, #86b2e3 30%, #c9ddf0 46%, #e9eef0 55%, #8a9a86 100%)}
+body:has(#v3d.on) .modal{z-index:2600}
+#v3act{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(var(--safe-b, 0px) + 18px);z-index:7;padding:8px 10px;display:none;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center;max-width:94vw;font-size:14px;color:var(--ink)}
+#v3act.on{display:flex}#v3act b{width:100%;text-align:center}#v3act button{padding:7px 11px;border-radius:9px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:inherit;font:inherit}#v3act button.on{background:#3d6b2f}
 #v3panel{position:absolute;right:10px;top:calc(var(--safe-t) + var(--tg) + 56px);z-index:6;padding:10px 14px;display:none;flex-direction:column;gap:10px;font-size:14px;color:var(--ink)}
 #v3panel.on{display:flex}
 #v3panel label{display:flex;align-items:center;gap:8px}
@@ -404,15 +407,15 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 </div></div>
 <div id="v3d"><div id="v3map"></div>
 <div id="v3top"><button id="v3close" class="glass">✕ 2D</button><select id="v3base" class="glass"></select><label class="glass" id="v3exl">Рельеф: <span id="v3exv">Реальный</span><input type="range" id="v3ex" min="1" max="5" step="0.5" value="1"></label><button id="v3lay" class="glass">Слои</button></div>
-<div id="v3panel" class="glass"><label><input type="checkbox" data-k="places"> Населённые пункты</label><label><input type="checkbox" data-k="aux"> Ориентиры с подписями</label><label><input type="checkbox" data-k="shapes"> Фигуры, линии, маршруты</label><label><input type="checkbox" data-k="tac"> Тактические знаки и точки</label><label style="padding-left:26px"><input type="checkbox" data-k="tacLbl"> подписи знаков</label><label><input type="checkbox" data-k="bld"> Здания</label><label><input type="checkbox" data-k="towers"> Вышки и мачты</label><label><input type="checkbox" data-k="forest"> Леса и лесополосы</label><label style="flex-direction:column;align-items:stretch;gap:4px">Плотность деревьев: <span id="v3denv"></span><input type="range" id="v3den" min="0.2" max="2" step="0.1" style="width:100%;height:auto"></label><small style="color:var(--mute);max-width:220px;line-height:1.3">Объекты грузятся участками ~3×3 км вокруг центра на крупном масштабе и сохраняются для работы без интернета.</small></div>
-<div id="v3msg"></div></div>
+<div id="v3panel" class="glass"><label><input type="checkbox" data-k="places"> Населённые пункты</label><label><input type="checkbox" data-k="aux"> Ориентиры с подписями</label><label><input type="checkbox" data-k="shapes"> Фигуры, линии, маршруты</label><label><input type="checkbox" data-k="tac"> Тактические знаки и точки</label><label style="padding-left:26px"><input type="checkbox" data-k="tacLbl"> подписи знаков</label><label><input type="checkbox" data-k="mdl"> 3D-модели знаков</label><label style="flex-direction:column;align-items:stretch;gap:4px">Масштаб моделей: <span id="v3msv"></span><input type="range" id="v3ms" min="1" max="12" step="1" style="width:100%;height:auto"></label><label style="flex-direction:column;align-items:stretch;gap:4px">Высота БПЛА, м: <span id="v3altv"></span><input type="range" id="v3alt" min="10" max="500" step="10" style="width:100%;height:auto"></label><label><input type="checkbox" data-k="bld"> Здания</label><label><input type="checkbox" data-k="towers"> Вышки и мачты</label><label><input type="checkbox" data-k="forest"> Леса и лесополосы</label><label><input type="checkbox" data-k="brg"> Мосты, броды, паромы</label><label style="flex-direction:column;align-items:stretch;gap:4px">Плотность деревьев: <span id="v3denv"></span><input type="range" id="v3den" min="0.2" max="3" step="0.1" style="width:100%;height:auto"></label><small style="color:var(--mute);max-width:220px;line-height:1.3">Объекты грузятся участками ~3×3 км вокруг центра на крупном масштабе и сохраняются для работы без интернета.</small></div>
+<div id="v3msg"></div><div id="v3act" class="glass"></div></div>
 <div id="radial"></div>
 <div id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 3.8';
+const VERSION = 'версия 4.0';
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
 document.documentElement.style.setProperty('--badge', framed ? '64px' : '10px');
@@ -1991,7 +1994,7 @@ v3 = new ml.Map({container:'v3map', center:[c.lng, c.lat], zoom:Math.max(1, map.
 style:{version:8, sources:{base:v3baseSrc(cur),
 dem:{type:'raster-dem', tiles:['skat://dem/{z}/{x}/{y}'], tileSize:256, encoding:'terrarium', maxzoom:14},
 dem2:{type:'raster-dem', tiles:['skat://dem/{z}/{x}/{y}'], tileSize:256, encoding:'terrarium', maxzoom:14},
-obj:{type:'geojson', data:buildObjs([].concat(...objCells.values()), v3cfg.den)}, plc:{type:'geojson', data:v3places(c)}, aux3:{type:'geojson', data:v3aux()}, tac:{type:'geojson', data:v3tac(c)},
+obj:{type:'geojson', data:buildObjs([].concat(...objCells.values()), v3cfg.den)}, plc:{type:'geojson', data:v3places(c)}, aux3:{type:'geojson', data:v3aux()}, tac:{type:'geojson', data:v3tac(c)}, mdl:{type:'geojson', data:v3mdl(c)},
 pts:{type:'geojson', data:v3data()}},
 layers:[{id:'base', type:'raster', source:'base'},
 {id:'hs', type:'hillshade', source:'dem2', paint:{'hillshade-exaggeration':0.35}},
@@ -1999,11 +2002,14 @@ layers:[{id:'base', type:'raster', source:'base'},
 {id:'outl', type:'line', source:'pts', filter:['==', '$type', 'Polygon'], paint:{'line-color':['get', 'color'], 'line-width':2}},
 {id:'line', type:'line', source:'pts', filter:['==', '$type', 'LineString'], paint:{'line-color':['get', 'color'], 'line-width':3}},
 {id:'trees', type:'fill-extrusion', source:'obj', minzoom:12, filter:['==', ['get', 'k'], 'tr'], layout:{visibility:v3cfg.forest ? 'visible' : 'none'}, paint:{'fill-extrusion-color':['get', 'c'], 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h']}},
-{id:'bw', type:'fill-extrusion', source:'obj', minzoom:12, filter:['==', ['get', 'k'], 'bw'], layout:{visibility:v3cfg.bld ? 'visible' : 'none'}, paint:{'fill-extrusion-pattern':'tex-wall', 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h']}},
+{id:'bw', type:'fill-extrusion', source:'obj', minzoom:12, filter:['==', ['get', 'k'], 'bw'], layout:{visibility:v3cfg.bld ? 'visible' : 'none'}, paint:{'fill-extrusion-color':['get', 'c'], 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h']}},
+{id:'bwi', type:'fill-extrusion', source:'obj', minzoom:12, filter:['==', ['get', 'k'], 'bwi'], layout:{visibility:v3cfg.bld ? 'visible' : 'none'}, paint:{'fill-extrusion-pattern':'tex-win', 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h']}},
+{id:'bg', type:'fill-extrusion', source:'obj', minzoom:12, filter:['==', ['get', 'k'], 'bg'], layout:{visibility:v3cfg.brg ? 'visible' : 'none'}, paint:{'fill-extrusion-color':['get', 'c'], 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h']}},
 {id:'br', type:'fill-extrusion', source:'obj', minzoom:12, filter:['==', ['get', 'k'], 'br'], layout:{visibility:v3cfg.bld ? 'visible' : 'none'}, paint:{'fill-extrusion-color':['get', 'c'], 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h']}},
 {id:'mt', type:'fill-extrusion', source:'obj', minzoom:12, filter:['==', ['get', 'k'], 'mt'], layout:{visibility:v3cfg.bld ? 'visible' : 'none'}, paint:{'fill-extrusion-color':['get', 'c'], 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h']}},
 {id:'tl', type:'fill-extrusion', source:'obj', minzoom:12, filter:['==', ['get', 'k'], 'tl'], layout:{visibility:v3cfg.towers ? 'visible' : 'none'}, paint:{'fill-extrusion-pattern':'tex-lattice', 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h']}},
 {id:'ts', type:'fill-extrusion', source:'obj', minzoom:12, filter:['==', ['get', 'k'], 'ts'], layout:{visibility:v3cfg.towers ? 'visible' : 'none'}, paint:{'fill-extrusion-color':['get', 'c'], 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h']}},
+{id:'mdl', type:'fill-extrusion', source:'mdl', paint:{'fill-extrusion-color':['get', 'c'], 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h']}},
 {id:'aux3', type:'symbol', source:'aux3', layout:Object.assign({visibility:v3cfg.aux ? 'visible' : 'none'}, V3SYM)},
 {id:'plc', type:'symbol', source:'plc', layout:Object.assign({visibility:v3cfg.places ? 'visible' : 'none', 'symbol-sort-key':['get', 'rk']}, V3SYM)},
 {id:'tac', type:'symbol', source:'tac', layout:Object.assign({visibility:v3cfg.tac ? 'visible' : 'none'}, V3SYM)}],
@@ -2011,13 +2017,13 @@ terrain:{source:'dem', exaggeration:ex}}});
 v3.addControl(new ml.NavigationControl({visualizePitch:true}), 'bottom-right');
 v3.on('styleimagemissing', e => { try { if (!v3.hasImage(e.id)){ const im = v3img(e.id); if (im) v3.addImage(e.id, im, {pixelRatio:2}); } } catch(_){} });
 ['fill', 'outl', 'line'].forEach(id => { try { v3.setLayoutProperty(id, 'visibility', v3cfg.shapes ? 'visible' : 'none'); } catch(_){} });
-v3.on('load', ensureObjs); v3.on('moveend', ensureObjs);
+v3.on('load', ensureObjs); v3.on('moveend', ensureObjs); v3.on('click', v3tap);
 v3.on('load', () => { $('v3msg').textContent = 'Наклон — двумя пальцами вверх/вниз, поворот — двумя пальцами по кругу. Компас справа — север вверх.'; });
 v3.on('error', () => {});
 } catch(e){ el.classList.remove('on'); toast('Устройство не поддерживает 3D (WebGL)'); }
 }
 // ---- 3D: подписи и знаки как картинки (работают без интернета)
-const v3cfg = Object.assign({places:true, aux:true, shapes:true, tac:false, tacLbl:false, bld:false, towers:false, forest:false, den:0.6}, lsGet('skat_v3', {}));
+const v3cfg = Object.assign({places:true, aux:true, shapes:true, tac:false, tacLbl:false, bld:false, towers:false, forest:false, brg:true, den:0.6, mdl:true, ms:4, alt:60}, lsGet('skat_v3', {}));
 let v3center = null;
 const V3SYM = {'icon-image':['get', 'img'], 'icon-anchor':'bottom', 'icon-pitch-alignment':'viewport', 'icon-rotation-alignment':'viewport', 'icon-allow-overlap':false, 'icon-padding':1};
 const clean = t => String(t || '').replace(/\|/g, '/');
@@ -2032,10 +2038,67 @@ function v3tac(c){
 const F = [];
 state.arrays.forEach(a => { if (a.hidden || a.kind === 'aux' || a.kind === 'shapes') return;
 a.points.forEach((p, i) => { const sid = p.sym || a.sym, col = sid ? symCol(sid, sideOf(a, p), styleOf(a, p).color) : styleOf(a, p).color, fcol = p.fc || a.fc || '', lb = v3cfg.tacLbl ? clean(labelOf(a, i)) : '';
-F.push({d:Math.abs(p.lat - c.lat) + Math.abs(p.lng - c.lng), f:{type:'Feature', properties:{img:sid && SYM_BY[sid] ? `ts|${sid}|${col}|${lb}|${fcol}` : `td|${col}|${lb}`}, geometry:{type:'Point', coordinates:[p.lng, p.lat]}}}); }); });
+if (v3cfg.mdl && sid && MDL_OF[sid]) return; F.push({d:Math.abs(p.lat - c.lat) + Math.abs(p.lng - c.lng), f:{type:'Feature', properties:{ai:state.arrays.indexOf(a), pi:i, img:sid && SYM_BY[sid] ? `ts|${sid}|${col}|${lb}|${fcol}` : `td|${col}|${lb}`}, geometry:{type:'Point', coordinates:[p.lng, p.lat]}}}); }); });
 F.sort((x, y) => x.d - y.d);
 return {type:'FeatureCollection', features:F.slice(0, 500).map(x => x.f)};
 }
+// ---- 3D: модели тактических знаков (составлены из объёмных блоков)
+const M3 = {dk:'#262826', tr:'#1d1f1d', earth:'#6e5b3c', ditch:'#2f2a22', log:'#7a6440', cnv:'#5f6b45', skin:'#c9a27e'};
+function mmix(a, b, t){ const p = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16)); if (!/^#[0-9a-f]{6}$/i.test(a)) return b; const A = p(a), B = p(b); return '#' + A.map((v, i) => Math.round(v * (1 - t) + B[i] * t).toString(16).padStart(2, '0')).join(''); }
+// части: [тип, x, y, a, b, низ, верх, цвет]; box: центр x,y, длина a (вдоль), ширина b; cyl: центр, радиус a, грани b; нос модели — на запад (-x)
+const MB = (x, y, a, b, z0, z1, c) => ['b', x, y, a, b, z0, z1, c], MC = (x, y, r, n, z0, z1, c) => ['c', x, y, r, n, z0, z1, c];
+const tracks = (L, W) => [MB(0, W / 2 - .35, L, .7, 0, 1, 'tr'), MB(0, -W / 2 + .35, L, .7, 0, 1, 'tr')];
+const wheels = (xs, W, r) => xs.flatMap(x => [MC(x, W / 2, r, 8, 0, r * 2, 'tr'), MC(x, -W / 2, r, 8, 0, r * 2, 'tr')]);
+const man = x => [MB(x, 0, .3, .35, 0, .9, 'dk'), MB(x, 0, .3, .5, .9, 1.5, 'body'), MC(x, 0, .14, 6, 1.5, 1.8, 'skin')];
+const MDLS = {
+tank:[...tracks(7, 3.4), MB(0, 0, 6.8, 2.6, .5, 1.7, 'body'), MC(.6, 0, 1.45, 8, 1.7, 2.45, 'body2'), MB(-3.2, 0, 4.8, .26, 2, 2.26, 'dk')],
+bmp:[...tracks(6.7, 3.1), MB(.3, 0, 6.1, 2.4, .5, 1.95, 'body'), MB(-3.1, 0, .9, 2.4, .5, 1.45, 'body'), MC(0, 0, .85, 6, 1.95, 2.45, 'body2'), MB(-1.8, 0, 2.6, .16, 2.15, 2.31, 'dk')],
+btr:[...wheels([-2.6, -.9, .9, 2.6], 2.6, .6), MB(0, 0, 7.4, 2.8, .7, 2.1, 'body'), MB(-3.6, 0, .6, 2.4, .7, 1.7, 'body'), MC(-.6, 0, .7, 6, 2.1, 2.6, 'body2'), MB(-1.9, 0, 2, .14, 2.3, 2.44, 'dk')],
+truck:[...wheels([-2.4, .8, 2.2], 2.3, .55), MB(-2.4, 0, 1.8, 2.4, .8, 2.9, 'body'), MB(-3.35, 0, .3, 2.2, .8, 1.6, 'body'), MB(1, 0, 4.4, 2.5, 1.1, 2.8, 'cnv')],
+gun:[MB(1.8, .7, 3.6, .25, .2, .5, 'dk'), MB(1.8, -.7, 3.6, .25, .2, .5, 'dk'), MC(0, 1.2, .6, 8, 0, 1.2, 'tr'), MC(0, -1.2, .6, 8, 0, 1.2, 'tr'), MB(0, 0, .25, 2.4, .5, 1.9, 'body'), MB(-.2, 0, 1.6, .7, .9, 1.5, 'body2'), MB(-3, 0, 5.4, .24, 1.15, 1.39, 'dk')],
+sau:[...tracks(7.2, 3.3), MB(0, 0, 7, 2.6, .5, 1.7, 'body'), MB(1, 0, 3.8, 3, 1.7, 2.95, 'body2'), MB(-3.6, 0, 6.2, .3, 2.2, 2.5, 'dk')],
+rszo:[...wheels([-2.6, .4, 1.9, 3.4], 2.4, .6), MB(-2.7, 0, 1.9, 2.5, .8, 3, 'body'), MB(1.4, 0, 4.6, 2.5, 1.1, 1.6, 'dk'), MB(1.5, 0, 4.2, 2.3, 1.9, 3.3, 'body2'), MB(-.65, 0, .1, 2.1, 2, 3.2, 'dk')],
+mortar:[MC(0, 0, .55, 8, 0, .12, 'dk'), MB(-.35, 0, .3, .3, 0, 1.45, 'dk'), MB(-.7, .35, .12, .12, 0, .9, 'dk'), MB(-.7, -.35, .12, .12, 0, .9, 'dk'), ...man(1.2)],
+dugout:[MB(0, 0, 7, 4.6, 0, .9, 'earth'), MB(0, 0, 5.4, 3.4, .9, 1.25, 'log'), MB(4.1, 0, 2.2, 1.1, 0, .06, 'ditch')],
+uavpu:[MB(0, 0, 7, 4.6, 0, .9, 'earth'), MB(0, 0, 5.4, 3.4, .9, 1.25, 'log'), MB(4.1, 0, 2.2, 1.1, 0, .06, 'ditch'), MC(0, 0, .12, 6, 1.25, 6.2, 'dk'), MB(-.9, 0, 2.4, .12, 5.9, 6.05, 'dk'), MB(-1.9, 0, .1, 1.2, 5.5, 6.45, 'dk'), MB(-1.2, 0, .1, .9, 5.6, 6.35, 'dk'), MB(-.5, 0, .1, .7, 5.65, 6.3, 'dk'), MB(.15, 0, .1, .5, 5.7, 6.25, 'dk')],
+inf:[...man(-1.6).map(p => (p[2] += .9, p)), ...man(0), ...man(1.6).map(p => (p[2] -= .9, p)), ...man(.8).map(p => (p[2] -= 2, p))],
+flagR:[MC(0, 0, .13, 6, 0, 8, 'dk'), MB(-1.65, 0, 3.2, .1, 5.6, 7.9, 'side')],
+flagT:[MC(0, 0, .13, 6, 0, 8, 'dk'), MB(-.55, 0, 1.1, .1, 5.4, 7.9, 'side'), MB(-1.55, 0, .9, .1, 5.95, 7.35, 'side'), MB(-2.4, 0, .8, .1, 6.4, 6.9, 'side')],
+flagT2:[MC(0, 0, .13, 6, 0, 8.5, 'dk'), MB(0, 0, .9, .1, 7.6, 7.8, 'dk'), MB(0, 0, .9, .1, 8.05, 8.25, 'dk'), MB(-.55, 0, 1.1, .1, 5.2, 7.4, 'side'), MB(-1.55, 0, .9, .1, 5.65, 6.95, 'side'), MB(-2.4, 0, .8, .1, 6.05, 6.55, 'side')],
+uavp:[MB(0, 0, 3.2, .42, 0, .4, 'body'), MB(.1, 0, .75, 4.6, .1, .26, 'body2'), MB(1.4, 0, .4, 1.6, .1, .22, 'body2'), MB(1.5, 0, .45, .09, .3, .95, 'body2'), MC(1.65, 0, .18, 6, .12, .3, 'dk')],
+ferry:[MB(0, 1.5, 10, 1.3, 0, .8, 'dk'), MB(0, -1.5, 10, 1.3, 0, .8, 'dk'), MB(0, 0, 9, 4.4, .8, 1, 'body'), MB(-5.3, 0, 1.6, 3.4, .7, .9, 'body2'), MB(5.3, 0, 1.6, 3.4, .7, .9, 'body2'), MB(2.6, 1.6, 1.6, 1, 1, 2.4, 'body2'), MB(-1, 0, 4.2, 2.2, 1, 2, 'cnv')],
+uavk:[MB(0, 0, .6, .6, 0, .3, 'body'), ['r', 0, 0, 2.2, .12, .05, .2, 'dk', Math.PI / 4], ['r', 0, 0, 2.2, .12, .05, .2, 'dk', -Math.PI / 4], ...[[.78, .78], [.78, -.78], [-.78, .78], [-.78, -.78]].map(([x, y]) => MC(x, y, .42, 8, .22, .27, 'body2'))]};
+const MDL_OF = {pu:'flagR', kp:'flagT', kp_m:'flagT', kp_r:'flagT2', kp_v:'flagT2', knp_b1:'flagT', knp_b2:'flagT', knp_r1:'flagT2', knp_r2:'flagT2', kp_rm:'bmp',
+tank:'tank', tank_pl:'tank', tank_tr:'tank', tank_bul:'tank', okop_t:'tank', bmp:'bmp', bmp_tr:'bmp', brm:'bmp', btr:'btr', brdm:'btr', dozor:'bmp',
+auto:'truck', auto_pr:'truck', auto_san:'truck', tyag_a:'truck', tyag_ap:'truck',
+art:'gun', art122:'gun', art155:'gun', art155p:'gun', art_ya:'gun', ptp:'gun', ptp85:'gun', ptp100:'gun', ptp100p:'gun', bat_art:'gun', lozh:'gun',
+sau:'sau', rszo:'rszo', rszo_s:'rszo', rszo_k:'rszo', min:'mortar', min_s:'mortar', min_k:'mortar', bat_min:'mortar', sam_min:'sau',
+blind:'dugout', blind_zhb:'dugout', ubezh:'dugout', ukr_zhb:'dugout', pu_bpla:'uavpu', zhs:'inf', pesh_doz:'inf', sekret:'inf',
+bpla:'uavp', bpla_k:'uavk', perepr:'ferry', op:'op', okop:'trSeg', okop_o:'trSeg'};
+const MDL_AIR = {uavp:1, uavk:1};
+function mdlPoly(cx, cy, kx, ky, ang, pts){ const ca = Math.cos(ang), sa = Math.sin(ang); const r = pts.map(([x, y]) => [cx + (x * ca - y * sa) / kx, cy + (x * sa + y * ca) / ky]); r.push(r[0]); return r; }
+function mdlParts(F, lng, lat, key, col, S, ang, lift, pure){ const [kx, ky] = mk(lat), C = pure ? {body:col, body2:mmix(col, '#000000', .25), side:col} : {body:mmix(col, '#3f4a24', .45), body2:mmix(col, '#2f3a1a', .55), side:col};
+(MDLS[key] || []).forEach(p => { const [t, x, y, a, b, z0, z1, c] = p; let loc;
+if (t === 'c'){ loc = []; for (let i = 0; i < b; i++){ const q = i / b * 2 * Math.PI; loc.push([x + Math.cos(q) * a, y + Math.sin(q) * a]); } }
+else { const ra = t === 'r' ? p[8] : 0, cr = Math.cos(ra), sr = Math.sin(ra); loc = [[-a / 2, -b / 2], [a / 2, -b / 2], [a / 2, b / 2], [-a / 2, b / 2]].map(([u, v]) => [x + u * cr - v * sr, y + u * sr + v * cr]); }
+F.push({type:'Feature', properties:{c:C[c] || M3[c] || c, b:lift + z0 * S, h:lift + z1 * S}, geometry:{type:'Polygon', coordinates:[mdlPoly(lng, lat, kx, ky, ang, loc.map(([u, v]) => [u * S, v * S]))]}}); }); }
+function mdlTrench(F, line, S, closed){ // траншея: ров и бруствер вдоль линии
+const lat0 = line[0][1], [kx, ky] = mk(lat0), P = line.map(([x, y]) => [x * kx, y * ky]), w = 0.9 * Math.max(1, S / 2), out = [];
+const band = (o1, o2, b, h, c) => { for (let i = 1; i < P.length; i++){ const [x1, y1] = P[i-1], [x2, y2] = P[i], L0 = Math.hypot(x2 - x1, y2 - y1); if (!L0) continue; const nx = -(y2 - y1) / L0, ny = (x2 - x1) / L0;
+const q = [[x1 + nx * o1, y1 + ny * o1], [x2 + nx * o1, y2 + ny * o1], [x2 + nx * o2, y2 + ny * o2], [x1 + nx * o2, y1 + ny * o2]].map(([x, y]) => [x / kx, y / ky]); q.push(q[0]);
+F.push({type:'Feature', properties:{c, b, h}, geometry:{type:'Polygon', coordinates:[q]}}); } };
+band(-w, w, 0, .05, M3.ditch); band(w, w * 2.2, 0, .55 * Math.max(1, S / 3), M3.earth); band(-w * 2.2, -w, 0, .35 * Math.max(1, S / 3), M3.earth); }
+function v3mdl(c){ const F = []; if (!v3cfg.mdl) return {type:'FeatureCollection', features:F}; const S = v3cfg.ms || 4; let n = 0;
+state.arrays.forEach(a => { if (a.hidden || a.kind === 'aux') return;
+if (a.kind === 'shapes'){ (a.shapes || []).forEach(sh => { const sy = sh.sym && SYM_BY[sh.sym]; if (!sy || !sh.pts || sh.pts.length < 2) return;
+if (/trench|rub_obor|a_obor/.test(sy.style)){ const L = sh.pts.map(p => [p.lng, p.lat]); if (sy.type === 'area') L.push(L[0]); mdlTrench(F, L, S); } }); return; }
+a.points.forEach((p, pi) => { const sid = p.sym || a.sym, key = sid && MDL_OF[sid]; if (!key || n > 400) return; const f0 = F.length, ai = state.arrays.indexOf(a); if (Math.abs(p.lat - c.lat) > 0.3 || Math.abs(p.lng - c.lng) > 0.45) return; n++;
+const col = sid === 'lozh' ? SCOL.g : symCol(sid, sideOf(a, p), styleOf(a, p).color), ang = -(p.rot || a.rot || 0) * Math.PI / 180;
+if (key === 'op' || key === 'trSeg'){ const [kx, ky] = mk(p.lat), R = key === 'op' ? 9 * S : 4 * S, L = []; const n2 = key === 'op' ? 24 : 6;
+for (let i = 0; i <= n2; i++){ const q = key === 'op' ? i / n2 * 2 * Math.PI : Math.PI * (0.65 + i / n2 * 0.7); L.push([p.lng + Math.cos(q) * R / kx, p.lat + Math.sin(q) * R / ky]); }
+mdlTrench(F, L, S); if (key === 'op') [[-.4, .3], [.35, -.2], [0, .45]].forEach(([u, v]) => mdlParts(F, p.lng + u * R / kx, p.lat + v * R / ky, 'inf', col, S * .7, 0, 0)); return; }
+mdlParts(F, p.lng, p.lat, key, col, MDL_AIR[key] ? Math.max(2, S * .8) : S, ang, MDL_AIR[key] ? (v3cfg.alt || 60) : 0, sid === 'lozh'); for (let k = f0; k < F.length; k++){ F[k].properties.ai = ai; F[k].properties.pi = pi; } }); });
+return {type:'FeatureCollection', features:F}; }
 function txtCanvas(w, h){ const c = document.createElement('canvas'); c.width = Math.ceil(w * 2); c.height = Math.ceil(h * 2); const g = c.getContext('2d'); g.scale(2, 2); return [c, g]; }
 function haloText(g, t, x, y, fs, col, bold){ g.font = `${bold ? 700 : 600} ${fs}px "IBM Plex Sans Condensed", sans-serif`; g.textBaseline = 'alphabetic'; g.lineJoin = 'round'; g.lineWidth = 3.5; g.strokeStyle = 'rgba(0,0,0,.85)'; g.strokeText(t, x, y); g.fillStyle = col; g.fillText(t, x, y); }
 function v3img(id){
@@ -2052,6 +2115,7 @@ if (lb) haloText(g, lb, (w - lw) / 2 + 5, 13, fs, '#fff', true);
 g.strokeStyle = 'rgba(30,30,30,.9)'; g.lineWidth = 2; g.beginPath(); g.moveTo(x0, top + 38); g.lineTo(x0, h); g.stroke();
 g.fillStyle = 'rgba(255,255,255,.93)'; g.strokeStyle = col; g.lineWidth = 2; g.beginPath(); g.roundRect ? g.roundRect(x0 - 20, top, 40, 38, 6) : g.rect(x0 - 20, top, 40, 38); g.fill(); g.stroke();
 if (kind === 'ts') drawSym(g, a1, x0, top + 19, col, a4 || null); else { g.fillStyle = col; g.beginPath(); g.arc(x0, top + 19, 8, 0, 7); g.fill(); } }
+else if (kind === 'tex-win'){ [c, g] = txtCanvas(16, 16); g.fillStyle = '#ddd3bf'; g.fillRect(0, 0, 16, 16); g.fillStyle = '#f2ede2'; g.fillRect(3, 0, 10, 16); g.fillStyle = '#41566a'; g.fillRect(4, 0, 8, 16); g.fillStyle = '#f2ede2'; g.fillRect(7.5, 0, 1, 16); g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(4, 0, 3, 16); }
 else if (kind === 'tex-wall'){ [c, g] = txtCanvas(32, 32); g.fillStyle = '#e2d9c6'; g.fillRect(0, 0, 32, 32); g.fillStyle = '#cfc4ad'; g.fillRect(0, 30, 32, 2);
 [[5, 8], [19, 8]].forEach(([x, y]) => { g.fillStyle = '#f4efe4'; g.fillRect(x - 1, y - 1, 10, 13); g.fillStyle = '#4f6273'; g.fillRect(x, y, 8, 11); g.fillStyle = '#f4efe4'; g.fillRect(x + 3.5, y, 1, 11); g.fillRect(x, y + 4, 8, 1); g.fillStyle = 'rgba(255,255,255,.3)'; g.fillRect(x, y, 3, 4); }); }
 else if (kind === 'tex-lattice'){ [c, g] = txtCanvas(16, 16); g.fillStyle = '#c4c8cc'; g.fillRect(0, 0, 16, 16); g.strokeStyle = '#626870'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(0, 0); g.lineTo(16, 16); g.moveTo(16, 0); g.lineTo(0, 16); g.moveTo(0, .7); g.lineTo(16, .7); g.moveTo(.7, 0); g.lineTo(.7, 16); g.stroke(); }
@@ -2081,11 +2145,14 @@ return await blob.arrayBuffer();
 function v3apply(){
 if (!v3) return; lsSet('skat_v3', v3cfg);
 const vis = (id, on) => { try { v3.setLayoutProperty(id, 'visibility', on ? 'visible' : 'none'); } catch(_){} };
-vis('plc', v3cfg.places); ['bw', 'br', 'mt'].forEach(id => vis(id, v3cfg.bld)); ['tl', 'ts'].forEach(id => vis(id, v3cfg.towers)); vis('trees', v3cfg.forest); ensureObjs(); vis('aux3', v3cfg.aux); vis('tac', v3cfg.tac); ['fill', 'outl', 'line'].forEach(id => vis(id, v3cfg.shapes));
+vis('plc', v3cfg.places); vis('bg', v3cfg.brg); ['bw', 'bwi', 'br', 'mt'].forEach(id => vis(id, v3cfg.bld)); ['tl', 'ts'].forEach(id => vis(id, v3cfg.towers)); vis('trees', v3cfg.forest); ensureObjs(); vis('aux3', v3cfg.aux); vis('tac', v3cfg.tac); ['fill', 'outl', 'line'].forEach(id => vis(id, v3cfg.shapes));
 try { if (v3cfg.tac) v3.getSource('tac').setData(v3tac(v3.getCenter())); } catch(_){}
+try { v3.getSource('mdl').setData(v3mdl(v3.getCenter())); } catch(_){}
 }
-$('v3lay').onclick = () => { $('v3panel').classList.toggle('on'); $('v3den').value = v3cfg.den; $('v3denv').textContent = '×' + v3cfg.den; $('v3panel').querySelectorAll('input[data-k]').forEach(i => { i.checked = !!v3cfg[i.dataset.k]; }); };
+$('v3lay').onclick = () => { $('v3panel').classList.toggle('on'); $('v3den').value = v3cfg.den; $('v3denv').textContent = '×' + v3cfg.den; $('v3ms').value = v3cfg.ms; $('v3msv').textContent = '×' + v3cfg.ms; $('v3alt').value = v3cfg.alt; $('v3altv').textContent = v3cfg.alt; $('v3panel').querySelectorAll('input[data-k]').forEach(i => { i.checked = !!v3cfg[i.dataset.k]; }); };
 $('v3den').oninput = e => { $('v3denv').textContent = '×' + e.target.value; };
+$('v3ms').oninput = e => { $('v3msv').textContent = '×' + e.target.value; }; $('v3ms').onchange = e => { v3cfg.ms = +e.target.value; v3apply(); };
+$('v3alt').oninput = e => { $('v3altv').textContent = e.target.value; }; $('v3alt').onchange = e => { v3cfg.alt = +e.target.value; v3apply(); };
 $('v3den').onchange = e => { v3cfg.den = +e.target.value; lsSet('skat_v3', v3cfg); refreshObjs(); };
 $('v3panel').querySelectorAll('input[data-k]').forEach(i => i.onchange = () => { v3cfg[i.dataset.k] = i.checked; if (i.dataset.k === 'tacLbl' && i.checked) v3cfg.tac = true; $('v3panel').querySelectorAll('input[data-k]').forEach(q => { q.checked = !!v3cfg[q.dataset.k]; }); v3apply(); });
 // ---- 3D: здания, вышки, леса из OpenStreetMap
@@ -2121,17 +2188,21 @@ for (const el of (j.elements || [])){
 const t = el.tags || {}, mm = t.man_made || '', hT = parseFloat(String(t.height || '').replace(',', '.'));
 const pt = c => { if (t.power === 'tower') R.push({t:'pw', c, h:hT || 28}); else if (TK.test(mm)) R.push({t:'tank', c, r:(parseFloat(t.diameter) || (mm === 'silo' ? 6 : 10)) / 2, h:hT || (mm === 'silo' ? 18 : 9)});
 else if (mm === 'water_tower') R.push({t:'wt', c, h:hT || 24}); else if (mm === 'chimney') R.push({t:'ch', c, h:hT || 30}); else if (mm) R.push({t:'mast', c, h:hT || (mm === 'mast' ? 45 : 35)}); };
-if (el.type === 'node'){ if (t.power === 'tower' || TK.test(mm) || TW.test(mm)) pt([+el.lon.toFixed(6), +el.lat.toFixed(6)]); continue; }
+if (el.type === 'node'){ if (t.ford && t.ford !== 'no'){ R.push({t:'fordp', c:[+el.lon.toFixed(6), +el.lat.toFixed(6)]}); continue; } if (t.power === 'tower' || TK.test(mm) || TW.test(mm)) pt([+el.lon.toFixed(6), +el.lat.toFixed(6)]); continue; }
 if (el.type !== 'way' || !el.geometry) continue;
 const ring = el.geometry.map(q => [+q.lon.toFixed(6), +q.lat.toFixed(6)]);
 if (t.natural === 'tree_row'){ R.push({t:'row', line:ring}); continue; }
+if (t.route === 'ferry'){ R.push({t:'fer', line:ring}); continue; }
+if (t.ford && t.ford !== 'no'){ R.push({t:'ford', line:ring}); continue; }
+if (t.bridge && t.bridge !== 'no' && (t.highway || t.railway)){ const HW = {motorway:14, trunk:12, primary:11, secondary:9, tertiary:8, residential:6, unclassified:6, service:4, track:4, footway:2.5, path:2.5, cycleway:2.5, pedestrian:4};
+R.push({t:'brg', line:ring, w:parseFloat(t.width) || (t.railway ? 5 : HW[t.highway] || 6), rw:!!t.railway, lv:Math.max(0, parseInt(t.layer) || 1)}); continue; }
 if (ring.length < 3) continue;
 if (ring[0][0] !== ring[ring.length-1][0] || ring[0][1] !== ring[ring.length-1][1]) ring.push(ring[0]);
 if (ring.length < 4) continue;
 if (TK.test(mm)){ const c = cen(ring); R.push({t:'tank', c, r:Math.max(2, Math.sqrt(areaM(ring) / Math.PI)), h:hT || (mm === 'silo' ? 18 : 9)}); continue; }
 if (TW.test(mm)){ pt(cen(ring)); continue; }
 if (t.building){ const lv = parseFloat(t['building:levels']), HB = {apartments:14, industrial:9, warehouse:8, church:16, commercial:8, garage:3, garages:3, shed:3, hut:3};
-R.push({t:'b', ring, h:Math.min(150, hT || (lv ? lv * 3 + 1 : HB[t.building] || 6)), id:el.id % 1000}); continue; }
+R.push({t:'b', ring, h:Math.min(150, hT || (lv ? lv * 3 + 1 : HB[t.building] || 6)), lv:lv || 0, id:el.id % 1000}); continue; }
 if (t.landuse === 'forest' || t.natural === 'wood') R.push({t:'f', ring, lf:t.leaf_type === 'needleleaved' ? 'n' : t.leaf_type === 'broadleaved' ? 'b' : 'm'});
 }
 return R;
@@ -2142,24 +2213,47 @@ const c = [x, y], j = hsh(x * 1e4, y * 1e4), sc = (0.8 + j * 0.45) * s;
 if (kind === 'n'){ const h = 12 * sc; add(ngon(c, 2.5 * sc, 6, j), 0.6, h * .42, '#1f4b2a'); add(ngon(c, 1.8 * sc, 6, j + .5), h * .42, h * .72, '#235631'); add(ngon(c, 1 * sc, 6, j), h * .72, h, '#2a6538'); }
 else { const h = 11 * sc; add(ngon(c, 0.3, 4, 0), 0, h * .42, '#e7e2d6'); add(ngon(c, 2.4 * sc, 7, j), h * .42, h, ['#5a9340', '#4f8738', '#6aa34a'][Math.floor(j * 3)]); }
 }
+const WALLS = ['#ddd3bf', '#d6cdbd', '#e4dccb', '#cdbfa5', '#c9c4bb', '#b98a6a'];
+function strip(add, line, W, b, h, c, gap){ // полоса шириной W вдоль линии; gap>0 — пунктир (шаг, м)
+for (let i = 1; i < line.length; i++){ const [x1, y1] = line[i-1], [x2, y2] = line[i], [kx, ky] = mk(y1), dx = (x2 - x1) * kx, dy = (y2 - y1) * ky, L0 = Math.hypot(dx, dy); if (!L0) continue;
+const nx = -dy / L0 * W / 2, ny = dx / L0 * W / 2, seg = gap ? gap : L0;
+for (let t = 0; t < L0; t += gap ? gap * 2 : L0){ const t2 = Math.min(L0, t + seg), ax = x1 + dx * t / L0 / kx, ay = y1 + dy * t / L0 / ky, bx = x1 + dx * t2 / L0 / kx, by = y1 + dy * t2 / L0 / ky;
+add([[ax + nx / kx, ay + ny / ky], [bx + nx / kx, by + ny / ky], [bx - nx / kx, by - ny / ky], [ax - nx / kx, ay - ny / ky], [ax + nx / kx, ay + ny / ky]], 'bg', b, h, c); } } }
+function midLine(line){ let tot = 0; for (let i = 1; i < line.length; i++){ const [kx, ky] = mk(line[i][1]); tot += Math.hypot((line[i][0] - line[i-1][0]) * kx, (line[i][1] - line[i-1][1]) * ky); }
+let acc = 0; for (let i = 1; i < line.length; i++){ const [kx, ky] = mk(line[i][1]), dx = (line[i][0] - line[i-1][0]) * kx, dy = (line[i][1] - line[i-1][1]) * ky, L0 = Math.hypot(dx, dy);
+if (acc + L0 >= tot / 2 && L0){ const f = (tot / 2 - acc) / L0; return {c:[line[i-1][0] + (line[i][0] - line[i-1][0]) * f, line[i-1][1] + (line[i][1] - line[i-1][1]) * f], ang:Math.atan2(dy, dx) + Math.PI}; } acc += L0; } return null; }
+function brgParts(add, o){ const D = 3 + o.lv * 2.5, W = o.w, dc = o.rw ? '#6f6a63' : '#8e8b84';
+strip(add, o.line, W, D, D + .8, dc, 0); // настил
+strip(add, offLine(o.line, W / 2 - .2), .3, D + .8, D + 1.9, '#55595c', 0); strip(add, offLine(o.line, -W / 2 + .2), .3, D + .8, D + 1.9, '#55595c', 0); // ограждение
+if (o.rw) [W / 2 - .3, -W / 2 + .3].forEach(q => strip(add, offLine(o.line, q), .35, D + .8, D + 4.5, '#4c5154', 6)); // фермы
+let acc = 18; for (let i = 1; i < o.line.length; i++){ const [x1, y1] = o.line[i-1], [x2, y2] = o.line[i], [kx, ky] = mk(y1), L0 = Math.hypot((x2 - x1) * kx, (y2 - y1) * ky); // опоры через ~18 м
+for (; acc < L0; acc += 18){ const f = acc / L0; add(rectR([x1 + (x2 - x1) * f, y1 + (y2 - y1) * f], Math.min(W / 2, 3), 1), 'bg', 0, D, '#9a958a'); } acc -= L0; } }
+function offLine(line, off){ return line.map((p, i) => { const a = line[Math.max(0, i - 1)], b = line[Math.min(line.length - 1, i + 1)], [kx, ky] = mk(p[1]), dx = (b[0] - a[0]) * kx, dy = (b[1] - a[1]) * ky, L0 = Math.hypot(dx, dy) || 1; return [p[0] - dy / L0 * off / kx, p[1] + dx / L0 * off / ky]; }); }
 function buildObjs(R, d){
 const F = [], add = (ring, k, b, h, c) => F.push({type:'Feature', properties:{k, b, h, c}, geometry:{type:'Polygon', coordinates:[ring]}});
 const rows = R.filter(o => o.t === 'row'), fors = R.filter(o => o.t === 'f');
-let budget = Math.round(1800 * d * Math.max(1, objCells.size));
-const rd = 7 / Math.sqrt(d), offs = d >= 0.8 ? [-4, 0, 4] : [-2.5, 2.5];
+let budget = Math.round(3500 * d * Math.max(1, objCells.size));
+const rd = 5 / Math.sqrt(d), offs = d >= 0.8 ? [-4, 0, 4] : [-2.5, 2.5];
 rows.forEach(o => { for (let i = 1; i < o.line.length && budget > 0; i++){ const [x1, y1] = o.line[i-1], [x2, y2] = o.line[i], [kx, ky] = mk(y1), dx = (x2 - x1) * kx, dy = (y2 - y1) * ky, L0 = Math.hypot(dx, dy); if (!L0) continue;
 const nx = -dy / L0, ny = dx / L0; for (let t = 0, r = 0; t < L0 && budget > 0; t += rd, r++){ offs.forEach((o2, q) => { if (budget <= 0) return; const tt = t + (q % 2 ? rd / 2 : 0); if (tt > L0) return; const px = x1 + (dx * tt / L0 + nx * o2) / kx, py = y1 + (dy * tt / L0 + ny * o2) / ky;
 addTree(F, px, py, hsh(px * 1e5, py * 1e5) < .5 ? 'b' : 'n', 0.9); budget--; }); } } });
-const tot = fors.reduce((a, o) => a + areaM(o.ring), 0), S = Math.max(28 / Math.sqrt(d), Math.sqrt(tot / Math.max(1, budget)));
+const tot = fors.reduce((a, o) => a + areaM(o.ring), 0), S = Math.max(18 / Math.sqrt(d), Math.sqrt(tot / Math.max(1, budget)));
 fors.forEach(o => { let x0 = 180, x1 = -180, y0 = 90, y1 = -90; o.ring.forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); });
 const [kx, ky] = mk(y0), sx = S / kx, sy = S / ky;
 for (let y = y0 + sy / 2; y < y1 && budget > 0; y += sy) for (let x = x0 + sx / 2; x < x1 && budget > 0; x += sx){
 const jx = x + (hsh(x * 1e4, y * 1e4) - .5) * sx * .8, jy = y + (hsh(y * 1e4, x * 1e4) - .5) * sy * .8;
 if (!inRing(jx, jy, o.ring)) continue; addTree(F, jx, jy, o.lf === 'm' ? (hsh(jx * 1e5, jy * 1e5) < .5 ? 'n' : 'b') : o.lf, 1); budget--; } });
 R.forEach(o => { switch (o.t){
-case 'b': { add(o.ring, 'bw', 0, o.h, ''); const rc = ROOFS[o.id % ROOFS.length];
+case 'b': { const wc = WALLS[o.id % WALLS.length], ar = areaM(o.ring), fl = Math.min(30, o.lv || Math.max(1, Math.round((o.h - 1) / 3)));
+if (ar < 25 || o.h < 2.6) add(o.ring, 'bw', 0, o.h, wc); else { const fh = (o.h - (o.h > fl * 3 ? 1 : 0)) / fl, wr = scaleRing(o.ring, ar < 150 ? .97 : .99); let z = 0;
+for (let i = 0; i < fl; i++){ const w0 = i * fh + fh * .32, w1 = i * fh + fh * .8; add(o.ring, 'bw', z, w0, wc); add(wr, 'bwi', w0, w1, ''); z = w1; } add(o.ring, 'bw', z, o.h, wc); }
+const rc = ROOFS[o.id % ROOFS.length];
 if (areaM(o.ring) < 500){ add(scaleRing(o.ring, 0.97), 'br', o.h, o.h + 1.1, rc); add(scaleRing(o.ring, 0.62), 'br', o.h + 1.1, o.h + 2.2, rc); add(scaleRing(o.ring, 0.28), 'br', o.h + 2.2, o.h + 3, rc); }
 else add(o.ring, 'br', o.h, o.h + 0.6, '#7b7f82'); break; }
+case 'brg': brgParts(add, o); break;
+case 'ford': strip(add, o.line, 4, 0, .35, '#a39780', 0); break;
+case 'fordp': { add(ngon(o.c, 5, 10), 'bg', 0, .35, '#a39780'); [[-6, 0], [6, 0]].forEach(([u]) => add(ngon([o.c[0] + u / mk(o.c[1])[0], o.c[1]], .25, 4), 'bg', 0, 1.6, '#e8e4dc')); } break;
+case 'fer': { strip(add, o.line, .8, 0, .25, '#efe7cf', 8); const m = midLine(o.line); if (m){ const f0 = F.length; mdlParts(F, m.c[0], m.c[1], 'ferry', '#7d8a6a', 1, m.ang, 0, true); for (let k = f0; k < F.length; k++) F[k].properties.k = 'bg'; } } break;
 case 'tank': add(ngon(o.c, o.r, 18), 'mt', 0, o.h, '#9ba1a6'); add(ngon(o.c, o.r * .7, 18), 'mt', o.h, o.h + Math.max(.6, o.r * .25), '#b3b9bd'); break;
 case 'wt': add(ngon(o.c, 1.5, 10), 'ts', 0, o.h - 7, '#a8a39a'); add(ngon(o.c, 4.2, 18), 'ts', o.h - 7, o.h - 1, '#8e959b'); add(ngon(o.c, 2.6, 18), 'ts', o.h - 1, o.h, '#7c8287'); break;
 case 'ch': add(ngon(o.c, 1.4, 12), 'ts', 0, o.h, '#8a5a44'); break;
@@ -2172,19 +2266,20 @@ return {type:'FeatureCollection', features:F};
 }
 function refreshObjs(){ try { if (v3 && v3.getSource('obj')) v3.getSource('obj').setData(buildObjs([].concat(...objCells.values()), v3cfg.den)); } catch(_){} }
 async function ensureObjs(){
-if (!v3 || !(v3cfg.bld || v3cfg.towers || v3cfg.forest) || objBusy) return;
+if (!v3 || !(v3cfg.bld || v3cfg.towers || v3cfg.forest || v3cfg.brg) || objBusy) return;
 if (v3.getZoom() < 12){ $('v3msg').textContent = 'Приблизьте карту, чтобы показать здания, вышки и леса'; return; }
-const c = v3.getCenter(), cy = Math.floor(c.lat / 0.03), cx = Math.floor(c.lng / 0.045), key = `obj2:${cy}:${cx}`;
+const c = v3.getCenter(), cy = Math.floor(c.lat / 0.03), cx = Math.floor(c.lng / 0.045), key = `obj3:${cy}:${cx}`, key2 = `obj2:${cy}:${cx}`;
 if (objCells.has(key)) return;
 objBusy = true;
 try {
 let txt = null;
 if (savedKeys.has(key)){ const b = await tileGetFast(key); if (b) txt = typeof b === 'string' ? b : await b.text(); }
+if (!txt && navigator.onLine === false && savedKeys.has(key2)){ const b = await tileGetFast(key2); if (b) txt = typeof b === 'string' ? b : await b.text(); }
 if (!txt){
 if (navigator.onLine === false) throw new Error('offline');
-$('v3msg').textContent = 'Загружаю здания, вышки и леса этого участка…';
+$('v3msg').textContent = 'Загружаю здания, вышки, леса и мосты этого участка…';
 const S0 = cy * 0.03, W0 = cx * 0.045, bb = `${S0.toFixed(4)},${W0.toFixed(4)},${(S0 + 0.03).toFixed(4)},${(W0 + 0.045).toFixed(4)}`;
-const j = await opQuery(`[out:json][timeout:90];(way["building"](${bb});way["man_made"~"^(tower|mast|water_tower|chimney|storage_tank|silo)$"](${bb});node["man_made"~"^(tower|mast|water_tower|chimney|storage_tank|silo)$"](${bb});node["power"="tower"](${bb});way["landuse"="forest"](${bb});way["natural"~"^(wood|tree_row)$"](${bb}););out geom;`, 90);
+const j = await opQuery(`[out:json][timeout:90];(way["building"](${bb});way["man_made"~"^(tower|mast|water_tower|chimney|storage_tank|silo)$"](${bb});node["man_made"~"^(tower|mast|water_tower|chimney|storage_tank|silo)$"](${bb});node["power"="tower"](${bb});way["bridge"]["highway"](${bb});way["bridge"]["railway"](${bb});way["ford"="yes"](${bb});node["ford"="yes"](${bb});way["route"="ferry"](${bb});way["landuse"="forest"](${bb});way["natural"~"^(wood|tree_row)$"](${bb}););out geom;`, 90);
 txt = JSON.stringify(osmRaw(j)); queuePut(key, new Blob([txt], {type:'application/json'}));
 }
 objCells.set(key, JSON.parse(txt));
@@ -2194,7 +2289,29 @@ $('v3msg').textContent = '';
 } catch(e){ $('v3msg').textContent = navigator.onLine === false || String(e.message) === 'offline' ? 'Объекты этого участка не сохранены — откройте его один раз с интернетом' : 'Не удалось загрузить объекты, попробуйте позже'; }
 objBusy = false;
 }
+// ---- 3D: выбор и правка объектов
+let v3sel = null, v3move = false;
+function v3upd(){ persist(); renderMarkers(); renderSheet(); try { v3.getSource('pts').setData(v3data()); } catch(_){} v3apply(); try { if (!v3cfg.tac) v3.getSource('tac').setData(v3tac(v3.getCenter())); } catch(_){} }
+function v3bar(){ const el = $('v3act'); if (!v3sel){ el.classList.remove('on'); el.innerHTML = ''; return; }
+const a = state.arrays[v3sel.ai], p = a && a.points[v3sel.pi]; if (!p){ v3sel = null; return v3bar(); }
+el.innerHTML = `<b>${escapeHtml(labelOf(a, v3sel.pi))}${v3move ? ' — коснитесь нового места' : ''}</b><button data-a="card">Карточка</button><button data-a="move" class="${v3move ? 'on' : ''}">Переместить</button><button data-a="l">↺ 15°</button><button data-a="r">↻ 15°</button><button data-a="del">Удалить</button><button data-a="x">✕</button>`;
+el.classList.add('on'); }
+$('v3act').onclick = e => { const b = e.target.closest('button'); if (!b || !v3sel) return; const a = state.arrays[v3sel.ai], p = a && a.points[v3sel.pi]; if (!p) return;
+const A = b.dataset.a;
+if (A === 'card'){ openPoint(a, v3sel.pi); return; }
+if (A === 'move'){ v3move = !v3move; v3bar(); return; }
+if (A === 'l' || A === 'r'){ p.rot = (((p.rot || a.rot || 0) + (A === 'r' ? 15 : -15)) % 360 + 360) % 360; v3upd(); toast(`Поворот ${p.rot}°`); return; }
+if (A === 'del'){ if (!confirm(`Удалить «${labelOf(a, v3sel.pi)}»?`)) return; a.points.splice(v3sel.pi, 1); v3sel = null; v3move = false; v3bar(); v3upd(); return; }
+v3sel = null; v3move = false; v3bar(); };
+function v3tap(e){
+if (v3move && v3sel){ const a = state.arrays[v3sel.ai], p = a && a.points[v3sel.pi]; if (p){ p.lat = +e.lngLat.lat.toFixed(7); p.lng = +e.lngLat.lng.toFixed(7); if (!p.hManual) fillHeight(p); if (!p.placeManual) delete p.place; v3upd(); } v3move = false; v3bar(); return; }
+const pt = e.point, L = ['mdl', 'tac'].filter(id => v3.getLayer(id));
+const f = v3.queryRenderedFeatures([[pt.x - 14, pt.y - 14], [pt.x + 14, pt.y + 14]], {layers:L}).find(q => q.properties && q.properties.ai != null);
+v3sel = f ? {ai:+f.properties.ai, pi:+f.properties.pi} : null; v3move = false; v3bar(); }
+// после правки в карточке — обновить 3D
+['ptSave', 'ptDel'].forEach(id => $(id).addEventListener('click', () => setTimeout(() => { if (!v3) return; if (id === 'ptDel'){ v3sel = null; v3bar(); } v3upd(); }, 0)));
 function close3D(){
+v3sel = null; v3move = false; v3bar();
 $('v3panel').classList.remove('on');
 if (v3){ try { const c = v3.getCenter(); map.setView([c.lat, c.lng], Math.min(20, v3.getZoom() + 1)); v3.remove(); } catch(e){} v3 = null; }
 $('v3d').classList.remove('on');
@@ -2314,7 +2431,7 @@ const SYM_DEF = [
 {id:"stop", n:"Подразделение остановлено на рубеже", ab:"\u041f\u041e", d:["M24 3c-3 1-4 3-4 5v16c0 2 1 4 4 5", "M20 16H11a4 4 0 0 1 0-8h3", "M20 16l-3.5-2.5M20 16l-3.5 2.5"]},
 {id:"otkhod", n:"Подразделение отходит с рубежа", ab:"\u041f\u041e", d:["M18 3c-3 1-4 3-4 5v16c0 2 1 4 4 5", "M14 16H8a4 4 0 0 1 0-8h3", "M14 16h15", "M29 16l-3.5-2.5M29 16l-3.5 2.5"]},
 {id:"bat_art", n:"Артиллерийская батарея на ОП", ab:"\u0410\u0411", d:["M4 16a12 12 0 1 0 24 0a12 12 0 1 0 -24 0", "M6 16h20", "M12 11.5h8M12 20.5h8"], cR:"#111111"},
-{id:"lozh", n:"Ложная огневая позиция", ab:"\u041b\u041e", d:["M4 16a12 12 0 1 0 24 0a12 12 0 1 0 -24 0", "M6 16h20", "M12 11.5h8M12 20.5h8"], cR:"#1a9b3a", cB:'#1a9b3a'},
+{id:"lozh", n:"Ложная огневая позиция", ab:"\u041b\u041e", d:["M4 16a12 12 0 1 0 24 0a12 12 0 1 0 -24 0", "M6 16h20", "M12 11.5h8M12 20.5h8"], cR:"#00d84a", cB:'#00d84a'},
 {id:"bat_min", n:"Миномётная батарея на ОП", ab:"\u041c\u0411", d:["M4 16a12 12 0 1 0 24 0a12 12 0 1 0 -24 0", "M14.5 16a4 4 0 1 0 8 0a4 4 0 1 0 -8 0", "M18.5 12L10.5 10", "M18.5 20L10.5 22"], cR:"#111111"},
 {id:"ogon_cel", n:"Огонь по отдельной цели", ab:"\u041e\u041f", d:["M4 16a12 12 0 1 0 24 0a12 12 0 1 0 -24 0", "M12 12h6v8h-6z", "M7 16h5", "M18 16l5-4M18 16l5 4"], cR:"#111111"},
 {id:"udar_rak", n:"Удар ракетой в обычном снаряжении", ab:"\u0423\u0420", d:["M4 16a12 12 0 1 0 24 0a12 12 0 1 0 -24 0"], f:["M10.5 16a5.5 5.5 0 1 0 11.0 0a5.5 5.5 0 1 0 -11.0 0"], cR:"#111111"},
@@ -2388,6 +2505,11 @@ const SYM_DEF = [
 {id:"ukr_zhb", n:"Укрытие из сборных ж/б элементов", ab:"\u0423\u0418", d:["M4 6h24v14H4z", "M10 20v4h3v4"], f:["M16 6h12v14H16z"], cR:"#111111"},
 {id:"med_zhb", n:"Медпункт батальона (ПулАД)", ab:"\u041c\u0411", d:["M4 6h24v14H4z", "M10 20v4h3v4", "M10 9v8M6 13h8"], f:["M16 6h12v14H16z"], dk:["", "", "r"], cR:"#111111"},
 {id:"kazarma", n:"Казарма (блиндаж) боевого дежурства", ab:"\u041a\u0411", d:["M2 16a14 6 0 1 0 28 0a14 6 0 1 0-28 0"], f:["M8 12h16v9H8z"], cR:"#111111"},
+// новые знаки (3D-модели)
+{id:"zhs", n:"Живая сила (пешее подразделение)", ab:"ЖС", d:["M5.4 8a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0", "M8 11v9", "M5 14h6", "M8 20l-2.5 7M8 20l2.5 7", "M13.4 8a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0", "M16 11v9", "M13 14h6", "M16 20l-2.5 7M16 20l2.5 7", "M21.4 8a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0", "M24 11v9", "M21 14h6", "M24 20l-2.5 7M24 20l2.5 7"]},
+{id:"bpla_k", n:"БПЛА коптерного типа", ab:"БК", d:["M9 9l14 14M23 9L9 23", "M4.5 8a3.5 3.5 0 1 0 7.0 0a3.5 3.5 0 1 0 -7.0 0", "M20.5 8a3.5 3.5 0 1 0 7.0 0a3.5 3.5 0 1 0 -7.0 0", "M4.5 24a3.5 3.5 0 1 0 7.0 0a3.5 3.5 0 1 0 -7.0 0", "M20.5 24a3.5 3.5 0 1 0 7.0 0a3.5 3.5 0 1 0 -7.0 0", "M13 13h6v6h-6z"]},
+{id:"perepr", n:"Переправа (паромная, бродом)", ab:"ПР", d:["M3 9q3.25-3 6.5 0q3.25 3 6.5 0q3.25-3 6.5 0q3.25 3 6.5 0", "M3 25q3.25-3 6.5 0q3.25 3 6.5 0q3.25-3 6.5 0q3.25 3 6.5 0", "M16 4v24", "M12 8l4-4 4 4", "M12 24l4 4 4-4"]},
+{id:"pu_bpla", n:"Пункт управления БПЛА", ab:"ПБ", d:["M4 14h24v13H4z", "M16 14V5", "M9 5h14", "M11 2.5v5M15 2.5v5M19 2.5v5", "M23 5l4-2.5M23 5l4 2.5"], tx:[{"x":16,"y":20.5,"s":8,"t":"БЛА"}]},
 // прежние знаки (сохранены для совместимости)
 {id:'bpla', n:'БпЛА', ab:'БП', d:['M16 5v22', 'M4 15l12-4 12 4', 'M11 26h10']},
 {id:'op', n:'Опорный пункт', ab:'ОП', d:['M16 5c7 0 11 5 11 11s-4 11-11 11S5 22 5 16 9 5 16 5z', 'M6 11l-3-2M5 19H2M7 25l-3 2M26 11l3-2M27 19h3M25 25l3 2M16 5V2']},
@@ -2482,12 +2604,12 @@ function defSym(x){ return Object.assign({type:'pt', fav:true, d:[], f:[]}, JSON
 function loadSyms(){
 const st = lsGet('skat_syms', null), del = lsGet('skat_syms_del', []);
 if (Array.isArray(st) && st.length){
-const old = lsGet('skat_syms_ver', 1) < 5, force = old;
+const old = lsGet('skat_syms_ver', 1) < 6, force = old;
 const cur = st.filter(x => !(old && !x.edited && !x.custom && !SYM_DEF.some(d => d.id === x.id))).map(x => { const d = SYM_DEF.find(q => q.id === x.id); return force && d && !x.edited ? Object.assign(defSym(d), {fav:x.fav !== false}) : x; });
 const has = new Set(cur.map(x => x.id)); SYMS = cur.concat(SYM_DEF.filter(x => !has.has(x.id) && !del.includes(x.id)).map(defSym)); }
 else SYMS = SYM_DEF.map(defSym);
 SYMS.forEach(x => { if (!x.type) x.type = 'pt'; if (x.fav === undefined) x.fav = true; if (!x.d) x.d = []; if (!x.f) x.f = []; const d0 = SYM_DEF.find(q => q.id === x.id); if (d0 && x.cR === undefined && d0.cR) x.cR = d0.cR; if (!x.z) x.z = x.d.filter(isClosedP); });
-SYM_BY = Object.fromEntries(SYMS.map(x => [x.id, x])); lsSet('skat_syms_ver', 5);
+SYM_BY = Object.fromEntries(SYMS.map(x => [x.id, x])); lsSet('skat_syms_ver', 6);
 }
 function saveSyms(){ lsSet('skat_syms', SYMS); SYM_BY = Object.fromEntries(SYMS.map(x => [x.id, x])); Object.keys(symPaths).forEach(k => delete symPaths[k]); Object.keys(symImgs).forEach(k => delete symImgs[k]); }
 loadSyms();
@@ -2573,7 +2695,7 @@ hatch:(g, P, c, k) => { if (P.length < 4) return; g.save(); g.beginPath(); P.for
 let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity; P.forEach(q => { x0 = Math.min(x0, q.x); x1 = Math.max(x1, q.x); y0 = Math.min(y0, q.y); y1 = Math.max(y1, q.y); });
 g.strokeStyle = c; g.lineWidth = 1.5 * k; g.beginPath(); const st = 10 * k, h = y1 - y0; for (let x = x0 - h; x < x1; x += st){ g.moveTo(x, y1); g.lineTo(x + h, y0); } g.stroke(); g.restore(); }};
 // ======== ДВИЖОК ЛИНЕЙНЫХ И ПЛОЩАДНЫХ ЗНАКОВ (Приложение 3) ========
-const SCOL = {k:'#111111', b:'#1f5fe0', r:'#e0302a', y:'#f2d21b', w:'#ffffff', g:'#1a9b3a'};
+const SCOL = {k:'#111111', b:'#1f5fe0', r:'#e0302a', y:'#f2d21b', w:'#ffffff', g:'#00d84a'};
 const LSPEC = {
 rub_obor:{n:'Рубеж обороны (не занятый)', base:'braces'},
 trench:{n:'Траншея', base:'solid', marks:[{t:'trench', step:16}]},
