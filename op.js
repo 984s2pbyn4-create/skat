@@ -25,27 +25,29 @@ function prnSize(){ let w, h; if (prnPaper === 'U'){ w = +$('prnW').value || 297
 function prnInfo(){ const [w, h] = prnSize(), dpi = +$('prnDpi').value; let W = Math.round(w / 25.4 * dpi), H = Math.round(h / 25.4 * dpi), note = '';
 if (W * H > 16e6){ const f = Math.sqrt(16e6 / (W * H)); W = Math.floor(W * f); H = Math.floor(H * f); note = ' (разрешение снижено под возможности устройства)'; }
 const jq = +$('prnJq').value, bpp = jq >= 100 ? .9 : jq >= 95 ? .45 : jq >= 90 ? .3 : jq >= 80 ? .2 : jq >= 70 ? .15 : .11; $('prnJqV').textContent = jq; $('prnInfo').textContent = `Лист ${w}×${h} мм, изображение ${W}×${H} пикс., файл ≈ ${(W * H * bpp / 1048576).toFixed(1)} МБ${note}. Печатается видимая на экране область.`; return [w, h, W, H]; }
-function renderPrnUI(){ $('prnPaperSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.p === prnPaper)); $('prnOriSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.o === prnOri));
+function renderPrnUI(){ prnSettingsUI(); $('prnPaperSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.p === prnPaper)); $('prnOriSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.o === prnOri));
 $('prnCustom').style.display = prnPaper === 'U' ? '' : 'none'; $('prnOriSeg').style.display = prnPaper === 'U' ? 'none' : ''; prnInfo(); }
 $('prnPaperSeg').querySelectorAll('button').forEach(b => b.onclick = () => { prnPaper = b.dataset.p; renderPrnUI(); });
 $('prnOriSeg').querySelectorAll('button').forEach(b => b.onclick = () => { prnOri = b.dataset.o; renderPrnUI(); });
 ['prnW', 'prnH', 'prnDpi', 'prnQ', 'prnJq'].forEach(id => $(id).addEventListener('input', prnInfo)); $('prnQ').addEventListener('change', prnInfo);
 $('prnBtn').onclick = () => { renderPrnUI(); openModal('prnModal'); };
 async function tileBmp(u){ try { let b = savedKeys.has(u) ? await tileGetFast(u) : null; if (!b && navigator.onLine !== false) b = await netBlob(u); return b ? await createImageBitmap(b) : null; } catch(e){ return null; } }
-$('prnGo').onclick = async () => {
-const [wmm, hmm, W, H] = prnInfo(), k = W / (wmm / 25.4 * +$('prnDpi').value), dpi = +$('prnDpi').value * k, mm = v => v / 25.4 * dpi;
+async function prnRender(prev){
+let [wmm, hmm, W, H] = prnInfo(); if (prev){ const f0 = Math.min(1, 1200 / Math.max(W, H)); W = Math.round(W * f0); H = Math.round(H * f0); }
+const prK = {s:+$('prnSym').value || 1, l:+$('prnLbl').value || 1, lbl:$('prnShowL').checked, txt:$('prnShowT').checked, shp:$('prnShowS').checked}, pOn = prnLaysOn();
+const k = W / (wmm / 25.4 * +$('prnDpi').value), dpi = +$('prnDpi').value * k, mm = v => v / 25.4 * dpi;
 const title = $('prnTitle').value.trim(), legend = $('prnLeg').checked, grid = $('prnGrid').checked;
-closeModals(); netMsg('Готовлю лист для печати…');
+netMsg(prev ? 'Готовлю предпросмотр…' : 'Готовлю лист для печати…');
 try {
 const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
 const mg = mm(8), th = title ? mm(11) : 0, fh = mm(7), ox0 = mg, oy0 = mg + th, ow = W - 2 * mg, oh = H - 2 * mg - th - fh, fb = grid ? mm(9) : 0, ix0 = ox0 + fb, iy0 = oy0 + fb, iw = ow - 2 * fb, ih = oh - 2 * fb;
 let FRAME = null;
 const Ws = map.getSize().x, Hs = map.getSize().y, c = map.getCenter(), a0 = map.containerPointToLatLng([Ws / 2 - 50, Hs / 2]), a1 = map.containerPointToLatLng([Ws / 2 + 50, Hs / 2]), mpp = distM(a0, a1) / 100;
 let wm = Ws * mpp, hm = Hs * mpp; if (iw / ih > wm / hm) hm = wm * ih / iw; else wm = hm * iw / ih;
-const def = LAYERS[state.layer], crs = crsOf(state.layer), z0 = map.getZoom();
+const bk = LAYERS[$('prnBase').value] ? $('prnBase').value : state.layer, def = LAYERS[bk], crs = crsOf(bk), z0 = map.getZoom();
 const pq = +$('prnQ').value; let zt = Math.min(def.max, pq + Math.max(Math.floor(z0), Math.round(z0 + Math.log2((wm / iw) > 0 ? mpp / (wm / iw) : 1))));
 const pc = crs.latLngToPoint(c, zt); let mz = mpp * Math.pow(2, z0 - zt);
-while (((wm / mz) / 256) * ((hm / mz) / 256) > 700 * (1 + pq * 1.5) && zt > 3){ zt--; mz *= 2; }
+while (((wm / mz) / 256) * ((hm / mz) / 256) > (prev ? 300 : [800, 1800, 3500][pq]) && zt > 3){ zt--; mz *= 2; }
 const pc2 = crs.latLngToPoint(c, zt), hw = wm / mz / 2, hh = hm / mz / 2, bx0 = pc2.x - hw, by0 = pc2.y - hh, f = iw / (2 * hw);
 const toC = ll => { const p = crs.latLngToPoint(L.latLng(ll), zt); return [ix0 + (p.x - bx0) * f, iy0 + (p.y - by0) * f]; };
 g.save(); g.beginPath(); g.rect(ix0, iy0, iw, ih); g.clip(); g.fillStyle = '#e9ece6'; g.fillRect(ix0, iy0, iw, ih);
@@ -53,7 +55,7 @@ let miss = 0; const tx0 = Math.floor(bx0 / 256), tx1 = Math.floor((bx0 + 2 * hw)
 for (const tpl of def.urls) for (let tx = tx0; tx <= tx1; tx++) for (let ty = ty0; ty <= ty1; ty++) jobs.push([tpl, tx, ty]);
 for (let q = 0; q < jobs.length; q += 8){ netMsg(`Готовлю лист: подложка ${Math.min(q + 8, jobs.length)} из ${jobs.length}…`);
 const part = await Promise.all(jobs.slice(q, q + 8).map(async ([tpl, tx, ty]) => [tx, ty, await (async () => { try { const b = await tileFb(tpl, zt, tx, ty); return b ? await createImageBitmap(b) : null; } catch(e){ return null; } })()]));
-part.forEach(([tx, ty, bm]) => { if (bm) g.drawImage(bm, ix0 + (tx * 256 - bx0) * f, iy0 + (ty * 256 - by0) * f, 256 * f + 1, 256 * f + 1); else miss++; }); }
+part.forEach(([tx, ty, bm]) => { if (bm){ g.drawImage(bm, ix0 + (tx * 256 - bx0) * f, iy0 + (ty * 256 - by0) * f, 256 * f + 1, 256 * f + 1); try { bm.close(); } catch(e){} } else miss++; }); }
 const sc = dpi / 110;
 if (grid){
 const corners = [[0, 0], [1, 0], [0, 1], [1, 1]].map(([u, v]) => crs.pointToLatLng(L.point(bx0 + u * 2 * hw, by0 + v * 2 * hh), zt)), zone = GEO.toSK(c.lat, c.lng).zone;
@@ -65,24 +67,24 @@ for (let x = Math.ceil(X0 / st) * st; x <= X1; x += st){ const a1 = toC(GEO.from
 FRAME = {xs, ys, corners};
 }
 const used = new Map();
-state.arrays.forEach(a => { if (a.hidden) return;
-(a.shapes || []).forEach(sh => { const col = sh.color || a.style.color, pts = sh.type === 'circle' ? circlePoly(LL(sh.pts[0]), sh.r).map(q => [q[1], q[0]]) : sh.pts.map(q => [q[0] ?? q.lat, q[1] ?? q.lng]);
+state.arrays.forEach(a => { if (!pOn.has(String(a.id))) return;
+(prK.shp ? (a.shapes || []) : []).forEach(sh => { const col = sh.color || a.style.color, pts = sh.type === 'circle' ? circlePoly(LL(sh.pts[0]), sh.r).map(q => [q[1], q[0]]) : sh.pts.map(q => [q[0] ?? q.lat, q[1] ?? q.lng]);
 g.beginPath(); pts.forEach((q, i) => { const [px, py] = toC(q); i ? g.lineTo(px, py) : g.moveTo(px, py); }); if (sh.type !== 'line') g.closePath();
 if (sh.type !== 'line'){ g.globalAlpha = (sh.op ?? 35) / 100; g.fillStyle = col; g.fill(); g.globalAlpha = 1; } g.strokeStyle = col; g.lineWidth = 2.5 * sc; g.stroke(); });
 if (a.kind === 'route' && a.points.length > 1){ g.beginPath(); a.points.forEach((p, i) => { const [px, py] = toC([p.lat, p.lng]); i ? g.lineTo(px, py) : g.moveTo(px, py); }); g.strokeStyle = a.style.color; g.lineWidth = 3 * sc; g.stroke(); }
 a.points.forEach((p, i) => { const [px, py] = toC([p.lat, p.lng]); if (px < ix0 || py < iy0 || px > ix0 + iw || py > iy0 + ih) return;
 const st = styleOf(a, p), sid = p.sym === '_none' ? null : (p.sym || a.sym), lb = labelOf(a, i);
-if (a.kind === 'aux'){ g.save(); g.translate(px, py); g.scale(sc, sc); g.beginPath(); TREE_PTS.forEach(([dx, dy], k2) => k2 ? g.lineTo(dx, dy) : g.moveTo(dx, dy)); g.closePath(); g.fillStyle = a.style.color; g.fill(); g.restore(); }
-else if (a.fplan){ g.beginPath(); g.arc(px, py, 19 * sc, 0, 7); g.fillStyle = st.color; g.fill(); g.lineWidth = 2 * sc; g.strokeStyle = '#111'; g.stroke(); if (sid && SYM_BY[sid]){ g.save(); g.translate(px, py); g.scale(sc * .8, sc * .8); drawSym(g, sid, 0, 0, '#111', null); g.restore(); } }
-else if (sid && SYM_BY[sid]){ const col = symCol(sid, sideOf(a, p), st.color); g.save(); g.translate(px, py); g.scale(sc, sc); if (p.rot) g.rotate(p.rot * Math.PI / 180); drawSym(g, sid, 0, 0, col, p.fc || a.fc); g.restore(); used.set(sid + '|' + col, [sid, col]); }
-else { g.beginPath(); g.arc(px, py, 6 * sc, 0, 7); g.fillStyle = st.color; g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 2 * sc; g.stroke(); }
-g.font = `${a.kind === 'aux' ? 'italic ' : ''}700 ${Math.round(12 * sc)}px sans-serif`; g.lineWidth = 3 * sc; g.strokeStyle = '#fff'; g.fillStyle = '#111'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; const lw2 = g.measureText(lb).width; let lx = px + 14 * sc, ly = py - 10 * sc; if (lx + lw2 > ix0 + iw - 2 * sc) lx = Math.max(ix0 + 2 * sc, px - 14 * sc - lw2); if (ly - 12 * sc < iy0) ly = py + 22 * sc; if (ly > iy0 + ih - 2 * sc) ly = iy0 + ih - 2 * sc; g.strokeText(lb, lx, ly); g.fillText(lb, lx, ly); });
+if (a.kind === 'aux'){ g.save(); g.translate(px, py); g.scale(sc * prK.s, sc * prK.s); g.beginPath(); TREE_PTS.forEach(([dx, dy], k2) => k2 ? g.lineTo(dx, dy) : g.moveTo(dx, dy)); g.closePath(); g.fillStyle = a.style.color; g.fill(); g.restore(); }
+else if (a.fplan){ g.beginPath(); g.arc(px, py, 19 * sc * prK.s, 0, 7); g.fillStyle = st.color; g.fill(); g.lineWidth = 2 * sc; g.strokeStyle = '#111'; g.stroke(); if (sid && SYM_BY[sid]){ g.save(); g.translate(px, py); g.scale(sc * .8 * prK.s, sc * .8 * prK.s); drawSym(g, sid, 0, 0, '#111', null); g.restore(); } }
+else if (sid && SYM_BY[sid]){ const col = symCol(sid, sideOf(a, p), st.color); g.save(); g.translate(px, py); g.scale(sc * prK.s, sc * prK.s); if (p.rot) g.rotate(p.rot * Math.PI / 180); drawSym(g, sid, 0, 0, col, p.fc || a.fc); g.restore(); used.set(sid + '|' + col, [sid, col]); }
+else { g.beginPath(); g.arc(px, py, 6 * sc * prK.s, 0, 7); g.fillStyle = st.color; g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 2 * sc; g.stroke(); }
+if (prK.lbl){ g.font = `${a.kind === 'aux' ? 'italic ' : ''}700 ${Math.round(12 * sc * prK.l)}px sans-serif`; g.lineWidth = 3 * sc; g.strokeStyle = '#fff'; g.fillStyle = '#111'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; const lw2 = g.measureText(lb).width; let lx = px + 14 * sc * prK.s, ly = py - 10 * sc * prK.s; if (lx + lw2 > ix0 + iw - 2 * sc) lx = Math.max(ix0 + 2 * sc, px - 14 * sc - lw2); if (ly - 12 * sc < iy0) ly = py + 22 * sc; if (ly > iy0 + ih - 2 * sc) ly = iy0 + ih - 2 * sc; g.strokeText(lb, lx, ly); g.fillText(lb, lx, ly); } });
 (a.tables || []).forEach(T => { if (T.hid) return; const [px, py] = toC([T.lat, T.lng]), rows = T.rows.slice(0, 40), nc = Math.min(10, Math.max(...rows.map(r => r.length))), fs = T.s * sc, ch = fs * 1.6;
 g.font = `500 ${fs}px '${T.f}', sans-serif`; const cw = Array.from({length:nc}, (_, c) => Math.max(...rows.map(r => g.measureText(String(r[c] ?? '')).width)) + fs);
 const tw = cw.reduce((x, y) => x + y, 0), th2 = ch * rows.length, x0 = px - tw / 2, y0 = py - th2 / 2;
 if (T.bg){ g.globalAlpha = T.op ?? 1; g.fillStyle = T.bg; g.fillRect(x0, y0, tw, th2); g.globalAlpha = 1; }
 rows.forEach((r, ri) => { let xx = x0; for (let c = 0; c < nc; c++){ g.font = `${ri === 0 && T.hdr ? 700 : 500} ${fs}px '${T.f}', sans-serif`; g.fillStyle = T.c; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(String(r[c] ?? ''), xx + fs / 2, y0 + ri * ch + ch / 2); if (T.bd){ g.strokeStyle = T.bd; g.lineWidth = (T.bw || 1) * sc; g.strokeRect(xx, y0 + ri * ch, cw[c], ch); } xx += cw[c]; } }); });
-(a.texts || []).forEach(t => { if (t.hid) return; const [px, py] = toC([t.lat, t.lng]); g.save(); g.translate(px, py); g.rotate((t.r || 0) * Math.PI / 180); g.font = `${t.i ? 'italic ' : ''}${t.b ? 700 : 500} ${Math.round(t.s * sc)}px '${t.f}', sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+(a.texts || []).forEach(t => { if (t.hid || !prK.txt) return; const [px, py] = toC([t.lat, t.lng]); g.save(); g.translate(px, py); g.rotate((t.r || 0) * Math.PI / 180); g.font = `${t.i ? 'italic ' : ''}${t.b ? 700 : 500} ${Math.round(t.s * sc)}px '${t.f}', sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
 const lines = String(t.t).split('\n'), lh = t.s * sc * 1.15, w = Math.max(...lines.map(l => g.measureText(l).width));
 if (t.bg){ g.fillStyle = t.bg; g.fillRect(-w / 2 - 6 * sc, -lh * lines.length / 2 - 2 * sc, w + 12 * sc, lh * lines.length + 4 * sc); }
 lines.forEach((l, k2) => { const yy = (k2 - (lines.length - 1) / 2) * lh; if (t.sw && t.sc){ g.lineJoin = 'round'; g.lineWidth = t.sw * 2 * sc; g.strokeStyle = t.sc; g.strokeText(l, 0, yy); } g.fillStyle = t.c; g.fillText(l, 0, yy); }); g.restore(); });
@@ -130,11 +132,22 @@ g.fillStyle = '#111'; g.textAlign = 'center'; g.textBaseline = 'middle';
 if (title){ g.font = `700 ${Math.round(mm(6))}px sans-serif`; g.fillText(title, W / 2, mg + th / 2); }
 const scale = Math.round(wm / (iw / dpi * 0.0254) / 100) * 100;
 g.font = `500 ${Math.round(mm(3.2))}px sans-serif`; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(`Масштаб ~1:${scale.toLocaleString('ru-RU')} · СК-42, зона ${GEO.toSK(c.lat, c.lng).zone} · сетка ${grid ? 'через ' + (FRAME && FRAME.xs.length > 1 ? Math.round(Math.abs((FRAME.xs[1][0] - FRAME.xs[0][0]) / 1000)) : 1) + ' км' : 'нет'} · ${new Date().toLocaleDateString('ru-RU')}`, ox0, oy0 + oh + fh / 2); g.textAlign = 'right'; g.fillText('СКАТ', ox0 + ow, oy0 + oh + fh / 2);
-const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', Math.min(1, (+$('prnJq').value || 90) / 100))); netMsg('');
+netMsg(''); return {cv, W, H, miss};
+} catch(e){ netMsg(''); toast('Не удалось подготовить лист: ' + (e.message || e)); return null; }
+}
+const prnSel = new Map();
+function prnLaysOn(){ const on = new Set(); state.arrays.forEach(a => { if (isMk(a)) return; const v = prnSel.has(String(a.id)) ? prnSel.get(String(a.id)) : !a.hidden; if (v) on.add(String(a.id)); }); return on; }
+function prnSettingsUI(){ const cur = $('prnBase').value || state.layer; $('prnBase').innerHTML = Object.entries(LAYERS).map(([k, v]) => `<option value="${k}"${k === cur ? ' selected' : ''}>${escapeHtml(v.name || k)}</option>`).join('');
+const on = prnLaysOn(); $('prnLays').innerHTML = state.arrays.filter(a => !isMk(a)).map(a => `<label class="f" style="display:flex;align-items:center;gap:10px;margin:2px 0"><input type="checkbox" data-pl="${a.id}"${on.has(String(a.id)) ? ' checked' : ''} style="width:22px;min-height:22px;margin:0"> ${escapeHtml(a.name)}</label>`).join('') || '<div class="empty">Слоёв нет</div>';
+$('prnLays').querySelectorAll('[data-pl]').forEach(c => c.onchange = () => prnSel.set(c.dataset.pl, c.checked)); }
+async function prnSave(){ closeModals(); const r = await prnRender(false); if (!r) return; netMsg('Сохраняю JPEG…');
+const blob = await new Promise(q => r.cv.toBlob(q, 'image/jpeg', Math.min(1, (+$('prnJq').value || 90) / 100))); netMsg(''); r.cv.width = r.cv.height = 1;
 if (!blob){ toast('Не хватило памяти — уменьшите формат или разрешение'); return; }
-deliverFile(blob, `СКАТ_печать_${stamp()}.jpg`, `Лист готов: ${W}×${H} пикс.${miss ? ` Не загрузилось тайлов подложки: ${miss} (Яндекс в веб-версии не копируется — выберите Esri или Топо).` : ''}`);
-} catch(e){ netMsg(''); toast('Не удалось подготовить лист: ' + (e.message || e)); }
-};
+deliverFile(blob, `СКАТ_печать_${stamp()}.jpg`, `Лист готов: ${r.W}×${r.H} пикс., ${(blob.size / 1048576).toFixed(1)} МБ.${r.miss ? ` Не загрузилось тайлов подложки: ${r.miss}.` : ''}`); }
+$('prnGo').onclick = prnSave; $('prnPvGo').onclick = prnSave;
+$('prnPrev').onclick = async () => { const r = await prnRender(true); if (!r) return; $('prnPvImg').src = r.cv.toDataURL('image/jpeg', .85); r.cv.width = r.cv.height = 1;
+const [w, h, W, H] = prnInfo(); $('prnPvInfo').textContent = `Уменьшенный вид. В файле: ${W}×${H} пикс. Подложка в предпросмотре грубее, чем в файле.${r.miss ? ` Не загрузилось участков: ${r.miss}.` : ''}`; openModal('prnPvModal'); };
+[['prnSym', 'prnSymV'], ['prnLbl', 'prnLblV']].forEach(([a, b]) => $(a).addEventListener('input', () => { $(b).textContent = (+$(a).value).toFixed(1); }));
 
 // ======== ОПЕРАТОР: СВОЙСТВА ЗНАКА ========
 let propRef = null;
