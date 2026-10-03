@@ -1,4 +1,4 @@
-// СКАТ — модуль «Оператор»: редактор надписей, печать JPEG, свойства знака. Грузится лениво из index.html (modLoad). Версия 6.3
+// СКАТ — модуль «Оператор»: редактор надписей, печать JPEG, свойства знака. Грузится лениво из index.html (modLoad). Версия 6.4
 // ======== ОПЕРАТОР: НАДПИСИ ========
 function openTextEd(a, ti, ll){
 const t = ti != null ? a.texts[ti] : {t:'', f:'Roboto Condensed', s:18, c:'#111111', sc:'#ffffff', sw:2, b:true, i:false, bg:'', r:0, lat:ll.lat, lng:ll.lng};
@@ -24,12 +24,12 @@ let prnPaper = 'A4', prnOri = 'l';
 function prnSize(){ let w, h; if (prnPaper === 'U'){ w = +$('prnW').value || 297; h = +$('prnH').value || 210; } else { [w, h] = PAPERS[prnPaper]; if (prnOri === 'l') [w, h] = [h, w]; } return [w, h]; }
 function prnInfo(){ const [w, h] = prnSize(), dpi = +$('prnDpi').value; let W = Math.round(w / 25.4 * dpi), H = Math.round(h / 25.4 * dpi), note = '';
 if (W * H > 16e6){ const f = Math.sqrt(16e6 / (W * H)); W = Math.floor(W * f); H = Math.floor(H * f); note = ' (разрешение снижено под возможности устройства)'; }
-$('prnInfo').textContent = `Лист ${w}×${h} мм, изображение ${W}×${H} пикс.${note} Печатается видимая на экране область.`; return [w, h, W, H]; }
+const jq = +$('prnJq').value, bpp = jq >= 100 ? .9 : jq >= 95 ? .45 : jq >= 90 ? .3 : jq >= 80 ? .2 : jq >= 70 ? .15 : .11; $('prnJqV').textContent = jq; $('prnInfo').textContent = `Лист ${w}×${h} мм, изображение ${W}×${H} пикс., файл ≈ ${(W * H * bpp / 1048576).toFixed(1)} МБ${note}. Печатается видимая на экране область.`; return [w, h, W, H]; }
 function renderPrnUI(){ $('prnPaperSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.p === prnPaper)); $('prnOriSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.o === prnOri));
 $('prnCustom').style.display = prnPaper === 'U' ? '' : 'none'; $('prnOriSeg').style.display = prnPaper === 'U' ? 'none' : ''; prnInfo(); }
 $('prnPaperSeg').querySelectorAll('button').forEach(b => b.onclick = () => { prnPaper = b.dataset.p; renderPrnUI(); });
 $('prnOriSeg').querySelectorAll('button').forEach(b => b.onclick = () => { prnOri = b.dataset.o; renderPrnUI(); });
-['prnW', 'prnH', 'prnDpi'].forEach(id => $(id).addEventListener('input', prnInfo));
+['prnW', 'prnH', 'prnDpi', 'prnQ', 'prnJq'].forEach(id => $(id).addEventListener('input', prnInfo)); $('prnQ').addEventListener('change', prnInfo);
 $('prnBtn').onclick = () => { renderPrnUI(); openModal('prnModal'); };
 async function tileBmp(u){ try { let b = savedKeys.has(u) ? await tileGetFast(u) : null; if (!b && navigator.onLine !== false) b = await netBlob(u); return b ? await createImageBitmap(b) : null; } catch(e){ return null; } }
 $('prnGo').onclick = async () => {
@@ -43,16 +43,16 @@ let FRAME = null;
 const Ws = map.getSize().x, Hs = map.getSize().y, c = map.getCenter(), a0 = map.containerPointToLatLng([Ws / 2 - 50, Hs / 2]), a1 = map.containerPointToLatLng([Ws / 2 + 50, Hs / 2]), mpp = distM(a0, a1) / 100;
 let wm = Ws * mpp, hm = Hs * mpp; if (iw / ih > wm / hm) hm = wm * ih / iw; else wm = hm * iw / ih;
 const def = LAYERS[state.layer], crs = crsOf(state.layer), z0 = map.getZoom();
-let zt = Math.min(def.max, Math.max(Math.floor(z0), Math.round(z0 + Math.log2((wm / iw) > 0 ? mpp / (wm / iw) : 1))));
+const pq = +$('prnQ').value; let zt = Math.min(def.max, pq + Math.max(Math.floor(z0), Math.round(z0 + Math.log2((wm / iw) > 0 ? mpp / (wm / iw) : 1))));
 const pc = crs.latLngToPoint(c, zt); let mz = mpp * Math.pow(2, z0 - zt);
-while (((wm / mz) / 256) * ((hm / mz) / 256) > 700 && zt > 3){ zt--; mz *= 2; }
+while (((wm / mz) / 256) * ((hm / mz) / 256) > 700 * (1 + pq * 1.5) && zt > 3){ zt--; mz *= 2; }
 const pc2 = crs.latLngToPoint(c, zt), hw = wm / mz / 2, hh = hm / mz / 2, bx0 = pc2.x - hw, by0 = pc2.y - hh, f = iw / (2 * hw);
 const toC = ll => { const p = crs.latLngToPoint(L.latLng(ll), zt); return [ix0 + (p.x - bx0) * f, iy0 + (p.y - by0) * f]; };
 g.save(); g.beginPath(); g.rect(ix0, iy0, iw, ih); g.clip(); g.fillStyle = '#e9ece6'; g.fillRect(ix0, iy0, iw, ih);
 let miss = 0; const tx0 = Math.floor(bx0 / 256), tx1 = Math.floor((bx0 + 2 * hw) / 256), ty0 = Math.floor(by0 / 256), ty1 = Math.floor((by0 + 2 * hh) / 256), jobs = [];
 for (const tpl of def.urls) for (let tx = tx0; tx <= tx1; tx++) for (let ty = ty0; ty <= ty1; ty++) jobs.push([tpl, tx, ty]);
 for (let q = 0; q < jobs.length; q += 8){ netMsg(`Готовлю лист: подложка ${Math.min(q + 8, jobs.length)} из ${jobs.length}…`);
-const part = await Promise.all(jobs.slice(q, q + 8).map(async ([tpl, tx, ty]) => [tx, ty, await tileBmp(tpl.replace('{s}', 'abc'[(tx + ty) % 3]).replace('{x}', tx).replace('{y}', ty).replace('{z}', zt))]));
+const part = await Promise.all(jobs.slice(q, q + 8).map(async ([tpl, tx, ty]) => [tx, ty, await (async () => { try { const b = await tileFb(tpl, zt, tx, ty); return b ? await createImageBitmap(b) : null; } catch(e){ return null; } })()]));
 part.forEach(([tx, ty, bm]) => { if (bm) g.drawImage(bm, ix0 + (tx * 256 - bx0) * f, iy0 + (ty * 256 - by0) * f, 256 * f + 1, 256 * f + 1); else miss++; }); }
 const sc = dpi / 110;
 if (grid){
@@ -130,7 +130,7 @@ g.fillStyle = '#111'; g.textAlign = 'center'; g.textBaseline = 'middle';
 if (title){ g.font = `700 ${Math.round(mm(6))}px sans-serif`; g.fillText(title, W / 2, mg + th / 2); }
 const scale = Math.round(wm / (iw / dpi * 0.0254) / 100) * 100;
 g.font = `500 ${Math.round(mm(3.2))}px sans-serif`; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(`Масштаб ~1:${scale.toLocaleString('ru-RU')} · СК-42, зона ${GEO.toSK(c.lat, c.lng).zone} · сетка ${grid ? 'через ' + (FRAME && FRAME.xs.length > 1 ? Math.round(Math.abs((FRAME.xs[1][0] - FRAME.xs[0][0]) / 1000)) : 1) + ' км' : 'нет'} · ${new Date().toLocaleDateString('ru-RU')}`, ox0, oy0 + oh + fh / 2); g.textAlign = 'right'; g.fillText('СКАТ', ox0 + ow, oy0 + oh + fh / 2);
-const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.92)); netMsg('');
+const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', Math.min(1, (+$('prnJq').value || 90) / 100))); netMsg('');
 if (!blob){ toast('Не хватило памяти — уменьшите формат или разрешение'); return; }
 deliverFile(blob, `СКАТ_печать_${stamp()}.jpg`, `Лист готов: ${W}×${H} пикс.${miss ? ` Не загрузилось тайлов подложки: ${miss} (Яндекс в веб-версии не копируется — выберите Esri или Топо).` : ''}`);
 } catch(e){ netMsg(''); toast('Не удалось подготовить лист: ' + (e.message || e)); }

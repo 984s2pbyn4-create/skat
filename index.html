@@ -522,6 +522,8 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="seg" id="prnOriSeg"><button data-o="p">Книжная</button><button data-o="l">Альбомная</button></div>
 <div class="duo" id="prnCustom" style="display:none"><label class="f">Ширина, мм<input id="prnW" inputmode="numeric" value="500"></label><label class="f">Высота, мм<input id="prnH" inputmode="numeric" value="350"></label></div>
 <label class="f">Разрешение, точек на дюйм<select id="prnDpi"><option value="100">100</option><option value="150" selected>150</option><option value="200">200</option><option value="300">300</option></select></label>
+<label class="f">Качество карты<select id="prnQ"><option value="0">Стандарт</option><option value="1" selected>Высокое (подложка подробнее)</option><option value="2">Максимальное</option></select></label>
+<label class="f">Качество JPEG: <span id="prnJqV">90</span>%<input type="range" id="prnJq" min="60" max="100" step="5" value="90"></label>
 <label class="f">Заголовок<input id="prnTitle" autocomplete="off" placeholder="например, Схема района"></label>
 <label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="prnGrid" checked style="width:22px;min-height:22px;margin:0"> Сетка СК-42 с подписями</label>
 <label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="prnLeg" checked style="width:22px;min-height:22px;margin:0"> Условные обозначения</label>
@@ -572,7 +574,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 6.3';
+const VERSION = 'версия 6.4';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -669,8 +671,9 @@ let tiles = [], tileErr = 0, tileOk = 0;
 // ---- тайлы: кэш → сеть; заглушка Esri и пустые участки заменяются увеличенным родительским тайлом
 const tplUrl = (t, x, y, z) => t.replace('{s}', 'abc'[(x + y) % 3]).replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{r}', '');
 async function isPlaceholder(b, url){ if (!/arcgisonline/.test(url)) return false;
-try { const bm = await createImageBitmap(b), cv = document.createElement('canvas'); cv.width = cv.height = 16; const g = cv.getContext('2d'); g.drawImage(bm, 0, 0, 16, 16); const d = g.getImageData(0, 0, 16, 16).data; let k = 0;
-for (let i = 0; i < d.length; i += 4){ const r = d[i], gg = d[i+1], bb = d[i+2]; if (r > 183 && r < 230 && gg > 175 && gg < 224 && bb > 190 && bb < 238 && bb - gg >= 5 && bb - gg <= 28) k++; } return k > 200; } catch(e){ return false; } }
+try { const bm = await createImageBitmap(b), cv = document.createElement('canvas'); cv.width = cv.height = 16; const g = cv.getContext('2d'); g.drawImage(bm, 0, 0, 16, 16); const d = g.getImageData(0, 0, 16, 16).data; let R = 0, G = 0, B = 0; const n = d.length / 4;
+for (let i = 0; i < d.length; i += 4){ R += d[i]; G += d[i+1]; B += d[i+2]; } R /= n; G /= n; B /= n; if (R + G + B < 520 || R + G + B > 705) return false;
+let k = 0; for (let i = 0; i < d.length; i += 4) if (Math.abs(d[i] - R) < 16 && Math.abs(d[i+1] - G) < 16 && Math.abs(d[i+2] - B) < 16) k++; return k > n * .78 && Math.max(R, G, B) - Math.min(R, G, B) < 40; } catch(e){ return false; } }
 async function tileBlob(url, net = true){ if (savedKeys.has(url) && !cOff(url)){ const b = await tileGetFast(url); if (b && !(await isPlaceholder(b, url))) return b; }
 if (!net || url.startsWith('mb:') || navigator.onLine === false) return null;
 try { const b = await netBlob(url); if (await isPlaceholder(b, url)) return null; if (savedKeys.size < 150000) queuePut(url, b); return b; } catch(e){ return null; } }
@@ -3340,7 +3343,7 @@ return {dN, dE, along, lat, mil, D}; }
 const devTxt = v => `${v.dN >= 0 ? 'Север' : 'Юг'} ${Math.abs(Math.round(v.dN))}, ${v.dE >= 0 ? 'Восток' : 'Запад'} ${Math.abs(Math.round(v.dE))}`;
 const FX = new Set();
 function ftaskSection(el){ const pl = state.arrays.filter(isPlanL); if (!state.ftasks.length && !pl.length) return; if (FTX.v === null) FTX.v = secMode !== 'tp'; const box = document.createElement('div');
-box.innerHTML = `<div class="sub-h" id="ftH" style="cursor:pointer">${FTX.v ? '▸' : '▾'} Огневые задачи (${state.ftasks.length + pl.length})</div>` + (FTX.v ? '' :  state.ftasks.map((t, k) => `<div class="arr${t.hid ? ' off' : ''}" data-ft="${k}"><button class="eye" data-f="x">${FX.has(t.id) ? '▾' : '▸'}</button><span class="kth" style="color:#d9532c">⊕</span><div class="nm"><div>${escapeHtml(t.name)}</div><div>${escapeHtml((SYS[t.sys] || SYS.d30).n)} · разрывов: ${(t.bursts || []).length}</div></div><button data-f="open">Открыть</button><button class="eye" data-f="del">🗑</button></div>` +
+box.innerHTML = `<div class="sub-h" id="ftH" style="cursor:pointer">${FTX.v ? '▸' : '▾'} Огневые задачи (${state.ftasks.length + pl.length})</div>` + (FTX.v ? '' :  state.ftasks.map((t, k) => `<div class="arr${t.hid ? ' off' : ''}" data-ft="${k}"><button class="eye" data-f="x">${FX.has(t.id) ? '▾' : '▸'}</button><span class="kth" style="color:#d9532c">⊕</span><div class="nm"><div>${escapeHtml(t.name)}</div><div>${escapeHtml((SYS[t.sys] || SYS.d30).n)}${t.res ? ' · <b>' + escapeHtml(t.res) + '</b>' : ''}${(t.shots || []).length ? ' · ' + t.shots.reduce((q, x) => q + (x.n || 1), 0) + ' сн.' : ''} · разрывов: ${(t.bursts || []).length}</div></div><button data-f="open">Открыть</button><button class="eye" data-f="del">🗑</button></div>` +
 (FX.has(t.id) ? `<div class="kids">${(t.bursts || []).map(b => `<div class="kid"><span class="kth">🔥</span><span class="kn">Разрыв ${b.n}: ${t.tgt && t.gun ? devTxt((CT = CT, (() => { const keep = CT; CT = t; const v = corrDev(b); CT = keep; return v; })())) : ''}</span></div>`).join('') || '<div class="empty" style="padding:6px 0">Разрывов нет</div>'}</div>` : '')).join(''));
 box.innerHTML = box.innerHTML; const mh0 = [...el.querySelectorAll('.sub-h')].find(h => /Макет/.test(h.textContent)); if (mh0) el.insertBefore(box, mh0); else el.appendChild(box);
 $('ftH').onclick = () => { FTX.v = !FTX.v; renderLayers(); };
@@ -3500,7 +3503,7 @@ toast(`${r.lbl ? r.lbl + ': ' : ''}X ${pad5(s.x)}  Y ${pad5(s.y)}` + (session &&
 $('ver').textContent = VERSION;
 map.invalidateSize();
 sizeCanvas(); setLayer(state.layer); renderMarkers(); renderSheet(); updateReadout(); centerHeight();
-histSnap(); updUndo(); if (secMode) applySection(); else showLaunch();
+histSnap(); updUndo(); if (secMode) applySection(); showLaunch();
 pdbLoad().then(() => { placeCache.clear(); drawPlaces(); ensureStartRegion(); });
 state.arrays.forEach(a => a.points.forEach(p => { if (p.h == null && !p.hManual && a.kind !== 'aux') fillHeight(p); }));
 </script></body></html>

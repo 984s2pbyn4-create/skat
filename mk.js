@@ -1,4 +1,4 @@
-// СКАТ — модуль «Макет» (3D, объекты, сценарии, камеры, огонь). Грузится лениво из index.html (modLoad). Версия 6.3
+// СКАТ — модуль «Макет» (3D, объекты, сценарии, камеры, огонь). Грузится лениво из index.html (modLoad). Версия 6.4
 // ======== 3D-ПРОСМОТР ========
 const ML = 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/';
 let MLp = null, v3 = null, v3proto = false;
@@ -26,7 +26,7 @@ if (a.kind === 'route' && a.points.length > 1) F.push({type:'Feature', propertie
 });
 return {type:'FeatureCollection', features:F};
 }
-function v3baseSrc(k){ return {type:'raster', tiles:[`skat://${k}/{z}/{x}/{y}`], tileSize:256, maxzoom:(LAYERS[k] && LAYERS[k].max) || 18, minzoom:(LAYERS[k] && LAYERS[k].min) || 0}; }
+function v3baseSrc(k){ return {type:'raster', tiles:[`skat://${k}/{z}/{x}/{y}`], tileSize:256, maxzoom:Math.min(k === 'esri' ? 17 : 19, (LAYERS[k] && LAYERS[k].max) || 18), minzoom:(LAYERS[k] && LAYERS[k].min) || 0}; }
 async function open3D(){
 if (session) return;
 if (tool.on) closeTools();
