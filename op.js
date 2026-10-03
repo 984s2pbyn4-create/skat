@@ -1,4 +1,4 @@
-// СКАТ — модуль «Оператор»: редактор надписей, печать JPEG, свойства знака. Грузится лениво из index.html (modLoad). Версия 6.2
+// СКАТ — модуль «Оператор»: редактор надписей, печать JPEG, свойства знака. Грузится лениво из index.html (modLoad). Версия 6.3
 // ======== ОПЕРАТОР: НАДПИСИ ========
 function openTextEd(a, ti, ll){
 const t = ti != null ? a.texts[ti] : {t:'', f:'Roboto Condensed', s:18, c:'#111111', sc:'#ffffff', sw:2, b:true, i:false, bg:'', r:0, lat:ll.lat, lng:ll.lng};
@@ -76,7 +76,7 @@ if (a.kind === 'aux'){ g.save(); g.translate(px, py); g.scale(sc, sc); g.beginPa
 else if (a.fplan){ g.beginPath(); g.arc(px, py, 19 * sc, 0, 7); g.fillStyle = st.color; g.fill(); g.lineWidth = 2 * sc; g.strokeStyle = '#111'; g.stroke(); if (sid && SYM_BY[sid]){ g.save(); g.translate(px, py); g.scale(sc * .8, sc * .8); drawSym(g, sid, 0, 0, '#111', null); g.restore(); } }
 else if (sid && SYM_BY[sid]){ const col = symCol(sid, sideOf(a, p), st.color); g.save(); g.translate(px, py); g.scale(sc, sc); if (p.rot) g.rotate(p.rot * Math.PI / 180); drawSym(g, sid, 0, 0, col, p.fc || a.fc); g.restore(); used.set(sid + '|' + col, [sid, col]); }
 else { g.beginPath(); g.arc(px, py, 6 * sc, 0, 7); g.fillStyle = st.color; g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 2 * sc; g.stroke(); }
-g.font = `${a.kind === 'aux' ? 'italic ' : ''}700 ${Math.round(12 * sc)}px sans-serif`; g.lineWidth = 3 * sc; g.strokeStyle = '#fff'; g.fillStyle = '#111'; g.strokeText(lb, px + 14 * sc, py - 10 * sc); g.fillText(lb, px + 14 * sc, py - 10 * sc); });
+g.font = `${a.kind === 'aux' ? 'italic ' : ''}700 ${Math.round(12 * sc)}px sans-serif`; g.lineWidth = 3 * sc; g.strokeStyle = '#fff'; g.fillStyle = '#111'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; const lw2 = g.measureText(lb).width; let lx = px + 14 * sc, ly = py - 10 * sc; if (lx + lw2 > ix0 + iw - 2 * sc) lx = Math.max(ix0 + 2 * sc, px - 14 * sc - lw2); if (ly - 12 * sc < iy0) ly = py + 22 * sc; if (ly > iy0 + ih - 2 * sc) ly = iy0 + ih - 2 * sc; g.strokeText(lb, lx, ly); g.fillText(lb, lx, ly); });
 (a.tables || []).forEach(T => { if (T.hid) return; const [px, py] = toC([T.lat, T.lng]), rows = T.rows.slice(0, 40), nc = Math.min(10, Math.max(...rows.map(r => r.length))), fs = T.s * sc, ch = fs * 1.6;
 g.font = `500 ${fs}px '${T.f}', sans-serif`; const cw = Array.from({length:nc}, (_, c) => Math.max(...rows.map(r => g.measureText(String(r[c] ?? '')).width)) + fs);
 const tw = cw.reduce((x, y) => x + y, 0), th2 = ch * rows.length, x0 = px - tw / 2, y0 = py - th2 / 2;

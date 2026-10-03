@@ -572,7 +572,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 6.2';
+const VERSION = 'версия 6.3';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -666,18 +666,30 @@ addEventListener('orientationchange', () => setTimeout(() => map.invalidateSize(
 if (window.visualViewport) visualViewport.addEventListener('resize', () => map.invalidateSize());
 const DEF_LBLZ = 14;
 let tiles = [], tileErr = 0, tileOk = 0;
+// ---- тайлы: кэш → сеть; заглушка Esri и пустые участки заменяются увеличенным родительским тайлом
+const tplUrl = (t, x, y, z) => t.replace('{s}', 'abc'[(x + y) % 3]).replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{r}', '');
+async function isPlaceholder(b, url){ if (!/arcgisonline/.test(url)) return false;
+try { const bm = await createImageBitmap(b), cv = document.createElement('canvas'); cv.width = cv.height = 16; const g = cv.getContext('2d'); g.drawImage(bm, 0, 0, 16, 16); const d = g.getImageData(0, 0, 16, 16).data; let k = 0;
+for (let i = 0; i < d.length; i += 4){ const r = d[i], gg = d[i+1], bb = d[i+2]; if (r > 183 && r < 230 && gg > 175 && gg < 224 && bb > 190 && bb < 238 && bb - gg >= 5 && bb - gg <= 28) k++; } return k > 200; } catch(e){ return false; } }
+async function tileBlob(url, net = true){ if (savedKeys.has(url) && !cOff(url)){ const b = await tileGetFast(url); if (b && !(await isPlaceholder(b, url))) return b; }
+if (!net || url.startsWith('mb:') || navigator.onLine === false) return null;
+try { const b = await netBlob(url); if (await isPlaceholder(b, url)) return null; if (savedKeys.size < 150000) queuePut(url, b); return b; } catch(e){ return null; } }
+async function parentTile(tpl, z, x, y, pixel){ for (let d = 1; d <= 6 && z - d >= 0; d++){ const s = 1 << d, px = x >> d, py = y >> d, b = await tileBlob(tplUrl(tpl, px, py, z - d), d <= 2); if (!b) continue;
+try { const bm = await createImageBitmap(b), w = bm.width / s, cv = document.createElement('canvas'); cv.width = cv.height = 256; const g = cv.getContext('2d'); g.imageSmoothingEnabled = !pixel; g.drawImage(bm, (x - px * s) * w, (y - py * s) * w, w, w, 0, 0, 256, 256); fbUsed = true; return await new Promise(r => cv.toBlob(r, 'image/png')); } catch(e){} } return null; }
+async function tileFb(tpl, z, x, y, pixel){ return (await tileBlob(tplUrl(tpl, x, y, z))) || (await parentTile(tpl, z, x, y, pixel)); }
+let fbUsed = false;
+window.addEventListener('online', () => { if (!fbUsed) return; fbUsed = false; setTimeout(() => { try { tiles.forEach(t => t.redraw()); } catch(e){} }, 1500); });
 const IdbTile = L.TileLayer.extend({ createTile(coords, done){
 const img = document.createElement('img'); img.alt = ''; img.setAttribute('role', 'presentation');
 L.DomEvent.on(img, 'load', L.Util.bind(this._tileOnLoad, this, done, img));
-L.DomEvent.on(img, 'error', L.Util.bind(this._tileOnError, this, done, img));
-const url = this.getTileUrl(coords);
+const url = this.getTileUrl(coords), tpl = this._url, z = this._getZoomForUrl();
 const show = b => { const o = URL.createObjectURL(b); img.addEventListener('load', () => URL.revokeObjectURL(o), {once:true}); img.src = o; };
+const fail = async () => { const pb = await parentTile(tpl, z, coords.x, coords.y); if (pb) show(pb); else this._tileOnError(done, img); };
 keysReady.then(async () => {
-if (savedKeys.has(url) && !cOff(url)){ const b = await tileGetFast(url); if (b){ show(b); return; } }
-if (url.startsWith('mb:')) return;
-if (navigator.onLine === false){ img.src = url; return; }
-if (savedKeys.size < 150000){ try { const b = await netBlob(url); show(b); queuePut(url, b); return; } catch(e){} }
-img.src = url;
+const b = await tileBlob(url, savedKeys.size < 150000);
+if (b){ show(b); return; }
+if (url.startsWith('mb:') || navigator.onLine === false){ fail(); return; }
+img.addEventListener('error', fail, {once:true}); img.src = url;
 });
 return img; } });
 function setLayer(key){
@@ -3320,8 +3332,8 @@ function ovalPts0(a, b){ const c = L.latLng((a.lat + b.lat) / 2, (a.lng + b.lng)
 for (let i = 0; i <= 36; i++){ const t = i / 36 * 2 * Math.PI, x = Math.cos(t) * (L0 + W * .4), y = Math.sin(t) * W, r = Math.hypot(x, y), q = Math.atan2(y, x) * 180 / Math.PI; out.push(destLL(c, az + q, r)); } return out; }
 
 function itKind(a, it){ const sid = it.sym || a.sym; return sid && MDL_OF[sid]; }
-const SYS = {m82:{n:'Миномёт 82 мм', v:180, hi:1}, m120:{n:'Миномёт 120 мм', v:260, hi:1}, d30:{n:'Д-30 122 мм', v:520}, msta:{n:'Мста-Б 152 мм', v:600}, sau:{n:'САУ 2С3/2С19', v:600}, grad:{n:'РСЗО «Град»', v:550, rs:40}, uragan:{n:'РСЗО «Ураган»', v:650, rs:16}, tank:{n:'Танк', v:1400}};
-let CT = null, corrPick = null, corrFly = [], corrRaf = 0;
+const SYS = {m82:{n:'Миномёт 82 мм', v:180, hi:1, max:4100}, m120:{n:'Миномёт 120 мм', v:260, hi:1, max:7100}, d30:{n:'Д-30 122 мм', v:520, max:15400}, msta:{n:'Мста-Б 152 мм', v:600, max:24700}, sau:{n:'САУ 2С3/2С19', v:600, max:24700}, grad:{n:'РСЗО «Град»', v:550, rs:40, max:20400}, uragan:{n:'РСЗО «Ураган»', v:650, rs:16, max:35800}, tank:{n:'Танк', v:1400, max:10000}};
+let CT = null, corrPick = null, corrFly = [], corrRaf = 0, corrShotN = 0;
 function corrDev(b){ const t = CT.tgt, [kx, ky] = mk(t.lat), dN = (b.lat - t.lat) * ky, dE = (b.lng - t.lng) * kx;
 const g = CT.gun, gx = (t.lng - g.lng) * kx, gy = (t.lat - g.lat) * ky, D = Math.hypot(gx, gy) || 1, ux = gx / D, uy = gy / D, along = dE * ux + dN * uy, lat = dE * uy - dN * ux, mil = Math.round(Math.atan2(lat, D + along) / (2 * Math.PI) * 6000);
 return {dN, dE, along, lat, mil, D}; }
