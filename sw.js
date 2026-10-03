@@ -1,4 +1,4 @@
-const V = 'skat-3.7';
+const V = 'skat-2.7';
 const APP = 'skat-app-' + V, LIB = 'skat-lib', TILES = 'skat-tiles';
 const SHELL = ['./', './index.html'];
 const LIBS = ['https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
@@ -50,6 +50,7 @@ const req = e.request;
 if (req.method !== 'GET') return;
 const u = new URL(req.url);
 if (req.mode === 'navigate') { e.respondWith(appFirst(req, e)); return; }
+if (u.origin === self.location.origin && /\.js$/.test(u.pathname) && !u.pathname.endsWith('/sw.js')) { e.respondWith(cacheFirst(req, APP)); return; }
 if (TILE_HOSTS.some(h => u.hostname.includes(h) || u.pathname.includes(h))) { e.respondWith(cacheFirst(req, TILES)); return; }
 if (u.hostname === 'cdnjs.cloudflare.com' || u.hostname === 'cdn.jsdelivr.net' || u.hostname.includes('fonts.g')) { e.respondWith(cacheFirst(req, LIB)); return; }
 });
