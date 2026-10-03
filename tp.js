@@ -1,4 +1,4 @@
-// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.4
+// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.5
 // ======== БОЕВОЙ КОНТУР: КОРРЕКТИРОВКА ОГНЯ ========
 const corrL = L.layerGroup().addTo(map);
 function sysTof(sys, d){ const k = SYS[sys] || SYS.d30; return Math.max(2, d / k.v * (k.hi ? 2 : 1.25)); }
@@ -33,7 +33,7 @@ el.querySelectorAll('[data-c]').forEach(b => { const c = b.dataset.c; if (b.tagN
 else b.onclick = () => { if (c === 'x'){ CT = null; corrPick = null; corrEnd = false; corrDraw(); corrPanel(); return; } if (c === 'stop'){ corrStop(); return; } if (c === 'gun' || c === 'tgt'){ corrPick = corrPick === c ? null : c; corrPanel(); toast(c === 'gun' ? 'Коснитесь огневой позиции или знака орудия' : 'Коснитесь цели'); return; }
 if (c === 'nobs' || c === 'mis'){ const p = pendShot(CT); if (p){ p.res = c; persist(); corrPanel(); } return; }
 if (c === 'end'){ corrEnd = true; corrPanel(); return; } if (c === 'r0'){ corrEnd = false; corrPanel(); return; }
-if (c === 'r1' || c === 'r2'){ CT.res = c === 'r1' ? 'Уничтожена' : 'Подавлена'; CT.done = Date.now(); corrEnd = false; persist(); corrPanel(); toast(`Цель ${CT.name || ''} ${CT.res.toLowerCase()}. ${statTxt(shotStats(CT))}`, 6000); return; }
+if (c === 'r1' || c === 'r2'){ CT.res = c === 'r1' ? 'Уничтожена' : 'Подавлена'; CT.done = Date.now(); corrEnd = false; logFromTask(CT); corrPanel(); toast(`Цель ${CT.name || ''} ${CT.res.toLowerCase()}. ${statTxt(shotStats(CT))}`, 6000); return; }
 if (c === 'un'){ const b0 = CT.bursts.pop(), sh = b0 && (CT.shots || []).find(x => x.no === b0.n && (x.res === 'hit' || x.res === 'dev')); if (sh) sh.res = null; persist(); corrDraw(); corrPanel(); return; } if (c === 'fire') corrFire(); }; }); }
 // разрыв по касанию: привязка к первому упавшему неотмеченному выстрелу, «в цель» — до 50 м
 function corrMark(ll){ const p = pendShot(CT), b = {lat:+ll.lat.toFixed(7), lng:+ll.lng.toFixed(7), n:p ? p.no : (CT.bursts.length ? Math.max(...CT.bursts.map(x => x.n)) + 1 : 1), t:Date.now()};
@@ -183,4 +183,50 @@ function zoneTgtAoa(sh){ const aoa = [['№ ТЗ', 'Зона', 'Цвет зон�
 zoneTargets(sh).forEach(({a, p, i}) => { const r = rowsOf(a)[i], ct = planCat(p); aoa.push([tzList(a, p).join(', '), sh.zn, colName(sh.color || '#e2533f'), ct ? TCAT[ct - 1][1] : '', p.ch || '', p.tno || r.id, r.x, r.y, r.h === '' ? '' : r.h, r.sq, r.place, r.comment, styleText(r.st)]); }); return aoa; }
 function zoneShapes(){ const z = state.arrays.find(x => x.zones); return z ? z.shapes.filter(s0 => s0.zn) : []; }
 
+// ======== ОГНЕВЫЕ ЗАДАЧИ (окно слева): ТЕКУЩИЕ И ЖУРНАЛ С ВЫГРУЗКОЙ В EXCEL ========
+let ftTab = 'cur', ftEdRef = null;
+const fmtDT = d => { const x = new Date(d); return isNaN(x) ? '' : x.toLocaleString('ru-RU', {day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit'}); };
+const toLocDT = d => { const x = new Date(d || Date.now()), z = n => String(n).padStart(2, '0'); return `${x.getFullYear()}-${z(x.getMonth() + 1)}-${z(x.getDate())}T${z(x.getHours())}:${z(x.getMinutes())}`; };
+function logFromTask(t){ const s = shotStats(t), sk = t.tgt ? GEO.toSK(t.tgt.lat, t.tgt.lng) : null, lt = t.tgt ? locText(t.tgt.lat, t.tgt.lng) : null;
+let r = state.ftlog.find(x => x.tid === t.id); if (!r){ r = {id:Date.now(), tid:t.id}; state.ftlog.push(r); }
+Object.assign(r, {date:new Date().toISOString(), name:t.name || '', obj:t.obj || '', loc:lt ? lt.loc : '', x:sk ? pad5(sk.x) : '', y:sk ? pad5(sk.y) : '', sys:(SYS[t.sys] || SYS.d30).n, res:t.res || '', shots:s.shots, n:s.n, hit:s.hit, dev:s.dev, nobs:s.nobs, mis:s.mis}); persist(); return r; }
+function renderFt(){ keepScroll('ftModal', renderFt0); }
+function renderFt0(){ const el = $('ftList'), row = $('ftRow'); $('ftTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === ftTab));
+if (ftTab === 'cur'){ const pl = state.arrays.filter(isPlanL);
+el.innerHTML = (state.ftasks.length ? state.ftasks.map((t, k) => { const st = shotStats(t); return `<div class="arr" data-k="${k}"><span class="kth" style="color:#d9532c">⊕</span><div class="nm"><div>${escapeHtml(t.name || 'Цель')}${t.obj ? ' · ' + escapeHtml(t.obj) : ''}</div><div>${escapeHtml((SYS[t.sys] || SYS.d30).n)}${t.res ? ' · <b>' + escapeHtml(t.res) + '</b>' : ''} · выстрелов ${st.shots}, снарядов ${st.n}</div></div><button data-a="open">Открыть</button></div>`; }).join('') : '<div class="empty">Огневых задач нет</div>')
++ (pl.length ? '<div class="sub-h">Плановые (ТЗ)</div>' + pl.map(a => `<div class="arr${a.hidden ? ' off' : ''}" data-id="${a.id}"><button class="eye" data-a="eye">${a.hidden ? '◌' : '●'}</button><div class="nm"><div>${escapeHtml(a.name)}</div><div>целей: ${a.points.length}</div></div><button data-a="plan">План ОЗ</button></div>`).join('') : '');
+row.innerHTML = '<button class="primary" id="ftNew">+ Задача (корректировка)</button><button data-close>Закрыть</button>';
+el.querySelectorAll('.arr[data-k]').forEach(r => { const t = state.ftasks[+r.dataset.k];
+r.querySelector('[data-a=open]').onclick = () => { closeModals(); CT = t; corrPick = null; corrEnd = false; corrDraw(); corrPanel(); if (t.tgt) map.setView([t.tgt.lat, t.tgt.lng], Math.max(map.getZoom(), 14)); };
+swipeable(r, () => askConfirm(`Удалить огневую задачу «${t.name || 'Цель'}»? Запись в журнале останется.`, 'Удалить', () => { state.ftasks = state.ftasks.filter(x => x !== t); if (CT === t){ CT = null; corrDraw(); corrPanel(); } persist(); renderFt(); })); });
+el.querySelectorAll('.arr[data-id]').forEach(r => { const a = state.arrays.find(x => String(x.id) === r.dataset.id); if (!a) return;
+r.querySelector('[data-a=eye]').onclick = () => { a.hidden = !a.hidden; persist(); renderMarkers(); renderFt(); };
+r.querySelector('[data-a=plan]').onclick = () => { closeModals(); renderPlan(); openModal('planModal'); }; });
+$('ftNew').onclick = () => { closeModals(); CT = newTask(); corrPick = 'gun'; corrEnd = false; corrDraw(); corrPanel(); toast('Коснитесь огневой позиции или знака орудия'); };
+row.querySelector('[data-close]').onclick = () => $('ftModal').classList.remove('open'); return; }
+const L1 = state.ftlog.slice().sort((x, y) => String(y.date).localeCompare(String(x.date)));
+el.innerHTML = L1.length ? L1.map(r => `<div class="arr" data-l="${r.id}"><span class="kth" style="color:${r.res === 'Уничтожена' ? '#2f9e44' : r.res === 'Подавлена' ? '#e8a33a' : '#888'}">${r.res === 'Уничтожена' ? '✖' : r.res === 'Подавлена' ? '◐' : '○'}</span><div class="nm"><div>${escapeHtml(r.name || 'Цель')}${r.obj ? ' · ' + escapeHtml(r.obj) : ''} — <b>${escapeHtml(r.res || '—')}</b></div><div>${fmtDT(r.date)} · ${escapeHtml(r.sys || '')} · снарядов ${r.n || 0}: в цель ${r.hit || 0}, откл. ${r.dev || 0}, не набл. ${r.nobs || 0}, осечка ${r.mis || 0}${r.note ? ' · ' + escapeHtml(r.note) : ''}</div></div><button class="eye" data-a="ed">✎</button></div>`).join('') : '<div class="empty">Журнал пуст. Записи появляются по «Итог задачи» в корректировке или кнопкой «+ Запись»</div>';
+row.innerHTML = `<button class="primary" id="ftXls" ${L1.length ? '' : 'disabled'}>Выгрузить в Excel</button><button id="ftAdd">+ Запись</button>`;
+el.querySelectorAll('.arr[data-l]').forEach(rw => { const r = state.ftlog.find(x => String(x.id) === rw.dataset.l); if (!r) return;
+rw.querySelector('[data-a=ed]').onclick = () => openFtEd(r);
+swipeable(rw, () => askConfirm(`Удалить запись журнала «${r.name || 'Цель'}»?`, 'Удалить', () => { state.ftlog = state.ftlog.filter(x => x !== r); persist(); renderFt(); })); });
+$('ftXls').onclick = exportFtLog; $('ftAdd').onclick = () => openFtEd(null); }
+const FTF = [['date', 'Дата и время', 'dt'], ['name', '№ цели', 'text'], ['obj', 'Объект / характер', 'text'], ['loc', 'Местоположение', 'text'], ['x', 'X', 'text'], ['y', 'Y', 'text'], ['sys', 'Система', 'text'], ['res', 'Результат', 'sel'],
+['shots', 'Выстрелов', 'num'], ['n', 'Снарядов (расход)', 'num'], ['hit', 'В цель', 'num'], ['dev', 'Отклонение (> 50 м)', 'num'], ['nobs', 'Не наблюдались', 'num'], ['mis', 'Осечка', 'num'], ['note', 'Примечание', 'text']];
+function openFtEd(r){ ftEdRef = r; const v = r || {date:new Date().toISOString(), res:'Подавлена'};
+$('ftEdBody').innerHTML = FTF.map(([k, l, ty]) => `<label class="f">${l}${ty === 'sel' ? `<select id="fe_${k}">${['Уничтожена', 'Подавлена', 'Не выполнена'].map(x => `<option${x === v.res ? ' selected' : ''}>${x}</option>`).join('')}</select>`
+: `<input id="fe_${k}" type="${ty === 'dt' ? 'datetime-local' : ty === 'num' ? 'number' : 'text'}" ${ty === 'num' ? 'inputmode="numeric" min="0"' : 'autocomplete="off"'} value="${escapeHtml(ty === 'dt' ? toLocDT(v[k]) : String(v[k] ?? ''))}">`}</label>`).join('');
+openModal('ftEdModal'); }
+$('ftEdOk').onclick = () => { const r = ftEdRef || {id:Date.now()}; FTF.forEach(([k, , ty]) => { const x = $('fe_' + k).value; r[k] = ty === 'num' ? Math.max(0, +x || 0) : ty === 'dt' ? (x ? new Date(x).toISOString() : r[k]) : x.trim(); });
+if (!ftEdRef) state.ftlog.push(r); persist(); $('ftEdModal').classList.remove('open'); renderFt(); toast('Запись сохранена'); };
+function exportFtLog(){ const L1 = state.ftlog.slice().sort((x, y) => String(x.date).localeCompare(String(y.date))), K = ['shots', 'n', 'hit', 'dev', 'nobs', 'mis'];
+const aoa = [['№ п/п', 'Дата', 'Время', '№ цели', 'Объект / характер', 'Местоположение', 'X', 'Y', 'Система', 'Результат', 'Выстрелов', 'Снарядов', 'В цель', 'Отклонение (>50 м)', 'Не наблюдались', 'Осечка', 'Примечание']];
+L1.forEach((r, i) => { const d = new Date(r.date); aoa.push([i + 1, isNaN(d) ? '' : d.toLocaleDateString('ru-RU'), isNaN(d) ? '' : d.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'}), r.name || '', r.obj || '', r.loc || '', r.x || '', r.y || '', r.sys || '', r.res || '', ...K.map(k => +r[k] || 0), r.note || '']); });
+aoa.push(['', '', '', '', '', '', '', '', '', 'Итого', ...K.map(k => L1.reduce((q, r) => q + (+r[k] || 0), 0)), `уничтожено ${L1.filter(r => r.res === 'Уничтожена').length}, подавлено ${L1.filter(r => r.res === 'Подавлена').length}`]);
+const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = [6, 10, 7, 10, 24, 30, 9, 9, 18, 13, 9, 9, 8, 12, 12, 8, 24].map(w => ({wch:w}));
+const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Журнал ОЗ');
+deliverFile(new Blob([XLSX.write(wb, {bookType:'xlsx', type:'array'})], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), `Журнал_огневых_задач_${stamp()}.xlsx`, 'Журнал огневых задач готов'); }
+$('ftTabs').querySelectorAll('button').forEach(b => b.onclick = () => { ftTab = b.dataset.t; renderFt(); });
+$('ftBtn').onclick = () => { ftTab = 'cur'; renderFt(); openModal('ftModal'); };
+{ const rp0 = renderPlan; window.renderPlan = () => keepScroll('planModal', rp0); }
 window.__mod_tp = 1;

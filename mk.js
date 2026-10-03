@@ -1,4 +1,4 @@
-// СКАТ — модуль «Макет» (3D, объекты, сценарии, камеры, огонь). Грузится лениво из index.html (modLoad). Версия 6.4
+// СКАТ — модуль «Макет» (3D, объекты, сценарии, камеры, огонь). Грузится лениво из index.html (modLoad). Версия 6.5
 // ======== 3D-ПРОСМОТР ========
 const ML = 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/';
 let MLp = null, v3 = null, v3proto = false;
@@ -40,13 +40,13 @@ const ex = +$('v3ex').value, c = map.getCenter();
 v3center = c;
 if (v3){ try { v3.remove(); } catch(e){} v3 = null; }
 try {
-v3 = new ml.Map({container:'v3map', center:[c.lng, c.lat], zoom:Math.max(1, map.getZoom() - 1), pitch:60, maxPitch:85, attributionControl:false,
+v3 = new ml.Map({container:'v3map', fadeDuration:0, center:[c.lng, c.lat], zoom:Math.max(1, map.getZoom() - 1), pitch:60, maxPitch:85, attributionControl:false,
 style:{version:8, sources:{base:v3baseSrc(cur),
 dem:{type:'raster-dem', tiles:['skat://dem/{z}/{x}/{y}'], tileSize:256, encoding:'terrarium', maxzoom:14},
 dem2:{type:'raster-dem', tiles:['skat://dem/{z}/{x}/{y}'], tileSize:256, encoding:'terrarium', maxzoom:14},
 obj:{type:'geojson', data:buildObjs([].concat(...objCells.values()), v3cfg.den)}, plc:{type:'geojson', data:v3places(c)}, aux3:{type:'geojson', data:v3aux()}, tac:{type:'geojson', data:v3tac(c)}, mdl:{type:'geojson', data:v3mdl(c)},
 pts:{type:'geojson', data:v3data()}},
-layers:[{id:'base', type:'raster', source:'base'},
+layers:[{id:'base', type:'raster', source:'base', paint:{'raster-fade-duration':0}},
 {id:'hs', type:'hillshade', source:'dem2', paint:{'hillshade-exaggeration':0.35}},
 {id:'fill', type:'fill', source:'pts', filter:['==', '$type', 'Polygon'], paint:{'fill-color':['get', 'color'], 'fill-opacity':['get', 'op']}},
 {id:'outl', type:'line', source:'pts', filter:['==', '$type', 'Polygon'], paint:{'line-color':['get', 'color'], 'line-width':2}},
@@ -397,7 +397,7 @@ $('v3d').classList.remove('on');
 }
 $('v3Btn').onclick = open3D;
 $('v3close').onclick = close3D;
-$('v3base').onchange = e => { if (!v3) return; const k = e.target.value; try { v3.removeLayer('base'); v3.removeSource('base'); v3.addSource('base', v3baseSrc(k)); v3.addLayer({id:'base', type:'raster', source:'base'}, 'hs'); } catch(_){} };
+$('v3base').onchange = e => { if (!v3) return; const k = e.target.value; try { v3.removeLayer('base'); v3.removeSource('base'); v3.addSource('base', v3baseSrc(k)); v3.addLayer({id:'base', type:'raster', source:'base', paint:{'raster-fade-duration':0}}, 'hs'); } catch(_){} };
 $('v3ex').oninput = e => { $('v3exv').textContent = +e.target.value === 1 ? 'Реальный' : '×' + e.target.value; if (v3) try { v3.setTerrain({source:'dem', exaggeration:+e.target.value}); } catch(_){} };
 // ======== МАКЕТ: ОБЪЕКТЫ, КРУГОВОЕ МЕНЮ 3D, АНИМАЦИЯ ========
 const ENV_D = {house:{w:9, l:11, h:6}, flat:{w:14, l:40, h:15}, wh:{w:18, l:40, h:8}, hangar:{w:22, l:30, h:9}, pw:{h:28}, mast:{h:45}, wt:{h:24}, tank:{r:6, h:9}};
