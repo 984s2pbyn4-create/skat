@@ -570,7 +570,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 5.9';
+const VERSION = 'версия 6.0';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -3915,11 +3915,11 @@ let tb = $('laySelBar'); if (!tb){ tb = document.createElement('div'); tb.id = '
 selBar();
 tagBar(); if (MKX === null) MKX = secMode !== 'mk'; ftaskSection(el);
 let nb = $('nolblBtn'); if (!nb){ nb = document.createElement('button'); nb.id = 'nolblBtn'; nb.className = 'ghost'; tb.appendChild(nb); } nb.textContent = NOLBL ? 'Подписи: выкл' : 'Подписи: вкл'; nb.onclick = () => { NOLBL = !NOLBL; lsSet('skat_nolbl', NOLBL); renderMarkers(); renderLayers(); };
-if (OBX.v === null) OBX.v = false; { const fr = el.querySelector('.arr[data-id]'); if (fr){ const oh = document.createElement('div'); oh.className = 'sub-h'; oh.style.cursor = 'pointer'; oh.style.marginTop = '0'; oh.textContent = `${OBX.v ? '▸' : '▾'} Обстановка (${state.arrays.filter(a => !isMk(a) && !a.fplan).length})`; oh.onclick = () => { OBX.v = !OBX.v; renderLayers(); }; el.insertBefore(oh, el.firstChild); } }
+if (OBX.v === null) OBX.v = false; { const fr = el.querySelector('.arr[data-id]'); if (fr){ const oh = document.createElement('div'); oh.className = 'sub-h'; oh.style.cursor = 'pointer'; oh.style.marginTop = '0'; oh.textContent = `${OBX.v ? '▸' : '▾'} Обстановка (${state.arrays.filter(a => !isMk(a) && !isPlanL(a)).length})`; oh.onclick = () => { OBX.v = !OBX.v; renderLayers(); }; el.insertBefore(oh, el.firstChild); } }
 const mh = [...el.querySelectorAll('.sub-h')].find(h => h.textContent.replace(/[▸▾\s\d()]/g, '') === 'Макет');
 if (mh){ const n = state.arrays.filter(isMk).length; mh.textContent = `${MKX ? '▸' : '▾'} Макет (${n})`; mh.style.cursor = 'pointer'; mh.onclick = () => { MKX = !MKX; renderLayers(); }; }
 el.querySelectorAll('.arr[data-id]').forEach(r => { const id = +r.dataset.id, a = arrById(id); if (!a) return;
-if (OBX.v && !isMk(a) && !a.fplan){ r.style.display = 'none'; return; }
+if (OBX.v && !isMk(a) && !isPlanL(a)){ r.style.display = 'none'; return; }
 if ((MKX && isMk(a)) || (TAGF && !tagOk(a) && !layItems(a).some(x => (x.o.tags || []).includes(TAGF)))){ r.style.display = 'none'; return; }
 const tgb = document.createElement('button'); tgb.className = 'eye'; tgb.textContent = '#'; tgb.title = 'Теги слоя'; tgb.onclick = e => { e.stopPropagation(); const v = prompt('Теги слоя через запятую (например: 111 мсп, 1 мсб)', (a.tags || []).join(', ')); if (v === null) return; a.tags = parseTags(v); if (!a.tags.length) delete a.tags; persist(); renderLayers(); }; r.appendChild(tgb);
 if (a.tags && a.tags.length){ const nm = r.querySelector('.nm div:last-child'); if (nm) nm.innerHTML += a.tags.map(t => ` <small class="tg">#${escapeHtml(t)}</small>`).join(''); }
@@ -3927,7 +3927,7 @@ const tg = document.createElement('button'); tg.className = 'eye'; tg.textConten
 if (SELM.on){ const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'selcb'; cb.checked = SELM.sel.has('L:' + id); cb.onchange = () => { cb.checked ? SELM.sel.add('L:' + id) : SELM.sel.delete('L:' + id); selBar(); }; r.insertBefore(cb, r.firstChild); }
 const aa = document.createElement('button'); aa.className = 'eye' + (a.nolbl ? ' dim' : ''); aa.textContent = 'Aa'; aa.title = 'Подписи слоя'; aa.onclick = e => { e.stopPropagation(); a.nolbl = !a.nolbl; if (!a.nolbl) delete a.nolbl; persist(); renderMarkers(); renderLayers(); }; r.appendChild(aa);
 const rn = document.createElement('button'); rn.className = 'eye'; rn.textContent = '✎'; rn.title = 'Переименовать'; rn.onclick = e => { e.stopPropagation(); const v = prompt('Название слоя', a.name); if (v && v.trim()){ a.name = v.trim(); persist(); renderLayers(); } }; r.appendChild(rn);
-if (LX.has(id)){ const kd = document.createElement('div'); kd.className = 'kids'; kd.innerHTML = kidsHtml(a); r.after(kd); bindKids(kd, a); } });
+if (LX.has(id)){ const kd = document.createElement('div'); kd.className = 'kids'; kd.innerHTML = kidsHtml(a); r.after(kd); bindKids(kd, a); if (a.zones) zoneKids(kd, a); } });
 }
 // ---- правка выбранных вместе
 let bat = null;
@@ -4139,7 +4139,7 @@ if (alive) corrRaf = requestAnimationFrame(step); else { corrFly = []; corrDraw(
 corrRaf = requestAnimationFrame(step); }
 // ---- огневые задачи в «Слоях»
 const FX = new Set();
-function ftaskSection(el){ const pl = state.arrays.filter(a => a.fplan); if (!state.ftasks.length && !pl.length) return; if (FTX.v === null) FTX.v = secMode !== 'tp'; const box = document.createElement('div');
+function ftaskSection(el){ const pl = state.arrays.filter(isPlanL); if (!state.ftasks.length && !pl.length) return; if (FTX.v === null) FTX.v = secMode !== 'tp'; const box = document.createElement('div');
 box.innerHTML = `<div class="sub-h" id="ftH" style="cursor:pointer">${FTX.v ? '▸' : '▾'} Огневые задачи (${state.ftasks.length + pl.length})</div>` + (FTX.v ? '' :  state.ftasks.map((t, k) => `<div class="arr${t.hid ? ' off' : ''}" data-ft="${k}"><button class="eye" data-f="x">${FX.has(t.id) ? '▾' : '▸'}</button><span class="kth" style="color:#d9532c">⊕</span><div class="nm"><div>${escapeHtml(t.name)}</div><div>${escapeHtml((SYS[t.sys] || SYS.d30).n)} · разрывов: ${(t.bursts || []).length}</div></div><button data-f="open">Открыть</button><button class="eye" data-f="del">🗑</button></div>` +
 (FX.has(t.id) ? `<div class="kids">${(t.bursts || []).map(b => `<div class="kid"><span class="kth">🔥</span><span class="kn">Разрыв ${b.n}: ${t.tgt && t.gun ? devTxt((CT = CT, (() => { const keep = CT; CT = t; const v = corrDev(b); CT = keep; return v; })())) : ''}</span></div>`).join('') || '<div class="empty" style="padding:6px 0">Разрывов нет</div>'}</div>` : '')).join(''));
 box.innerHTML = box.innerHTML; const mh0 = [...el.querySelectorAll('.sub-h')].find(h => /Макет/.test(h.textContent)); if (mh0) el.insertBefore(box, mh0); else el.appendChild(box);
@@ -4165,7 +4165,12 @@ const OBX = {v:null}, FTX = {v:null};
 const CHAR = ['Живая сила', 'Огневая точка', 'Пулемёт', 'ПТРК', 'Миномёт', 'Артиллерия', 'Танк', 'БМП / БТР', 'Автомобили', 'НП', 'КНП', 'Блиндаж', 'Опорный пункт', 'Склад', 'Переправа', 'Расчёт БпЛА'];
 function planLayer(){ const n = prompt('Название слоя плановых огневых задач', `Плановые ОЗ ${state.arrays.filter(a => a.fplan).length + 1}`); if (n === null) return null;
 const a = normArr({id:Date.now(), kind:'main', fplan:true, name:n.trim() || 'Плановые ОЗ', ident:n.trim() || 'Плановые ОЗ', prefix:'', start:nextTgtNo(), step:1, style:copySt(state.palette.find(p => p.name === 'Оранжевый') || state.palette[0] || DEFAULT_PAL[2]), points:[], minZ:0, lblZ:10}); state.arrays.push(a); persist(); return a; }
-function renderPlan(){ const el = $('planList'), L1 = state.arrays.filter(a => a.fplan);
+function renderPlan(){ renderPlan0(); const el = $('planList'), Z = zoneShapes(); if (!Z.length) return; const d = document.createElement('div');
+d.innerHTML = '<div class="sub-h">Зоны поражения</div>' + Z.map((sh, k) => `<div class="arr" data-z="${k}"><span class="sw" style="background:${sh.color || '#e2533f'}"></span><div class="nm"><div>${escapeHtml(sh.name || 'Зона ' + sh.zn)}</div><div>целей: ${zoneTargets(sh).length} · поражает: ${escapeHtml(colName(sh.color || '#e2533f'))}</div></div><button data-zz="go">Показать</button><button class="eye" data-zz="ed">✎</button></div>`).join(''); el.appendChild(d);
+d.querySelectorAll('[data-z]').forEach(r => { const sh = Z[+r.dataset.z], za = state.arrays.find(x => x.zones);
+r.querySelector('[data-zz=go]').onclick = () => { closeModals(); map.fitBounds(L.latLngBounds(sh.pts.map(q => [q[0] ?? q.lat, q[1] ?? q.lng])).pad(.2)); };
+r.querySelector('[data-zz=ed]').onclick = () => { closeModals(); openShapeEd(za, za.shapes.indexOf(sh)); }; }); }
+function renderPlan0(){ const el = $('planList'), L1 = state.arrays.filter(a => a.fplan);
 el.innerHTML = L1.length ? L1.map(a => `<div class="arr" data-id="${a.id}"><span class="sw" style="background:${a.style.color}"></span><div class="nm"><div>${escapeHtml(a.name)}</div><div>целей: ${a.points.length}${a.points.length ? ` (${escapeHtml(labelOf(a, 0))}…${escapeHtml(labelOf(a, a.points.length - 1))})` : ''}</div></div><button data-p="add">＋ Цели</button><button data-p="tbl">Таблица</button><button class="eye" data-p="ren">✎</button></div>`).join('') : '<div class="empty">Слоёв плановых огневых задач нет — нажмите «Добавить слой».</div>';
 el.querySelectorAll('.arr').forEach(r => { const a = arrById(+r.dataset.id);
 r.querySelector('[data-p=add]').onclick = () => planPreset(a);
@@ -4250,10 +4255,9 @@ $('seDel').onclick = () => { const {a, i} = shRef; a.shapes.splice(i, 1); persis
 // ---- общая выгрузка
 function planAoa(a){ const aoa = [['№ ТЗ', 'Зона', 'Цвет зоны', 'Категория', 'Характер цели', '№ цели', 'X', 'Y', 'H', 'Квадрат', 'Населённый пункт', 'Комментарий', 'Привлекается (цвет)']];
 rowsOf(a).forEach((r, i) => { const p = a.points[i], ct = planCat(p), zs = zoneShape(p.lat, p.lng); aoa.push([p.tz || a.tz || '', p.tno ? p.tno.slice(0, 2) : '', zs ? colName(zs.color || '#e2533f') : '', ct ? TCAT[ct - 1][1] : '', p.ch || '', p.tno || r.id, r.x, r.y, r.h === '' ? '' : r.h, r.sq, r.place, r.comment, styleText(r.st)]); }); return aoa; }
-function zonesAoa(){ const aoa = [['Зона', 'Наименование', 'Точка', 'Местоположение', 'X', 'Y', 'Квадрат', 'Населённый пункт', 'Цвет (кто поражает)', 'Целей в зоне']], z = state.arrays.find(x => x.zones);
-(z ? z.shapes : []).forEach(sh => { if (!sh.zn) return; const n = state.arrays.reduce((s0, a) => s0 + (a.fplan ? a.points.filter(p => p.tno && p.tno.slice(0, 2) === String(sh.zn).padStart(2, '0').slice(-2)).length : 0), 0);
-sh.pts.forEach((q, k) => { const lat = q[0] ?? q.lat, lng = q[1] ?? q.lng, s0 = GEO.toSK(lat, lng), lt = locText(lat, lng); aoa.push([sh.zn, sh.name || `Зона ${sh.zn}`, k + 1, lt.loc, pad5(s0.x), pad5(s0.y), sqOf(s0), lt.place, colName(sh.color || '#e2533f'), k === 0 ? n : '']); }); });
-return aoa; }
+function zonesAoa(){ const aoa = [['№ п/п', 'Наименование', 'Местоположение', 'Примечание', 'Населённый пункт']]; let n = 0;
+zoneShapes().forEach(sh => { const T = zoneTargets(sh).length; sh.pts.forEach((q, k) => { const lat = q[0] ?? q.lat, lng = q[1] ?? q.lng, lt = locText(lat, lng);
+aoa.push([++n, `${sh.name || 'Зона ' + sh.zn}, точка ${k + 1}`, lt.loc, k === 0 ? `поражает: ${colName(sh.color || '#e2533f')}; целей в зоне: ${T}` : '', lt.place]); }); }); return aoa; }
 function fireAoa(){ const aoa = [['Цель', 'Объект', 'Средство', 'X цели', 'Y цели', 'Квадрат', 'Местоположение', 'Разрывов', 'Последний разрыв от цели']];
 state.ftasks.forEach(t => { if (!t.tgt) return; const s0 = GEO.toSK(t.tgt.lat, t.tgt.lng), last = (t.bursts || []).slice(-1)[0]; let dv = ''; if (last && t.gun){ const keep = CT; CT = t; dv = devTxt(corrDev(last)); CT = keep; }
 aoa.push([t.name, t.obj || '', (SYS[t.sys] || SYS.d30).n, pad5(s0.x), pad5(s0.y), sqOf(s0), locText(t.tgt.lat, t.tgt.lng).loc, (t.bursts || []).length, dv]); }); return aoa; }
@@ -4264,7 +4268,8 @@ const wb = XLSX.utils.book_new(), used = new Set();
 const tzs = [...new Set(pls.flatMap(a => a.points.flatMap(p => tzList(a, p))).concat(pls.map(a => String(a.tz || '')).filter(Boolean)))].sort((x, y) => (+x || 0) - (+y || 0) || x.localeCompare(y));
 tzs.forEach(tz => addSheet(wb, planAoaTz(tz), 'ТЗ ' + tz, ['A', 'B', 'F', 'G', 'H', 'J']));
 const ma = meetAoa(); if (ma.length > 1) addSheet(wb, ma, 'Точки встречи', ['C', 'D', 'E', 'F']);
-const za = zonesAoa(); if (za.length > 1) addSheet(wb, za, 'Зоны', ['A', 'E', 'F', 'G']);
+const za = zonesAoa(); if (za.length > 1) addSheet(wb, za, 'Зоны (описание)', ['B', 'C']);
+zoneShapes().forEach(sh => { const zt = zoneTgtAoa(sh); if (zt.length > 1) addSheet(wb, zt, 'Зона ' + sh.zn, ['A', 'B', 'F', 'G', 'H', 'J']); });
 const fa = fireAoa(); if (fa.length > 1) addSheet(wb, fa, 'Огневые задачи', ['A', 'D', 'E', 'F']);
 if (!wb.SheetNames.length){ toast('Нет данных для выгрузки'); return; }
 deliverFile(new Blob([XLSX.write(wb, {bookType:'xlsx', type:'array'})], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), `План_ОЗ_${stamp()}.xlsx`, `Файл готов: вкладок ${wb.SheetNames.length}`); }
@@ -4319,6 +4324,17 @@ function meetAoa(){ const aoa = [['Маршрут', 'Пара', 'Точка', 'X
 function planAoaTz(tz){ const aoa = [['№ ТЗ', 'Зона', 'Цвет зоны', 'Категория', 'Характер цели', '№ цели', 'X', 'Y', 'H', 'Квадрат', 'Населённый пункт', 'Комментарий', 'Привлекается (цвет)']];
 state.arrays.forEach(a => { if (!a.fplan) return; rowsOf(a).forEach((r, i) => { const p = a.points[i]; if (!tzList(a, p).includes(tz)) return; const ct = planCat(p), zs = zoneShape(p.lat, p.lng);
 aoa.push([tz, p.tno ? p.tno.slice(0, 2) : '', zs ? colName(zs.color || '#e2533f') : '', ct ? TCAT[ct - 1][1] : '', p.ch || '', p.tno || r.id, r.x, r.y, r.h === '' ? '' : r.h, r.sq, r.place, r.comment, styleText(r.st)]); }); }); return aoa; }
+
+// ======== ЗОНЫ В «ПЛАН ОЗ»: ПОДГРУППЫ ЦЕЛЕЙ, ВКЛАДКИ ПО ЗОНАМ ========
+const isPlanL = a => !!(a.fplan || a.zones || a.meetL);
+function zoneTargets(sh){ const out = []; state.arrays.forEach(a => { if (!a.fplan) return; a.points.forEach((p, i) => { if (zoneShape(p.lat, p.lng) === sh) out.push({a, p, i}); }); }); return out; }
+function zoneKids(kd, a){ kd.querySelectorAll('.kid').forEach(r => { const [, t, i] = r.dataset.k.split('|'); if (t !== 's') return; const sh = a.shapes[+i]; if (!sh || !sh.zn) return;
+const T = zoneTargets(sh), box = document.createElement('div'); box.className = 'gkids';
+box.innerHTML = `<div class="kid" style="opacity:.8"><span class="kn"><b>Цели зоны ${escapeHtml(sh.zn)}: ${T.length}</b></span></div>` + T.map(x => `<div class="kid zt" data-a="${x.a.id}" data-i="${x.i}">${thumb(x.a, {t:'p', o:x.p})}<span class="kn">${escapeHtml(labelOf(x.a, x.i))} <small class="tg">ТЗ ${escapeHtml(tzList(x.a, x.p).join(', '))}</small></span></div>`).join('');
+r.after(box); box.querySelectorAll('.zt').forEach(z => z.onclick = () => { const L1 = arrById(+z.dataset.a), p = L1.points[+z.dataset.i]; closeModals(); map.setView([p.lat, p.lng], Math.max(map.getZoom(), 16)); }); }); }
+function zoneTgtAoa(sh){ const aoa = [['№ ТЗ', 'Зона', 'Цвет зоны', 'Категория', 'Характер цели', '№ цели', 'X', 'Y', 'H', 'Квадрат', 'Населённый пункт', 'Комментарий', 'Привлекается (цвет)']];
+zoneTargets(sh).forEach(({a, p, i}) => { const r = rowsOf(a)[i], ct = planCat(p); aoa.push([tzList(a, p).join(', '), sh.zn, colName(sh.color || '#e2533f'), ct ? TCAT[ct - 1][1] : '', p.ch || '', p.tno || r.id, r.x, r.y, r.h === '' ? '' : r.h, r.sq, r.place, r.comment, styleText(r.st)]); }); return aoa; }
+function zoneShapes(){ const z = state.arrays.find(x => x.zones); return z ? z.shapes.filter(s0 => s0.zn) : []; }
 
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
