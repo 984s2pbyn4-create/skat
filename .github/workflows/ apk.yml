@@ -2,7 +2,7 @@ name: Build APK
 on:
   workflow_dispatch: {}
   push:
-    paths: ['index.html', 'sw.js', 'manifest.json', 'icon-512.png', '.github/workflows/apk.yml']
+    paths: ['index.html', 'mk.js', 'op.js', 'tp.js', 'sw.js', 'manifest.json', 'icon-512.png', '.github/workflows/apk.yml']
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,6 +20,7 @@ jobs:
           mkdir -p app/www/lib
           cp index.html app/www/index.html
           cp sw.js app/www/sw.js
+          cp mk.js op.js tp.js app/www/
           cp manifest.json icon-192.png icon-512.png app/www/ 2>/dev/null || true
           cd app/www
           curl -sfL -o lib/leaflet.min.css https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css
@@ -30,8 +31,9 @@ jobs:
           curl -sfL -o lib/maplibre-gl.css https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css
           curl -sfL -o lib/sql-wasm.js https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js
           curl -sfL -o lib/sql-wasm.wasm https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.wasm
-          sed -i 's#https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/#lib/#g; s#https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/#lib/#g; s#https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/#lib/#g' index.html
+          sed -i 's#https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/#lib/#g; s#https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/#lib/#g; s#https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/#lib/#g' index.html mk.js
           grep -c 'lib/leaflet.min.js' index.html
+          grep -c 'lib/maplibre-gl.js' mk.js
       - name: Capacitor Android project
         working-directory: app
         run: |
