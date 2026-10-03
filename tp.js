@@ -1,4 +1,4 @@
-// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.5
+// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.5.1
 // ======== БОЕВОЙ КОНТУР: КОРРЕКТИРОВКА ОГНЯ ========
 const corrL = L.layerGroup().addTo(map);
 function sysTof(sys, d){ const k = SYS[sys] || SYS.d30; return Math.max(2, d / k.v * (k.hi ? 2 : 1.25)); }
@@ -79,10 +79,10 @@ function nextTgtNo(){ let m = 100; state.ftasks.forEach(t => { const n = parseIn
 function planLayer(){ const n = prompt('Название слоя плановых огневых задач', `Плановые ОЗ ${state.arrays.filter(a => a.fplan).length + 1}`); if (n === null) return null;
 const a = normArr({id:Date.now(), kind:'main', fplan:true, name:n.trim() || 'Плановые ОЗ', ident:n.trim() || 'Плановые ОЗ', prefix:'', start:nextTgtNo(), step:1, style:copySt(state.palette.find(p => p.name === 'Оранжевый') || state.palette[0] || DEFAULT_PAL[2]), points:[], minZ:0, lblZ:10}); state.arrays.push(a); persist(); return a; }
 function renderPlan(){ renderPlan0(); const el = $('planList'), Z = zoneShapes(); if (!Z.length) return; const d = document.createElement('div');
-d.innerHTML = '<div class="sub-h">Зоны поражения</div>' + Z.map((sh, k) => `<div class="arr" data-z="${k}"><span class="sw" style="background:${sh.color || '#e2533f'}"></span><div class="nm"><div>${escapeHtml(sh.name || 'Зона ' + sh.zn)}</div><div>целей: ${zoneTargets(sh).length} · поражает: ${escapeHtml(colName(sh.color || '#e2533f'))}</div></div><button data-zz="go">Показать</button><button class="eye" data-zz="ed">✎</button><button class="eye" data-zz="del">🗑</button></div>`).join(''); el.appendChild(d);
+d.innerHTML = '<div class="sub-h">Зоны поражения</div>' + Z.map((sh, k) => `<div class="arr" data-z="${k}"><span class="sw" style="background:${sh.color || '#e2533f'}"></span><div class="nm"><div>${escapeHtml(sh.name || 'Зона ' + sh.zn)}</div><div>целей: ${zoneTargets(sh).length} · поражает: ${escapeHtml(colName(sh.color || '#e2533f'))}</div></div><button data-zz="go">Показать</button><button data-zz="tb">Таблица</button><button class="eye" data-zz="ed">✎</button><button class="eye" data-zz="del">🗑</button></div>`).join(''); el.appendChild(d);
 d.querySelectorAll('[data-z]').forEach(r => { const sh = Z[+r.dataset.z], za = state.arrays.find(x => x.zones);
 r.querySelector('[data-zz=go]').onclick = () => { closeModals(); map.fitBounds(L.latLngBounds(sh.pts.map(q => [q[0] ?? q.lat, q[1] ?? q.lng])).pad(.2)); };
-r.querySelector('[data-zz=ed]').onclick = () => { closeModals(); openShapeEd(za, za.shapes.indexOf(sh)); };
+r.querySelector('[data-zz=ed]').onclick = () => { closeModals(); openShapeEd(za, za.shapes.indexOf(sh)); }; r.querySelector('[data-zz=tb]').onclick = () => openZoneTbl(sh);
 r.querySelector('[data-zz=del]').onclick = () => askConfirm(`Удалить «${sh.name || 'Зона ' + sh.zn}»? (↶ — вернуть)`, 'Удалить', () => { za.shapes.splice(za.shapes.indexOf(sh), 1); state.arrays.forEach(L1 => { if (L1.fplan) L1.points.forEach(q => planNum(L1, q)); }); persist(); renderMarkers(); openModal('planModal'); renderPlan(); }); }); }
 function renderPlan0(){ const el = $('planList'), L1 = state.arrays.filter(a => a.fplan);
 el.innerHTML = L1.length ? L1.map(a => `<div class="arr" data-id="${a.id}"><span class="sw" style="background:${a.style.color}"></span><div class="nm"><div>${escapeHtml(a.name)}</div><div>целей: ${a.points.length}${a.points.length ? ` (${escapeHtml(labelOf(a, 0))}…${escapeHtml(labelOf(a, a.points.length - 1))})` : ''}</div></div><button data-p="add">＋ Цели</button><button data-p="tbl">Таблица</button><button class="eye" data-p="ren">✎</button><button class="eye" data-p="del">🗑</button></div>`).join('') : '<div class="empty">Слоёв плановых огневых задач нет — нажмите «Добавить слой».</div>';
@@ -194,7 +194,7 @@ function renderFt(){ keepScroll('ftModal', renderFt0); }
 function renderFt0(){ const el = $('ftList'), row = $('ftRow'); $('ftTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === ftTab));
 if (ftTab === 'cur'){ const pl = state.arrays.filter(isPlanL);
 el.innerHTML = (state.ftasks.length ? state.ftasks.map((t, k) => { const st = shotStats(t); return `<div class="arr" data-k="${k}"><span class="kth" style="color:#d9532c">⊕</span><div class="nm"><div>${escapeHtml(t.name || 'Цель')}${t.obj ? ' · ' + escapeHtml(t.obj) : ''}</div><div>${escapeHtml((SYS[t.sys] || SYS.d30).n)}${t.res ? ' · <b>' + escapeHtml(t.res) + '</b>' : ''} · выстрелов ${st.shots}, снарядов ${st.n}</div></div><button data-a="open">Открыть</button></div>`; }).join('') : '<div class="empty">Огневых задач нет</div>')
-+ (pl.length ? '<div class="sub-h">Плановые (ТЗ)</div>' + pl.map(a => `<div class="arr${a.hidden ? ' off' : ''}" data-id="${a.id}"><button class="eye" data-a="eye">${a.hidden ? '◌' : '●'}</button><div class="nm"><div>${escapeHtml(a.name)}</div><div>целей: ${a.points.length}</div></div><button data-a="plan">План ОЗ</button></div>`).join('') : '');
++ (pl.length ? '<div class="sub-h">Плановые (ТЗ)</div>' + pl.map(a => { const Z = a.zones ? zoneShapes() : []; return `<div class="arr${a.hidden ? ' off' : ''}" data-id="${a.id}"><button class="eye" data-a="eye">${a.hidden ? '◌' : '●'}</button><div class="nm"><div>${escapeHtml(a.name)}</div><div>${a.zones ? `зон ${Z.length}, целей в зонах ${Z.reduce((q, sh) => q + zoneTargets(sh).length, 0)}` : a.meetL ? `точек: ${a.points.length}` : `целей: ${a.points.length}`}</div></div><button data-a="plan">План ОЗ</button></div>` + (Z.length ? `<div class="kids">${Z.map((sh, k) => `<div class="kid"><span class="sw" style="background:${sh.color || '#e2533f'}"></span><span class="kn">${escapeHtml(sh.name || 'Зона ' + sh.zn)} — целей ${zoneTargets(sh).length}</span><button data-zt="${k}">Таблица</button></div>`).join('')}</div>` : ''); }).join('') : '');
 row.innerHTML = '<button class="primary" id="ftNew">+ Задача (корректировка)</button><button data-close>Закрыть</button>';
 el.querySelectorAll('.arr[data-k]').forEach(r => { const t = state.ftasks[+r.dataset.k];
 r.querySelector('[data-a=open]').onclick = () => { closeModals(); CT = t; corrPick = null; corrEnd = false; corrDraw(); corrPanel(); if (t.tgt) map.setView([t.tgt.lat, t.tgt.lng], Math.max(map.getZoom(), 14)); };
@@ -202,6 +202,7 @@ swipeable(r, () => askConfirm(`Удалить огневую задачу «${t.
 el.querySelectorAll('.arr[data-id]').forEach(r => { const a = state.arrays.find(x => String(x.id) === r.dataset.id); if (!a) return;
 r.querySelector('[data-a=eye]').onclick = () => { a.hidden = !a.hidden; persist(); renderMarkers(); renderFt(); };
 r.querySelector('[data-a=plan]').onclick = () => { closeModals(); renderPlan(); openModal('planModal'); }; });
+el.querySelectorAll('[data-zt]').forEach(b => b.onclick = () => openZoneTbl(zoneShapes()[+b.dataset.zt]));
 $('ftNew').onclick = () => { closeModals(); CT = newTask(); corrPick = 'gun'; corrEnd = false; corrDraw(); corrPanel(); toast('Коснитесь огневой позиции или знака орудия'); };
 row.querySelector('[data-close]').onclick = () => $('ftModal').classList.remove('open'); return; }
 const L1 = state.ftlog.slice().sort((x, y) => String(y.date).localeCompare(String(x.date)));
@@ -229,4 +230,13 @@ deliverFile(new Blob([XLSX.write(wb, {bookType:'xlsx', type:'array'})], {type:'a
 $('ftTabs').querySelectorAll('button').forEach(b => b.onclick = () => { ftTab = b.dataset.t; renderFt(); });
 $('ftBtn').onclick = () => { ftTab = 'cur'; renderFt(); openModal('ftModal'); };
 { const rp0 = renderPlan; window.renderPlan = () => keepScroll('planModal', rp0); }
+// ---- таблица целей зоны поражения
+function openZoneTbl(sh){ let m = $('ztModal'); if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'ztModal'; m.innerHTML = '<div class="card big"><h3 id="ztH"></h3><div id="ztBody" style="overflow-x:auto"></div><div class="row"><button class="ghost" data-close>Закрыть</button></div></div>';
+m.addEventListener('click', e => { if (e.target === m || e.target.hasAttribute('data-close')) m.classList.remove('open'); });
+const st = document.createElement('style'); st.textContent = '.ztt{border-collapse:collapse;width:100%;font-size:13px}.ztt td,.ztt th{border-bottom:1px solid rgba(128,128,128,.3);padding:7px 5px;text-align:left;white-space:nowrap}.ztt tr[data-k]{cursor:pointer}'; document.head.appendChild(st); }
+document.body.appendChild(m); const T = zoneTargets(sh);
+$('ztH').textContent = `${sh.name || 'Зона ' + sh.zn}: целей ${T.length}`;
+$('ztBody').innerHTML = T.length ? `<table class="ztt"><tr><th>№ цели</th><th>Характер</th><th>ТЗ</th><th>X</th><th>Y</th><th>Квадрат</th></tr>${T.map(({a, p, i}, k) => { const s0 = GEO.toSK(p.lat, p.lng); return `<tr data-k="${k}"><td><b>${escapeHtml(labelOf(a, i))}</b></td><td>${escapeHtml(p.ch || '')}</td><td>${escapeHtml(a.name)}</td><td>${pad5(s0.x)}</td><td>${pad5(s0.y)}</td><td>${sqOf(s0)}</td></tr>`; }).join('')}</table>` : '<div class="empty">В зоне нет целей</div>';
+$('ztBody').querySelectorAll('tr[data-k]').forEach(r => r.onclick = () => { const {p} = T[+r.dataset.k]; closeModals(); map.setView([p.lat, p.lng], Math.max(map.getZoom(), 15)); });
+openModal('ztModal'); }
 window.__mod_tp = 1;

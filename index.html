@@ -581,7 +581,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 6.5';
+const VERSION = 'версия 6.5.1';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -667,7 +667,7 @@ const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v == n
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
 const rel = Object.assign({mode:'off', op:60, ex:3, min:50, max:250}, lsGet('skat_rel', {}));
 let rotOn = lsGet('skat_rot', true);
-const map = L.map('map', {crs:crsOf(state.layer), zoomControl:false, maxZoom:20, minZoom:3, zoomSnap:0.5, rotate:true, touchRotate:false, rotateControl:false, bearing:0}).setView(START, 12);
+const map = L.map('map', {crs:crsOf(state.layer), zoomControl:false, maxZoom:18, minZoom:3, zoomSnap:0.5, rotate:true, touchRotate:false, rotateControl:false, bearing:0}).setView(START, 12);
 const ROTP = map._rotatePane || undefined, NROTP = map._norotatePane || undefined;
 L.control.zoom({position:'bottomright'}).addTo(map);
 map.attributionControl.setPrefix('Leaflet');
@@ -677,16 +677,16 @@ const DEF_LBLZ = 14;
 let tiles = [], tileErr = 0, tileOk = 0;
 // ---- тайлы: кэш → сеть; заглушка Esri и пустые участки заменяются увеличенным родительским тайлом
 const tplUrl = (t, x, y, z) => t.replace('{s}', 'abc'[(x + y) % 3]).replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{r}', '');
-async function isPlaceholder(b, url){ if (!/arcgisonline/.test(url)) return false;
+async function isPlaceholder(b, url){ if (!/arcgisonline/.test(url)) return false; const zm = url.match(/\/tile\/(\d+)\//); if (zm && +zm[1] < 15) return false;
 try { const bm = await createImageBitmap(b), cv = document.createElement('canvas'); cv.width = cv.height = 16; const g = cv.getContext('2d'); g.drawImage(bm, 0, 0, 16, 16); const d = g.getImageData(0, 0, 16, 16).data; let R = 0, G = 0, B = 0; const n = d.length / 4;
 for (let i = 0; i < d.length; i += 4){ R += d[i]; G += d[i+1]; B += d[i+2]; } R /= n; G /= n; B /= n; if (R + G + B < 520 || R + G + B > 705) return false;
 let k = 0; for (let i = 0; i < d.length; i += 4) if (Math.abs(d[i] - R) < 16 && Math.abs(d[i+1] - G) < 16 && Math.abs(d[i+2] - B) < 16) k++; return k > n * .78 && Math.max(R, G, B) - Math.min(R, G, B) < 40; } catch(e){ return false; } }
-async function tileBlob(url, net = true){ if (savedKeys.has(url) && !cOff(url)){ const b = await tileGetFast(url); if (b && !(await isPlaceholder(b, url))) return b; }
+async function tileBlob(url, net = true, signal){ if (savedKeys.has(url) && !cOff(url)){ const b = await tileGetFast(url); if (b && !(await isPlaceholder(b, url))) return b; }
 if (!net || url.startsWith('mb:') || navigator.onLine === false) return null;
-try { const b = await netBlob(url); if (await isPlaceholder(b, url)) return null; if (savedKeys.size < 150000) queuePut(url, b); return b; } catch(e){ return null; } }
-async function parentTile(tpl, z, x, y, pixel, cacheOnly){ for (let d = 1; d <= 6 && z - d >= 0; d++){ const s = 1 << d, px = x >> d, py = y >> d, b = await tileBlob(tplUrl(tpl, px, py, z - d), !cacheOnly && d <= 2); if (!b) continue;
+try { const b = await netBlob(url, signal); if (await isPlaceholder(b, url)) return null; if (savedKeys.size < 150000) queuePut(url, b); return b; } catch(e){ return null; } }
+async function parentTile(tpl, z, x, y, pixel, cacheOnly, signal){ if (signal && signal.aborted) return null; for (let d = 1; d <= 6 && z - d >= 0; d++){ const s = 1 << d, px = x >> d, py = y >> d, b = await tileBlob(tplUrl(tpl, px, py, z - d), !cacheOnly && d <= 2, signal); if (!b) continue;
 try { const bm = await createImageBitmap(b), w = bm.width / s, cv = document.createElement('canvas'); cv.width = cv.height = 256; const g = cv.getContext('2d'); g.imageSmoothingEnabled = !pixel; g.drawImage(bm, (x - px * s) * w, (y - py * s) * w, w, w, 0, 0, 256, 256); fbUsed = true; return await new Promise(r => cv.toBlob(r, 'image/png')); } catch(e){} } return null; }
-async function tileFb(tpl, z, x, y, pixel){ return (await tileBlob(tplUrl(tpl, x, y, z))) || (await parentTile(tpl, z, x, y, pixel)); }
+async function tileFb(tpl, z, x, y, pixel, signal){ return (await tileBlob(tplUrl(tpl, x, y, z), true, signal)) || (await parentTile(tpl, z, x, y, pixel, false, signal)); }
 let fbUsed = false;
 window.addEventListener('online', () => { if (!fbUsed) return; fbUsed = false; setTimeout(() => { try { tiles.forEach(t => t.redraw()); } catch(e){} }, 1500); });
 const IdbTile = L.TileLayer.extend({ createTile(coords, done){
@@ -710,7 +710,7 @@ tiles.forEach(t => map.removeLayer(t)); tiles = [];
 const crs = crsOf(key);
 if (map.options.crs !== crs){ map.options.crs = crs; map._resetView(c, z, true); }
 tileErr = 0; tileOk = 0; $('banner').style.display = 'none';
-def.urls.forEach(u => tiles.push(new IdbTile(u, {maxNativeZoom:def.max, minNativeZoom:def.min || 0, maxZoom:20, subdomains:'abc', attribution:def.attr, keepBuffer:4, updateWhenZooming:false, updateWhenIdle:false})
+def.urls.forEach(u => tiles.push(new IdbTile(u, {maxNativeZoom:def.max, minNativeZoom:def.min || 0, maxZoom:18, subdomains:'abc', attribution:def.attr, keepBuffer:4, updateWhenZooming:false, updateWhenIdle:false})
 .on('tileload', () => { tileOk++; $('banner').style.display = 'none'; })
 .on('tileerror', () => { tileErr++; if (tileErr >= 4 && tileOk === 0) showTileBanner(def.name); })
 .addTo(map)));
@@ -1410,7 +1410,7 @@ card.addEventListener('touchend', end); card.addEventListener('touchcancel', end
 }
 document.querySelectorAll('.modal .card').forEach(sheetify);
 let cfCb = null;
-function askConfirm(text, yes, cb){ cfCb = cb; $('cfText').textContent = text; $('cfYes').textContent = yes; openModal('cfModal'); }
+function askConfirm(text, yes, cb){ cfCb = cb; document.body.appendChild($('cfModal')); $('cfText').textContent = text; $('cfYes').textContent = yes; openModal('cfModal'); }
 $('cfYes').onclick = () => { $('cfModal').classList.remove('open'); const f = cfCb; cfCb = null; f && f(); };
 $('cfNo').onclick = () => { $('cfModal').classList.remove('open'); cfCb = null; };
 function closeModals(){ document.querySelectorAll('.modal.open').forEach(m => m.classList.remove('open')); }
@@ -3009,7 +3009,7 @@ function setSection(m){ secMode = m; favCache = null; lsSet('skat_mode', m); $('
 function applySection(){
 $('modeBtn').querySelector('span').textContent = SEC_SH[secMode] || 'Раздел';
 $('v3Btn').style.display = secMode === 'mk' ? '' : 'none'; applySectionOp();
-if (secMode === 'mk'){ if (!$('v3d').classList.contains('on')) mkLoad().then(open3D).catch(() => {}); } else if ($('v3d').classList.contains('on')) close3D();
+if (secMode === 'mk'){ if (!window.__mod_mk) toast('Загружаю 3D…'); if (!$('v3d').classList.contains('on')) mkLoad().then(open3D).catch(() => {}); } else if ($('v3d').classList.contains('on')) close3D();
 }
 $('modeBtn').onclick = showLaunch;
 // ---- отмена / повтор

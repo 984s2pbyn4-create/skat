@@ -1,4 +1,4 @@
-// СКАТ — модуль «Макет» (3D, объекты, сценарии, камеры, огонь). Грузится лениво из index.html (modLoad). Версия 6.5
+// СКАТ — модуль «Макет» (3D, объекты, сценарии, камеры, огонь). Грузится лениво из index.html (modLoad). Версия 6.5.1
 // ======== 3D-ПРОСМОТР ========
 const ML = 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/';
 let MLp = null, v3 = null, v3proto = false;
@@ -26,14 +26,14 @@ if (a.kind === 'route' && a.points.length > 1) F.push({type:'Feature', propertie
 });
 return {type:'FeatureCollection', features:F};
 }
-function v3baseSrc(k){ return {type:'raster', tiles:[`skat://${k}/{z}/{x}/{y}`], tileSize:256, maxzoom:Math.min(k === 'esri' ? 17 : 19, (LAYERS[k] && LAYERS[k].max) || 18), minzoom:(LAYERS[k] && LAYERS[k].min) || 0}; }
+function v3baseSrc(k){ return {type:'raster', tiles:[`skat://${k}/{z}/{x}/{y}`], tileSize:256, maxzoom:Math.min(k === 'esri' ? 17 : 18, (LAYERS[k] && LAYERS[k].max) || 18), minzoom:(LAYERS[k] && LAYERS[k].min) || 0}; }
 async function open3D(){
 if (session) return;
 if (tool.on) closeTools();
 const el = $('v3d'); el.classList.add('on'); $('v3msg').textContent = 'Загружаю 3D‑модуль…';
 let ml;
 try { ml = await loadML(); } catch(e){ el.classList.remove('on'); toast('3D‑модуль не загрузился — откройте один раз с интернетом'); return; }
-if (!v3proto){ ml.addProtocol('skat', async (params) => { const m = params.url.match(/^skat:\/\/([^/]+)\/(\d+)\/(\d+)\/(\d+)/); const z = +m[2], x = +m[3], y = +m[4]; if (m[1] !== 'dem'){ const b = LAYERS[m[1]] ? await tileFb(LAYERS[m[1]].urls[0], z, x, y) : null; if (!b) throw new Error('нет тайла'); return {data: await b.arrayBuffer()}; } let buf; try { buf = await tileBytes(keyUrl('dem', z, x, y)); } catch(e){ const b = await parentTile(keyUrl('dem', '{z}', '{x}', '{y}'), z, x, y, true); if (!b) throw e; buf = await b.arrayBuffer(); } return {data: await cleanDem(buf)}; }); v3proto = true; }
+if (!v3proto){ ml.addProtocol('skat', async (params, ac) => { const sig = ac && ac.signal; const m = params.url.match(/^skat:\/\/([^/]+)\/(\d+)\/(\d+)\/(\d+)/); const z = +m[2], x = +m[3], y = +m[4]; if (m[1] !== 'dem'){ const b = LAYERS[m[1]] ? await tileFb(LAYERS[m[1]].urls[0], z, x, y, false, sig) : null; if (!b) throw new Error('нет тайла'); return {data: await b.arrayBuffer()}; } let buf; try { buf = await tileBytes(keyUrl('dem', z, x, y)); } catch(e){ const b = await parentTile(keyUrl('dem', '{z}', '{x}', '{y}'), z, x, y, true); if (!b) throw e; buf = await b.arrayBuffer(); } return {data: await cleanDem(buf)}; }); v3proto = true; }
 const B = v3bases(), cur = B[state.layer] ? state.layer : state.layer === 'ya_map' ? 'topo' : 'esri';
 $('v3base').innerHTML = Object.entries(B).map(([k, v]) => `<option value="${k}"${k === cur ? ' selected' : ''}>${escapeHtml(v)}</option>`).join('');
 const ex = +$('v3ex').value, c = map.getCenter();
@@ -46,7 +46,7 @@ dem:{type:'raster-dem', tiles:['skat://dem/{z}/{x}/{y}'], tileSize:256, encoding
 dem2:{type:'raster-dem', tiles:['skat://dem/{z}/{x}/{y}'], tileSize:256, encoding:'terrarium', maxzoom:14},
 obj:{type:'geojson', data:buildObjs([].concat(...objCells.values()), v3cfg.den)}, plc:{type:'geojson', data:v3places(c)}, aux3:{type:'geojson', data:v3aux()}, tac:{type:'geojson', data:v3tac(c)}, mdl:{type:'geojson', data:v3mdl(c)},
 pts:{type:'geojson', data:v3data()}},
-layers:[{id:'base', type:'raster', source:'base', paint:{'raster-fade-duration':0}},
+layers:[{id:'bkg', type:'background', paint:{'background-color':'#5d6650'}}, {id:'base', type:'raster', source:'base', paint:{'raster-fade-duration':0}},
 {id:'hs', type:'hillshade', source:'dem2', paint:{'hillshade-exaggeration':0.35}},
 {id:'fill', type:'fill', source:'pts', filter:['==', '$type', 'Polygon'], paint:{'fill-color':['get', 'color'], 'fill-opacity':['get', 'op']}},
 {id:'outl', type:'line', source:'pts', filter:['==', '$type', 'Polygon'], paint:{'line-color':['get', 'color'], 'line-width':2}},
