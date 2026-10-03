@@ -1,4 +1,4 @@
-// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.7
+// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.9
 // ======== БОЕВОЙ КОНТУР: КОРРЕКТИРОВКА ОГНЯ ========
 const corrL = L.layerGroup().addTo(map);
 function sysTof(sys, d){ const k = SYS[sys] || SYS.d30; return Math.max(2, d / k.v * (k.hi ? 2 : 1.25)); }
@@ -18,20 +18,20 @@ const statTxt = s => `Выстрелов ${s.shots}, снарядов ${s.n}: в
 const pendShot = t => (t.shots || []).find(x => x.landed && !x.res);
 let corrEnd = false;
 function corrPanel(){ const el = $('corr'); if (!CT){ el.classList.remove('on'); return; } el.classList.add('on'); const sys = SYS[CT.sys] || SYS.d30, last = (CT.bursts || []).slice(-1)[0];
-const d = CT.gun && CT.tgt ? distM(CT.gun, CT.tgt) : 0, far = d && sys.max && d > sys.max, ps = pendShot(CT), st = shotStats(CT), nextNo = (CT.reuse && CT.reuse.length) ? Math.min(...CT.reuse) : (CT.shotN || 0) + 1;
+const d = CT.gun && CT.tgt ? distM(CT.gun, CT.tgt) : 0, mx = CT.maxOv || sys.max, far = d && mx && d > mx, ps = pendShot(CT), st = shotStats(CT), nextNo = (CT.reuse && CT.reuse.length) ? Math.min(...CT.reuse) : (CT.shotN || 0) + 1;
 let dv = ''; if (last && CT.gun && CT.tgt){ const v = corrDev(last), dd = Math.round(Math.hypot(v.dN, v.dE)); dv = `<div class="cdv"><b>Разрыв ${last.n}:</b> ${devTxt(v)} (${dd} м${dd > 50 ? ', отклонение' : ', в цель'})</div>`; }
 el.innerHTML = `<div class="crow"><b>Цель ${escapeHtml(CT.name || '…')}${CT.obj ? ' · ' + escapeHtml(CT.obj) : ''}${CT.res ? ' · ' + escapeHtml(CT.res) : ''}</b><button data-c="x">✕</button></div>
 <div class="crow"><button data-c="gun" class="${corrPick === 'gun' ? 'on' : ''}">Орудие${CT.gun ? ' ✓' : ''}</button><button data-c="tgt" class="${corrPick === 'tgt' ? 'on' : ''}">Цель${CT.tgt ? ' ✓' : ''}</button><select data-c="sys">${Object.entries(SYS).map(([k, v]) => `<option value="${k}"${k === CT.sys ? ' selected' : ''}>${v.n}</option>`).join('')}</select>${sys.rs ? `<select data-c="rs">${[1, 2, 4, 8, 12, 20, sys.rs].filter((v, i, ar) => v <= sys.rs && ar.indexOf(v) === i).map(v => `<option value="${v}"${v === (CT.rs || 4) ? ' selected' : ''}>${v} РС</option>`).join('')}</select>` : ''}</div>
-${d ? `<div class="cdv"${far ? ' style="color:#ff6b5a"' : ''}>Дальность ${fmtDist(d)} · подлёт ${sysTof(CT.sys, d).toFixed(1)} с · макс. ${fmtDist(sys.max)}${far ? ' — цель вне досягаемости' : ''}</div>` : '<div class="cdv">Выберите орудие и цель: кнопка, затем касание карты или знака</div>'}
-<div class="ctm" id="corrTm"></div>${dv}
+${d ? `<div class="cdv"${far ? ' style="color:#ff6b5a"' : ''}>Дальность ${fmtDist(d)} · подлёт ${sysTof(CT.sys, d).toFixed(1)} с · макс. ${fmtDist(mx)}${far ? ' — цель вне досягаемости' : ''}</div>` : '<div class="cdv">Выберите орудие и цель: кнопка, затем касание карты или знака</div>'}
+${faLine(CT)}<div class="ctm" id="corrTm"></div>${dv}
 ${st.shots ? `<div class="cdv">${statTxt(st)}</div>` : ''}
 <div class="crow"><button data-c="fire" class="primary" ${CT.gun && CT.tgt && !far ? '' : 'disabled'}>▶ Выстрел №${nextNo}</button><button data-c="stop" id="corrStopB" ${corrFly.some(f => f.task === CT) ? '' : 'disabled'}>■ Стоп</button><button data-c="un" ${(CT.bursts || []).length ? '' : 'disabled'}>↶ Разрыв</button></div>
 ${ps ? `<div class="crow"><button data-c="nobs">Не набл. №${ps.no}</button><button data-c="mis">Осечка №${ps.no}</button></div>` : ''}
 ${corrEnd ? `<div class="crow"><button data-c="r1" class="primary">Уничтожена</button><button data-c="r2" class="primary">Подавлена</button><button data-c="r0">Отмена</button></div>` : `<div class="crow"><button data-c="end" ${st.shots ? '' : 'disabled'}>✔ Итог задачи</button></div>`}
 <div class="cdv" style="opacity:.75">Касание карты — отметить разрыв${ps ? ' №' + ps.no : ''}</div>`;
 corrTimer();
-el.querySelectorAll('[data-c]').forEach(b => { const c = b.dataset.c; if (b.tagName === 'SELECT') b.onchange = () => { if (c === 'sys') CT.sys = b.value; else CT.rs = +b.value; persist(); corrPanel(); };
-else b.onclick = () => { if (c === 'x'){ CT = null; corrPick = null; corrEnd = false; corrDraw(); corrPanel(); return; } if (c === 'stop'){ corrStop(); return; } if (c === 'gun' || c === 'tgt'){ corrPick = corrPick === c ? null : c; corrPanel(); toast(c === 'gun' ? 'Коснитесь огневой позиции или знака орудия' : 'Коснитесь цели'); return; }
+el.querySelectorAll('[data-c]').forEach(b => { const c = b.dataset.c; if (b.tagName === 'SELECT') b.onchange = () => { if (c === 'sys') CT.sys = b.value; else if (c === 'am') CT.ammoT = b.value; else CT.rs = +b.value; persist(); corrPanel(); };
+else b.onclick = () => { if (c === 'x'){ CT = null; corrPick = null; corrEnd = false; corrDraw(); corrPanel(); return; } if (c === 'stop'){ corrStop(); return; } if (c === 'gun'){ pickGun(CT); return; } if (c === 'tgt'){ pickTgt(CT); return; }
 if (c === 'nobs' || c === 'mis'){ const p = pendShot(CT); if (p){ p.res = c; persist(); corrPanel(); } return; }
 if (c === 'end'){ corrEnd = true; corrPanel(); return; } if (c === 'r0'){ corrEnd = false; corrPanel(); return; }
 if (c === 'r1' || c === 'r2'){ CT.res = c === 'r1' ? 'Уничтожена' : 'Подавлена'; CT.done = Date.now(); corrEnd = false; logFromTask(CT); corrPanel(); toast(`Цель ${CT.name || ''} ${CT.res.toLowerCase()}. ${statTxt(shotStats(CT))}`, 6000); return; }
@@ -40,7 +40,7 @@ if (c === 'un'){ const b0 = CT.bursts.pop(), sh = b0 && (CT.shots || []).find(x 
 function corrMark(ll){ const p = pendShot(CT), b = {lat:+ll.lat.toFixed(7), lng:+ll.lng.toFixed(7), n:p ? p.no : (CT.bursts.length ? Math.max(...CT.bursts.map(x => x.n)) + 1 : 1), t:Date.now()};
 CT.bursts.push(b); if (p && CT.tgt) p.res = distM(b, CT.tgt) > 50 ? 'dev' : 'hit'; try { navigator.vibrate && navigator.vibrate(20); } catch(e){} }
 function newTask(){ const t = {id:Date.now(), name:'', sys:'d30', rs:4, bursts:[]}; state.ftasks.push(t); persist(); return t; }
-$('corrBtn').onclick = () => { if (CT){ CT = null; corrEnd = false; corrDraw(); corrPanel(); return; } CT = newTask(); corrPick = 'gun'; corrDraw(); corrPanel(); toast('Коснитесь огневой позиции или знака орудия'); };
+$('corrBtn').onclick = () => { if (CT){ CT = null; corrEnd = false; corrDraw(); corrPanel(); return; } CT = newTask(); corrDraw(); corrPanel(); pickGun(CT); };
 function corrTap(ll){ const h = hitPoint(...(() => { const q = map.latLngToContainerPoint(ll), r = map.getContainer().getBoundingClientRect(); return [q.x + r.left, q.y + r.top, corrPick === 'tgt' ? 48 : 30]; })()), at = h && h.i != null ? {lat:h.a.points[h.i].lat, lng:h.a.points[h.i].lng} : {lat:ll.lat, lng:ll.lng};
 if (corrPick === 'gun'){ CT.gun = at; if (h && h.i != null){ CT.gname = labelOf(h.a, h.i); const k = itKind(h.a, h.a.points[h.i]); CT.sys = k === 'mortar' ? 'm120' : k === 'rszo' ? 'grad' : k === 'tank' ? 'tank' : k === 'sau' ? 'sau' : CT.sys; } corrPick = CT.tgt ? null : 'tgt'; if (corrPick) toast('Коснитесь цели'); }
 else if (corrPick === 'tgt'){ if (CT.tgt){ const prev = CT; CT = newTask(); CT.gun = prev.gun; CT.sys = prev.sys; CT.rs = prev.rs; CT.gname = prev.gname; } CT.tgt = at; { const sid0 = h && h.i != null ? (h.a.points[h.i].sym || h.a.sym) : null; let c0 = catOfSym(sid0); if (!c0){ c0 = catOfTxt(prompt('Характер цели (например: живая сила, миномёт, танк, РЭБ, ПВО)', '')) || 1; } CT.cat = c0; CT.name = tgtNo(at.lat, at.lng, c0, CT); } if (h && h.i != null) CT.obj = labelOf(h.a, h.i); corrPick = null; toast(`Цель ${CT.name}${CT.obj ? ' — ' + CT.obj : ''}. Разрывы считаются с 1`); }
@@ -50,17 +50,18 @@ function arcPts(g, t, k){ const out = [], [kx, ky] = mk(g.lat), dx = (t.lng - g.
 for (let i = 0; i <= 30; i++){ const u = i / 30, o = 4 * bow * u * (1 - u); out.push([g.lat + (dy * u + ny * o) / ky, g.lng + (dx * u + nx * o) / kx]); } return out; }
 function corrFire(T){ if (T || CT) corrFire1(T || CT); }
 function corrFire1(CT){ const sys = SYS[CT.sys] || SYS.d30, d = distM(CT.gun, CT.tgt);
-if (sys.max && d > sys.max){ toast(`Цель вне досягаемости: ${fmtDist(d)}, у ${sys.n} максимум ${fmtDist(sys.max)}`); return; }
+const mx = CT.maxOv || sys.max; if (mx && d > mx){ toast(`Цель вне досягаемости: ${fmtDist(d)}, у ${CT.gname || sys.n} максимум ${fmtDist(mx)}`); return; }
 const tof = sysTof(CT.sys, d), n = sys.rs ? Math.min(sys.rs, Math.max(1, +CT.rs || 4)) : 1, pts = arcPts(CT.gun, CT.tgt, sys.hi), t0 = performance.now() / 1000;
 CT.shots = CT.shots || []; CT.reuse = CT.reuse || []; let no; if (CT.reuse.length){ no = Math.min(...CT.reuse); CT.reuse = CT.reuse.filter(x => x !== no); } else no = CT.shotN = (CT.shotN || 0) + 1;
 const shot = {no, n, sys:CT.sys, t:Date.now()}; CT.shots.push(shot); CT.shots.sort((x, y) => x.no - y.no); persist();
+faUse(CT, n);
 for (let i = 0; i < n; i++) corrFly.push({task:CT, shot:no, rec:shot, sys:CT.sys, d0:i * .5, t0, tof, pts, pos:null, left:tof + i * .5});
 try { navigator.vibrate && navigator.vibrate(30); } catch(e){}
 corrPanel(); if (!corrRaf) corrRaf = requestAnimationFrame(corrStep); }
 // «Стоп» отменяет крайний выстрел этой задачи, его номер получит следующий выстрел
 function corrStop(T){ if (T || CT) corrStop1(T || CT); }
 function corrStop1(CT){ const mine = corrFly.filter(f => f.task === CT); if (!mine.length) return; const no = Math.max(...mine.map(f => f.shot));
-corrFly = corrFly.filter(f => !(f.task === CT && f.shot === no)); CT.shots = (CT.shots || []).filter(x => x.no !== no); (CT.reuse = CT.reuse || []).push(no); persist();
+corrFly = corrFly.filter(f => !(f.task === CT && f.shot === no)); { const cs0 = (CT.shots || []).find(x => x.no === no); if (cs0) faUse(CT, -(cs0.n || 1)); } CT.shots = (CT.shots || []).filter(x => x.no !== no); (CT.reuse = CT.reuse || []).push(no); persist();
 toast(`Выстрел №${no} отменён`); if (!corrFly.length && corrRaf){ cancelAnimationFrame(corrRaf); corrRaf = 0; } corrDraw(); corrPanel(); }
 function corrTimer(){ mixTimer(); const el = $('corrTm'), sb = $('corrStopB'), mine = corrFly.filter(f => f.task === CT); if (sb) sb.disabled = !mine.length; if (!el) return;
 const by = new Map(); mine.forEach(f => by.set(f.shot, Math.max(by.get(f.shot) || 0, f.left)));
@@ -125,7 +126,7 @@ $('chRes').querySelectorAll('.arr').forEach(d => d.onclick = () => { const cb = 
 function askChar(cb, init){ chCb = cb; $('chQ').value = init || ''; chRender(); openModal('chModal'); setTimeout(() => $('chQ').focus(), 80); }
 $('chQ').oninput = chRender;
 function applyChar(a, p, v){ p.ch = v; const sy = SYMS.find(s => s.type === 'pt' && (s.n.toLowerCase() === v.toLowerCase())) || SYMS.find(s => s.type === 'pt' && catOfSym(s.id) && v.toLowerCase().includes(s.n.toLowerCase()));
-const sid2 = symForChar(v); if (sid2){ p.sym = sid2; if (!p.side) p.side = 'b'; } if (!planNum(a, p)){ const c = catOfSym(p.sym); if (!c){ p.tno = tgtNo(p.lat, p.lng, 1, p); p.lbl = p.tno + ' ' + v; } } persist(); renderMarkers(); }
+const sid2 = symForChar(v); if (sid2){ p.sym = sid2; if (!p.side) p.side = 'b'; } if (!planNum(a, p)){ const c = catOfSym(p.sym); if (!c){ p.tno = tgtNo(p.lat, p.lng, 1, p); p.lbl = p.tno; } } persist(); renderMarkers(); }
 // ---- правка фигур и зон
 let shRef = null;
 function openShapeEd(a, i){ const sh = a.shapes[i]; shRef = {a, i, sh};
@@ -192,7 +193,7 @@ const fmtDT = d => { const x = new Date(d); return isNaN(x) ? '' : x.toLocaleStr
 const toLocDT = d => { const x = new Date(d || Date.now()), z = n => String(n).padStart(2, '0'); return `${x.getFullYear()}-${z(x.getMonth() + 1)}-${z(x.getDate())}T${z(x.getHours())}:${z(x.getMinutes())}`; };
 function logFromTask(t){ const s = shotStats(t), sk = t.tgt ? GEO.toSK(t.tgt.lat, t.tgt.lng) : null, lt = t.tgt ? locText(t.tgt.lat, t.tgt.lng) : null;
 let r = state.ftlog.find(x => x.tid === t.id); if (!r){ r = {id:Date.now(), tid:t.id}; state.ftlog.push(r); }
-Object.assign(r, {date:new Date().toISOString(), name:t.name || '', obj:t.obj || '', loc:lt ? lt.loc : '', x:sk ? pad5(sk.x) : '', y:sk ? pad5(sk.y) : '', sys:(SYS[t.sys] || SYS.d30).n, res:t.res || '', shots:s.shots, n:s.n, hit:s.hit, dev:s.dev, nobs:s.nobs, mis:s.mis}); persist(); return r; }
+Object.assign(r, {date:new Date().toISOString(), name:t.name || '', obj:t.obj || '', loc:lt ? lt.loc : '', x:sk ? pad5(sk.x) : '', y:sk ? pad5(sk.y) : '', sys:(SYS[t.sys] || SYS.d30).n, fa:t.gname || '', res:t.res || '', shots:s.shots, n:s.n, hit:s.hit, dev:s.dev, nobs:s.nobs, mis:s.mis}); persist(); return r; }
 function renderFt(){ keepScroll('ftModal', renderFt0); }
 function renderFt0(){ const el = $('ftList'), row = $('ftRow'); $('ftTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === ftTab));
 if (ftTab === 'cur'){ const pl = state.arrays.filter(isPlanL);
@@ -206,7 +207,7 @@ el.querySelectorAll('.arr[data-id]').forEach(r => { const a = state.arrays.find(
 r.querySelector('[data-a=eye]').onclick = () => { a.hidden = !a.hidden; persist(); renderMarkers(); renderFt(); };
 r.querySelector('[data-a=plan]').onclick = () => { closeModals(); renderPlan(); openModal('planModal'); }; });
 el.querySelectorAll('[data-zt]').forEach(b => b.onclick = () => openZoneTbl(zoneShapes()[+b.dataset.zt]));
-$('ftNew').onclick = () => { closeModals(); CT = newTask(); corrPick = 'gun'; corrEnd = false; corrDraw(); corrPanel(); toast('Коснитесь огневой позиции или знака орудия'); };
+$('ftNew').onclick = () => { closeModals(); CT = newTask(); corrEnd = false; corrDraw(); corrPanel(); pickGun(CT); };
 row.querySelector('[data-close]').onclick = () => $('ftModal').classList.remove('open'); return; }
 const L1 = state.ftlog.slice().sort((x, y) => String(y.date).localeCompare(String(x.date)));
 el.innerHTML = L1.length ? L1.map(r => `<div class="arr" data-l="${r.id}"><span class="kth" style="color:${r.res === 'Уничтожена' ? '#2f9e44' : r.res === 'Подавлена' ? '#e8a33a' : '#888'}">${r.res === 'Уничтожена' ? '✖' : r.res === 'Подавлена' ? '◐' : '○'}</span><div class="nm"><div>${escapeHtml(r.name || 'Цель')}${r.obj ? ' · ' + escapeHtml(r.obj) : ''} — <b>${escapeHtml(r.res || '—')}</b></div><div>${fmtDT(r.date)} · ${escapeHtml(r.sys || '')} · снарядов ${r.n || 0}: в цель ${r.hit || 0}, откл. ${r.dev || 0}, не набл. ${r.nobs || 0}, осечка ${r.mis || 0}${r.note ? ' · ' + escapeHtml(r.note) : ''}</div></div><button class="eye" data-a="ed">✎</button></div>`).join('') : '<div class="empty">Журнал пуст. Записи появляются по «Итог задачи» в корректировке или кнопкой «+ Запись»</div>';
@@ -215,7 +216,7 @@ el.querySelectorAll('.arr[data-l]').forEach(rw => { const r = state.ftlog.find(x
 rw.querySelector('[data-a=ed]').onclick = () => openFtEd(r);
 swipeable(rw, () => askConfirm(`Удалить запись журнала «${r.name || 'Цель'}»?`, 'Удалить', () => { state.ftlog = state.ftlog.filter(x => x !== r); persist(); renderFt(); })); });
 $('ftXls').onclick = exportFtLog; $('ftAdd').onclick = () => openFtEd(null); }
-const FTF = [['date', 'Дата и время', 'dt'], ['name', '№ цели', 'text'], ['obj', 'Объект / характер', 'text'], ['loc', 'Местоположение', 'text'], ['x', 'X', 'text'], ['y', 'Y', 'text'], ['sys', 'Система', 'text'], ['res', 'Результат', 'sel'],
+const FTF = [['date', 'Дата и время', 'dt'], ['name', '№ цели', 'text'], ['obj', 'Объект / характер', 'text'], ['loc', 'Местоположение', 'text'], ['x', 'X', 'text'], ['y', 'Y', 'text'], ['fa', 'Огневое средство', 'text'], ['sys', 'Система', 'text'], ['res', 'Результат', 'sel'],
 ['shots', 'Выстрелов', 'num'], ['n', 'Снарядов (расход)', 'num'], ['hit', 'В цель', 'num'], ['dev', 'Отклонение (> 50 м)', 'num'], ['nobs', 'Не наблюдались', 'num'], ['mis', 'Осечка', 'num'], ['note', 'Примечание', 'text']];
 function openFtEd(r){ ftEdRef = r; const v = r || {date:new Date().toISOString(), res:'Подавлена'};
 $('ftEdBody').innerHTML = FTF.map(([k, l, ty]) => `<label class="f">${l}${ty === 'sel' ? `<select id="fe_${k}">${['Уничтожена', 'Подавлена', 'Не выполнена'].map(x => `<option${x === v.res ? ' selected' : ''}>${x}</option>`).join('')}</select>`
@@ -224,10 +225,10 @@ openModal('ftEdModal'); }
 $('ftEdOk').onclick = () => { const r = ftEdRef || {id:Date.now()}; FTF.forEach(([k, , ty]) => { const x = $('fe_' + k).value; r[k] = ty === 'num' ? Math.max(0, +x || 0) : ty === 'dt' ? (x ? new Date(x).toISOString() : r[k]) : x.trim(); });
 if (!ftEdRef) state.ftlog.push(r); persist(); $('ftEdModal').classList.remove('open'); renderFt(); toast('Запись сохранена'); };
 function exportFtLog(){ const L1 = state.ftlog.slice().sort((x, y) => String(x.date).localeCompare(String(y.date))), K = ['shots', 'n', 'hit', 'dev', 'nobs', 'mis'];
-const aoa = [['№ п/п', 'Дата', 'Время', '№ цели', 'Объект / характер', 'Местоположение', 'X', 'Y', 'Система', 'Результат', 'Выстрелов', 'Снарядов', 'В цель', 'Отклонение (>50 м)', 'Не наблюдались', 'Осечка', 'Примечание']];
-L1.forEach((r, i) => { const d = new Date(r.date); aoa.push([i + 1, isNaN(d) ? '' : d.toLocaleDateString('ru-RU'), isNaN(d) ? '' : d.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'}), r.name || '', r.obj || '', r.loc || '', r.x || '', r.y || '', r.sys || '', r.res || '', ...K.map(k => +r[k] || 0), r.note || '']); });
-aoa.push(['', '', '', '', '', '', '', '', '', 'Итого', ...K.map(k => L1.reduce((q, r) => q + (+r[k] || 0), 0)), `уничтожено ${L1.filter(r => r.res === 'Уничтожена').length}, подавлено ${L1.filter(r => r.res === 'Подавлена').length}`]);
-const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = [6, 10, 7, 10, 24, 30, 9, 9, 18, 13, 9, 9, 8, 12, 12, 8, 24].map(w => ({wch:w}));
+const aoa = [['№ п/п', 'Дата', 'Время', '№ цели', 'Объект / характер', 'Местоположение', 'X', 'Y', 'Огневое средство', 'Система', 'Результат', 'Выстрелов', 'Снарядов', 'В цель', 'Отклонение (>50 м)', 'Не наблюдались', 'Осечка', 'Примечание']];
+L1.forEach((r, i) => { const d = new Date(r.date); aoa.push([i + 1, isNaN(d) ? '' : d.toLocaleDateString('ru-RU'), isNaN(d) ? '' : d.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'}), r.name || '', r.obj || '', r.loc || '', r.x || '', r.y || '', r.fa || '', r.sys || '', r.res || '', ...K.map(k => +r[k] || 0), r.note || '']); });
+aoa.push(['', '', '', '', '', '', '', '', '', '', 'Итого', ...K.map(k => L1.reduce((q, r) => q + (+r[k] || 0), 0)), `уничтожено ${L1.filter(r => r.res === 'Уничтожена').length}, подавлено ${L1.filter(r => r.res === 'Подавлена').length}`]);
+const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = [6, 10, 7, 10, 24, 30, 9, 9, 16, 18, 13, 9, 9, 8, 12, 12, 8, 24].map(w => ({wch:w}));
 const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Журнал ОЗ');
 deliverFile(new Blob([XLSX.write(wb, {bookType:'xlsx', type:'array'})], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), `Журнал_огневых_задач_${stamp()}.xlsx`, 'Журнал огневых задач готов'); }
 $('ftTabs').querySelectorAll('button').forEach(b => b.onclick = () => { ftTab = b.dataset.t; renderFt(); });
@@ -248,13 +249,13 @@ function mixTasks(){ return MIX.map(id => state.ftasks.find(t => t.id === id)).f
 function mixSave(){ MIX = mixTasks().map(t => t.id); lsSet('skat_mix', MIX); }
 function azTxt(g, t){ const [kx, ky] = mk(g.lat), dx = (t.lng - g.lng) * kx, dy = (t.lat - g.lat) * ky; let a = Math.atan2(dx, dy) * 180 / Math.PI; if (a < 0) a += 360; const du = Math.round(a / 360 * 6000) % 6000; return `${Math.round(a)}° (${Math.floor(du / 100)}-${String(du % 100).padStart(2, '0')})`; }
 function renderMix(){ const el = $('mixer'); if (!mixOn){ el.classList.remove('on'); return; } el.classList.add('on'); const T = mixTasks(), x0 = el.scrollLeft;
-el.innerHTML = `<div class="mxin">${T.map((t, k) => { const sys = SYS[t.sys] || SYS.d30, d = t.gun && t.tgt ? distM(t.gun, t.tgt) : 0, far = d && sys.max && d > sys.max, st = shotStats(t), last = (t.bursts || []).slice(-1)[0], nextNo = (t.reuse && t.reuse.length) ? Math.min(...t.reuse) : (t.shotN || 0) + 1, ps = pendShot(t);
+el.innerHTML = `<div class="mxin">${T.map((t, k) => { const sys = SYS[t.sys] || SYS.d30, d = t.gun && t.tgt ? distM(t.gun, t.tgt) : 0, mx = t.maxOv || sys.max, far = d && mx && d > mx, st = shotStats(t), last = (t.bursts || []).slice(-1)[0], nextNo = (t.reuse && t.reuse.length) ? Math.min(...t.reuse) : (t.shotN || 0) + 1, ps = pendShot(t);
 let dv = ''; if (last && t.gun && t.tgt){ const keep = CT; CT = t; const v = corrDev(last); CT = keep; dv = `${devTxt(v)} (${Math.round(Math.hypot(v.dN, v.dE))} м)`; }
 return `<div class="mxs${t === CT ? ' act' : ''}" data-k="${k}"><div class="mxh"><b>${escapeHtml(t.gname || 'Орудие ' + (k + 1))}</b><button data-m="x" title="Убрать из микшера">✕</button></div>
 <select data-m="sys">${Object.entries(SYS).map(([q, v]) => `<option value="${q}"${q === t.sys ? ' selected' : ''}>${v.n}</option>`).join('')}</select>${sys.rs ? `<select data-m="rs">${[1, 2, 4, 8, 12, 20, sys.rs].filter((v, i, ar) => v <= sys.rs && ar.indexOf(v) === i).map(v => `<option value="${v}"${v === (t.rs || 4) ? ' selected' : ''}>${v} РС</option>`).join('')}</select>` : ''}
 <div class="mxi">${t.tgt ? 'Цель ' + escapeHtml(t.name || '…') + (t.res ? ' · ' + escapeHtml(t.res) : '') : 'цель не задана'}</div>
 <div class="mxi"${far ? ' style="color:#ff6b5a"' : ''}>${d ? `Д ${fmtDist(d)} · Аз ${azTxt(t.gun, t.tgt)}${far ? ' · вне досягаемости' : ''}` : (t.gun ? 'орудие ✓' : 'орудие не задано')}</div>
-<div class="mxt" data-tm="${t.id}"></div>
+${t.faId ? `<div class="mxi">${faLine(t, true)}</div>` : ''}<div class="mxt" data-tm="${t.id}"></div>
 <div class="mxi">${dv ? 'Разрыв ' + last.n + ': ' + dv : ''}</div>
 <div class="mxi">${st.shots ? `сн. ${st.n}: цель ${st.hit}, откл. ${st.dev}, н/н ${st.nobs}, осеч. ${st.mis}` : ''}</div>
 <div class="mxb"><button data-m="fire" class="primary" ${t.gun && t.tgt && !far ? '' : 'disabled'}>▶ №${nextNo}</button><button data-m="stop" data-st="${t.id}">■ Стоп</button></div>
@@ -266,11 +267,12 @@ s.querySelectorAll('select').forEach(q => q.onchange = () => { if (q.dataset.m =
 s.querySelectorAll('button[data-m]').forEach(b => b.onclick = () => { const m = b.dataset.m;
 if (m === 'x'){ MIX = MIX.filter(id => id !== t.id); mixSave(); corrDraw(); renderMix(); return; }
 if (m === 'fire'){ corrFire(t); return; } if (m === 'stop'){ corrStop(t); return; }
+if (m === 'gun'){ pickGun(t); return; } if (m === 'tgt'){ pickTgt(t); return; }
 if (m === 'nobs' || m === 'mis'){ const p = pendShot(t); if (p){ p.res = m; persist(); corrPanel(); } return; }
 CT = t; corrEnd = false; corrPick = m === 'gun' || m === 'tgt' ? m : null; corrDraw(); corrPanel();
 toast(m === 'gun' ? 'Коснитесь огневой позиции или знака орудия' : m === 'tgt' ? 'Коснитесь цели' : `Канал «${t.gname || 'Орудие'}» активен: касание карты — разрыв`);
 if (m === 'corr' && t.tgt) map.panTo([t.tgt.lat, t.tgt.lng]); }); });
-el.querySelector('[data-m=add]').onclick = () => { const prev = mixTasks().slice(-1)[0]; CT = newTask(); if (prev){ CT.sys = prev.sys; CT.rs = prev.rs; } MIX.push(CT.id); mixSave(); corrPick = 'gun'; corrEnd = false; corrDraw(); corrPanel(); toast('Коснитесь огневой позиции или знака орудия'); };
+el.querySelector('[data-m=add]').onclick = () => { const prev = mixTasks().slice(-1)[0]; CT = newTask(); if (prev){ CT.sys = prev.sys; CT.rs = prev.rs; } MIX.push(CT.id); mixSave(); corrEnd = false; corrDraw(); corrPanel(); pickGun(CT); };
 el.querySelector('[data-m=hide]').onclick = () => { mixOn = false; renderMix(); };
 mixTimer(); }
 function mixTimer(){ if (!mixOn) return; $('mixer').querySelectorAll('[data-tm]').forEach(e => { const id = +e.dataset.tm, by = new Map(); corrFly.forEach(f => { if (f.task && f.task.id === id) by.set(f.shot, Math.max(by.get(f.shot) || 0, f.left)); });
@@ -279,4 +281,60 @@ const sb = $('mixer').querySelector(`[data-st="${id}"]`); if (sb) sb.disabled = 
 $('mixBtn').onclick = () => { mixOn = !mixOn; if (mixOn && !MIX.length && CT){ MIX.push(CT.id); mixSave(); } renderMix(); corrDraw(); };
 { const cp0 = corrPanel; window.corrPanel = () => { cp0(); if (mixOn) renderMix(); }; }
 { const ct0 = corrTap; window.corrTap = ll => { const before = CT; ct0(ll); if (before && CT && CT !== before){ const i = MIX.indexOf(before.id); if (i >= 0){ MIX[i] = CT.id; lsSet('skat_mix', MIX); } } if (mixOn) renderMix(); }; }
+// ======== ОГНЕВЫЕ СРЕДСТВА: КАРТОЧКИ У ЗНАКОВ ОРУДИЙ, ВЫБОР ОРУДИЯ И ЦЕЛИ ========
+const FA_KIND = {gun:'d30', sau:'s19', rszo:'grad', mortar:'m120', tank:'tank'};
+function faAll(){ const out = []; state.arrays.forEach(a => a.points.forEach((p, i) => { if (p.fa) out.push({a, p, i}); })); return out; }
+function faFind(id){ return faAll().find(x => x.p.fa.id === id); }
+function faCand(){ const out = []; state.arrays.forEach(a => { if (a.fplan || a.zones || a.meetL || a.kind === 'aux') return; a.points.forEach((p, i) => { if (!p.fa && FA_KIND[itKind(a, p)] && sideOf(a, p) !== 'b') out.push({a, p, i}); }); }); return out; }
+const faLeft = fa => (fa.ammo || []).reduce((q, x) => q + (+x.have || 0), 0);
+const faTxt = fa => `${escapeHtml((SYS[fa.sys] || SYS.d30).n)}${fa.n ? ' × ' + fa.n : ''} · БП ${(fa.ammo || []).map(x => `${escapeHtml(x.t)} ${+x.have || 0}`).join(', ') || 'не указаны'}`;
+// расход: со склада огневого средства задачи списывается выбранный тип (или первый с остатком), отмена «Стоп» — возврат
+function faUse(t, n){ const r = t && t.faId && faFind(t.faId); if (!r) return; const A = r.p.fa.ammo || []; let x = A.find(z => z.t === t.ammoT) || A.find(z => (+z.have || 0) > 0) || A[0]; if (!x) return; x.have = Math.max(0, (+x.have || 0) - n); persist();
+if (n > 0 && x.have === 0) toast(`«${r.p.fa.cs || 'Орудие'}»: ${x.t} закончились`); }
+function pkModal(){ let m = $('pkModal'); if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'pkModal'; m.innerHTML = '<div class="card big"><h3 id="pkH"></h3><input id="pkQ" placeholder="Поиск: номер, позывной, характер" autocomplete="off" style="width:100%;margin-bottom:8px"><div id="pkList"></div><div class="row" style="margin-top:8px"><button class="ghost" data-close>Отмена</button><button class="primary" id="pkMap">Указать на карте</button></div></div>'; m.addEventListener('click', e => { if (e.target === m || e.target.hasAttribute('data-close')) m.classList.remove('open'); }); } document.body.appendChild(m); return m; }
+function pickGun(t){ pkModal(); $('pkH').textContent = 'Выбор огневого средства'; $('pkQ').value = '';
+const draw = () => { const q = $('pkQ').value.trim().toLowerCase(), F = faAll().filter(x => !q || (x.p.fa.cs + ' ' + x.p.fa.unit + ' ' + x.p.fa.reg + ' ' + (SYS[x.p.fa.sys] || {}).n).toLowerCase().includes(q)), C = faCand().filter(x => !q || labelOf(x.a, x.i).toLowerCase().includes(q));
+$('pkList').innerHTML = (F.length ? F.map((x, k) => `<div class="arr" data-f="${k}"><span class="kth" style="color:#e0302a">▲</span><div class="nm"><div><b>${escapeHtml(x.p.fa.cs || labelOf(x.a, x.i))}</b>${x.p.fa.unit ? ' · ' + escapeHtml(x.p.fa.unit) : ''}${x.p.fa.reg ? ' · ' + escapeHtml(x.p.fa.reg) : ''}</div><div>${faTxt(x.p.fa)}</div></div><button data-a="ok">Выбрать</button></div>`).join('') : '<div class="empty">Огневых средств с карточкой нет — заведите их кнопкой «Огн. ср.» слева</div>')
++ (C.length ? '<div class="sub-h">Знаки орудий без карточки</div>' + C.slice(0, 60).map((x, k) => `<div class="arr" data-c="${k}"><span class="kth">▲</span><div class="nm"><div>${escapeHtml(labelOf(x.a, x.i))}</div><div>${escapeHtml(x.a.name)}</div></div><button data-a="ok">Выбрать</button></div>`).join('') : '');
+$('pkList').querySelectorAll('[data-f]').forEach(r => r.querySelector('[data-a=ok]').onclick = () => { const x = F[+r.dataset.f], fa = x.p.fa; t.gun = {lat:x.p.lat, lng:x.p.lng}; t.gname = fa.cs || labelOf(x.a, x.i); t.sys = SYS[fa.sys] ? fa.sys : t.sys; t.faId = fa.id; t.maxOv = +fa.max || null; t.ammoT = null; pkDone(t, 'gun'); });
+$('pkList').querySelectorAll('[data-c]').forEach(r => r.querySelector('[data-a=ok]').onclick = () => { const x = C[+r.dataset.c]; t.gun = {lat:x.p.lat, lng:x.p.lng}; t.gname = labelOf(x.a, x.i); t.sys = FA_KIND[itKind(x.a, x.p)] || t.sys; t.faId = null; t.maxOv = null; pkDone(t, 'gun'); }); };
+$('pkQ').oninput = draw; draw(); $('pkMap').onclick = () => { $('pkModal').classList.remove('open'); CT = t; corrPick = 'gun'; corrDraw(); corrPanel(); toast('Коснитесь огневой позиции или знака орудия'); }; openModal('pkModal'); }
+function pickTgt(t){ pkModal(); $('pkH').textContent = 'Выбор цели'; $('pkQ').value = '';
+const enemy = [], plan = []; state.arrays.forEach(a => { if (a.zones || a.meetL || a.kind === 'aux') return; a.points.forEach((p, i) => { if (a.fplan) plan.push({a, p, i}); else if (sideOf(a, p) === 'b') enemy.push({a, p, i}); }); });
+const draw = () => { const q = $('pkQ').value.trim().toLowerCase(), f = L1 => L1.filter(x => !q || (labelOf(x.a, x.i) + ' ' + (x.p.ch || '') + ' ' + (x.p.tno || '') + ' ' + x.a.name).toLowerCase().includes(q)), P = f(plan), E = f(enemy);
+const row = (x, k, g) => { const d = t.gun ? distM(t.gun, x.p) : 0; return `<div class="arr" data-${g}="${k}"><span class="kth" style="color:#1f5fe0">⊕</span><div class="nm"><div><b>${escapeHtml(String(x.p.tno || labelOf(x.a, x.i)))}</b>${x.p.ch ? ' · ' + escapeHtml(x.p.ch) : ''}</div><div>${escapeHtml(x.a.name)}${d ? ' · ' + fmtDist(d) : ''}</div></div><button data-a="ok">Выбрать</button></div>`; };
+$('pkList').innerHTML = '<div class="sub-h">Плановые цели (ТЗ)</div>' + (P.slice(0, 120).map((x, k) => row(x, k, 'p')).join('') || '<div class="empty">Нет</div>') + '<div class="sub-h">Противник на карте</div>' + (E.slice(0, 120).map((x, k) => row(x, k, 'e')).join('') || '<div class="empty">Нет</div>');
+const bind = (g, Lx) => $('pkList').querySelectorAll(`[data-${g}]`).forEach(r => r.querySelector('[data-a=ok]').onclick = () => { const x = Lx[+r.dataset[g]]; setTgt(t, x); });
+bind('p', P); bind('e', E); };
+$('pkQ').oninput = draw; draw(); $('pkMap').onclick = () => { $('pkModal').classList.remove('open'); CT = t; corrPick = 'tgt'; corrDraw(); corrPanel(); toast('Коснитесь цели'); }; openModal('pkModal'); }
+// новая цель для задачи, по которой уже стреляли, — новая задача с тем же орудием (как при касании карты)
+function setTgt(t, x){ let T = t; if (t.tgt && (t.shots || []).length){ T = newTask(); ['gun', 'sys', 'rs', 'gname', 'faId', 'maxOv', 'ammoT'].forEach(k => { T[k] = t[k]; }); const i = MIX.indexOf(t.id); if (i >= 0){ MIX[i] = T.id; lsSet('skat_mix', MIX); } }
+T.tgt = {lat:x.p.lat, lng:x.p.lng}; T.name = String(x.p.tno || labelOf(x.a, x.i)); T.obj = x.p.ch || (x.p.tno ? '' : labelOf(x.a, x.i)); T.cat = catOfSym(x.p.sym || x.a.sym) || T.cat || 1; pkDone(T, 'tgt'); }
+function pkDone(t, what){ $('pkModal').classList.remove('open'); CT = t; corrPick = null; corrEnd = false; persist(); corrDraw(); corrPanel(); if (what === 'gun' && !t.tgt) setTimeout(() => pickTgt(t), 150); else toast(what === 'gun' ? `Орудие: ${t.gname || ''}` : `Цель ${t.name}`); }
+// ---- окно «Огневые средства»: по полкам и подразделениям
+function renderFa(){ keepScroll('faModal', () => { const F = faAll(), C = faCand(), G = new Map(); F.forEach(x => { const k = (x.p.fa.reg || 'Без полка') + ' / ' + (x.p.fa.unit || 'без подразделения'); if (!G.has(k)) G.set(k, []); G.get(k).push(x); });
+$('faList').innerHTML = (F.length ? [...G.entries()].sort().map(([k, L1]) => `<div class="sub-h">${escapeHtml(k)}</div>` + L1.map(x => `<div class="arr" data-id="${x.p.fa.id}"><span class="kth" style="color:#e0302a">▲</span><div class="nm"><div><b>${escapeHtml(x.p.fa.cs || labelOf(x.a, x.i))}</b> · ${escapeHtml((SYS[x.p.fa.sys] || SYS.d30).n)}${x.p.fa.n ? ' × ' + x.p.fa.n : ''}</div><div>БП: ${(x.p.fa.ammo || []).map(z => `${escapeHtml(z.t)} ${+z.have || 0}${z.norm ? ' (норма ' + z.norm + ')' : ''}`).join(', ') || 'не указаны'}</div></div><button data-a="go">Показать</button><button class="eye" data-a="ed">✎</button></div>`).join('')).join('') : '<div class="empty">Карточек пока нет</div>')
++ (C.length ? '<div class="sub-h">Знаки орудий без карточки</div>' + C.slice(0, 80).map((x, k) => `<div class="arr" data-c="${k}"><span class="kth">▲</span><div class="nm"><div>${escapeHtml(labelOf(x.a, x.i))}</div><div>${escapeHtml(x.a.name)}</div></div><button data-a="add">+ Карточка</button></div>`).join('') : '');
+$('faList').querySelectorAll('.arr[data-id]').forEach(r => { const x = faFind(+r.dataset.id); r.querySelector('[data-a=go]').onclick = () => { closeModals(); map.setView([x.p.lat, x.p.lng], Math.max(map.getZoom(), 15)); }; r.querySelector('[data-a=ed]').onclick = () => openFaEd(x);
+swipeable(r, () => askConfirm(`Убрать карточку «${x.p.fa.cs || 'орудие'}»? Знак на карте останется.`, 'Убрать', () => { delete x.p.fa; persist(); renderFa(); })); });
+$('faList').querySelectorAll('.arr[data-c]').forEach(r => r.querySelector('[data-a=add]').onclick = () => { const x = C[+r.dataset.c]; x.p.fa = {id:Date.now(), cs:labelOf(x.a, x.i), sys:FA_KIND[itKind(x.a, x.p)] || 'd30', n:1, ammo:[]}; persist(); openFaEd(x); }); }); }
+let faRef = null;
+function openFaEd(x){ faRef = x; const fa = x.p.fa; let m = $('faEdModal'); if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'faEdModal'; m.innerHTML = '<div class="card big"><h3>Карточка огневого средства</h3><div id="faEdBody"></div><div class="row"><button class="ghost" data-close>Отмена</button><button class="primary" id="faEdOk">Сохранить</button></div></div>'; m.addEventListener('click', e => { if (e.target === m || e.target.hasAttribute('data-close')) m.classList.remove('open'); }); }
+document.body.appendChild(m); const sys = SYS[fa.sys] || SYS.d30;
+const am = () => (fa.ammo || []).map((z, k) => `<div class="duo" data-am="${k}"><label class="f">Тип БП<input data-k="t" value="${escapeHtml(z.t || '')}" placeholder="ОФС"></label><label class="f">Наличие<input data-k="have" inputmode="numeric" value="${+z.have || 0}"></label><label class="f">Норма на цель<input data-k="norm" inputmode="numeric" value="${z.norm || ''}"></label><button class="eye" data-x="${k}" style="align-self:end">🗑</button></div>`).join('');
+$('faEdBody').innerHTML = `<label class="f">Позывной<input id="fa_cs" value="${escapeHtml(fa.cs || '')}" autocomplete="off"></label><div class="duo"><label class="f">Полк<input id="fa_reg" value="${escapeHtml(fa.reg || '')}"></label><label class="f">Подразделение<input id="fa_unit" value="${escapeHtml(fa.unit || '')}"></label></div>
+<label class="f">Система<select id="fa_sys">${Object.entries(SYS).map(([k, v]) => `<option value="${k}"${k === fa.sys ? ' selected' : ''}>${v.n}</option>`).join('')}</select></label><div class="duo"><label class="f">Орудий<input id="fa_n" inputmode="numeric" value="${fa.n || 1}"></label><label class="f">Макс. дальность, м<input id="fa_max" inputmode="numeric" value="${fa.max || ''}" placeholder="${sys.max}"></label></div>
+<div class="flabel">Боеприпасы</div><div id="fa_am">${am()}</div><button id="fa_amAdd">+ Тип боеприпасов</button><label class="f">Примечание<input id="fa_note" value="${escapeHtml(fa.note || '')}"></label>`;
+const readAm = () => { $('fa_am').querySelectorAll('[data-am]').forEach(r => { const z = fa.ammo[+r.dataset.am]; r.querySelectorAll('input').forEach(i => { z[i.dataset.k] = i.dataset.k === 't' ? i.value.trim() : Math.max(0, +i.value || 0); }); }); };
+const bindAm = () => $('fa_am').querySelectorAll('[data-x]').forEach(b => b.onclick = () => { readAm(); fa.ammo.splice(+b.dataset.x, 1); $('fa_am').innerHTML = am(); bindAm(); });
+bindAm(); $('fa_amAdd').onclick = () => { readAm(); (fa.ammo = fa.ammo || []).push({t:'ОФС', have:0, norm:0}); $('fa_am').innerHTML = am(); bindAm(); };
+$('fa_sys').onchange = () => { $('fa_max').placeholder = (SYS[$('fa_sys').value] || SYS.d30).max; };
+$('faEdOk').onclick = () => { readAm(); fa.cs = $('fa_cs').value.trim(); fa.reg = $('fa_reg').value.trim(); fa.unit = $('fa_unit').value.trim(); fa.sys = $('fa_sys').value; fa.n = Math.max(1, +$('fa_n').value || 1); fa.max = +$('fa_max').value || null; fa.note = $('fa_note').value.trim(); fa.ammo = (fa.ammo || []).filter(z => z.t);
+state.ftasks.forEach(t => { if (t.faId === fa.id){ t.sys = fa.sys; t.maxOv = fa.max; t.gname = fa.cs || t.gname; } }); persist(); m.classList.remove('open'); if ($('faModal').classList.contains('open')) renderFa(); corrPanel(); toast('Карточка сохранена'); };
+openModal('faEdModal'); }
+$('faBtn').onclick = () => { renderFa(); openModal('faModal'); };
+function faLine(t, short){ const r = t && t.faId && faFind(t.faId); if (!r) return ''; const A = r.p.fa.ammo || []; if (!A.length) return short ? 'БП не указаны' : '<div class="cdv">БП не указаны — заполните карточку</div>';
+const cur = (A.find(z => z.t === t.ammoT) || A.find(z => (+z.have || 0) > 0) || A[0]).t;
+if (short) return 'БП: ' + A.map(z => `${escapeHtml(z.t)} ${+z.have || 0}`).join(', ');
+return `<div class="crow">БП:<select data-c="am">${A.map(z => `<option value="${escapeHtml(z.t)}"${z.t === cur ? ' selected' : ''}>${escapeHtml(z.t)} — ${+z.have || 0}${z.norm ? ' (норма ' + z.norm + ')' : ''}</option>`).join('')}</select></div>`; }
 window.__mod_tp = 1;

@@ -154,9 +154,9 @@ tr .swdel{border-radius:0}
 body.picking #cross i{background:var(--signal)}
 #mixer{position:fixed;left:0;right:0;bottom:calc(var(--safe-b) + var(--badge) + 4px);z-index:1050;display:none;padding:6px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 #mixer.on{display:block}.mxin{display:flex;gap:8px;width:max-content}
-.mxs{width:178px;flex:none;display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:12px;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--ink);font-size:12.5px;border:2px solid transparent}
+.mxs{width:214px;flex:none;display:flex;flex-direction:column;gap:5px;padding:9px;border-radius:12px;background:rgba(18,24,20,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#f2f5f0;font-size:14px;border:2px solid rgba(255,255,255,.12)}
 .mxs.act{border-color:#ff8a2a}.mxh{display:flex;align-items:center;gap:6px}.mxh b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mxh button{min-height:28px;padding:0 8px}
-.mxs select{width:100%;font-size:12.5px;min-height:30px}.mxb{display:flex;gap:4px}.mxb button{flex:1;min-height:34px;font-size:12.5px;padding:0 4px}.mxb button.on{outline:2px solid #ff8a2a}
+.mxs select{width:100%;font-size:14px;min-height:36px;background:#26332b;color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:0 8px;-webkit-appearance:none;appearance:none}.mxs select option{color:#000}.mxb{display:flex;gap:5px}.mxb button{flex:1;min-height:40px;font-size:14px;padding:0 4px;color:#fff;background:#2c3a31;border:1px solid rgba(255,255,255,.2)}.mxb button.primary{background:#e8782a;border-color:#e8782a}.mxb button:disabled{opacity:.45}.mxh button{color:#fff;background:#2c3a31}.mxb button.on{outline:2px solid #ff8a2a}
 .mxt{color:#ffb000;font-weight:700;min-height:16px}.mxi{min-height:15px;line-height:1.25}.mxadd{justify-content:center}
 #lrail{position:fixed;left:10px;top:calc(var(--safe-t) + var(--tg) + 68px);z-index:1000;display:flex;flex-direction:column;gap:6px}
 #lrail:has(.rb[style*="display: none"]:only-child){display:none}
@@ -303,6 +303,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <button class="rb on" id="gridBtn" title="Сетка СК-42"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M9 4v16M15 4v16"/></svg>Сетка</button>
 </div>
 <div id="lrail">
+<button class="rb" id="faBtn" title="Огневые средства" style="display:none"><svg viewBox="0 0 24 24"><path d="M3 18h18M6 18l3-6h6l3 6M12 12V5M9 7l3-3 3 3"/></svg>Огн. ср.</button>
 <button class="rb" id="mixBtn" title="Микшер орудий" style="display:none"><svg viewBox="0 0 24 24"><path d="M6 3v18M12 3v18M18 3v18"/><rect x="4" y="7" width="4" height="3"/><rect x="10" y="13" width="4" height="3"/><rect x="16" y="9" width="4" height="3"/></svg>Микшер</button>
 <button class="rb" id="ftBtn" title="Огневые задачи и журнал" style="display:none"><svg viewBox="0 0 24 24"><path d="M12 3c2 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-8z"/></svg>Огн. зад.</button>
 <button class="rb" id="corrBtn" title="Корректировка огня" style="display:none"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>Корр.</button>
@@ -533,12 +534,13 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="seg" id="prnPaperSeg" style="flex-wrap:wrap"><button data-p="A5">A5</button><button data-p="A4">A4</button><button data-p="A3">A3</button><button data-p="A2">A2</button><button data-p="A1">A1</button><button data-p="A0">A0</button><button data-p="U">Свой</button></div>
 <div class="seg" id="prnOriSeg"><button data-o="p">Книжная</button><button data-o="l">Альбомная</button></div>
 <div class="duo" id="prnCustom" style="display:none"><label class="f">Ширина, мм<input id="prnW" inputmode="numeric" value="500"></label><label class="f">Высота, мм<input id="prnH" inputmode="numeric" value="350"></label></div>
-<label class="f">Разрешение, точек на дюйм<select id="prnDpi"><option value="100">100</option><option value="150" selected>150</option><option value="200">200</option><option value="300">300</option><option value="400">400</option></select></label>
+<label class="f">Разрешение, точек на дюйм<select id="prnDpi"><option value="100">100</option><option value="150">150</option><option value="200">200</option><option value="300" selected>300</option><option value="400">400</option></select></label>
 <label class="f">Качество карты<select id="prnQ"><option value="0">Стандарт</option><option value="1" selected>Высокое (подложка подробнее)</option><option value="2">Максимальное</option></select></label>
 <label class="f">Качество JPEG: <span id="prnJqV">90</span>%<input type="range" id="prnJq" min="60" max="100" step="5" value="90"></label>
 <label class="f">Заголовок<input id="prnTitle" autocomplete="off" placeholder="например, Схема района"></label>
 <label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="prnGrid" checked style="width:22px;min-height:22px;margin:0"> Сетка СК-42 с подписями</label>
 <label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="prnLeg" checked style="width:22px;min-height:22px;margin:0"> Условные обозначения</label>
+<label class="f">Масштаб листа<select id="prnScale"><option value="0" selected>Авто (по топографическому ряду)</option><option value="10000">1:10 000 (в 1 см 100 м)</option><option value="25000">1:25 000 (в 1 см 250 м)</option><option value="50000">1:50 000 (в 1 см 500 м)</option><option value="100000">1:100 000 (в 1 см 1 км)</option><option value="200000">1:200 000 (в 1 см 2 км)</option></select></label>
 <label class="f">Подложка<select id="prnBase"></select></label>
 <div class="flabel">Слои на листе</div><div id="prnLays" style="max-height:180px;overflow:auto;margin-bottom:8px"></div>
 <label class="f">Масштаб знаков: ×<span id="prnSymV">1</span><input type="range" id="prnSym" min="0.5" max="2.5" step="0.1" value="1"></label>
@@ -580,6 +582,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="row"><button class="ok" id="prOk">Готово</button></div></div></div>
 <div id="corr" class="glass"></div>
 <div id="mixer"></div>
+<div class="modal" id="faModal"><div class="card big"><h3>Огневые средства</h3><div id="faList"></div><div class="row" style="margin-top:10px"><button class="ghost" data-close>Закрыть</button></div></div></div>
 <div class="modal" id="ftModal"><div class="card big"><h3>Огневые задачи</h3><div class="seg" id="ftTabs"><button data-t="cur" class="on">Текущие</button><button data-t="log">Журнал</button></div><div id="ftList"></div><div class="row" id="ftRow" style="margin-top:10px"></div></div></div>
 <div class="modal" id="ftEdModal"><div class="card"><h3>Запись журнала</h3><div id="ftEdBody"></div><div class="row"><button class="ghost" data-close>Отмена</button><button class="primary" id="ftEdOk">Сохранить</button></div></div></div>
 <div class="modal" id="planModal"><div class="card big"><h3>Плановые огневые задачи</h3><div id="planList"></div><div class="row" style="margin-top:10px"><button class="primary" id="planAdd">Добавить ТЗ</button><button id="planMeet">Точки встречи</button><button id="planAll">Выгрузить всё (Excel)</button><button id="planZone">Добавить зону</button><button class="ghost" data-close>Закрыть</button></div><p class="status" style="margin-top:10px">Цели нумеруются с 101. Касание цели (удержание → «Карточка») — № ТЗ, характер цели, комментарий, цвет (кто привлекается). Группировка — в «Слоях» через «☑ Выбрать». Excel: № ТЗ, характер, № цели, X, Y, H, квадрат, н.п., комментарий, привлекается.</p></div></div>
@@ -597,7 +600,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 6.7';
+const VERSION = 'версия 6.9';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -864,7 +867,7 @@ function updateReadout(){
 const c = map.getCenter(), s = GEO.toSK(c.lat, c.lng);
 const sq = pad2(Math.floor(s.x/1000)) + pad2(Math.floor(s.y/1000));
 const fx = state.full ? String(Math.round(s.x)) : pad5(s.x), fy = state.full ? String(Math.round(s.y)) : pad5(s.y);
-ro.innerHTML = `<div class="xy"><span>X</span>${fx}&emsp;<span>Y</span>${fy}</div><div class="meta"><span class="sq">кв. ${sq}-${snailOf(s.x,s.y)}</span>&ensp;${centerH!=null?`H ${Math.round(centerH)} м&ensp;`:''}масшт. ${map.getZoom()}&ensp;<span class="mode">${state.full ? 'полные' : 'сокр.'}</span></div>`;
+ro.innerHTML = `<div class="xy"><span>X</span>${fx}&emsp;<span>Y</span>${fy}</div><div class="meta"><span class="sq">кв. ${sq}-${snailOf(s.x,s.y)}</span>&ensp;${centerH!=null?`H ${Math.round(centerH)} м&ensp;`:''}масшт. ${map.getZoom()} (≈1:${topoScale().toLocaleString('ru-RU')})&ensp;<span class="mode">${state.full ? 'полные' : 'сокр.'}</span></div>`;
 }
 ro.onclick = () => { state.full = !state.full; persist(); updateReadout(); toast(state.full ? 'Полные координаты' : 'Сокращённые координаты'); };
 function centerHeight(){
@@ -3187,7 +3190,7 @@ state.arrays.push(a); pts.slice(0, 300).forEach(p => { fillHeight(p); fillPlace(
 persistNow(); closeModals(); renderMarkers(); map.fitBounds(L.latLngBounds(pts.map(p => [p.lat, p.lng])).pad(0.2), {maxZoom:16});
 toast(`Нанесено точек: ${pts.length}${bad ? `, пропущено строк: ${bad}` : ''}`);
 };
-function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; $('ftBtn').style.display = secMode === 'tp' ? '' : 'none'; $('mixBtn').style.display = secMode === 'tp' ? '' : 'none'; if (secMode !== 'tp' && $('mixer')) $('mixer').classList.remove('on'); $('lrail').style.display = secMode === 'tp' ? '' : 'none'; }
+function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; $('ftBtn').style.display = secMode === 'tp' ? '' : 'none'; $('mixBtn').style.display = secMode === 'tp' ? '' : 'none'; $('faBtn').style.display = secMode === 'tp' ? '' : 'none'; if (secMode !== 'tp' && $('mixer')) $('mixer').classList.remove('on'); $('lrail').style.display = secMode === 'tp' ? '' : 'none'; }
 const ENV_N = {trow:'Ряд деревьев', tpoly:'Роща', house:'Дом', flat:'Многоэтажка', wh:'Склад', hangar:'Ангар', tree_n:'Ель', tree_b:'Берёза', grove:'Роща', pw:'Опора ЛЭП', mast:'Мачта связи', wt:'Водонапорная башня', tank:'Цистерна'};
 const ENV_IC = {house:'⌂', flat:'▥', wh:'▭', hangar:'⌓', tree_n:'▲', tree_b:'●', grove:'♣', pw:'ᛉ', mast:'⊥', wt:'♜', tank:'◉'};
 function envMarkers(a, z){ if (!a.env) return;
@@ -3365,7 +3368,7 @@ function ovalPts0(a, b){ const c = L.latLng((a.lat + b.lat) / 2, (a.lng + b.lng)
 for (let i = 0; i <= 36; i++){ const t = i / 36 * 2 * Math.PI, x = Math.cos(t) * (L0 + W * .4), y = Math.sin(t) * W, r = Math.hypot(x, y), q = Math.atan2(y, x) * 180 / Math.PI; out.push(destLL(c, az + q, r)); } return out; }
 
 function itKind(a, it){ const sid = it.sym || a.sym; return sid && MDL_OF[sid]; }
-const SYS = {m82:{n:'Миномёт 82 мм', v:180, hi:1, max:4100}, m120:{n:'Миномёт 120 мм', v:260, hi:1, max:7100}, d30:{n:'Д-30 122 мм', v:520, max:15400}, msta:{n:'Мста-Б 152 мм', v:600, max:24700}, sau:{n:'САУ 2С3/2С19', v:600, max:24700}, grad:{n:'РСЗО «Град»', v:550, rs:40, max:20400}, uragan:{n:'РСЗО «Ураган»', v:650, rs:16, max:35800}, tank:{n:'Танк', v:1400, max:10000}};
+const SYS = {m82:{n:'Миномёт 82 мм', v:180, hi:1, max:4100}, m120:{n:'Миномёт 120 мм', v:260, hi:1, max:7100}, d30:{n:'Д-30 122 мм', v:520, max:15400}, msta:{n:'Мста-Б 152 мм', v:600, max:24700}, sau:{n:'САУ 2С3/2С19', v:600, max:24700}, s19:{n:'2С19 «Мста-С» 152 мм', v:600, max:24700}, s3:{n:'2С3 «Акация» 152 мм', v:600, max:17400}, s1:{n:'2С1 «Гвоздика» 122 мм', v:520, max:15200}, d20:{n:'Д-20 152 мм', v:580, max:17400}, grad:{n:'РСЗО «Град»', v:550, rs:40, max:20400}, uragan:{n:'РСЗО «Ураган»', v:650, rs:16, max:35800}, tank:{n:'Танк', v:1400, max:10000}};
 let CT = null, corrPick = null, corrFly = [], corrRaf = 0, corrShotN = 0;
 function corrDev(b){ const t = CT.tgt, [kx, ky] = mk(t.lat), dN = (b.lat - t.lat) * ky, dE = (b.lng - t.lng) * kx;
 const g = CT.gun, gx = (t.lng - g.lng) * kx, gy = (t.lat - g.lat) * ky, D = Math.hypot(gx, gy) || 1, ux = gx / D, uy = gy / D, along = dE * ux + dN * uy, lat = dE * uy - dN * ux, mil = Math.round(Math.atan2(lat, D + along) / (2 * Math.PI) * 6000);
@@ -3405,7 +3408,7 @@ function tgtNo(lat, lng, cat, skip){ const zn = zoneOf(lat, lng), zz = zn != nul
 for (let k = cat * 100 + 1; k < cat * 100 + 100; k++){ const no = zz + String(k).padStart(3, '0'); if (!u.has(no)) return no; } return zz + String(cat * 100 + 99); }
 function planCat(p){ return catOfTxt(p.ch) || catOfSym(p.sym) || catOfSym(p.osym); }
 function planNum(a, p){ const c = planCat(p); if (!c){ delete p.tno; return false; } const zz = zoneOf(p.lat, p.lng), keep = p.tno && p.tno.slice(0, 2) === (zz != null ? String(zz).padStart(2, '0').slice(-2) : '00') && Math.floor(+p.tno.slice(2) / 100) === c;
-if (!keep) p.tno = tgtNo(p.lat, p.lng, c, p); p.lbl = p.tno + (p.ch ? ' ' + p.ch : ''); return true; }
+if (!keep) p.tno = tgtNo(p.lat, p.lng, c, p); p.lbl = p.tno; return true; }
 function planNew(a, p){ planPrep(a, p); const q = map.latLngToContainerPoint([p.lat, p.lng]), r = map.getContainer().getBoundingClientRect(), h = hitPoint(q.x + r.left, q.y + r.top, 40);
 if (h && h.i != null && h.a !== a){ const o = h.a.points[h.i]; p.osym = o.sym || h.a.sym || undefined; if (!p.comment) p.comment = labelOf(h.a, h.i); p.lat = o.lat; p.lng = o.lng; }
 if (a.tz) p.tz = a.tz;
@@ -3461,6 +3464,11 @@ function auxSection(el){ const ax = state.arrays.filter(a => a.kind === 'aux'); 
 const h = document.createElement('div'); h.className = 'sub-h'; h.style.cursor = 'pointer'; h.textContent = `${AUX.v ? '▸' : '▾'} Ориентиры (${ax.length})`; h.onclick = () => { AUX.v = !AUX.v; renderLayers(); };
 const ref = el.querySelector('#ftH') ? el.querySelector('#ftH').parentNode : [...el.querySelectorAll('.sub-h')].find(x => /Макет/.test(x.textContent)); if (ref) el.insertBefore(h, ref); else el.appendChild(h);
 let cur = h; ax.forEach(a => { const r = el.querySelector(`.arr[data-id="${a.id}"]`); if (!r) return; const k = r.nextElementSibling && r.nextElementSibling.classList.contains('kids') ? r.nextElementSibling : null; cur.after(r); cur = r; if (k){ r.after(k); cur = k; } }); }
+// ---- номера целей без характера (перевод старых подписей)
+state.arrays.forEach(a => { if (a.fplan) a.points.forEach(p => { if (p.tno && p.lbl && p.lbl !== p.tno && String(p.lbl).startsWith(p.tno + ' ')) p.lbl = p.tno; }); });
+// ---- масштаб по топографическому ряду (экран ≈ 96 точек на дюйм)
+const TOPO_S = [5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000];
+function topoScale(){ try { const c = map.getCenter(), mpp = 156543.03392 * Math.cos(c.lat * Math.PI / 180) / Math.pow(2, map.getZoom()), s0 = mpp / 0.0002646; return TOPO_S.reduce((b, x) => Math.abs(Math.log(x / s0)) < Math.abs(Math.log(b / s0)) ? x : b, TOPO_S[0]); } catch(e){ return 25000; } }
 // ======== МОДУЛИ: ЛЕНИВАЯ ЗАГРУЗКА (mk.js — Макет/3D, op.js — Оператор, tp.js — Боевой контур) ========
 const MODV = VERSION.replace(/^\D+/, ''), MODN = {mk:'«Макет»', op:'«Оператор»', tp:'«Боевой контур»'}, modP = {};
 function modLoad(m){ if (window['__mod_' + m]) return Promise.resolve(); if (modP[m]) return modP[m];
@@ -3472,7 +3480,7 @@ const mkLoad = () => modLoad('mk');
 const modStub = (m, ...ns) => ns.forEach(n => { const f = (...a) => modLoad(m).then(() => { if (window[n] === f) throw new Error(n); return window[n](...a); }).catch(e => console.warn(e)); window[n] = f; });
 const modBtn = (m, ...ids) => ids.forEach(id => { const el = $(id); if (!el) return; const f = e => modLoad(m).then(() => { if (el.onclick && el.onclick !== f) el.onclick(e); }).catch(() => {}); el.onclick = f; });
 modStub('op', 'openTextEd', 'openProp'); modBtn('op', 'prnBtn');
-modStub('tp', 'corrTap', 'exportPlanXlsx', 'openShapeEd', 'meetTap', 'corrDraw', 'corrPanel', 'askChar', 'applyChar'); modBtn('tp', 'corrBtn', 'planBtn', 'ftBtn', 'mixBtn');
+modStub('tp', 'corrTap', 'exportPlanXlsx', 'openShapeEd', 'meetTap', 'corrDraw', 'corrPanel', 'askChar', 'applyChar'); modBtn('tp', 'corrBtn', 'planBtn', 'ftBtn', 'mixBtn', 'faBtn');
 $('v3Btn').onclick = () => mkLoad().then(open3D).catch(() => {});
 setTimeout(() => ['mk', 'op', 'tp'].forEach(m => { try { fetch(m + '.js?v=' + MODV).catch(() => {}); } catch(e){} }), 8000);
 

@@ -44,6 +44,8 @@ const mg = mm(8), th = title ? mm(11) : 0, fh = mm(7), ox0 = mg, oy0 = mg + th, 
 let FRAME = null;
 const Ws = map.getSize().x, Hs = map.getSize().y, c = map.getCenter(), a0 = map.containerPointToLatLng([Ws / 2 - 50, Hs / 2]), a1 = map.containerPointToLatLng([Ws / 2 + 50, Hs / 2]), mpp = distM(a0, a1) / 100;
 let wm = Ws * mpp, hm = Hs * mpp; if (iw / ih > wm / hm) hm = wm * ih / iw; else wm = hm * iw / ih;
+// масштаб листа по топографическому ряду: «Авто» — ближайший стандартный, при котором видимая область почти целиком помещается
+const iwm = iw / dpi * 0.0254, sFit = wm / iwm, sSel = +$('prnScale').value || [10000, 25000, 50000, 100000, 200000, 500000, 1000000].find(x => x >= sFit * .85) || 1000000; wm = sSel * iwm; hm = wm * ih / iw;
 const bk = LAYERS[$('prnBase').value] ? $('prnBase').value : state.layer, def = LAYERS[bk], crs = crsOf(bk), z0 = map.getZoom();
 const pq = +$('prnQ').value; let zt = Math.min(def.max, pq + Math.max(Math.floor(z0), Math.round(z0 + Math.log2((wm / iw) > 0 ? mpp / (wm / iw) : 1))));
 const pc = crs.latLngToPoint(c, zt); let mz = mpp * Math.pow(2, z0 - zt);
@@ -78,7 +80,7 @@ if (a.kind === 'aux'){ g.save(); g.translate(px, py); g.scale(sc * prK.s, sc * p
 else if (a.fplan){ g.beginPath(); g.arc(px, py, 19 * sc * prK.s, 0, 7); g.fillStyle = st.color; g.fill(); g.lineWidth = 2 * sc; g.strokeStyle = '#111'; g.stroke(); if (sid && SYM_BY[sid]){ g.save(); g.translate(px, py); g.scale(sc * .8 * prK.s, sc * .8 * prK.s); drawSym(g, sid, 0, 0, '#111', null); g.restore(); } }
 else if (sid && SYM_BY[sid]){ const col = symCol(sid, sideOf(a, p), st.color); g.save(); g.translate(px, py); g.scale(sc * prK.s, sc * prK.s); if (p.rot) g.rotate(p.rot * Math.PI / 180); drawSym(g, sid, 0, 0, col, p.fc || a.fc); g.restore(); used.set(sid + '|' + col, [sid, col]); }
 else { g.beginPath(); g.arc(px, py, 6 * sc * prK.s, 0, 7); g.fillStyle = st.color; g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 2 * sc; g.stroke(); }
-if (prK.lbl){ g.font = `${a.kind === 'aux' ? 'italic ' : ''}700 ${Math.round(12 * sc * prK.l)}px sans-serif`; g.lineWidth = 3 * sc; g.strokeStyle = '#fff'; g.fillStyle = '#111'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; const lw2 = g.measureText(lb).width; let lx = px + 14 * sc * prK.s, ly = py - 10 * sc * prK.s; if (lx + lw2 > ix0 + iw - 2 * sc) lx = Math.max(ix0 + 2 * sc, px - 14 * sc - lw2); if (ly - 12 * sc < iy0) ly = py + 22 * sc; if (ly > iy0 + ih - 2 * sc) ly = iy0 + ih - 2 * sc; g.strokeText(lb, lx, ly); g.fillText(lb, lx, ly); } });
+if (prK.lbl){ const fpx = Math.max(9, Math.round(mm(2.6) * prK.l)); g.font = `${a.kind === 'aux' ? 'italic ' : ''}600 ${fpx}px sans-serif`; g.lineJoin = 'round'; g.lineWidth = Math.max(2, fpx * .28); g.strokeStyle = '#fff'; g.fillStyle = '#111'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; const lw2 = g.measureText(lb).width; let lx = px + 14 * sc * prK.s, ly = py - 10 * sc * prK.s; if (lx + lw2 > ix0 + iw - 2 * sc) lx = Math.max(ix0 + 2 * sc, px - 14 * sc - lw2); if (ly - 12 * sc < iy0) ly = py + 22 * sc; if (ly > iy0 + ih - 2 * sc) ly = iy0 + ih - 2 * sc; g.strokeText(lb, lx, ly); g.fillText(lb, lx, ly); } });
 (a.tables || []).forEach(T => { if (T.hid) return; const [px, py] = toC([T.lat, T.lng]), rows = T.rows.slice(0, 40), nc = Math.min(10, Math.max(...rows.map(r => r.length))), fs = T.s * sc, ch = fs * 1.6;
 g.font = `500 ${fs}px '${T.f}', sans-serif`; const cw = Array.from({length:nc}, (_, c) => Math.max(...rows.map(r => g.measureText(String(r[c] ?? '')).width)) + fs);
 const tw = cw.reduce((x, y) => x + y, 0), th2 = ch * rows.length, x0 = px - tw / 2, y0 = py - th2 / 2;
@@ -131,7 +133,7 @@ cl.forEach(([x, y, la, lo, al, bs]) => { g.textAlign = al; g.textBaseline = bs; 
 g.fillStyle = '#111'; g.textAlign = 'center'; g.textBaseline = 'middle';
 if (title){ g.font = `700 ${Math.round(mm(6))}px sans-serif`; g.fillText(title, W / 2, mg + th / 2); }
 const scale = Math.round(wm / (iw / dpi * 0.0254) / 100) * 100;
-g.font = `500 ${Math.round(mm(3.2))}px sans-serif`; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(`Масштаб ~1:${scale.toLocaleString('ru-RU')} · СК-42, зона ${GEO.toSK(c.lat, c.lng).zone} · сетка ${grid ? 'через ' + (FRAME && FRAME.xs.length > 1 ? Math.round(Math.abs((FRAME.xs[1][0] - FRAME.xs[0][0]) / 1000)) : 1) + ' км' : 'нет'} · ${new Date().toLocaleDateString('ru-RU')}`, ox0, oy0 + oh + fh / 2); g.textAlign = 'right'; g.fillText('СКАТ', ox0 + ow, oy0 + oh + fh / 2);
+g.font = `500 ${Math.round(mm(3.2))}px sans-serif`; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(`Масштаб 1:${sSel.toLocaleString('ru-RU')} (в 1 см ${sSel >= 100000 ? sSel / 100000 + ' км' : sSel / 100 + ' м'}) · СК-42, зона ${GEO.toSK(c.lat, c.lng).zone} · сетка ${grid ? 'через ' + (FRAME && FRAME.xs.length > 1 ? Math.round(Math.abs((FRAME.xs[1][0] - FRAME.xs[0][0]) / 1000)) : 1) + ' км' : 'нет'} · ${new Date().toLocaleDateString('ru-RU')}`, ox0, oy0 + oh + fh / 2); g.textAlign = 'right'; g.fillText('СКАТ', ox0 + ow, oy0 + oh + fh / 2);
 netMsg(''); return {cv, W, H, miss};
 } catch(e){ netMsg(''); toast('Не удалось подготовить лист: ' + (e.message || e)); return null; }
 }
