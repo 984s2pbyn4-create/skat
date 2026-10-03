@@ -152,12 +152,20 @@ tr .swdel{border-radius:0}
 #cross i:nth-child(3){top:10px;left:0;height:2px;width:7px}
 #cross i:nth-child(4){top:10px;right:0;height:2px;width:7px}
 body.picking #cross i{background:var(--signal)}
-#mixer{position:fixed;left:0;right:0;bottom:calc(var(--safe-b) + var(--badge) + 4px);z-index:1050;display:none;padding:6px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-#mixer.on{display:block}.mxin{display:flex;gap:8px;width:max-content}
-.mxs{width:214px;flex:none;display:flex;flex-direction:column;gap:5px;padding:9px;border-radius:12px;background:rgba(18,24,20,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#f2f5f0;font-size:14px;border:2px solid rgba(255,255,255,.12)}
-.mxs.act{border-color:#ff8a2a}.mxh{display:flex;align-items:center;gap:6px}.mxh b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mxh button{min-height:28px;padding:0 8px}
-.mxs select{width:100%;font-size:14px;min-height:36px;background:#26332b;color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:0 8px;-webkit-appearance:none;appearance:none}.mxs select option{color:#000}.mxb{display:flex;gap:5px}.mxb button{flex:1;min-height:40px;font-size:14px;padding:0 4px;color:#fff;background:#2c3a31;border:1px solid rgba(255,255,255,.2)}.mxb button.primary{background:#e8782a;border-color:#e8782a}.mxb button:disabled{opacity:.45}.mxh button{color:#fff;background:#2c3a31}.mxb button.on{outline:2px solid #ff8a2a}
-.mxt{color:#ffb000;font-weight:700;min-height:16px}.mxi{min-height:15px;line-height:1.25}.mxadd{justify-content:center}
+#mixer{position:fixed;left:0;right:0;bottom:calc(var(--safe-b) + var(--badge) + 2px);z-index:1050;display:none;padding:6px 8px 8px;background:rgba(10,14,12,.38);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-top:1px solid rgba(255,255,255,.15)}
+#mixer.on{display:block}.mxbar{display:flex;gap:6px;align-items:center;overflow-x:auto;padding-bottom:6px}.mxbar select,.mxbar button{min-height:34px;font-size:13.5px;color:#fff;background:rgba(38,51,43,.75);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:0 10px;flex:none}.mxbar button.primary{background:#e8782a;border-color:#e8782a}
+.mxseg{display:flex;flex:none}.mxseg button{border-radius:0}.mxseg button:first-child{border-radius:8px 0 0 8px}.mxseg button:last-child{border-radius:0 8px 8px 0}.mxseg button.on{background:#e8782a;border-color:#e8782a}
+.mxin{display:flex;gap:10px;align-items:flex-end;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:14px 4px 4px}
+.mxs{width:214px;flex:none;perspective:900px;transition:transform .2s}.mxs.firing{transform:translateY(-12px)}.mxs.firing .mxface{box-shadow:0 8px 18px rgba(0,0,0,.55),0 0 0 2px #ffb000}
+.mxc{display:grid;transition:transform .45s;transform-style:preserve-3d}.mxs.flip .mxc{transform:rotateX(180deg)}
+.mxface{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;gap:5px;padding:9px;border-radius:12px;background-color:rgba(18,24,20,.62);color:#f2f5f0;font-size:14px;border:2px solid rgba(255,255,255,.14);text-shadow:0 1px 2px rgba(0,0,0,.8)}
+.mxback{transform:rotateX(180deg);overflow:auto}.mxs.act .mxface{border-color:#ff8a2a}.mxh{display:flex;align-items:center;gap:5px}.mxh b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mxh button{min-height:30px;padding:0 7px;color:#fff;background:rgba(44,58,49,.8);border:1px solid rgba(255,255,255,.2)}.mxfv{color:#ffd400!important}
+.mxface select,.mxface input{width:100%;font-size:14px;min-height:34px;background:rgba(38,51,43,.85);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:0 8px;-webkit-appearance:none;appearance:none}.mxface select option{color:#000}
+.mxb{display:flex;gap:5px}.mxb button{flex:1;min-height:40px;font-size:14px;padding:0 4px;color:#fff;background:rgba(44,58,49,.85);border:1px solid rgba(255,255,255,.2)}.mxb button.primary{background:#e8782a;border-color:#e8782a}.mxb button:disabled{opacity:.45}.mxb button.on{outline:2px solid #ff8a2a}
+.mxt{color:#ffb000;font-weight:700;min-height:16px}.mxi{min-height:15px;line-height:1.25}.mxsub{opacity:.75;font-size:12.5px}.mxadd{justify-content:center}
+.mxdeck{position:relative;width:190px;height:150px;flex:none;cursor:pointer;margin-right:16px;transition:transform .2s}.mxdeck.firing{transform:translateY(-10px)}.mxdl{position:absolute;left:0;top:0;width:176px;height:136px;border-radius:12px;background-color:rgba(18,24,20,.7);border:2px solid rgba(255,255,255,.18);box-shadow:0 3px 8px rgba(0,0,0,.4)}.mxdeck.firing .mxdl:first-child{border-color:#ffb000}
+.mxdt{position:absolute;left:10px;top:10px;width:156px;color:#fff;font-size:14px;line-height:1.35;z-index:5;text-shadow:0 1px 2px #000}
+.mxgh{display:flex;flex-direction:column;gap:6px;flex:none;align-self:stretch;justify-content:center}.mxgh button{min-height:38px;color:#fff;background:rgba(44,58,49,.85);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:0 10px}.mxgh button.primary{background:#e8782a}.mxgt{font-weight:700}
 #lrail{position:fixed;left:10px;top:calc(var(--safe-t) + var(--tg) + 68px);z-index:1000;display:flex;flex-direction:column;gap:6px}
 #lrail:has(.rb[style*="display: none"]:only-child){display:none}
 #rail{position:fixed;right:10px;top:calc(var(--safe-t) + var(--tg) + 68px);z-index:1000;display:flex;flex-direction:column;gap:6px}
@@ -303,6 +311,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <button class="rb on" id="gridBtn" title="Сетка СК-42"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M9 4v16M15 4v16"/></svg>Сетка</button>
 </div>
 <div id="lrail">
+<button class="rb" id="geoBtn" title="Топогеодезические задачи"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="6"/><path d="M16 4l4 4"/></svg>Топо</button>
 <button class="rb" id="faBtn" title="Огневые средства" style="display:none"><svg viewBox="0 0 24 24"><path d="M3 18h18M6 18l3-6h6l3 6M12 12V5M9 7l3-3 3 3"/></svg>Огн. ср.</button>
 <button class="rb" id="mixBtn" title="Микшер орудий" style="display:none"><svg viewBox="0 0 24 24"><path d="M6 3v18M12 3v18M18 3v18"/><rect x="4" y="7" width="4" height="3"/><rect x="10" y="13" width="4" height="3"/><rect x="16" y="9" width="4" height="3"/></svg>Микшер</button>
 <button class="rb" id="ftBtn" title="Огневые задачи и журнал" style="display:none"><svg viewBox="0 0 24 24"><path d="M12 3c2 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-8z"/></svg>Огн. зад.</button>
@@ -582,6 +591,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div class="row"><button class="ok" id="prOk">Готово</button></div></div></div>
 <div id="corr" class="glass"></div>
 <div id="mixer"></div>
+<div class="modal" id="geoModal"><div class="card big"><h3>Топогеодезические задачи</h3><div class="seg" id="geoTabs" style="flex-wrap:wrap"></div><div id="geoBody"></div><div class="row" style="margin-top:8px"><button class="ghost" data-close>Закрыть</button></div></div></div>
 <div class="modal" id="faModal"><div class="card big"><h3>Огневые средства</h3><div id="faList"></div><div class="row" style="margin-top:10px"><button class="ghost" data-close>Закрыть</button></div></div></div>
 <div class="modal" id="ftModal"><div class="card big"><h3>Огневые задачи</h3><div class="seg" id="ftTabs"><button data-t="cur" class="on">Текущие</button><button data-t="log">Журнал</button></div><div id="ftList"></div><div class="row" id="ftRow" style="margin-top:10px"></div></div></div>
 <div class="modal" id="ftEdModal"><div class="card"><h3>Запись журнала</h3><div id="ftEdBody"></div><div class="row"><button class="ghost" data-close>Отмена</button><button class="primary" id="ftEdOk">Сохранить</button></div></div></div>
@@ -600,7 +610,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 6.9';
+const VERSION = 'версия 6.11';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -1321,7 +1331,7 @@ if (session.style && !sameSt(session.style, a.style)) p.style = copySt(session.s
 a.points.push(p); fillHeight(p); fillPlace(p); persist(); renderMarkers(); renderSheet();
 if (a.fplan) planNew(a, p);
 }
-map.on('click', e => { if (meetMode && !session){ meetTap(e.latlng); return; } if (CT && !session && !tool.on){ corrTap(e.latlng); return; } if (tblPending && tblPending.rows && !session){ const a = (tblPending.target && arrById(tblPending.target)) || textLayer(); if (!a.tables) a.tables = []; openTbEd(a, null, e.latlng); return; }
+map.on('click', e => { if (window.geoPickCb && !session){ const f = window.geoPickCb; window.geoPickCb = null; f(e.latlng); return; } if (meetMode && !session){ meetTap(e.latlng); return; } if (CT && !session && !tool.on){ corrTap(e.latlng); return; } if (tblPending && tblPending.rows && !session){ const a = (tblPending.target && arrById(tblPending.target)) || textLayer(); if (!a.tables) a.tables = []; openTbEd(a, null, e.latlng); return; }
 if (textPending && !session){ const a = textLayer(); openTextEd(a, null, e.latlng); return; } if (session && session.mode === 'pick') addPoint(e.latlng); else if (!session && tool.on) toolAdd(e.latlng); });
 const sheet = $('sheet');
 { let sy = 0; sheet.addEventListener('touchstart', e => { sy = e.touches[0].clientY; }, {passive:true});
@@ -3190,7 +3200,7 @@ state.arrays.push(a); pts.slice(0, 300).forEach(p => { fillHeight(p); fillPlace(
 persistNow(); closeModals(); renderMarkers(); map.fitBounds(L.latLngBounds(pts.map(p => [p.lat, p.lng])).pad(0.2), {maxZoom:16});
 toast(`Нанесено точек: ${pts.length}${bad ? `, пропущено строк: ${bad}` : ''}`);
 };
-function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; $('ftBtn').style.display = secMode === 'tp' ? '' : 'none'; $('mixBtn').style.display = secMode === 'tp' ? '' : 'none'; $('faBtn').style.display = secMode === 'tp' ? '' : 'none'; if (secMode !== 'tp' && $('mixer')) $('mixer').classList.remove('on'); $('lrail').style.display = secMode === 'tp' ? '' : 'none'; }
+function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; $('ftBtn').style.display = secMode === 'tp' ? '' : 'none'; $('mixBtn').style.display = secMode === 'tp' ? '' : 'none'; $('faBtn').style.display = secMode === 'tp' ? '' : 'none'; if (secMode !== 'tp' && $('mixer')) $('mixer').classList.remove('on'); $('lrail').style.display = ''; }
 const ENV_N = {trow:'Ряд деревьев', tpoly:'Роща', house:'Дом', flat:'Многоэтажка', wh:'Склад', hangar:'Ангар', tree_n:'Ель', tree_b:'Берёза', grove:'Роща', pw:'Опора ЛЭП', mast:'Мачта связи', wt:'Водонапорная башня', tank:'Цистерна'};
 const ENV_IC = {house:'⌂', flat:'▥', wh:'▭', hangar:'⌓', tree_n:'▲', tree_b:'●', grove:'♣', pw:'ᛉ', mast:'⊥', wt:'♜', tank:'◉'};
 function envMarkers(a, z){ if (!a.env) return;
@@ -3368,7 +3378,22 @@ function ovalPts0(a, b){ const c = L.latLng((a.lat + b.lat) / 2, (a.lng + b.lng)
 for (let i = 0; i <= 36; i++){ const t = i / 36 * 2 * Math.PI, x = Math.cos(t) * (L0 + W * .4), y = Math.sin(t) * W, r = Math.hypot(x, y), q = Math.atan2(y, x) * 180 / Math.PI; out.push(destLL(c, az + q, r)); } return out; }
 
 function itKind(a, it){ const sid = it.sym || a.sym; return sid && MDL_OF[sid]; }
-const SYS = {m82:{n:'Миномёт 82 мм', v:180, hi:1, max:4100}, m120:{n:'Миномёт 120 мм', v:260, hi:1, max:7100}, d30:{n:'Д-30 122 мм', v:520, max:15400}, msta:{n:'Мста-Б 152 мм', v:600, max:24700}, sau:{n:'САУ 2С3/2С19', v:600, max:24700}, s19:{n:'2С19 «Мста-С» 152 мм', v:600, max:24700}, s3:{n:'2С3 «Акация» 152 мм', v:600, max:17400}, s1:{n:'2С1 «Гвоздика» 122 мм', v:520, max:15200}, d20:{n:'Д-20 152 мм', v:580, max:17400}, grad:{n:'РСЗО «Град»', v:550, rs:40, max:20400}, uragan:{n:'РСЗО «Ураган»', v:650, rs:16, max:35800}, tank:{n:'Танк', v:1400, max:10000}};
+const SYS = {m82:{n:'Миномёт 82 мм', v:180, hi:1, max:4100, g:'Миномёты'}, m120:{n:'Миномёт 120 мм', v:260, hi:1, max:7100, g:'Миномёты'}, d30:{n:'Д-30 122 мм', v:520, max:15400, g:'Ствольная'}, msta:{n:'2А65 «Мста-Б» 152 мм', v:600, max:24700, g:'Ствольная'}, sau:{n:'САУ 2С3/2С19', v:600, max:24700, g:'Ствольная'}, s19:{n:'2С19 «Мста-С» 152 мм', v:600, max:24700, g:'Ствольная'}, s3:{n:'2С3 «Акация» 152 мм', v:600, max:17400, g:'Ствольная'}, s1:{n:'2С1 «Гвоздика» 122 мм', v:520, max:15200, g:'Ствольная'}, d20:{n:'Д-20 152 мм', v:580, max:17400, g:'Ствольная'}, grad:{n:'БМ-21 «Град» 122 мм', v:550, rs:40, max:20400, g:'РСЗО'}, uragan:{n:'9П140 «Ураган» 220 мм', v:650, rs:16, max:35800, g:'РСЗО'}, tank:{n:'Танк 2А46 125 мм', v:1400, max:10000, g:'Танки и БМ'}};
+// справочник систем для карточек (названия и калибры; макс. дальность — заполняется в карточке)
+[['m2b9', '2Б9 «Василёк» 82 мм', 'Миномёты'], ['m2b14', '2Б14 «Поднос» 82 мм', 'Миномёты'], ['m2b24', '2Б24 «Дева» 82 мм', 'Миномёты'], ['m2b25', '2Б25 «Галл» 82 мм', 'Миномёты'], ['mbm37', 'БМ-37 82 мм', 'Миномёты'],
+['m2b11', '2Б11/2С12 «Сани» 120 мм', 'Миномёты'], ['m2b16', '2Б16 «Нона-К» 120 мм', 'Миномёты'], ['m2b23', '2Б23 «Нона-М1» 120 мм', 'Миномёты'], ['m2s9', '2С9 «Нона-С» 120 мм', 'Миномёты'], ['m2s31', '2С31 «Вена» 120 мм', 'Миномёты'], ['m2s34', '2С34 «Хоста» 120 мм', 'Миномёты'], ['mpm120', 'ПМ-120 120 мм', 'Миномёты'], ['m140', 'Миномёт-140 140 мм', 'Миномёты'], ['m2s4', '2С4 «Тюльпан» 240 мм', 'Миномёты'],
+['gm30', 'М-30 122 мм', 'Ствольная'], ['gd74', 'Д-74 122 мм', 'Ствольная'], ['gm46', 'М-46 130 мм', 'Ствольная'], ['gd1', 'Д-1 152 мм', 'Ствольная'], ['g2a36', '2А36 «Гиацинт-Б» 152 мм', 'Ствольная'], ['g2s5', '2С5 «Гиацинт-С» 152 мм', 'Ствольная'], ['g2s7', '2С7 «Пион» 203 мм', 'Ствольная'], ['gd44', 'Д-44 85 мм', 'Ствольная'], ['gbs3', 'БС-3 100 мм', 'Ствольная'], ['gmt12', 'МТ-12 «Рапира» 100 мм', 'Ствольная'], ['gs60', 'С-60 57 мм', 'Ствольная'],
+['t2a20', '2А20 (Т-62) 115 мм', 'Танки и БМ'], ['td10', 'Д10-Т (Т-54/55) 100 мм', 'Танки и БМ'], ['t2a70', '2А70 (БМП-3, БМД-4) 100 мм', 'Танки и БМ'], ['t2a28', '2А28 (БМП-1) 73 мм', 'Танки и БМ'],
+['rtos', 'ТОС-1А «Солнцепёк» 220 мм', 'РСЗО', 24], ['r107', 'РСЗО-107 (Тип-63) 107 мм', 'РСЗО', 12], ['r240', 'РСЗО-240 240 мм', 'РСЗО', 12],
+['ags17', 'АГС-17 «Пламя» 30 мм', 'Гранатомёты'], ['ags30', 'АГС-30 30 мм', 'Гранатомёты'], ['spg9', 'СПГ-9 «Копьё» 73 мм', 'Гранатомёты']].forEach(([k, n, g, rs]) => { if (!SYS[k]) SYS[k] = {n, g, v:g === 'Миномёты' ? 230 : g === 'РСЗО' ? 600 : g === 'Гранатомёты' ? 180 : 600, hi:g === 'Миномёты' ? 1 : 0, rs:rs || 0}; });
+function sysOpts(cur){ const G = {}; Object.entries(SYS).forEach(([k, v]) => { (G[v.g || 'Прочее'] = G[v.g || 'Прочее'] || []).push(`<option value="${k}"${k === cur ? ' selected' : ''}>${v.n}</option>`); }); return Object.entries(G).map(([g, L1]) => `<optgroup label="${g}">${L1.join('')}</optgroup>`).join(''); }
+// номенклатура для учёта (подсказки в полях карточки)
+const AMMO_REF = {
+sh:['О-365К(В)', 'О-365Ж(В)', 'О-367А', 'О-460А', 'О-462А', 'О-832Д', 'О-832ДУ', 'О-1023', 'ОФ-24(Ж)', 'ОФ-462(Ж)', 'ОФ-540', 'ОФ-540Ж', 'ОФ-540В', 'ОФ-530', 'ОФ-550', 'ОФ-551', 'ОФ-552', 'ОФ-472', 'ОФ-482М', 'ОФ-412', 'ОФ-412Ж', 'ОФ-436', 'ОФ-843А', 'ОФ-843Б', 'ОФ-34', 'ОФ-36', 'ОФ-49', 'ОФ-50', 'ОФ-56', 'ОФ-68', 'ОФ-74', 'ОФ25', 'ОФ29', 'ОФ45', 'ОФ61', 'ОФ64', 'Ф-864', 'ОР-281', 'ОР-281У', 'ОГ-9', 'ОГ-15', 'Д-462', 'Д-462А', 'Д-832А', 'Д-832ДУ', 'Д-843А', 'С-463(Ж)', 'С-832С', 'С-843', 'А-832А', 'З-О-13', 'З-О-14', 'З-О-23', 'З-О-26', 'З-843А', 'Г-530', 'Г-530Ш', '9М22', '9М22У', '9М22С', '9М28Ф', '9М28Д', '9М28С', '9М521', '9М538', '9М539', '9М27Ф', '9М27К', '9М27С', '9М27Д', '9М53Ф', '107-ОФ', 'Р-240ОФ', 'ВОГ-17М', 'ВОГ-30Д', 'ОГ-9П'],
+fz:['РГМ-2', 'РГМ-2М', 'РГМ-6', 'В-90', 'В-429', 'В-429Е', 'В-491', 'Т-1', 'Т-7', 'ДТМ-75', 'Д-1-У', 'АР-5', 'АР-6', 'АР-27', 'АР-30', 'МРВ', 'МРВ-У', 'ГВМЗ-7', 'ГПВ-2', 'ГПВ-3', 'ГКВ', 'ГДТ-90', 'ГО-2', 'КТМ-1', 'КТМ-1-У', 'КТМ-2', 'ДБТ', 'М-12', 'ТМ-16', 'ТМ-120', 'УДВ-60', 'МГ-57', 'МГЗ-57', '9Э260-1', '9Э285', '9Э363М'],
+ch:['Полный', 'Уменьшенный', 'Дальнобойный', 'Основной', 'Первый', 'Второй', 'Третий', 'Четвёртый', 'Пятый', 'Шестой', 'Седьмой', 'Восьмой', 'Девятый', 'Десятый', 'Одиннадцатый', 'Двенадцатый', 'Особый', 'Специальный', 'Штатный', 'Большое ТК', 'Малое ТК'],
+tr:['Настильная', 'Навесная', 'Мортирная']};
+{ const dl = document.createElement('div'); dl.innerHTML = [['dlSh', 'sh'], ['dlFz', 'fz'], ['dlCh', 'ch']].map(([id, k]) => `<datalist id="${id}">${AMMO_REF[k].map(v => `<option value="${v}">`).join('')}</datalist>`).join(''); document.body.appendChild(dl); }
 let CT = null, corrPick = null, corrFly = [], corrRaf = 0, corrShotN = 0;
 function corrDev(b){ const t = CT.tgt, [kx, ky] = mk(t.lat), dN = (b.lat - t.lat) * ky, dE = (b.lng - t.lng) * kx;
 const g = CT.gun, gx = (t.lng - g.lng) * kx, gy = (t.lat - g.lat) * ky, D = Math.hypot(gx, gy) || 1, ux = gx / D, uy = gy / D, along = dE * ux + dN * uy, lat = dE * uy - dN * ux, mil = Math.round(Math.atan2(lat, D + along) / (2 * Math.PI) * 6000);
@@ -3480,7 +3505,7 @@ const mkLoad = () => modLoad('mk');
 const modStub = (m, ...ns) => ns.forEach(n => { const f = (...a) => modLoad(m).then(() => { if (window[n] === f) throw new Error(n); return window[n](...a); }).catch(e => console.warn(e)); window[n] = f; });
 const modBtn = (m, ...ids) => ids.forEach(id => { const el = $(id); if (!el) return; const f = e => modLoad(m).then(() => { if (el.onclick && el.onclick !== f) el.onclick(e); }).catch(() => {}); el.onclick = f; });
 modStub('op', 'openTextEd', 'openProp'); modBtn('op', 'prnBtn');
-modStub('tp', 'corrTap', 'exportPlanXlsx', 'openShapeEd', 'meetTap', 'corrDraw', 'corrPanel', 'askChar', 'applyChar'); modBtn('tp', 'corrBtn', 'planBtn', 'ftBtn', 'mixBtn', 'faBtn');
+modStub('tp', 'corrTap', 'exportPlanXlsx', 'openShapeEd', 'meetTap', 'corrDraw', 'corrPanel', 'askChar', 'applyChar'); modBtn('tp', 'corrBtn', 'planBtn', 'ftBtn', 'mixBtn', 'faBtn', 'geoBtn');
 $('v3Btn').onclick = () => mkLoad().then(open3D).catch(() => {});
 setTimeout(() => ['mk', 'op', 'tp'].forEach(m => { try { fetch(m + '.js?v=' + MODV).catch(() => {}); } catch(e){} }), 8000);
 

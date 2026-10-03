@@ -1,4 +1,4 @@
-// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.9
+// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.11
 // ======== БОЕВОЙ КОНТУР: КОРРЕКТИРОВКА ОГНЯ ========
 const corrL = L.layerGroup().addTo(map);
 function sysTof(sys, d){ const k = SYS[sys] || SYS.d30; return Math.max(2, d / k.v * (k.hi ? 2 : 1.25)); }
@@ -21,19 +21,19 @@ function corrPanel(){ const el = $('corr'); if (!CT){ el.classList.remove('on');
 const d = CT.gun && CT.tgt ? distM(CT.gun, CT.tgt) : 0, mx = CT.maxOv || sys.max, far = d && mx && d > mx, ps = pendShot(CT), st = shotStats(CT), nextNo = (CT.reuse && CT.reuse.length) ? Math.min(...CT.reuse) : (CT.shotN || 0) + 1;
 let dv = ''; if (last && CT.gun && CT.tgt){ const v = corrDev(last), dd = Math.round(Math.hypot(v.dN, v.dE)); dv = `<div class="cdv"><b>Разрыв ${last.n}:</b> ${devTxt(v)} (${dd} м${dd > 50 ? ', отклонение' : ', в цель'})</div>`; }
 el.innerHTML = `<div class="crow"><b>Цель ${escapeHtml(CT.name || '…')}${CT.obj ? ' · ' + escapeHtml(CT.obj) : ''}${CT.res ? ' · ' + escapeHtml(CT.res) : ''}</b><button data-c="x">✕</button></div>
-<div class="crow"><button data-c="gun" class="${corrPick === 'gun' ? 'on' : ''}">Орудие${CT.gun ? ' ✓' : ''}</button><button data-c="tgt" class="${corrPick === 'tgt' ? 'on' : ''}">Цель${CT.tgt ? ' ✓' : ''}</button><select data-c="sys">${Object.entries(SYS).map(([k, v]) => `<option value="${k}"${k === CT.sys ? ' selected' : ''}>${v.n}</option>`).join('')}</select>${sys.rs ? `<select data-c="rs">${[1, 2, 4, 8, 12, 20, sys.rs].filter((v, i, ar) => v <= sys.rs && ar.indexOf(v) === i).map(v => `<option value="${v}"${v === (CT.rs || 4) ? ' selected' : ''}>${v} РС</option>`).join('')}</select>` : ''}</div>
-${d ? `<div class="cdv"${far ? ' style="color:#ff6b5a"' : ''}>Дальность ${fmtDist(d)} · подлёт ${sysTof(CT.sys, d).toFixed(1)} с · макс. ${fmtDist(mx)}${far ? ' — цель вне досягаемости' : ''}</div>` : '<div class="cdv">Выберите орудие и цель: кнопка, затем касание карты или знака</div>'}
+<div class="crow"><button data-c="gun" class="${corrPick === 'gun' ? 'on' : ''}">Орудие${CT.gun ? ' ✓' : ''}</button><button data-c="tgt" class="${corrPick === 'tgt' ? 'on' : ''}">Цель${CT.tgt ? ' ✓' : ''}</button><select data-c="sys">${sysOpts(CT.sys)}</select>${sys.rs ? `<select data-c="rs">${[1, 2, 4, 8, 12, 20, sys.rs].filter((v, i, ar) => v <= sys.rs && ar.indexOf(v) === i).map(v => `<option value="${v}"${v === (CT.rs || 4) ? ' selected' : ''}>${v} РС</option>`).join('')}</select>` : ''}</div>
+${d ? `<div class="cdv"${far ? ' style="color:#ff6b5a"' : ''}>Дальность ${fmtDist(d)} · подлёт ${sysTof(CT.sys, d).toFixed(1)} с${mx ? ' · макс. ' + fmtDist(mx) : ' · макс. не задана (карточка)'}${far ? ' — цель вне досягаемости' : ''}</div>` : '<div class="cdv">Выберите орудие и цель: кнопка, затем касание карты или знака</div>'}
 ${faLine(CT)}<div class="ctm" id="corrTm"></div>${dv}
 ${st.shots ? `<div class="cdv">${statTxt(st)}</div>` : ''}
 <div class="crow"><button data-c="fire" class="primary" ${CT.gun && CT.tgt && !far ? '' : 'disabled'}>▶ Выстрел №${nextNo}</button><button data-c="stop" id="corrStopB" ${corrFly.some(f => f.task === CT) ? '' : 'disabled'}>■ Стоп</button><button data-c="un" ${(CT.bursts || []).length ? '' : 'disabled'}>↶ Разрыв</button></div>
 ${ps ? `<div class="crow"><button data-c="nobs">Не набл. №${ps.no}</button><button data-c="mis">Осечка №${ps.no}</button></div>` : ''}
-${corrEnd ? `<div class="crow"><button data-c="r1" class="primary">Уничтожена</button><button data-c="r2" class="primary">Подавлена</button><button data-c="r0">Отмена</button></div>` : `<div class="crow"><button data-c="end" ${st.shots ? '' : 'disabled'}>✔ Итог задачи</button></div>`}
+${corrEnd ? `<div class="crow"><button data-c="r1" class="primary">Уничтожена</button><button data-c="r2" class="primary">Подавлена</button><button data-c="r0">Отмена</button></div>` : `<div class="crow"><button data-c="end" ${st.shots ? '' : 'disabled'}>✔ Итог задачи</button><button data-c="xfer" ${CT.tgt ? '' : 'disabled'}>⇪ Передать</button></div>`}
 <div class="cdv" style="opacity:.75">Касание карты — отметить разрыв${ps ? ' №' + ps.no : ''}</div>`;
 corrTimer();
 el.querySelectorAll('[data-c]').forEach(b => { const c = b.dataset.c; if (b.tagName === 'SELECT') b.onchange = () => { if (c === 'sys') CT.sys = b.value; else if (c === 'am') CT.ammoT = b.value; else CT.rs = +b.value; persist(); corrPanel(); };
 else b.onclick = () => { if (c === 'x'){ CT = null; corrPick = null; corrEnd = false; corrDraw(); corrPanel(); return; } if (c === 'stop'){ corrStop(); return; } if (c === 'gun'){ pickGun(CT); return; } if (c === 'tgt'){ pickTgt(CT); return; }
 if (c === 'nobs' || c === 'mis'){ const p = pendShot(CT); if (p){ p.res = c; persist(); corrPanel(); } return; }
-if (c === 'end'){ corrEnd = true; corrPanel(); return; } if (c === 'r0'){ corrEnd = false; corrPanel(); return; }
+if (c === 'end'){ corrEnd = true; corrPanel(); return; } if (c === 'xfer'){ xferSend(xferText(CT)); return; } if (c === 'r0'){ corrEnd = false; corrPanel(); return; }
 if (c === 'r1' || c === 'r2'){ CT.res = c === 'r1' ? 'Уничтожена' : 'Подавлена'; CT.done = Date.now(); corrEnd = false; logFromTask(CT); corrPanel(); toast(`Цель ${CT.name || ''} ${CT.res.toLowerCase()}. ${statTxt(shotStats(CT))}`, 6000); return; }
 if (c === 'un'){ const b0 = CT.bursts.pop(), sh = b0 && (CT.shots || []).find(x => x.no === b0.n && (x.res === 'hit' || x.res === 'dev')); if (sh) sh.res = null; persist(); corrDraw(); corrPanel(); return; } if (c === 'fire') corrFire(); }; }); }
 // разрыв по касанию: привязка к первому упавшему неотмеченному выстрелу, «в цель» — до 50 м
@@ -54,7 +54,7 @@ const mx = CT.maxOv || sys.max; if (mx && d > mx){ toast(`Цель вне дос
 const tof = sysTof(CT.sys, d), n = sys.rs ? Math.min(sys.rs, Math.max(1, +CT.rs || 4)) : 1, pts = arcPts(CT.gun, CT.tgt, sys.hi), t0 = performance.now() / 1000;
 CT.shots = CT.shots || []; CT.reuse = CT.reuse || []; let no; if (CT.reuse.length){ no = Math.min(...CT.reuse); CT.reuse = CT.reuse.filter(x => x !== no); } else no = CT.shotN = (CT.shotN || 0) + 1;
 const shot = {no, n, sys:CT.sys, t:Date.now()}; CT.shots.push(shot); CT.shots.sort((x, y) => x.no - y.no); persist();
-faUse(CT, n);
+shot.am = faUse(CT, n) || null; persist();
 for (let i = 0; i < n; i++) corrFly.push({task:CT, shot:no, rec:shot, sys:CT.sys, d0:i * .5, t0, tof, pts, pos:null, left:tof + i * .5});
 try { navigator.vibrate && navigator.vibrate(30); } catch(e){}
 corrPanel(); if (!corrRaf) corrRaf = requestAnimationFrame(corrStep); }
@@ -248,36 +248,87 @@ var MIX = lsGet('skat_mix', []), mixOn = false;
 function mixTasks(){ return MIX.map(id => state.ftasks.find(t => t.id === id)).filter(Boolean); }
 function mixSave(){ MIX = mixTasks().map(t => t.id); lsSet('skat_mix', MIX); }
 function azTxt(g, t){ const [kx, ky] = mk(g.lat), dx = (t.lng - g.lng) * kx, dy = (t.lat - g.lat) * ky; let a = Math.atan2(dx, dy) * 180 / Math.PI; if (a < 0) a += 360; const du = Math.round(a / 360 * 6000) % 6000; return `${Math.round(a)}° (${Math.floor(du / 100)}-${String(du % 100).padStart(2, '0')})`; }
-function renderMix(){ const el = $('mixer'); if (!mixOn){ el.classList.remove('on'); return; } el.classList.add('on'); const T = mixTasks(), x0 = el.scrollLeft;
-el.innerHTML = `<div class="mxin">${T.map((t, k) => { const sys = SYS[t.sys] || SYS.d30, d = t.gun && t.tgt ? distM(t.gun, t.tgt) : 0, mx = t.maxOv || sys.max, far = d && mx && d > mx, st = shotStats(t), last = (t.bursts || []).slice(-1)[0], nextNo = (t.reuse && t.reuse.length) ? Math.min(...t.reuse) : (t.shotN || 0) + 1, ps = pendShot(t);
-let dv = ''; if (last && t.gun && t.tgt){ const keep = CT; CT = t; const v = corrDev(last); CT = keep; dv = `${devTxt(v)} (${Math.round(Math.hypot(v.dN, v.dE))} м)`; }
-return `<div class="mxs${t === CT ? ' act' : ''}" data-k="${k}"><div class="mxh"><b>${escapeHtml(t.gname || 'Орудие ' + (k + 1))}</b><button data-m="x" title="Убрать из микшера">✕</button></div>
-<select data-m="sys">${Object.entries(SYS).map(([q, v]) => `<option value="${q}"${q === t.sys ? ' selected' : ''}>${v.n}</option>`).join('')}</select>${sys.rs ? `<select data-m="rs">${[1, 2, 4, 8, 12, 20, sys.rs].filter((v, i, ar) => v <= sys.rs && ar.indexOf(v) === i).map(v => `<option value="${v}"${v === (t.rs || 4) ? ' selected' : ''}>${v} РС</option>`).join('')}</select>` : ''}
-<div class="mxi">${t.tgt ? 'Цель ' + escapeHtml(t.name || '…') + (t.res ? ' · ' + escapeHtml(t.res) : '') : 'цель не задана'}</div>
-<div class="mxi"${far ? ' style="color:#ff6b5a"' : ''}>${d ? `Д ${fmtDist(d)} · Аз ${azTxt(t.gun, t.tgt)}${far ? ' · вне досягаемости' : ''}` : (t.gun ? 'орудие ✓' : 'орудие не задано')}</div>
-${t.faId ? `<div class="mxi">${faLine(t, true)}</div>` : ''}<div class="mxt" data-tm="${t.id}"></div>
-<div class="mxi">${dv ? 'Разрыв ' + last.n + ': ' + dv : ''}</div>
-<div class="mxi">${st.shots ? `сн. ${st.n}: цель ${st.hit}, откл. ${st.dev}, н/н ${st.nobs}, осеч. ${st.mis}` : ''}</div>
-<div class="mxb"><button data-m="fire" class="primary" ${t.gun && t.tgt && !far ? '' : 'disabled'}>▶ №${nextNo}</button><button data-m="stop" data-st="${t.id}">■ Стоп</button></div>
-<div class="mxb"><button data-m="gun">Орудие</button><button data-m="tgt">Цель</button><button data-m="corr" class="${t === CT ? 'on' : ''}">Корр.${ps ? ' №' + ps.no : ''}</button></div>
-${ps ? `<div class="mxb"><button data-m="nobs">Не набл.</button><button data-m="mis">Осечка</button></div>` : ''}</div>`; }).join('')}<div class="mxs mxadd"><button data-m="add" class="primary">＋ Орудие</button><button data-m="hide">Свернуть</button></div></div>`;
-el.scrollLeft = x0;
-el.querySelectorAll('.mxs[data-k]').forEach(s => { const t = T[+s.dataset.k];
-s.querySelectorAll('select').forEach(q => q.onchange = () => { if (q.dataset.m === 'sys') t.sys = q.value; else t.rs = +q.value; persist(); corrPanel(); });
-s.querySelectorAll('button[data-m]').forEach(b => b.onclick = () => { const m = b.dataset.m;
+function renderMix(){ const el = $('mixer'); if (!mixOn){ el.classList.remove('on'); return; } el.classList.add('on'); const sc = el.querySelector('.mxin'), x0 = sc ? sc.scrollLeft : 0;
+const V = mixV(), All = mixTasks(), T0 = V.mode === 'fav' ? All.filter(t => t.fav) : All, T = mixSort(T0, V.sort);
+const bar = `<div class="mxbar"><div class="mxseg">${[['all', 'Все'], ['deck', 'Колоды'], ['fav', '★ Избранные']].map(([k, l]) => `<button data-v="${k}" class="${V.mode === k ? 'on' : ''}">${l}</button>`).join('')}</div>
+<select data-vs="grp">${[['reg', 'Группы: по полкам'], ['unit', 'Группы: по подразделениям'], ['own', 'Группы: свои']].map(([k, l]) => `<option value="${k}"${V.grp === k ? ' selected' : ''}>${l}</option>`).join('')}</select>
+<select data-vs="sort">${[['unit', 'Сорт.: подразделение'], ['sys', 'Сорт.: система'], ['ammo', 'Сорт.: остаток БП'], ['cs', 'Сорт.: позывной'], ['ready', 'Сорт.: готовность']].map(([k, l]) => `<option value="${k}"${V.sort === k ? ' selected' : ''}>${l}</option>`).join('')}</select>
+<button data-m="add" class="primary">＋ Орудие</button><button data-m="hide">Свернуть</button></div>`;
+let body = '';
+if (V.mode === 'deck'){ const G = mixGroups(T, V.grp);
+body = [...G.entries()].map(([g, L1]) => { if (V.open === g) return `<div class="mxgh"><button data-gc="${escapeHtml(g)}" class="mxgt">▾ ${escapeHtml(g)} · ${L1.length}</button><button data-ga="fire" data-g="${escapeHtml(g)}" class="primary">▶ Группой</button><button data-ga="stop" data-g="${escapeHtml(g)}">■ Стоп всем</button><button data-ga="xf" data-g="${escapeHtml(g)}">⇪</button></div>` + L1.map(mixCard).join('');
+const ammo = L1.reduce((q, t) => { const r = t.faId && faFind(t.faId); return q + (r ? faLeft(r.p.fa) : 0); }, 0), fly = L1.filter(t => corrFly.some(f => f.task === t)).length;
+return `<div class="mxdeck${fly ? ' firing' : ''}" data-go="${escapeHtml(g)}">${L1.slice(0, 3).map((t, k) => `<div class="mxdl" style="transform:translate(${k * 7}px,${k * 7}px);z-index:${3 - k};${mixBg(t)}"></div>`).join('')}<div class="mxdt"><b>${escapeHtml(g)}</b><div>орудий ${L1.length}</div><div>БП ${ammo}</div>${fly ? `<div class="mxt">в воздухе: ${fly}</div>` : ''}</div></div>`; }).join(''); }
+else body = T.map(mixCard).join('') || '<div class="mxs mxadd"><div class="mxi">Нет карточек</div></div>';
+el.innerHTML = bar + `<div class="mxin">${body}</div>`; el.querySelector('.mxin').scrollLeft = x0;
+el.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { V.mode = b.dataset.v; mixVSave(); renderMix(); });
+el.querySelectorAll('[data-vs]').forEach(q => q.onchange = () => { V[q.dataset.vs] = q.value; V.open = null; mixVSave(); renderMix(); });
+el.querySelectorAll('[data-go]').forEach(d => d.onclick = () => { V.open = d.dataset.go; mixVSave(); renderMix(); });
+el.querySelectorAll('[data-gc]').forEach(d => d.onclick = () => { V.open = null; mixVSave(); renderMix(); });
+el.querySelectorAll('[data-ga]').forEach(b => b.onclick = () => { const L1 = mixGroups(T, V.grp).get(b.dataset.g) || [], a = b.dataset.ga;
+if (a === 'fire'){ let n = 0; L1.forEach(t => { const s = SYS[t.sys] || SYS.d30, mx = t.maxOv || s.max; if (t.gun && t.tgt && !(mx && distM(t.gun, t.tgt) > mx)){ corrFire(t); n++; } }); toast(n ? `Выстрел группой: ${n} ор.` : 'Нет готовых орудий (орудие и цель)'); }
+if (a === 'stop') L1.forEach(t => { if (corrFly.some(f => f.task === t)) corrStop(t); });
+if (a === 'xf') xferSend(L1.map(xferText).join('\n\n')); });
+el.querySelectorAll('.mxs[data-id]').forEach(s => { const t = state.ftasks.find(x => x.id === +s.dataset.id); if (!t) return;
+let y0 = null, x1 = 0; s.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; x1 = e.touches[0].clientX; }, {passive:true});
+s.addEventListener('touchend', e => { if (y0 == null) return; const dy = e.changedTouches[0].clientY - y0, dx = e.changedTouches[0].clientX - x1; y0 = null; if (Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx) * 1.5 && !e.target.closest('select,input')){ if ((dy < 0) !== mixFlip.has(t.id)){ mixFlip.has(t.id) ? mixFlip.delete(t.id) : mixFlip.add(t.id); s.classList.toggle('flip'); } } }, {passive:true});
+s.querySelectorAll('select[data-m]').forEach(q => q.onchange = () => { if (q.dataset.m === 'sys') t.sys = q.value; else if (q.dataset.m === 'am') t.ammoT = q.value; else t.rs = +q.value; persist(); corrPanel(); });
+s.querySelectorAll('input[data-m=grp]').forEach(q => q.onchange = () => { t.grp = q.value.trim(); persist(); renderMix(); });
+s.querySelectorAll('button[data-m]').forEach(b => b.onclick = e => { e.stopPropagation(); const m = b.dataset.m;
+if (m === 'flip'){ mixFlip.has(t.id) ? mixFlip.delete(t.id) : mixFlip.add(t.id); s.classList.toggle('flip'); return; }
+if (m === 'fav'){ t.fav = !t.fav; persist(); renderMix(); return; }
+if (m === 'card'){ const r = t.faId && faFind(t.faId); if (r) openFaEd(r); else toast('Орудие без карточки — выберите огневое средство кнопкой «Орудие»'); return; }
 if (m === 'x'){ MIX = MIX.filter(id => id !== t.id); mixSave(); corrDraw(); renderMix(); return; }
-if (m === 'fire'){ corrFire(t); return; } if (m === 'stop'){ corrStop(t); return; }
+if (m === 'fire'){ corrFire(t); return; } if (m === 'xf'){ xferSend(xferText(t)); return; } if (m === 'stop'){ corrStop(t); return; }
 if (m === 'gun'){ pickGun(t); return; } if (m === 'tgt'){ pickTgt(t); return; }
 if (m === 'nobs' || m === 'mis'){ const p = pendShot(t); if (p){ p.res = m; persist(); corrPanel(); } return; }
-CT = t; corrEnd = false; corrPick = m === 'gun' || m === 'tgt' ? m : null; corrDraw(); corrPanel();
-toast(m === 'gun' ? 'Коснитесь огневой позиции или знака орудия' : m === 'tgt' ? 'Коснитесь цели' : `Канал «${t.gname || 'Орудие'}» активен: касание карты — разрыв`);
-if (m === 'corr' && t.tgt) map.panTo([t.tgt.lat, t.tgt.lng]); }); });
+CT = t; corrEnd = false; corrPick = null; corrDraw(); corrPanel(); toast(`Канал «${t.gname || 'Орудие'}» активен: касание карты — разрыв`); if (t.tgt) map.panTo([t.tgt.lat, t.tgt.lng]); }); });
 el.querySelector('[data-m=add]').onclick = () => { const prev = mixTasks().slice(-1)[0]; CT = newTask(); if (prev){ CT.sys = prev.sys; CT.rs = prev.rs; } MIX.push(CT.id); mixSave(); corrEnd = false; corrDraw(); corrPanel(); pickGun(CT); };
 el.querySelector('[data-m=hide]').onclick = () => { mixOn = false; renderMix(); };
 mixTimer(); }
+function mixCard(t){ const sys = SYS[t.sys] || SYS.d30, d = t.gun && t.tgt ? distM(t.gun, t.tgt) : 0, mx = t.maxOv || sys.max, far = d && mx && d > mx, st = shotStats(t), last = (t.bursts || []).slice(-1)[0], nextNo = (t.reuse && t.reuse.length) ? Math.min(...t.reuse) : (t.shotN || 0) + 1, ps = pendShot(t), r = t.faId && faFind(t.faId), fa = r && r.p.fa, k = MIX.indexOf(t.id);
+let dv = ''; if (last && t.gun && t.tgt){ const keep = CT; CT = t; const v = corrDev(last); CT = keep; dv = `${devTxt(v)} (${Math.round(Math.hypot(v.dN, v.dE))} м)`; }
+const day = Date.now() - 864e5, spent = {}; state.ftasks.forEach(q => { if (fa && q.faId === fa.id) (q.shots || []).forEach(s => { if (s.t > day){ const key = s.am || '—'; spent[key] = (spent[key] || 0) + (s.n || 1); } }); });
+const front = `<div class="mxh"><button data-m="fav" class="mxfv">${t.fav ? '★' : '☆'}</button><b>${escapeHtml(t.gname || 'Орудие ' + (k + 1))}</b><button data-m="xf" title="Передать данные">⇪</button><button data-m="flip" title="Оборот">↻</button><button data-m="x" title="Убрать из микшера">✕</button></div>
+<div class="mxi mxsub">${escapeHtml([fa && fa.unit, fa && fa.reg, t.grp].filter(Boolean).join(' · ') || 'без группы')}</div>
+<select data-m="sys">${sysOpts(t.sys)}</select>${sys.rs ? `<select data-m="rs">${[1, 2, 4, 8, 12, 20, sys.rs].filter((v, i, ar) => v <= sys.rs && ar.indexOf(v) === i).map(v => `<option value="${v}"${v === (t.rs || 4) ? ' selected' : ''}>${v} РС</option>`).join('')}</select>` : ''}
+${fa && (fa.ammo || []).length ? `<select data-m="am">${fa.ammo.map(z => `<option value="${escapeHtml(z.t)}"${z.t === t.ammoT ? ' selected' : ''}>${escapeHtml(z.t)} — ${+z.have || 0}</option>`).join('')}</select>` : ''}
+<div class="mxi">${t.tgt ? 'Цель ' + escapeHtml(t.name || '…') + (t.res ? ' · ' + escapeHtml(t.res) : '') : 'цель не задана'}</div>
+<div class="mxi"${far ? ' style="color:#ff6b5a"' : ''}>${d ? `Д ${fmtDist(d)} · Аз ${azTxt(t.gun, t.tgt)}${far ? ' · вне досягаемости' : ''}` : (t.gun ? 'орудие ✓' : 'орудие не задано')}</div>
+<div class="mxt" data-tm="${t.id}"></div><div class="mxi">${dv ? 'Разрыв ' + last.n + ': ' + dv : ''}</div><div class="mxi">${st.shots ? `сн. ${st.n}: цель ${st.hit}, откл. ${st.dev}, н/н ${st.nobs}, осеч. ${st.mis}` : ''}</div>
+<div class="mxb"><button data-m="fire" class="primary" ${t.gun && t.tgt && !far ? '' : 'disabled'}>▶ №${nextNo}</button><button data-m="stop" data-st="${t.id}">■ Стоп</button></div>
+<div class="mxb"><button data-m="gun">Орудие</button><button data-m="tgt">Цель</button><button data-m="corr" class="${t === CT ? 'on' : ''}">Корр.${ps ? ' №' + ps.no : ''}</button></div>
+${ps ? `<div class="mxb"><button data-m="nobs">Не набл.</button><button data-m="mis">Осечка</button></div>` : ''}`;
+const back = `<div class="mxh"><b>${escapeHtml(fa ? fa.cs || t.gname || 'Орудие' : t.gname || 'Орудие')}</b><button data-m="flip">↻</button></div>
+<div class="mxi">${escapeHtml(sys.n)}${fa && fa.n ? ' × ' + fa.n : ''}</div><div class="mxi">${fa ? escapeHtml([fa.unit, fa.reg].filter(Boolean).join(', ') || 'подразделение не указано') : 'без карточки огневого средства'}</div>
+<div class="mxi">Макс. дальность: ${mx ? fmtDist(mx) : 'не задана'}</div>
+<label class="mxi">Своя группа<input data-m="grp" value="${escapeHtml(t.grp || '')}" placeholder="например, Огневая группа 1"></label>
+<div class="mxi"><b>Боеприпасы</b></div>${fa && (fa.ammo || []).length ? fa.ammo.map(z => `<div class="mxi">${escapeHtml(z.t)}${z.vz ? ', ' + escapeHtml(z.vz) : ''}${z.zr ? ', ' + escapeHtml(z.zr) : ''}: <b>${+z.have || 0}</b>${z.norm ? ' · норма ' + z.norm : ''}${spent[z.t] ? ' · за сутки −' + spent[z.t] : ''}</div>`).join('') : '<div class="mxi">не указаны</div>'}
+${fa && fa.note ? `<div class="mxi">${escapeHtml(fa.note)}</div>` : ''}<div class="mxb"><button data-m="card">✎ Карточка</button></div>`;
+const fly = corrFly.some(f => f.task === t);
+return `<div class="mxs${t === CT ? ' act' : ''}${fly ? ' firing' : ''}${mixFlip.has(t.id) ? ' flip' : ''}" data-id="${t.id}"><div class="mxc"><div class="mxface" style="${mixBg(t)}">${front}</div><div class="mxface mxback" style="${mixBg(t)}">${back}</div></div></div>`; }
+const mixFlip = new Set();
+function mixV(){ if (!window._mixV) window._mixV = Object.assign({mode:'all', grp:'unit', sort:'unit', open:null}, lsGet('skat_mixv', {})); return window._mixV; }
+function mixVSave(){ lsSet('skat_mixv', mixV()); }
+function mixGKey(t, grp){ const r = t.faId && faFind(t.faId), fa = r && r.p.fa; return (grp === 'reg' ? fa && fa.reg : grp === 'unit' ? fa && fa.unit : t.grp) || 'Без группы'; }
+function mixGroups(T, grp){ const G = new Map(); T.forEach(t => { const k = mixGKey(t, grp); if (!G.has(k)) G.set(k, []); G.get(k).push(t); }); return new Map([...G.entries()].sort((a, b) => a[0] === 'Без группы' ? 1 : b[0] === 'Без группы' ? -1 : a[0].localeCompare(b[0], 'ru'))); }
+function mixSort(T, by){ const left = t => { const r = t.faId && faFind(t.faId); return r ? faLeft(r.p.fa) : -1; }, fly = t => corrFly.some(f => f.task === t) ? 2 : t.gun && t.tgt ? 1 : 0;
+const key = {unit:t => mixGKey(t, 'unit') + ' ' + (t.gname || ''), sys:t => (SYS[t.sys] || SYS.d30).n, cs:t => t.gname || '', ammo:null, ready:null}[by];
+return T.slice().sort((a, b) => by === 'ammo' ? left(b) - left(a) : by === 'ready' ? fly(b) - fly(a) : String(key(a)).localeCompare(String(key(b)), 'ru')); }
+// полупрозрачный силуэт арт. системы (вид сверху) на фоне карточки
+const SIL = {
+gun:'<path d="M45 60L8 28M45 60L8 92" stroke-width="7"/><rect x="52" y="30" width="16" height="14" rx="3"/><rect x="52" y="76" width="16" height="14" rx="3"/><path d="M78 40q8 20 0 40" stroke-width="5" fill="none"/><rect x="48" y="52" width="34" height="16" rx="3"/><rect x="80" y="56" width="112" height="8" rx="2"/>',
+spg:'<rect x="18" y="22" width="132" height="14" rx="5"/><rect x="18" y="84" width="132" height="14" rx="5"/><rect x="24" y="36" width="120" height="48" rx="6"/><rect x="62" y="40" width="58" height="40" rx="10"/><rect x="118" y="56" width="76" height="8" rx="2"/>',
+mlrs:'<rect x="150" y="38" width="34" height="44" rx="6"/><rect x="16" y="42" width="136" height="36" rx="4"/>' + Array.from({length:20}, (_, i) => `<circle cx="${34 + (i % 10) * 10}" cy="${52 + Math.floor(i / 10) * 16}" r="4"/>`).join(''),
+tank:'<rect x="22" y="20" width="140" height="16" rx="6"/><rect x="22" y="84" width="140" height="16" rx="6"/><rect x="28" y="36" width="128" height="48" rx="8"/><ellipse cx="88" cy="60" rx="30" ry="24"/><rect x="112" y="56" width="84" height="8" rx="2"/>',
+mortar:'<circle cx="62" cy="60" r="24"/><rect x="62" y="55" width="92" height="10" rx="3"/><path d="M128 60L150 30M128 60L150 90" stroke-width="5"/>',
+ags:'<path d="M70 60L30 26M70 60L30 94M70 60L24 60" stroke-width="5"/><rect x="62" y="48" width="48" height="24" rx="5"/><rect x="108" y="56" width="70" height="8" rx="2"/>'};
+function sysCat(k){ const s = SYS[k] || SYS.d30; if (['s19', 's3', 's1', 'sau', 'g2s5', 'g2s7', 'm2s9', 'm2s31', 'm2s34', 'm2s4'].includes(k)) return 'spg'; return {'Миномёты':'mortar', 'РСЗО':'mlrs', 'Танки и БМ':'tank', 'Гранатомёты':'ags'}[s.g] || 'gun'; }
+function mixBg(t){ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><g fill="#ffffff" stroke="#ffffff" opacity=".13" stroke-linecap="round">${SIL[sysCat(t.sys)]}</g></svg>`; return `background-image:url('data:image/svg+xml,${encodeURIComponent(svg)}');background-repeat:no-repeat;background-position:center 62%;background-size:96% auto`; }
 function mixTimer(){ if (!mixOn) return; $('mixer').querySelectorAll('[data-tm]').forEach(e => { const id = +e.dataset.tm, by = new Map(); corrFly.forEach(f => { if (f.task && f.task.id === id) by.set(f.shot, Math.max(by.get(f.shot) || 0, f.left)); });
 e.textContent = by.size ? '⏱ ' + [...by.entries()].sort((x, y) => x[0] - y[0]).map(([n, l]) => `№${n} ${l.toFixed(1)}`).join(' · ') : '';
-const sb = $('mixer').querySelector(`[data-st="${id}"]`); if (sb) sb.disabled = !by.size; }); }
+const card = e.closest('.mxs'); if (card) card.classList.toggle('firing', by.size > 0); const sb = $('mixer').querySelector(`[data-st="${id}"]`); if (sb) sb.disabled = !by.size; });
+$('mixer').querySelectorAll('.mxdeck').forEach(d => { const g = d.dataset.go, V = mixV(), L1 = (mixGroups(mixTasks(), V.grp).get(g) || []); d.classList.toggle('firing', L1.some(t => corrFly.some(f => f.task === t))); }); }
 $('mixBtn').onclick = () => { mixOn = !mixOn; if (mixOn && !MIX.length && CT){ MIX.push(CT.id); mixSave(); } renderMix(); corrDraw(); };
 { const cp0 = corrPanel; window.corrPanel = () => { cp0(); if (mixOn) renderMix(); }; }
 { const ct0 = corrTap; window.corrTap = ll => { const before = CT; ct0(ll); if (before && CT && CT !== before){ const i = MIX.indexOf(before.id); if (i >= 0){ MIX[i] = CT.id; lsSet('skat_mix', MIX); } } if (mixOn) renderMix(); }; }
@@ -290,13 +341,13 @@ const faLeft = fa => (fa.ammo || []).reduce((q, x) => q + (+x.have || 0), 0);
 const faTxt = fa => `${escapeHtml((SYS[fa.sys] || SYS.d30).n)}${fa.n ? ' × ' + fa.n : ''} · БП ${(fa.ammo || []).map(x => `${escapeHtml(x.t)} ${+x.have || 0}`).join(', ') || 'не указаны'}`;
 // расход: со склада огневого средства задачи списывается выбранный тип (или первый с остатком), отмена «Стоп» — возврат
 function faUse(t, n){ const r = t && t.faId && faFind(t.faId); if (!r) return; const A = r.p.fa.ammo || []; let x = A.find(z => z.t === t.ammoT) || A.find(z => (+z.have || 0) > 0) || A[0]; if (!x) return; x.have = Math.max(0, (+x.have || 0) - n); persist();
-if (n > 0 && x.have === 0) toast(`«${r.p.fa.cs || 'Орудие'}»: ${x.t} закончились`); }
+if (n > 0 && x.have === 0) toast(`«${r.p.fa.cs || 'Орудие'}»: ${x.t} закончились`); return x.t; }
 function pkModal(){ let m = $('pkModal'); if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'pkModal'; m.innerHTML = '<div class="card big"><h3 id="pkH"></h3><input id="pkQ" placeholder="Поиск: номер, позывной, характер" autocomplete="off" style="width:100%;margin-bottom:8px"><div id="pkList"></div><div class="row" style="margin-top:8px"><button class="ghost" data-close>Отмена</button><button class="primary" id="pkMap">Указать на карте</button></div></div>'; m.addEventListener('click', e => { if (e.target === m || e.target.hasAttribute('data-close')) m.classList.remove('open'); }); } document.body.appendChild(m); return m; }
 function pickGun(t){ pkModal(); $('pkH').textContent = 'Выбор огневого средства'; $('pkQ').value = '';
 const draw = () => { const q = $('pkQ').value.trim().toLowerCase(), F = faAll().filter(x => !q || (x.p.fa.cs + ' ' + x.p.fa.unit + ' ' + x.p.fa.reg + ' ' + (SYS[x.p.fa.sys] || {}).n).toLowerCase().includes(q)), C = faCand().filter(x => !q || labelOf(x.a, x.i).toLowerCase().includes(q));
 $('pkList').innerHTML = (F.length ? F.map((x, k) => `<div class="arr" data-f="${k}"><span class="kth" style="color:#e0302a">▲</span><div class="nm"><div><b>${escapeHtml(x.p.fa.cs || labelOf(x.a, x.i))}</b>${x.p.fa.unit ? ' · ' + escapeHtml(x.p.fa.unit) : ''}${x.p.fa.reg ? ' · ' + escapeHtml(x.p.fa.reg) : ''}</div><div>${faTxt(x.p.fa)}</div></div><button data-a="ok">Выбрать</button></div>`).join('') : '<div class="empty">Огневых средств с карточкой нет — заведите их кнопкой «Огн. ср.» слева</div>')
 + (C.length ? '<div class="sub-h">Знаки орудий без карточки</div>' + C.slice(0, 60).map((x, k) => `<div class="arr" data-c="${k}"><span class="kth">▲</span><div class="nm"><div>${escapeHtml(labelOf(x.a, x.i))}</div><div>${escapeHtml(x.a.name)}</div></div><button data-a="ok">Выбрать</button></div>`).join('') : '');
-$('pkList').querySelectorAll('[data-f]').forEach(r => r.querySelector('[data-a=ok]').onclick = () => { const x = F[+r.dataset.f], fa = x.p.fa; t.gun = {lat:x.p.lat, lng:x.p.lng}; t.gname = fa.cs || labelOf(x.a, x.i); t.sys = SYS[fa.sys] ? fa.sys : t.sys; t.faId = fa.id; t.maxOv = +fa.max || null; t.ammoT = null; pkDone(t, 'gun'); });
+$('pkList').querySelectorAll('[data-f]').forEach(r => r.querySelector('[data-a=ok]').onclick = () => { const x = F[+r.dataset.f], fa = x.p.fa; t.gun = {lat:x.p.lat, lng:x.p.lng, h:x.p.h}; t.gname = fa.cs || labelOf(x.a, x.i); t.sys = SYS[fa.sys] ? fa.sys : t.sys; t.faId = fa.id; t.maxOv = +fa.max || null; t.ammoT = null; pkDone(t, 'gun'); });
 $('pkList').querySelectorAll('[data-c]').forEach(r => r.querySelector('[data-a=ok]').onclick = () => { const x = C[+r.dataset.c]; t.gun = {lat:x.p.lat, lng:x.p.lng}; t.gname = labelOf(x.a, x.i); t.sys = FA_KIND[itKind(x.a, x.p)] || t.sys; t.faId = null; t.maxOv = null; pkDone(t, 'gun'); }); };
 $('pkQ').oninput = draw; draw(); $('pkMap').onclick = () => { $('pkModal').classList.remove('open'); CT = t; corrPick = 'gun'; corrDraw(); corrPanel(); toast('Коснитесь огневой позиции или знака орудия'); }; openModal('pkModal'); }
 function pickTgt(t){ pkModal(); $('pkH').textContent = 'Выбор цели'; $('pkQ').value = '';
@@ -309,7 +360,7 @@ bind('p', P); bind('e', E); };
 $('pkQ').oninput = draw; draw(); $('pkMap').onclick = () => { $('pkModal').classList.remove('open'); CT = t; corrPick = 'tgt'; corrDraw(); corrPanel(); toast('Коснитесь цели'); }; openModal('pkModal'); }
 // новая цель для задачи, по которой уже стреляли, — новая задача с тем же орудием (как при касании карты)
 function setTgt(t, x){ let T = t; if (t.tgt && (t.shots || []).length){ T = newTask(); ['gun', 'sys', 'rs', 'gname', 'faId', 'maxOv', 'ammoT'].forEach(k => { T[k] = t[k]; }); const i = MIX.indexOf(t.id); if (i >= 0){ MIX[i] = T.id; lsSet('skat_mix', MIX); } }
-T.tgt = {lat:x.p.lat, lng:x.p.lng}; T.name = String(x.p.tno || labelOf(x.a, x.i)); T.obj = x.p.ch || (x.p.tno ? '' : labelOf(x.a, x.i)); T.cat = catOfSym(x.p.sym || x.a.sym) || T.cat || 1; pkDone(T, 'tgt'); }
+T.tgt = {lat:x.p.lat, lng:x.p.lng, h:x.p.h}; T.name = String(x.p.tno || labelOf(x.a, x.i)); T.obj = x.p.ch || (x.p.tno ? '' : labelOf(x.a, x.i)); T.cat = catOfSym(x.p.sym || x.a.sym) || T.cat || 1; pkDone(T, 'tgt'); }
 function pkDone(t, what){ $('pkModal').classList.remove('open'); CT = t; corrPick = null; corrEnd = false; persist(); corrDraw(); corrPanel(); if (what === 'gun' && !t.tgt) setTimeout(() => pickTgt(t), 150); else toast(what === 'gun' ? `Орудие: ${t.gname || ''}` : `Цель ${t.name}`); }
 // ---- окно «Огневые средства»: по полкам и подразделениям
 function renderFa(){ keepScroll('faModal', () => { const F = faAll(), C = faCand(), G = new Map(); F.forEach(x => { const k = (x.p.fa.reg || 'Без полка') + ' / ' + (x.p.fa.unit || 'без подразделения'); if (!G.has(k)) G.set(k, []); G.get(k).push(x); });
@@ -321,13 +372,13 @@ $('faList').querySelectorAll('.arr[data-c]').forEach(r => r.querySelector('[data
 let faRef = null;
 function openFaEd(x){ faRef = x; const fa = x.p.fa; let m = $('faEdModal'); if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'faEdModal'; m.innerHTML = '<div class="card big"><h3>Карточка огневого средства</h3><div id="faEdBody"></div><div class="row"><button class="ghost" data-close>Отмена</button><button class="primary" id="faEdOk">Сохранить</button></div></div>'; m.addEventListener('click', e => { if (e.target === m || e.target.hasAttribute('data-close')) m.classList.remove('open'); }); }
 document.body.appendChild(m); const sys = SYS[fa.sys] || SYS.d30;
-const am = () => (fa.ammo || []).map((z, k) => `<div class="duo" data-am="${k}"><label class="f">Тип БП<input data-k="t" value="${escapeHtml(z.t || '')}" placeholder="ОФС"></label><label class="f">Наличие<input data-k="have" inputmode="numeric" value="${+z.have || 0}"></label><label class="f">Норма на цель<input data-k="norm" inputmode="numeric" value="${z.norm || ''}"></label><button class="eye" data-x="${k}" style="align-self:end">🗑</button></div>`).join('');
+const am = () => (fa.ammo || []).map((z, k) => `<div class="duo" data-am="${k}" style="flex-wrap:wrap;border-bottom:1px solid rgba(128,128,128,.25);padding-bottom:6px;margin-bottom:6px"><label class="f">Снаряд / мина<input data-k="t" list="dlSh" value="${escapeHtml(z.t || '')}" placeholder="ОФ-462"></label><label class="f">Взрыватель<input data-k="vz" list="dlFz" value="${escapeHtml(z.vz || '')}"></label><label class="f">Заряд<input data-k="zr" list="dlCh" value="${escapeHtml(z.zr || '')}"></label><label class="f">Наличие<input data-k="have" inputmode="numeric" value="${+z.have || 0}"></label><label class="f">Норма на цель<input data-k="norm" inputmode="numeric" value="${z.norm || ''}"></label><button class="eye" data-x="${k}" style="align-self:end">🗑</button></div>`).join('');
 $('faEdBody').innerHTML = `<label class="f">Позывной<input id="fa_cs" value="${escapeHtml(fa.cs || '')}" autocomplete="off"></label><div class="duo"><label class="f">Полк<input id="fa_reg" value="${escapeHtml(fa.reg || '')}"></label><label class="f">Подразделение<input id="fa_unit" value="${escapeHtml(fa.unit || '')}"></label></div>
-<label class="f">Система<select id="fa_sys">${Object.entries(SYS).map(([k, v]) => `<option value="${k}"${k === fa.sys ? ' selected' : ''}>${v.n}</option>`).join('')}</select></label><div class="duo"><label class="f">Орудий<input id="fa_n" inputmode="numeric" value="${fa.n || 1}"></label><label class="f">Макс. дальность, м<input id="fa_max" inputmode="numeric" value="${fa.max || ''}" placeholder="${sys.max}"></label></div>
+<label class="f">Система<select id="fa_sys">${sysOpts(fa.sys)}</select></label><div class="duo"><label class="f">Орудий<input id="fa_n" inputmode="numeric" value="${fa.n || 1}"></label><label class="f">Макс. дальность, м<input id="fa_max" inputmode="numeric" value="${fa.max || ''}" placeholder="${sys.max}"></label></div>
 <div class="flabel">Боеприпасы</div><div id="fa_am">${am()}</div><button id="fa_amAdd">+ Тип боеприпасов</button><label class="f">Примечание<input id="fa_note" value="${escapeHtml(fa.note || '')}"></label>`;
-const readAm = () => { $('fa_am').querySelectorAll('[data-am]').forEach(r => { const z = fa.ammo[+r.dataset.am]; r.querySelectorAll('input').forEach(i => { z[i.dataset.k] = i.dataset.k === 't' ? i.value.trim() : Math.max(0, +i.value || 0); }); }); };
+const readAm = () => { $('fa_am').querySelectorAll('[data-am]').forEach(r => { const z = fa.ammo[+r.dataset.am]; r.querySelectorAll('input').forEach(i => { z[i.dataset.k] = ['t', 'vz', 'zr'].includes(i.dataset.k) ? i.value.trim() : Math.max(0, +i.value || 0); }); }); };
 const bindAm = () => $('fa_am').querySelectorAll('[data-x]').forEach(b => b.onclick = () => { readAm(); fa.ammo.splice(+b.dataset.x, 1); $('fa_am').innerHTML = am(); bindAm(); });
-bindAm(); $('fa_amAdd').onclick = () => { readAm(); (fa.ammo = fa.ammo || []).push({t:'ОФС', have:0, norm:0}); $('fa_am').innerHTML = am(); bindAm(); };
+bindAm(); $('fa_amAdd').onclick = () => { readAm(); (fa.ammo = fa.ammo || []).push({t:'', vz:'', zr:'', have:0, norm:0}); $('fa_am').innerHTML = am(); bindAm(); };
 $('fa_sys').onchange = () => { $('fa_max').placeholder = (SYS[$('fa_sys').value] || SYS.d30).max; };
 $('faEdOk').onclick = () => { readAm(); fa.cs = $('fa_cs').value.trim(); fa.reg = $('fa_reg').value.trim(); fa.unit = $('fa_unit').value.trim(); fa.sys = $('fa_sys').value; fa.n = Math.max(1, +$('fa_n').value || 1); fa.max = +$('fa_max').value || null; fa.note = $('fa_note').value.trim(); fa.ammo = (fa.ammo || []).filter(z => z.t);
 state.ftasks.forEach(t => { if (t.faId === fa.id){ t.sys = fa.sys; t.maxOv = fa.max; t.gname = fa.cs || t.gname; } }); persist(); m.classList.remove('open'); if ($('faModal').classList.contains('open')) renderFa(); corrPanel(); toast('Карточка сохранена'); };
@@ -337,4 +388,87 @@ function faLine(t, short){ const r = t && t.faId && faFind(t.faId); if (!r) retu
 const cur = (A.find(z => z.t === t.ammoT) || A.find(z => (+z.have || 0) > 0) || A[0]).t;
 if (short) return 'БП: ' + A.map(z => `${escapeHtml(z.t)} ${+z.have || 0}`).join(', ');
 return `<div class="crow">БП:<select data-c="am">${A.map(z => `<option value="${escapeHtml(z.t)}"${z.t === cur ? ' selected' : ''}>${escapeHtml(z.t)} — ${+z.have || 0}${z.norm ? ' (норма ' + z.norm + ')' : ''}</option>`).join('')}</select></div>`; }
+// ---- передача данных цели и ОП (текст в порядке ввода; буфер обмена / «Поделиться»)
+function xferText(t){ const L1 = [], sk = q => { const s = GEO.toSK(q.lat, q.lng); return `X ${Math.round(s.x)}  Y ${Math.round(s.y)}${q.h != null && q.h !== '' ? '  H ' + Math.round(q.h) : ''}  кв. ${sqOf(s)}`; };
+const r = t.faId && faFind(t.faId), fa = r && r.p.fa, A = fa && (fa.ammo || []), am = A && (A.find(z => z.t === t.ammoT) || A.find(z => (+z.have || 0) > 0) || A[0]);
+L1.push(`ОП: ${t.gname || 'орудие'}${fa && fa.unit ? ' (' + fa.unit + ')' : ''}`, `Система: ${(SYS[t.sys] || SYS.d30).n}${fa && fa.n ? ', орудий ' + fa.n : ''}`); if (t.gun) L1.push('Координаты ОП: ' + sk(t.gun));
+if (am) L1.push(`Боеприпас: ${am.t}${am.vz ? ', взр. ' + am.vz : ''}${am.zr ? ', заряд ' + am.zr : ''}${am.have != null ? ', в наличии ' + am.have : ''}`);
+L1.push(`Цель № ${t.name || '—'}${t.obj ? ' — ' + t.obj : ''}`); if (t.tgt) L1.push('Координаты цели: ' + sk(t.tgt));
+if (t.gun && t.tgt){ const d = distM(t.gun, t.tgt); L1.push(`Дальность (топогр.): ${Math.round(d)} м · дир. угол ${azTxt(t.gun, t.tgt)}`); }
+return L1.join('\n'); }
+async function xferSend(txt){ const Sh = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Share;
+try { if (Sh){ await Sh.share({title:'СКАТ: данные цели', text:txt, dialogTitle:'Передать данные'}); return; } if (navigator.share){ await navigator.share({title:'СКАТ: данные цели', text:txt}); return; } } catch(e){ if (e && e.name === 'AbortError') return; }
+try { await navigator.clipboard.writeText(txt); toast('Данные скопированы — вставьте в программу'); } catch(e){ toast(txt); } }
+// ======== ТОПОГЕОДЕЗИЯ: ПРЯМАЯ И ОБРАТНАЯ ЗАДАЧИ, ЗАСЕЧКИ, ПЕРЕСЧЁТ КООРДИНАТ, УГЛЫ ========
+const DU = 6000, du2r = d => d / DU * 2 * Math.PI, r2du = r => ((r / (2 * Math.PI) * DU) % DU + DU) % DU;
+const fmtDU = d => { const v = Math.round(d) % DU; return `${Math.floor(v / 100)}-${String(v % 100).padStart(2, '0')}`; };
+const fmtDeg = r => { let g = (r * 180 / Math.PI % 360 + 360) % 360; const d = Math.floor(g), m = (g - d) * 60; return `${d}°${m.toFixed(1)}′`; };
+let geoTab = 'dir', geoUnit = 'du';
+function parseAng(s){ s = String(s || '').trim().replace(',', '.'); if (!s) return NaN; const m = s.match(/^(\d{1,2})-(\d{1,2})$/); if (m) return du2r(+m[1] * 100 + +m[2]); const v = parseFloat(s); if (isNaN(v)) return NaN; return geoUnit === 'du' && !/°/.test(s) ? du2r(v) : v * Math.PI / 180; }
+const angOut = r => `${fmtDU(r2du(r))} (${fmtDeg(r)})`;
+// короткие (5 цифр) координаты дополняются по центру карты
+function fullXY(xs, ys){ const c = map.getCenter(), s0 = GEO.toSK(c.lat, c.lng), ex = (v, ref) => { v = +String(v).replace(/\s/g, ''); if (isNaN(v)) return NaN; if (v >= 1e5) return v; const b = ref - ref % 1e5; return [b - 1e5, b, b + 1e5].map(q => q + v).sort((p, q) => Math.abs(p - ref) - Math.abs(q - ref))[0]; }; return {x:ex(xs, s0.x), y:ex(ys, s0.y)}; }
+const ptHtml = (k, l) => `<div class="flabel">${l}</div><div class="duo"><label class="f">X<input id="g${k}x" inputmode="numeric" autocomplete="off"></label><label class="f">Y<input id="g${k}y" inputmode="numeric" autocomplete="off"></label></div><div class="crow"><button data-pk="${k}">📍 С карты</button><button data-pc="${k}">Центр карты</button></div>`;
+const angHtml = (id, l) => `<label class="f">${l} <small>(д.у. «45-00» или число в выбранных единицах)</small><input id="${id}" autocomplete="off"></label>`;
+function geoPt(k){ return fullXY($('g' + k + 'x').value, $('g' + k + 'y').value); }
+function geoSet(k, ll){ const s = GEO.toSK(ll.lat, ll.lng); $('g' + k + 'x').value = Math.round(s.x); $('g' + k + 'y').value = Math.round(s.y); }
+function geoRes(html, pts){ $('geoOut').innerHTML = html + (pts && pts.length ? `<div class="crow" style="margin-top:6px"><button class="primary" id="geoPut">Поставить на карту</button><button id="geoCopy">Скопировать</button></div>` : '');
+if (pts && pts.length){ $('geoPut').onclick = () => { let a = state.arrays.find(x => x.name === 'Топогеодезия'); if (!a){ a = normArr({id:Date.now(), kind:'pts', name:'Топогеодезия', ident:'Т', style:{color:'#8a2be2', name:'Фиолетовый', glyph:''}, points:[], shapes:[]}); state.arrays.push(a); }
+pts.forEach(q => { const [la, lo] = GEO.fromSK(q.x, q.y); a.points.push({lat:+la.toFixed(7), lng:+lo.toFixed(7), name:q.n || ('Т' + (a.points.length + 1))}); }); persist(); renderMarkers(); const [la, lo] = GEO.fromSK(pts[0].x, pts[0].y); $('geoModal').classList.remove('open'); map.setView([la, lo], Math.max(map.getZoom(), 14)); toast('Точка поставлена в слой «Топогеодезия»'); };
+$('geoCopy').onclick = () => { const t = $('geoOut').innerText; try { navigator.clipboard.writeText(t); toast('Скопировано'); } catch(e){ toast(t); } }; } }
+const sq2 = (x, y) => sqOf({x, y});
+function renderGeo(){ const T = {dir:'Прямая', inv:'Обратная', fwd:'Засечка прямая', res:'Засечка обратная', conv:'Пересчёт', ang:'Углы'};
+$('geoTabs').innerHTML = Object.entries(T).map(([k, v]) => `<button data-g="${k}" class="${k === geoTab ? 'on' : ''}">${v}</button>`).join('');
+$('geoTabs').querySelectorAll('button').forEach(b => b.onclick = () => { geoTab = b.dataset.g; renderGeo(); });
+const unit = `<label class="f">Единицы углов<select id="geoU"><option value="du"${geoUnit === 'du' ? ' selected' : ''}>деления угломера (60-00)</option><option value="deg"${geoUnit === 'deg' ? ' selected' : ''}>градусы</option></select></label>`;
+const F = {dir:ptHtml('a', 'Исходная точка А') + unit + `<label class="f">Дальность, м<input id="gD" inputmode="numeric"></label>` + angHtml('gA', 'Дирекционный угол'),
+inv:ptHtml('a', 'Точка А') + ptHtml('b', 'Точка Б'),
+fwd:unit + ptHtml('a', 'Пункт А') + angHtml('gA', 'Дирекционный угол с А на цель') + ptHtml('b', 'Пункт Б') + angHtml('gB', 'Дирекционный угол с Б на цель'),
+res:unit + '<p class="status">Измерьте с точки стояния направления (одним прибором, от одного нуля) на три ориентира А, Б, В.</p>' + ptHtml('a', 'Ориентир А') + angHtml('gA', 'Отсчёт на А') + ptHtml('b', 'Ориентир Б') + angHtml('gB', 'Отсчёт на Б') + ptHtml('c', 'Ориентир В') + angHtml('gC', 'Отсчёт на В'),
+conv:ptHtml('a', 'СК-42 (X, Y)') + `<div class="flabel">или WGS-84</div><div class="duo"><label class="f">Широта<input id="gLat" autocomplete="off" placeholder="51.123456 или 51°07′24″"></label><label class="f">Долгота<input id="gLon" autocomplete="off"></label></div>`,
+ang:unit + angHtml('gA', 'Угол') + `<div class="duo"><label class="f">Склонение магнитное δ<input id="gDec" placeholder="+7°30′ → 7.5" inputmode="decimal"></label><label class="f">Сближение меридианов γ<input id="gConv" placeholder="авто по центру карты" inputmode="decimal"></label></div><label class="f">Угол задан как<select id="gKind"><option value="dir">дирекционный угол</option><option value="mag">магнитный азимут</option></select></label>`};
+$('geoBody').innerHTML = F[geoTab] + '<div class="row" style="margin-top:8px"><button class="primary" id="geoGo">Рассчитать</button></div><div id="geoOut" class="cdv" style="margin-top:8px;font-size:15px;line-height:1.5"></div>';
+if ($('geoU')) $('geoU').onchange = e => { geoUnit = e.target.value; };
+$('geoBody').querySelectorAll('[data-pk]').forEach(b => b.onclick = () => { const k = b.dataset.pk; $('geoModal').classList.remove('open'); toast('Коснитесь точки на карте'); window.geoPickCb = ll => { const h = hitPoint(...(() => { const q = map.latLngToContainerPoint(ll), r = map.getContainer().getBoundingClientRect(); return [q.x + r.left, q.y + r.top, 30]; })()); geoSet(k, h && h.i != null ? h.a.points[h.i] : ll); openModal('geoModal'); }; });
+$('geoBody').querySelectorAll('[data-pc]').forEach(b => b.onclick = () => geoSet(b.dataset.pc, map.getCenter()));
+$('geoGo').onclick = geoCalc; }
+function geoCalc(){ const bad = () => geoRes('<b>Проверьте исходные данные</b>');
+try { if (geoTab === 'dir'){ const A = geoPt('a'), D = +$('gD').value, al = parseAng($('gA').value); if ([A.x, A.y, D, al].some(isNaN)) return bad();
+const x = A.x + D * Math.cos(al), y = A.y + D * Math.sin(al); return geoRes(`Точка Б: <b>X ${Math.round(x)} Y ${Math.round(y)}</b><br>кв. ${sq2(x, y)}`, [{x, y}]); }
+if (geoTab === 'inv'){ const A = geoPt('a'), B = geoPt('b'); if ([A.x, A.y, B.x, B.y].some(isNaN)) return bad(); const dx = B.x - A.x, dy = B.y - A.y, D = Math.hypot(dx, dy), al = Math.atan2(dy, dx);
+return geoRes(`Дальность: <b>${D.toFixed(1)} м</b><br>Дирекционный угол А→Б: <b>${angOut(al)}</b><br>Обратный Б→А: ${angOut(al + Math.PI)}`); }
+if (geoTab === 'fwd'){ const A = geoPt('a'), B = geoPt('b'), a1 = parseAng($('gA').value), a2 = parseAng($('gB').value); if ([A.x, A.y, B.x, B.y, a1, a2].some(isNaN)) return bad();
+const c1 = Math.cos(a1), s1 = Math.sin(a1), c2 = Math.cos(a2), s2 = Math.sin(a2), den = c1 * s2 - s1 * c2; if (Math.abs(den) < 1e-6) return geoRes('<b>Направления почти параллельны — засечка невозможна</b>');
+const t = ((B.x - A.x) * s2 - (B.y - A.y) * c2) / den, x = A.x + t * c1, y = A.y + t * s1, g = Math.abs(a1 - a2) * 180 / Math.PI % 180;
+return geoRes(`Цель: <b>X ${Math.round(x)} Y ${Math.round(y)}</b><br>кв. ${sq2(x, y)} · угол засечки ${Math.round(Math.min(g, 180 - g))}°${Math.min(g, 180 - g) < 30 ? ' — <b>мал, точность низкая</b>' : ''}`, [{x, y}]); }
+if (geoTab === 'res'){ const P = ['a', 'b', 'c'].map(geoPt), d = ['gA', 'gB', 'gC'].map(id => parseAng($(id).value)); if (P.some(q => isNaN(q.x) || isNaN(q.y)) || d.some(isNaN)) return bad();
+// метод Тинстры (с выбором ориентации по согласию измеренных углов)
+const ang = (u, v) => { let r = (v - u) % (2 * Math.PI); return r < 0 ? r + 2 * Math.PI : r; }, cot = v => 1 / Math.tan(v);
+const tri = (p, q, r) => { const a1 = Math.atan2(q.y - p.y, q.x - p.x), a2 = Math.atan2(r.y - p.y, r.x - p.x); let v = Math.abs(a1 - a2); return v > Math.PI ? 2 * Math.PI - v : v; };
+const A = tri(P[0], P[1], P[2]), B = tri(P[1], P[2], P[0]), C = tri(P[2], P[0], P[1]);
+const tien = dd => { const k1 = 1 / (cot(A) - cot(ang(dd[1], dd[2]))), k2 = 1 / (cot(B) - cot(ang(dd[2], dd[0]))), k3 = 1 / (cot(C) - cot(ang(dd[0], dd[1]))), K = k1 + k2 + k3; return {x:(k1 * P[0].x + k2 * P[1].x + k3 * P[2].x) / K, y:(k1 * P[0].y + k2 * P[1].y + k3 * P[2].y) / K}; };
+const err = r => { let s = 0; for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++){ const o = Math.atan2(P[j].y - r.y, P[j].x - r.x) - Math.atan2(P[i].y - r.y, P[i].x - r.x), m = d[j] - d[i]; s += Math.abs(Math.atan2(Math.sin(o - m), Math.cos(o - m))); } return isFinite(s) ? s : 1e9; };
+const c1 = tien(d), c2 = tien(d.map(v => -v)), R = err(c1) <= err(c2) ? c1 : c2, x = R.x, y = R.y;
+if (!isFinite(x) || !isFinite(y) || err(R) > .01) return geoRes('<b>Решения нет: проверьте отсчёты или точка стояния близка к окружности через ориентиры</b>');
+return geoRes(`Точка стояния: <b>X ${Math.round(x)} Y ${Math.round(y)}</b><br>кв. ${sq2(x, y)}`, [{x, y, n:'ТС'}]); }
+if (geoTab === 'conv'){ let la, lo; const sx = $('gax').value.trim(), la0 = $('gLat').value.trim();
+const dms = s => { const n = String(s).replace(',', '.').match(/[\d.]+/g); if (!n) return NaN; return +n[0] + (+n[1] || 0) / 60 + (+n[2] || 0) / 3600; };
+if (sx){ const A = geoPt('a'); if (isNaN(A.x) || isNaN(A.y)) return bad(); [la, lo] = GEO.fromSK(A.x, A.y); } else if (la0){ la = dms(la0); lo = dms($('gLon').value); } if (isNaN(la) || isNaN(lo)) return bad();
+const s = GEO.toSK(la, lo), dm = v => { const d = Math.floor(v), m = (v - d) * 60, mi = Math.floor(m); return `${d}°${String(mi).padStart(2, '0')}′${((m - mi) * 60).toFixed(1)}″`; };
+return geoRes(`СК-42: <b>X ${Math.round(s.x)} Y ${Math.round(s.y)}</b> (зона ${s.zone}) · кв. ${sqOf(s)}<br>WGS-84: <b>${la.toFixed(6)}, ${lo.toFixed(6)}</b><br>${dm(la)} с.ш., ${dm(lo)} в.д.<br>МГРС: <b>${mgrs(la, lo)}</b>`, [{x:s.x, y:s.y}]); }
+if (geoTab === 'ang'){ const a = parseAng($('gA').value); if (isNaN(a)) return bad(); const c = map.getCenter(), z = GEO.zoneOf(c.lng), L0 = 6 * z - 3;
+const gAuto = (c.lng - L0) * Math.sin(c.lat * Math.PI / 180), dec = parseFloat(String($('gDec').value).replace(',', '.')) || 0, gm = $('gConv').value.trim() ? parseFloat($('gConv').value.replace(',', '.')) : gAuto, P = (dec - gm) * Math.PI / 180;
+const isDir = $('gKind').value === 'dir', dir = isDir ? a : a + P, mag = isDir ? a - P : a;
+return geoRes(`Дирекционный угол: <b>${angOut(dir)}</b><br>Магнитный азимут: <b>${angOut(mag)}</b><br>Поправка направления (δ − γ): ${(dec - gm).toFixed(2)}° (${fmtDU(r2du(Math.abs(P)))}${P < 0 ? ', минус' : ''})<br>γ ${gm.toFixed(2)}°${$('gConv').value.trim() ? '' : ' (по центру карты)'}, δ ${dec}°`); }
+} catch(e){ bad(); } }
+// МГРС из WGS-84 (UTM)
+function mgrs(lat, lon){ const a = 6378137, f = 1 / 298.257223563, e2 = f * (2 - f), ep2 = e2 / (1 - e2), k0 = .9996, zn = Math.floor((lon + 180) / 6) + 1, L0 = (zn * 6 - 183) * Math.PI / 180, ph = lat * Math.PI / 180, la = lon * Math.PI / 180;
+const N = a / Math.sqrt(1 - e2 * Math.sin(ph) ** 2), T = Math.tan(ph) ** 2, C = ep2 * Math.cos(ph) ** 2, A = Math.cos(ph) * (la - L0);
+const M = a * ((1 - e2 / 4 - 3 * e2 * e2 / 64 - 5 * e2 ** 3 / 256) * ph - (3 * e2 / 8 + 3 * e2 * e2 / 32 + 45 * e2 ** 3 / 1024) * Math.sin(2 * ph) + (15 * e2 * e2 / 256 + 45 * e2 ** 3 / 1024) * Math.sin(4 * ph) - 35 * e2 ** 3 / 3072 * Math.sin(6 * ph));
+const E = k0 * N * (A + (1 - T + C) * A ** 3 / 6 + (5 - 18 * T + T * T + 72 * C - 58 * ep2) * A ** 5 / 120) + 500000;
+let Nn = k0 * (M + N * Math.tan(ph) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * A ** 4 / 24 + (61 - 58 * T + T * T + 600 * C - 330 * ep2) * A ** 6 / 720)); if (lat < 0) Nn += 1e7;
+const band = 'CDEFGHJKLMNPQRSTUVWXX'[Math.floor((lat + 80) / 8)], set = (zn - 1) % 6, colL = ['ABCDEFGH', 'JKLMNPQR', 'STUVWXYZ'][set % 3], rowL = 'ABCDEFGHJKLMNPQRSTUV';
+const col = colL[Math.floor(E / 1e5) - 1], row = rowL[(Math.floor(Nn / 1e5) + (set % 2 ? 5 : 0)) % 20], p5 = v => String(Math.floor(v % 1e5)).padStart(5, '0');
+return `${zn}${band} ${col}${row} ${p5(E)} ${p5(Nn)}`; }
+$('geoBtn').onclick = () => { renderGeo(); openModal('geoModal'); };
 window.__mod_tp = 1;
