@@ -33,7 +33,7 @@ jobs:
           curl -sfL -o lib/sql-wasm.wasm https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.wasm
           sed -i 's#https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/#lib/#g; s#https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/#lib/#g; s#https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/#lib/#g' index.html mk.js
           grep -c 'lib/leaflet.min.js' index.html
-          grep -c 'lib/maplibre-gl.js' mk.js
+          grep -c "const ML = 'lib/'" mk.js
       - name: Capacitor Android project
         working-directory: app
         run: |
