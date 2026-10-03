@@ -138,6 +138,8 @@ body:has(#v3d.on) .modal{z-index:2600}
 .mtp{transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:#ffd400;border:2px solid #111;font:800 12px/24px sans-serif;text-align:center;color:#111;display:inline-block}
 .frac{transform:translate(-50%,-140%);display:inline-flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.92);border:1.5px solid #111;border-radius:6px;padding:2px 8px;font:700 12.5px/1.3 'Roboto Condensed',sans-serif;color:#111;white-space:nowrap}.frac span:first-child{border-bottom:1.5px solid #111;padding-bottom:1px}
 #meetBar{position:fixed;left:10px;top:calc(var(--safe-t) + var(--tg) + 68px);z-index:1100;display:none;align-items:center;gap:10px;padding:8px 12px;color:var(--ink)}#meetBar.on{display:flex}#meetBar button{min-height:36px;padding:4px 12px}
+.swdel{position:absolute;right:0;top:0;bottom:0;width:88px;min-height:0;margin:0;padding:0;border-radius:0 10px 10px 0;background:#e2533f;color:#fff;font-size:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;z-index:5;box-shadow:-6px 0 12px rgba(0,0,0,.35)}.swdel small{font-size:11px;font-weight:700}
+tr .swdel{border-radius:0}
 .trashbtn.sw{position:absolute;right:-84px;top:2px;bottom:2px;width:80px;min-height:0;margin:0;border-radius:10px;font-size:18px}
 #layList,.kids,#tblBody{overflow-x:hidden}
 #tblModal .card{max-width:none}#tblModal table.t td,#tblModal table.t th{white-space:normal;word-break:break-word;font-size:13px;padding:5px 4px}
@@ -570,7 +572,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 6.0';
+const VERSION = 'версия 6.1';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -3405,17 +3407,18 @@ state.trash.splice(k, 1); persist(); renderMarkers(); renderTrash(); });
 $('trashBtn').onclick = () => { closeModals(); renderTrash(); openModal('trashModal'); };
 $('trashClr').onclick = () => askConfirm('Очистить корзину навсегда?', 'Очистить', () => { state.trash = []; persist(); renderTrash(); openModal('trashModal'); });
 function swipeable(row, onTrash){
-let x0 = null, y0 = 0, dx = 0, lock = null, btn = null; const isTr = row.tagName === 'TR';
-if (!isTr) row.style.position = 'relative';
-const ensure = () => { if (btn) return; btn = document.createElement('button'); btn.className = 'trashbtn sw'; btn.textContent = '🗑'; btn.onclick = ev => { ev.stopPropagation(); onTrash(); };
-if (isTr){ const td = document.createElement('td'); td.style.cssText = 'padding:0;width:0;border:0;position:relative'; td.appendChild(btn); row.appendChild(td); } else row.appendChild(btn); };
-row.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = row.classList.contains('sw-open') ? -84 : 0; lock = null; row.style.transition = 'none'; }, {passive:true});
+const isTr = row.tagName === 'TR'; let x0 = null, y0 = 0, dx = 0, lock = null, btn = null, open = false;
+const host = isTr ? (row.lastElementChild || row) : row;
+host.style.position = 'relative'; if (!isTr) row.style.overflow = 'hidden';
+const W = 88, set = (v, anim) => { btn.style.transition = anim ? 'transform .2s ease' : 'none'; btn.style.transform = `translateX(${v}px)`; };
+const ensure = () => { if (btn) return; btn = document.createElement('button'); btn.className = 'swdel'; btn.innerHTML = '🗑<small>Удалить</small>'; btn.onclick = ev => { ev.stopPropagation(); onTrash(); }; host.appendChild(btn); set(W, false); };
+row.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; lock = null; dx = 0; }, {passive:true});
 row.addEventListener('touchmove', e => { if (x0 == null) return; const mx = e.touches[0].clientX - x0, my = e.touches[0].clientY - y0;
 if (!lock) lock = Math.abs(mx) > Math.abs(my) + 4 ? 'h' : Math.abs(my) > 6 ? 'v' : null; if (lock !== 'h') return;
-dx = Math.max(-130, Math.min(0, (row.classList.contains('sw-open') ? -84 : 0) + mx)); ensure(); row.style.transform = `translateX(${dx}px)`; }, {passive:true});
-row.addEventListener('touchend', () => { if (x0 == null) return; x0 = null; row.style.transition = 'transform .2s ease'; if (lock !== 'h') return;
-if (dx < -48){ row.classList.add('sw-open'); row.style.transform = 'translateX(-84px)'; } else { row.classList.remove('sw-open'); row.style.transform = ''; } });
-row.addEventListener('click', e => { if (row.classList.contains('sw-open') && !e.target.classList.contains('trashbtn')){ e.stopPropagation(); e.preventDefault(); row.classList.remove('sw-open'); row.style.transition = 'transform .2s ease'; row.style.transform = ''; } }, true);
+ensure(); dx = mx; set(Math.max(0, Math.min(W, (open ? 0 : W) + mx)), false); }, {passive:true});
+row.addEventListener('touchend', () => { if (x0 == null) return; x0 = null; if (lock !== 'h' || !btn) return;
+const pos = (open ? 0 : W) + dx; open = pos < W / 2; set(open ? 0 : W, true); row.classList.toggle('sw-open', open); });
+row.addEventListener('click', e => { if (open && !e.target.closest('.swdel')){ e.stopPropagation(); e.preventDefault(); open = false; set(W, true); row.classList.remove('sw-open'); } }, true);
 }
 // ---- выбор знака из полного списка
 function openSymPick(types, cb, color, none, filt){
@@ -3913,13 +3916,14 @@ function decorateLayers(){
 const el = $('layList'); if (!el) return;
 let tb = $('laySelBar'); if (!tb){ tb = document.createElement('div'); tb.id = 'laySelBar'; tb.className = 'row'; tb.style.marginBottom = '8px'; el.parentNode.insertBefore(tb, el); }
 selBar();
-tagBar(); if (MKX === null) MKX = secMode !== 'mk'; ftaskSection(el);
+tagBar(); if (MKX === null) MKX = secMode !== 'mk'; ftaskSection(el); auxSection(el);
 let nb = $('nolblBtn'); if (!nb){ nb = document.createElement('button'); nb.id = 'nolblBtn'; nb.className = 'ghost'; tb.appendChild(nb); } nb.textContent = NOLBL ? 'Подписи: выкл' : 'Подписи: вкл'; nb.onclick = () => { NOLBL = !NOLBL; lsSet('skat_nolbl', NOLBL); renderMarkers(); renderLayers(); };
-if (OBX.v === null) OBX.v = false; { const fr = el.querySelector('.arr[data-id]'); if (fr){ const oh = document.createElement('div'); oh.className = 'sub-h'; oh.style.cursor = 'pointer'; oh.style.marginTop = '0'; oh.textContent = `${OBX.v ? '▸' : '▾'} Обстановка (${state.arrays.filter(a => !isMk(a) && !isPlanL(a)).length})`; oh.onclick = () => { OBX.v = !OBX.v; renderLayers(); }; el.insertBefore(oh, el.firstChild); } }
+if (OBX.v === null) OBX.v = false; { const fr = el.querySelector('.arr[data-id]'); if (fr){ const oh = document.createElement('div'); oh.className = 'sub-h'; oh.style.cursor = 'pointer'; oh.style.marginTop = '0'; oh.textContent = `${OBX.v ? '▸' : '▾'} Обстановка (${state.arrays.filter(a => !isMk(a) && !isPlanL(a) && a.kind !== 'aux').length})`; oh.onclick = () => { OBX.v = !OBX.v; renderLayers(); }; el.insertBefore(oh, el.firstChild); } }
 const mh = [...el.querySelectorAll('.sub-h')].find(h => h.textContent.replace(/[▸▾\s\d()]/g, '') === 'Макет');
 if (mh){ const n = state.arrays.filter(isMk).length; mh.textContent = `${MKX ? '▸' : '▾'} Макет (${n})`; mh.style.cursor = 'pointer'; mh.onclick = () => { MKX = !MKX; renderLayers(); }; }
 el.querySelectorAll('.arr[data-id]').forEach(r => { const id = +r.dataset.id, a = arrById(id); if (!a) return;
-if (OBX.v && !isMk(a) && !isPlanL(a)){ r.style.display = 'none'; return; }
+if (a.kind === 'aux'){ if (AUX.v){ r.style.display = 'none'; return; } }
+else if (OBX.v && !isMk(a) && !isPlanL(a)){ r.style.display = 'none'; return; }
 if ((MKX && isMk(a)) || (TAGF && !tagOk(a) && !layItems(a).some(x => (x.o.tags || []).includes(TAGF)))){ r.style.display = 'none'; return; }
 const tgb = document.createElement('button'); tgb.className = 'eye'; tgb.textContent = '#'; tgb.title = 'Теги слоя'; tgb.onclick = e => { e.stopPropagation(); const v = prompt('Теги слоя через запятую (например: 111 мсп, 1 мсб)', (a.tags || []).join(', ')); if (v === null) return; a.tags = parseTags(v); if (!a.tags.length) delete a.tags; persist(); renderLayers(); }; r.appendChild(tgb);
 if (a.tags && a.tags.length){ const nm = r.querySelector('.nm div:last-child'); if (nm) nm.innerHTML += a.tags.map(t => ` <small class="tg">#${escapeHtml(t)}</small>`).join(''); }
@@ -4166,16 +4170,18 @@ const CHAR = ['Живая сила', 'Огневая точка', 'Пулемё�
 function planLayer(){ const n = prompt('Название слоя плановых огневых задач', `Плановые ОЗ ${state.arrays.filter(a => a.fplan).length + 1}`); if (n === null) return null;
 const a = normArr({id:Date.now(), kind:'main', fplan:true, name:n.trim() || 'Плановые ОЗ', ident:n.trim() || 'Плановые ОЗ', prefix:'', start:nextTgtNo(), step:1, style:copySt(state.palette.find(p => p.name === 'Оранжевый') || state.palette[0] || DEFAULT_PAL[2]), points:[], minZ:0, lblZ:10}); state.arrays.push(a); persist(); return a; }
 function renderPlan(){ renderPlan0(); const el = $('planList'), Z = zoneShapes(); if (!Z.length) return; const d = document.createElement('div');
-d.innerHTML = '<div class="sub-h">Зоны поражения</div>' + Z.map((sh, k) => `<div class="arr" data-z="${k}"><span class="sw" style="background:${sh.color || '#e2533f'}"></span><div class="nm"><div>${escapeHtml(sh.name || 'Зона ' + sh.zn)}</div><div>целей: ${zoneTargets(sh).length} · поражает: ${escapeHtml(colName(sh.color || '#e2533f'))}</div></div><button data-zz="go">Показать</button><button class="eye" data-zz="ed">✎</button></div>`).join(''); el.appendChild(d);
+d.innerHTML = '<div class="sub-h">Зоны поражения</div>' + Z.map((sh, k) => `<div class="arr" data-z="${k}"><span class="sw" style="background:${sh.color || '#e2533f'}"></span><div class="nm"><div>${escapeHtml(sh.name || 'Зона ' + sh.zn)}</div><div>целей: ${zoneTargets(sh).length} · поражает: ${escapeHtml(colName(sh.color || '#e2533f'))}</div></div><button data-zz="go">Показать</button><button class="eye" data-zz="ed">✎</button><button class="eye" data-zz="del">🗑</button></div>`).join(''); el.appendChild(d);
 d.querySelectorAll('[data-z]').forEach(r => { const sh = Z[+r.dataset.z], za = state.arrays.find(x => x.zones);
 r.querySelector('[data-zz=go]').onclick = () => { closeModals(); map.fitBounds(L.latLngBounds(sh.pts.map(q => [q[0] ?? q.lat, q[1] ?? q.lng])).pad(.2)); };
-r.querySelector('[data-zz=ed]').onclick = () => { closeModals(); openShapeEd(za, za.shapes.indexOf(sh)); }; }); }
+r.querySelector('[data-zz=ed]').onclick = () => { closeModals(); openShapeEd(za, za.shapes.indexOf(sh)); };
+r.querySelector('[data-zz=del]').onclick = () => askConfirm(`Удалить «${sh.name || 'Зона ' + sh.zn}»? (↶ — вернуть)`, 'Удалить', () => { za.shapes.splice(za.shapes.indexOf(sh), 1); state.arrays.forEach(L1 => { if (L1.fplan) L1.points.forEach(q => planNum(L1, q)); }); persist(); renderMarkers(); openModal('planModal'); renderPlan(); }); }); }
 function renderPlan0(){ const el = $('planList'), L1 = state.arrays.filter(a => a.fplan);
-el.innerHTML = L1.length ? L1.map(a => `<div class="arr" data-id="${a.id}"><span class="sw" style="background:${a.style.color}"></span><div class="nm"><div>${escapeHtml(a.name)}</div><div>целей: ${a.points.length}${a.points.length ? ` (${escapeHtml(labelOf(a, 0))}…${escapeHtml(labelOf(a, a.points.length - 1))})` : ''}</div></div><button data-p="add">＋ Цели</button><button data-p="tbl">Таблица</button><button class="eye" data-p="ren">✎</button></div>`).join('') : '<div class="empty">Слоёв плановых огневых задач нет — нажмите «Добавить слой».</div>';
+el.innerHTML = L1.length ? L1.map(a => `<div class="arr" data-id="${a.id}"><span class="sw" style="background:${a.style.color}"></span><div class="nm"><div>${escapeHtml(a.name)}</div><div>целей: ${a.points.length}${a.points.length ? ` (${escapeHtml(labelOf(a, 0))}…${escapeHtml(labelOf(a, a.points.length - 1))})` : ''}</div></div><button data-p="add">＋ Цели</button><button data-p="tbl">Таблица</button><button class="eye" data-p="ren">✎</button><button class="eye" data-p="del">🗑</button></div>`).join('') : '<div class="empty">Слоёв плановых огневых задач нет — нажмите «Добавить слой».</div>';
 el.querySelectorAll('.arr').forEach(r => { const a = arrById(+r.dataset.id);
 r.querySelector('[data-p=add]').onclick = () => planPreset(a);
 r.querySelector('[data-p=tbl]').onclick = () => { closeModals(); openTable(a.id); };
-r.querySelector('[data-p=ren]').onclick = () => { const v = prompt('Название слоя', a.name); if (v && v.trim()){ a.name = v.trim(); persist(); renderPlan(); } }; }); }
+r.querySelector('[data-p=ren]').onclick = () => { const v = prompt('Номер ТЗ', a.tz || ''); if (v === null) return; if (v.trim()){ const old = a.tz; a.tz = v.trim(); a.name = `ТЗ № ${a.tz}`; a.ident = `ТЗ ${a.tz}`; a.points.forEach(p => { if (p.tz === old) p.tz = a.tz; if (p.tzs) p.tzs = p.tzs.map(t => t === old ? a.tz : t); }); persist(); renderPlan(); renderMarkers(); } };
+r.querySelector('[data-p=del]').onclick = () => askConfirm(`Удалить «${a.name}» со всеми целями? (можно вернуть из корзины)`, 'Удалить', () => { trashLayer(a); openModal('planModal'); renderPlan(); }); }); }
 $('planBtn').onclick = () => { renderPlan(); openModal('planModal'); };
 
 async function exportPlanXlsx(a){
@@ -4336,6 +4342,11 @@ function zoneTgtAoa(sh){ const aoa = [['№ ТЗ', 'Зона', 'Цвет зон�
 zoneTargets(sh).forEach(({a, p, i}) => { const r = rowsOf(a)[i], ct = planCat(p); aoa.push([tzList(a, p).join(', '), sh.zn, colName(sh.color || '#e2533f'), ct ? TCAT[ct - 1][1] : '', p.ch || '', p.tno || r.id, r.x, r.y, r.h === '' ? '' : r.h, r.sq, r.place, r.comment, styleText(r.st)]); }); return aoa; }
 function zoneShapes(){ const z = state.arrays.find(x => x.zones); return z ? z.shapes.filter(s0 => s0.zn) : []; }
 
+const AUX = {v:false};
+function auxSection(el){ const ax = state.arrays.filter(a => a.kind === 'aux'); if (!ax.length) return;
+const h = document.createElement('div'); h.className = 'sub-h'; h.style.cursor = 'pointer'; h.textContent = `${AUX.v ? '▸' : '▾'} Ориентиры (${ax.length})`; h.onclick = () => { AUX.v = !AUX.v; renderLayers(); };
+const ref = el.querySelector('#ftH') ? el.querySelector('#ftH').parentNode : [...el.querySelectorAll('.sub-h')].find(x => /Макет/.test(x.textContent)); if (ref) el.insertBefore(h, ref); else el.appendChild(h);
+let cur = h; ax.forEach(a => { const r = el.querySelector(`.arr[data-id="${a.id}"]`); if (!r) return; const k = r.nextElementSibling && r.nextElementSibling.classList.contains('kids') ? r.nextElementSibling : null; cur.after(r); cur = r; if (k){ r.after(k); cur = k; } }); }
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
 const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
