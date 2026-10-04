@@ -163,6 +163,16 @@ body.picking #cross i{background:var(--signal)}
 .mxface select,.mxface input{width:100%;font-size:14px;min-height:34px;background:rgba(38,51,43,.85);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:0 8px;-webkit-appearance:none;appearance:none}.mxface select option{color:#000}
 .mxb{display:flex;gap:5px}.mxb button{flex:1;min-height:40px;font-size:14px;padding:0 4px;color:#fff;background:rgba(44,58,49,.85);border:1px solid rgba(255,255,255,.2)}.mxb button.primary{background:#e8782a;border-color:#e8782a}.mxb button:disabled{opacity:.45}.mxb button.on{outline:2px solid #ff8a2a}
 .mxt{color:#ffb000;font-weight:700;min-height:16px}.mxi{min-height:15px;line-height:1.25}.mxsub{opacity:.75;font-size:12.5px}.mxadd{justify-content:center}
+#mixer.sz-third .mxin{max-height:calc(33vh - 48px);overflow-y:auto}#mixer.sz-third .mxs{width:188px}#mixer.sz-third .mxface{font-size:12.5px;padding:7px;gap:3px}#mixer.sz-third .mxb button{min-height:32px;font-size:12.5px}#mixer.sz-third .mxface select{min-height:28px;font-size:12.5px}#mixer.sz-third .mxdeck{height:120px}#mixer.sz-third .mxdl{height:108px}
+#mixer.sz-peek{background:transparent;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;padding:0 6px;pointer-events:none}#mixer.sz-peek .mxpeek{pointer-events:auto;padding:0;gap:6px;align-items:flex-end;overflow-y:visible}
+.mxtip{width:160px;padding:6px 8px 4px;border-radius:12px 12px 0 0;background-color:rgba(18,24,20,.72);color:#fff;font-size:12.5px;border:2px solid rgba(255,255,255,.15);border-bottom:0;transform:translateY(0);transition:transform .2s;display:flex;flex-direction:column;gap:3px;text-shadow:0 1px 2px #000}.mxtip.up{width:200px}.mxtip.firing{transform:translateY(-8px);border-color:#ffb000}.mxtip.act{border-color:#ff8a2a}
+.mxup{pointer-events:auto;flex:none;align-self:flex-end;min-height:34px;color:#fff;background:rgba(232,120,42,.9);border:0;border-radius:10px 10px 0 0;padding:0 12px}
+#corr.mini{padding:6px 8px;gap:4px;font-size:13px;max-width:min(300px,calc(100vw - 90px));background:rgba(18,24,20,.55)}#corr.mini .crow button{min-height:34px;padding:0 9px}
+.fadot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:3px;border:1px solid rgba(0,0,0,.4)}.fadotmap{position:absolute;left:10px;top:-22px;width:11px;height:11px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 3px #000}
+.ptc{border:2px solid}.tgt-wrap{z-index:1000!important}.shl.zlb{transform:translate(4px,4px);font-weight:800;font-size:15px;color:#fff;background:rgba(160,20,20,.75);padding:2px 7px;border-radius:6px;text-shadow:none;white-space:nowrap}.shl.lplb{font-weight:800;font-style:italic;color:#d8ffd0;text-shadow:0 0 3px #000,0 0 6px #000,0 0 2px #000;white-space:nowrap}
+.ax .lb{font-weight:800;text-shadow:0 0 3px #fff,0 0 5px #fff}.mtp{background:#d9362c!important;color:#fff!important;border-color:#fff!important}
+#fbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--safe-t) + var(--tg) + 70px);z-index:1200;display:none;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 12px;max-width:calc(100vw - 150px);color:var(--ink);font-size:14px}#fbar.on{display:flex}#fbar span{opacity:.8}
+.zdh{width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#ffd400;border:2px solid #111;box-shadow:0 0 4px #000}.zdm{width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:rgba(255,255,255,.85);color:#111;font:700 13px/16px sans-serif;text-align:center;border:1px solid #111}
 .mxdeck{position:relative;width:190px;height:150px;flex:none;cursor:pointer;margin-right:16px;transition:transform .2s}.mxdeck.firing{transform:translateY(-10px)}.mxdl{position:absolute;left:0;top:0;width:176px;height:136px;border-radius:12px;background-color:rgba(18,24,20,.7);border:2px solid rgba(255,255,255,.18);box-shadow:0 3px 8px rgba(0,0,0,.4)}.mxdeck.firing .mxdl:first-child{border-color:#ffb000}
 .mxdt{position:absolute;left:10px;top:10px;width:156px;color:#fff;font-size:14px;line-height:1.35;z-index:5;text-shadow:0 1px 2px #000}
 .mxgh{display:flex;flex-direction:column;gap:6px;flex:none;align-self:stretch;justify-content:center}.mxgh button{min-height:38px;color:#fff;background:rgba(44,58,49,.85);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:0 10px}.mxgh button.primary{background:#e8782a}.mxgt{font-weight:700}
@@ -311,6 +321,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <button class="rb on" id="gridBtn" title="Сетка СК-42"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M9 4v16M15 4v16"/></svg>Сетка</button>
 </div>
 <div id="lrail">
+<button class="rb" id="usBtn" title="Поиск по задачам" style="display:none"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="M15 15l6 6"/></svg>Найти</button>
 <button class="rb" id="geoBtn" title="Топогеодезические задачи"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="6"/><path d="M16 4l4 4"/></svg>Топо</button>
 <button class="rb" id="faBtn" title="Огневые средства" style="display:none"><svg viewBox="0 0 24 24"><path d="M3 18h18M6 18l3-6h6l3 6M12 12V5M9 7l3-3 3 3"/></svg>Огн. ср.</button>
 <button class="rb" id="mixBtn" title="Микшер орудий" style="display:none"><svg viewBox="0 0 24 24"><path d="M6 3v18M12 3v18M18 3v18"/><rect x="4" y="7" width="4" height="3"/><rect x="10" y="13" width="4" height="3"/><rect x="16" y="9" width="4" height="3"/></svg>Микшер</button>
@@ -592,8 +603,8 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <div id="corr" class="glass"></div>
 <div id="mixer"></div>
 <div class="modal" id="geoModal"><div class="card big"><h3>Топогеодезические задачи</h3><div class="seg" id="geoTabs" style="flex-wrap:wrap"></div><div id="geoBody"></div><div class="row" style="margin-top:8px"><button class="ghost" data-close>Закрыть</button></div></div></div>
-<div class="modal" id="faModal"><div class="card big"><h3>Огневые средства</h3><div id="faList"></div><div class="row" style="margin-top:10px"><button class="ghost" data-close>Закрыть</button></div></div></div>
-<div class="modal" id="ftModal"><div class="card big"><h3>Огневые задачи</h3><div class="seg" id="ftTabs"><button data-t="cur" class="on">Текущие</button><button data-t="log">Журнал</button></div><div id="ftList"></div><div class="row" id="ftRow" style="margin-top:10px"></div></div></div>
+<div class="modal" id="faModal"><div class="card big"><h3>Огневые средства</h3><div id="faList"></div><div class="row" style="margin-top:10px"><button id="faXls">Ведомость БП (Excel)</button><button id="faTrk">Следы ОП</button><button class="ghost" data-close>Закрыть</button></div></div></div>
+<div class="modal" id="ftModal"><div class="card big"><h3>Огневые задачи</h3><div class="seg" id="ftTabs"><button data-t="cur" class="on">Текущие</button><button data-t="log">Журнал</button><button data-t="sum">Сводка</button><button data-t="sig">Сигналы</button></div><div id="ftList"></div><div class="row" id="ftRow" style="margin-top:10px"></div></div></div>
 <div class="modal" id="ftEdModal"><div class="card"><h3>Запись журнала</h3><div id="ftEdBody"></div><div class="row"><button class="ghost" data-close>Отмена</button><button class="primary" id="ftEdOk">Сохранить</button></div></div></div>
 <div class="modal" id="planModal"><div class="card big"><h3>Плановые огневые задачи</h3><div id="planList"></div><div class="row" style="margin-top:10px"><button class="primary" id="planAdd">Добавить ТЗ</button><button id="planMeet">Точки встречи</button><button id="planAll">Выгрузить всё (Excel)</button><button id="planZone">Добавить зону</button><button class="ghost" data-close>Закрыть</button></div><p class="status" style="margin-top:10px">Цели нумеруются с 101. Касание цели (удержание → «Карточка») — № ТЗ, характер цели, комментарий, цвет (кто привлекается). Группировка — в «Слоях» через «☑ Выбрать». Excel: № ТЗ, характер, № цели, X, Y, H, квадрат, н.п., комментарий, привлекается.</p></div></div>
 <div class="modal" id="chModal"><div class="card big"><h3>Характер цели</h3><label class="f"><input id="chQ" placeholder="Начните вводить: живая сила, миномёт, РЭБ…" autocomplete="off"></label><div id="chRes" style="max-height:50vh;overflow:auto"></div><div class="row" style="margin-top:8px"><button class="ghost" data-close>Отмена</button></div></div></div>
@@ -610,7 +621,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 6.11';
+const VERSION = 'версия 6.15';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -972,7 +983,8 @@ function arrById(id){ return state.arrays.find(a => a.id === id); }
 const TREE = c => `<svg viewBox="0 0 18 22"><path d="M9 1L14 8h-2.5L15 14h-3l4.5 5h-15L6 14H3l3.5-6H4z" fill="${c}" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/><rect x="8" y="19" width="2" height="3" fill="#fff"/></svg>`;
 const TREE_BTN = '<svg viewBox="0 0 24 24"><path d="M12 2l5 7h-3l4 6h-3.5L19 20H5l4.5-5H6l4-6H7z"/><path d="M12 20v3"/></svg>';
 const BOLT = '<svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>';
-function renderMarkers(){
+function renderMarkers(){ renderMarkers0(); declutter(); }
+function renderMarkers0(){
 markers.clearLayers();
 updateCluster();
 const z = map.getZoom(), vb = map.getBounds().pad(0.5);
@@ -1005,7 +1017,7 @@ if (a.fplan) html = planHtml(a, p, i, sid, showLb, editing, op);
 else if (sid && SYM_BY[sid]) html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="sym" style="color:${p.fake ? FAKE : symCol(sid, sideOf(a, p), st.color)}${symTf(a, p, sid)}">${symSvg(sid, p.fc || a.fc, symOpt(p))}</div>${showLb && !p.nolbl ? `<div class="lb"${lbStyle(p)}>${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
 else html = `<div class="pt${editing?' edit':''}" style="opacity:${op}"><div class="dot${g?' g':''}${ex?' ex':''}" style="background:${st.color};color:${ink(st.color)}">${escapeHtml(g)}</div>${showLb && !p.nolbl ? `<div class="lb">${escapeHtml(labelOf(a,i))}</div>` : ''}</div>`;
 }
-const m = L.marker([p.lat,p.lng], {icon:L.divIcon({className:'pt-wrap', html, iconSize:[0,0]}), draggable:editing, interactive:editing, keyboard:false});
+const m = L.marker([p.lat,p.lng], {icon:L.divIcon({className:'pt-wrap' + (a.fplan ? ' tgt-wrap' : ''), html, iconSize:[0,0]}), draggable:editing, interactive:editing, keyboard:false, zIndexOffset:a.fplan ? 1000 : 0});
 if (editing){
 m.on('drag', e => { if (a.kind === 'route'){ const ll = e.target.getLatLng(); p.lat = ll.lat; p.lng = ll.lng; routeLive(a); } });
 m.on('dragend', e => { const ll = e.target.getLatLng(); p.lat = ll.lat; p.lng = ll.lng; if (a.fplan) planNum(a, p);
@@ -1331,7 +1343,7 @@ if (session.style && !sameSt(session.style, a.style)) p.style = copySt(session.s
 a.points.push(p); fillHeight(p); fillPlace(p); persist(); renderMarkers(); renderSheet();
 if (a.fplan) planNew(a, p);
 }
-map.on('click', e => { if (window.geoPickCb && !session){ const f = window.geoPickCb; window.geoPickCb = null; f(e.latlng); return; } if (meetMode && !session){ meetTap(e.latlng); return; } if (CT && !session && !tool.on){ corrTap(e.latlng); return; } if (tblPending && tblPending.rows && !session){ const a = (tblPending.target && arrById(tblPending.target)) || textLayer(); if (!a.tables) a.tables = []; openTbEd(a, null, e.latlng); return; }
+map.on('click', e => { if (window.geoPickCb && !session){ const f = window.geoPickCb; window.geoPickCb = null; f(e.latlng); return; } if (window.mapTapHook && !session){ window.mapTapHook(e.latlng); return; } if (meetMode && !session){ meetTap(e.latlng); return; } if (CT && !session && !tool.on){ corrTap(e.latlng); return; } if (tblPending && tblPending.rows && !session){ const a = (tblPending.target && arrById(tblPending.target)) || textLayer(); if (!a.tables) a.tables = []; openTbEd(a, null, e.latlng); return; }
 if (textPending && !session){ const a = textLayer(); openTextEd(a, null, e.latlng); return; } if (session && session.mode === 'pick') addPoint(e.latlng); else if (!session && tool.on) toolAdd(e.latlng); });
 const sheet = $('sheet');
 { let sy = 0; sheet.addEventListener('touchstart', e => { sy = e.touches[0].clientY; }, {passive:true});
@@ -1983,7 +1995,8 @@ function drawShapes(a, lbl){
 (a.shapes || []).forEach(sh => {
 if (sh.hid || !tagOk(a, sh)) return;
 markers.addLayer(shapeLayer(sh, sh.color || a.style.color, (sh.op ?? 35) / 100, symExtra(sh)));
-if (lbl && sh.name){ const c = shapeGeo(sh).c; markers.addLayer(L.marker(c, {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="shl">${escapeHtml(sh.name)}</div>`})})); }
+if (lbl && sh.name){ let c = shapeGeo(sh).c, cls = 'shl'; if ((sh.zn || a.zones) && sh.pts && sh.pts.length > 2){ const P = sh.pts.map(q => [q[0] ?? q.lat, q[1] ?? q.lng]), k = Math.cos(P[0][0] * Math.PI / 180); c = P.reduce((b, q) => (q[0] - q[1] * k) > (b[0] - b[1] * k) ? q : b, P[0]); cls = 'shl zlb'; } else if (sh.lp || a.lpL) cls = 'shl lplb';
+markers.addLayer(L.marker(c, {interactive:false, keyboard:false, zIndexOffset:900, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="${cls}">${escapeHtml(sh.name)}</div>`})})); }
 });
 }
 function drawTool(){
@@ -3065,6 +3078,7 @@ state.trash.splice(k, 1); persist(); renderMarkers(); renderTrash(); });
 $('trashBtn').onclick = () => { closeModals(); renderTrash(); openModal('trashModal'); };
 $('trashClr').onclick = () => askConfirm('Очистить корзину навсегда?', 'Очистить', () => { state.trash = []; persist(); renderTrash(); openModal('trashModal'); });
 function swipeable(row, onTrash){
+if (!('ontouchstart' in window)) row.addEventListener('contextmenu', e => { if (e.target.closest('input,select,textarea')) return; e.preventDefault(); e.stopPropagation(); onTrash(); });
 const isTr = row.tagName === 'TR'; let x0 = null, y0 = 0, dx = 0, lock = null, btn = null, open = false;
 const host = isTr ? (row.lastElementChild || row) : row;
 host.style.position = 'relative'; if (!isTr) row.style.overflow = 'hidden';
@@ -3200,7 +3214,7 @@ state.arrays.push(a); pts.slice(0, 300).forEach(p => { fillHeight(p); fillPlace(
 persistNow(); closeModals(); renderMarkers(); map.fitBounds(L.latLngBounds(pts.map(p => [p.lat, p.lng])).pad(0.2), {maxZoom:16});
 toast(`Нанесено точек: ${pts.length}${bad ? `, пропущено строк: ${bad}` : ''}`);
 };
-function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; $('ftBtn').style.display = secMode === 'tp' ? '' : 'none'; $('mixBtn').style.display = secMode === 'tp' ? '' : 'none'; $('faBtn').style.display = secMode === 'tp' ? '' : 'none'; if (secMode !== 'tp' && $('mixer')) $('mixer').classList.remove('on'); $('lrail').style.display = ''; }
+function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; $('ftBtn').style.display = secMode === 'tp' ? '' : 'none'; $('mixBtn').style.display = secMode === 'tp' ? '' : 'none'; $('faBtn').style.display = secMode === 'tp' ? '' : 'none'; $('usBtn').style.display = secMode === 'tp' ? '' : 'none'; if (secMode !== 'tp' && $('mixer')) $('mixer').classList.remove('on'); $('lrail').style.display = ''; }
 const ENV_N = {trow:'Ряд деревьев', tpoly:'Роща', house:'Дом', flat:'Многоэтажка', wh:'Склад', hangar:'Ангар', tree_n:'Ель', tree_b:'Берёза', grove:'Роща', pw:'Опора ЛЭП', mast:'Мачта связи', wt:'Водонапорная башня', tank:'Цистерна'};
 const ENV_IC = {house:'⌂', flat:'▥', wh:'▭', hangar:'⌓', tree_n:'▲', tree_b:'●', grove:'♣', pw:'ᛉ', mast:'⊥', wt:'♜', tank:'◉'};
 function envMarkers(a, z){ if (!a.env) return;
@@ -3470,13 +3484,15 @@ state.arrays.forEach(a => { if (a.fplan) a.points.forEach(p => { if (p.ch && !p.
 state.arrays.forEach(a => { if (a.kind !== 'aux') return; let ch = false; a.points.forEach(p => { const m = String(p.name || '').match(/^лп\s+(?:лесополосы|ориентиры)\s+(лп\s+.+?)(?:\s+\d{4}-\d)?$/i); if (m){ p.name = m[1]; ch = true; } else { const m2 = String(p.name || '').match(/^(лп\s+.+?)\s+\d{4}-\d$/); if (m2){ p.name = m2[1]; ch = true; } } }); if (ch) persist(); });
 function planPrep(a, p){ const pr = session && session.plan; if (!pr) return; if (pr.color){ const pal = state.palette.find(x => x.color === pr.color); p.style = pal ? copySt(pal) : {color:pr.color, name:colName(pr.color), glyph:''}; }
 if (pr.ch && !p.osym){ p.ch = pr.ch; const id = symForChar(pr.ch); if (id){ p.sym = id; if (!p.side) p.side = 'b'; } } }
+function hexA(c, al){ const m = String(c).match(/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i); return m ? `rgba(${parseInt(m[1], 16)},${parseInt(m[2], 16)},${parseInt(m[3], 16)},${al})` : c; }
 function planHtml(a, p, i, sid, showLb, editing, op){ const col = styleOf(a, p).color;
-return `<div class="pt${editing ? ' edit' : ''}" style="opacity:${op}"><div class="ptc" style="background:${col}">${sid && SYM_BY[sid] ? `<div class="sym2" style="color:#111">${symSvg(sid, null, symOpt(p))}</div>` : '<b>?</b>'}</div>${showLb && !p.nolbl ? `<div class="lb" style="left:22px;top:-26px">${escapeHtml(labelOf(a, i))}</div>` : ''}</div>`; }
+return `<div class="pt${editing ? ' edit' : ''}" style="opacity:${op}"><div class="ptc" style="background:${hexA(col, .45)};border-color:${col}">${sid && SYM_BY[sid] ? `<div class="sym2" style="color:#1f5fe0${lsGet('skat_tgtE', false) ? ';transform:scaleX(-1)' : ''}">${symSvg(sid, null, symOpt(p))}</div>` : '<b>?</b>'}</div>${showLb && !p.nolbl ? `<div class="lb" style="left:22px;top:-26px">${escapeHtml(labelOf(a, i))}</div>` : ''}</div>`; }
 const tzList = (a, p) => (p.tzs && p.tzs.length ? p.tzs : [p.tz || a.tz || '']).map(String).filter(Boolean);
 let meetMode = null;
-function meetMarkers(a){ (a.meet || []).forEach(m => { if (m.hid) return; markers.addLayer(L.polyline([m.p1, m.p2], {color:'#111', weight:2, dashArray:'5 5', interactive:false}));
+function meetMarkers(a){ (a.meet || []).forEach(m => { if (m.hid) return; markers.addLayer(L.polyline([m.p1, m.p2], {color:'#d9362c', weight:2.5, dashArray:'5 5', interactive:false}));
 [[m.p1, 1], [m.p2, 2]].forEach(([q, n]) => markers.addLayer(L.marker(q, {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="mtp">${m.k}${n}</div>`})})));
 markers.addLayer(L.marker([(m.p1[0] + m.p2[0]) / 2, (m.p1[1] + m.p2[1]) / 2], {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="frac"><span>${escapeHtml(m.r)} – ${m.k}</span><span>«С» + ${escapeHtml(m.t)}</span></div>`})})); });
+(a.meetP || []).forEach(q => { if (!q.hid) markers.addLayer(L.marker([q.lat, q.lng], {interactive:false, keyboard:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="mtp">${escapeHtml(q.n)}</div>`})})); });
 if (meetMode && meetMode.p1) markers.addLayer(L.marker(meetMode.p1, {interactive:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="mtp">${meetMode.k}1</div>`})})); }
 const isPlanL = a => !!(a.fplan || a.zones || a.meetL);
 function zoneTargets(sh){ const out = []; state.arrays.forEach(a => { if (!a.fplan) return; a.points.forEach((p, i) => { if (zoneShape(p.lat, p.lng) === sh) out.push({a, p, i}); }); }); return out; }
@@ -3505,10 +3521,21 @@ const mkLoad = () => modLoad('mk');
 const modStub = (m, ...ns) => ns.forEach(n => { const f = (...a) => modLoad(m).then(() => { if (window[n] === f) throw new Error(n); return window[n](...a); }).catch(e => console.warn(e)); window[n] = f; });
 const modBtn = (m, ...ids) => ids.forEach(id => { const el = $(id); if (!el) return; const f = e => modLoad(m).then(() => { if (el.onclick && el.onclick !== f) el.onclick(e); }).catch(() => {}); el.onclick = f; });
 modStub('op', 'openTextEd', 'openProp'); modBtn('op', 'prnBtn');
-modStub('tp', 'corrTap', 'exportPlanXlsx', 'openShapeEd', 'meetTap', 'corrDraw', 'corrPanel', 'askChar', 'applyChar'); modBtn('tp', 'corrBtn', 'planBtn', 'ftBtn', 'mixBtn', 'faBtn', 'geoBtn');
+modStub('tp', 'corrTap', 'exportPlanXlsx', 'openShapeEd', 'meetTap', 'corrDraw', 'corrPanel', 'askChar', 'applyChar'); modBtn('tp', 'corrBtn', 'planBtn', 'ftBtn', 'mixBtn', 'faBtn', 'geoBtn', 'usBtn');
 $('v3Btn').onclick = () => mkLoad().then(open3D).catch(() => {});
 setTimeout(() => ['mk', 'op', 'tp'].forEach(m => { try { fetch(m + '.js?v=' + MODV).catch(() => {}); } catch(e){} }), 8000);
 
+// ---- ПК: клавиши (Esc — закрыть окна, пробел — выстрел активной задачи, Ctrl+F — поиск)
+document.addEventListener('keydown', e => { if (e.target.closest && e.target.closest('input,select,textarea')) return;
+if (e.key === 'Escape'){ const m = [...document.querySelectorAll('.modal.open')].pop(); if (m){ m.classList.remove('open'); e.preventDefault(); } }
+else if (e.key === ' ' && CT && secMode === 'tp' && window.__mod_tp){ e.preventDefault(); corrFire(CT); }
+else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f' && secMode === 'tp'){ e.preventDefault(); $('usBtn').click(); } });
+// ---- подписи без наложения: подпись, налезающая на уже размещённую, сдвигается вниз/вверх/влево, иначе бледнеет
+var dcT = 0; function declutter(){ cancelAnimationFrame(dcT); dcT = requestAnimationFrame(() => { const L1 = [...document.querySelectorAll('.leaflet-marker-pane .pt-wrap .lb, .leaflet-marker-pane .ax .lb')]; L1.forEach(e => { e.style.translate = ''; e.style.opacity = ''; });
+const R = [], hit = r => R.some(q => r.left < q.right && r.right > q.left && r.top < q.bottom && r.bottom > q.top);
+L1.sort((x, y) => (y.closest('.tgt-wrap') ? 1 : 0) - (x.closest('.tgt-wrap') ? 1 : 0)); L1.forEach(e => { const r0 = e.getBoundingClientRect(); if (!r0.width) return; const h = r0.height + 2;
+for (const [dx, dy] of [[0, 0], [0, h], [0, -h], [-(r0.width + 30), 0], [0, 2 * h], [0, -2 * h]]){ const r = {left:r0.left + dx, right:r0.right + dx, top:r0.top + dy, bottom:r0.bottom + dy}; if (!hit(r)){ if (dx || dy) e.style.translate = `${dx}px ${dy}px`; R.push(r); return; } } e.style.opacity = '.45'; R.push(r0); }); }); }
+map.on('zoomend moveend', declutter);
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
 const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
