@@ -1,4 +1,4 @@
-// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.15
+// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.16
 // ======== БОЕВОЙ КОНТУР: КОРРЕКТИРОВКА ОГНЯ ========
 const corrL = L.layerGroup().addTo(map);
 function sysTof(sys, d){ const k = SYS[sys] || SYS.d30; return Math.max(2, d / k.v * (k.hi ? 2 : 1.25)); }
@@ -40,7 +40,7 @@ if (c === 'un'){ const b0 = CT.bursts.pop(), sh = b0 && (CT.shots || []).find(x 
 // разрыв по касанию: привязка к первому упавшему неотмеченному выстрелу, «в цель» — до 50 м
 function corrMark(ll){ const p = pendShot(CT), b = {lat:+ll.lat.toFixed(7), lng:+ll.lng.toFixed(7), n:p ? p.no : (CT.bursts.length ? Math.max(...CT.bursts.map(x => x.n)) + 1 : 1), t:Date.now()};
 CT.bursts.push(b); if (p && CT.tgt) p.res = distM(b, CT.tgt) > 50 ? 'dev' : 'hit'; try { navigator.vibrate && navigator.vibrate(20); } catch(e){} }
-function newTask(){ const t = {id:Date.now(), name:'', sys:'d30', rs:4, bursts:[]}; state.ftasks.push(t); persist(); return t; }
+function newTask(){ let id0 = Date.now(); while (state.ftasks.some(x => x.id === id0)) id0++; const t = {id:id0, name:'', sys:'d30', rs:4, bursts:[]}; state.ftasks.push(t); persist(); return t; }
 $('corrBtn').onclick = () => { if (CT){ CT = null; corrEnd = false; corrDraw(); corrPanel(); return; } CT = newTask(); corrDraw(); corrPanel(); pickGun(CT); };
 function corrTap(ll){ const h = hitPoint(...(() => { const q = map.latLngToContainerPoint(ll), r = map.getContainer().getBoundingClientRect(); return [q.x + r.left, q.y + r.top, corrPick === 'tgt' ? 48 : 30]; })()), at = h && h.i != null ? {lat:h.a.points[h.i].lat, lng:h.a.points[h.i].lng} : {lat:ll.lat, lng:ll.lng};
 if (corrPick === 'gun'){ CT.gun = at; if (h && h.i != null){ CT.gname = labelOf(h.a, h.i); const k = itKind(h.a, h.a.points[h.i]); CT.sys = k === 'mortar' ? 'm120' : k === 'rszo' ? 'grad' : k === 'tank' ? 'tank' : k === 'sau' ? 'sau' : CT.sys; } corrPick = CT.tgt ? null : 'tgt'; if (corrPick) toast('Коснитесь цели'); }
@@ -198,7 +198,7 @@ Object.assign(r, {date:new Date().toISOString(), name:t.name || '', obj:t.obj ||
 function renderFt(){ keepScroll('ftModal', renderFt0); }
 function renderFt0(){ const el = $('ftList'), row = $('ftRow'); $('ftTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === ftTab));
 if (ftTab === 'cur'){ const pl = state.arrays.filter(isPlanL);
-el.innerHTML = (state.ftasks.length ? state.ftasks.map((t, k) => { const st = shotStats(t); return `<div class="arr" data-k="${k}"><span class="kth" style="color:#d9532c">⊕</span><div class="nm"><div>${escapeHtml(t.name || 'Цель')}${t.obj ? ' · ' + escapeHtml(t.obj) : ''}</div><div>${escapeHtml((SYS[t.sys] || SYS.d30).n)}${t.res ? ' · <b>' + escapeHtml(t.res) + '</b>' : ''} · выстрелов ${st.shots}, снарядов ${st.n}</div></div>${t.name ? '<button data-a="hist">История</button>' : ''}<button data-a="open">Открыть</button></div>`; }).join('') : '<div class="empty">Огневых задач нет</div>')
+el.innerHTML = (state.ftasks.length ? state.ftasks.map((t, k) => { if (!(t.tgt || (t.shots || []).length)) return ''; const st = shotStats(t); return `<div class="arr" data-k="${k}"><span class="kth" style="color:#d9532c">⊕</span><div class="nm"><div>${escapeHtml(t.name || 'Цель')}${t.obj ? ' · ' + escapeHtml(t.obj) : ''}</div><div>${escapeHtml((SYS[t.sys] || SYS.d30).n)}${t.res ? ' · <b>' + escapeHtml(t.res) + '</b>' : ''} · выстрелов ${st.shots}, снарядов ${st.n}</div></div>${t.name ? '<button data-a="hist">История</button>' : ''}<button data-a="open">Открыть</button></div>`; }).join('') : '<div class="empty">Огневых задач нет</div>')
 + (pl.length ? '<div class="sub-h">Плановые (ТЗ)</div>' + pl.map(a => { const Z = a.zones ? zoneShapes() : []; return `<div class="arr${a.hidden ? ' off' : ''}" data-id="${a.id}"><button class="eye" data-a="eye">${a.hidden ? '◌' : '●'}</button><div class="nm"><div>${escapeHtml(a.name)}</div><div>${a.zones ? `зон ${Z.length}, целей в зонах ${Z.reduce((q, sh) => q + zoneTargets(sh).length, 0)}` : a.meetL ? `точек: ${a.points.length}` : `целей: ${a.points.length}`}</div></div><button data-a="plan">План ОЗ</button></div>` + (Z.length ? `<div class="kids">${Z.map((sh, k) => `<div class="kid"><span class="sw" style="background:${sh.color || '#e2533f'}"></span><span class="kn">${escapeHtml(sh.name || 'Зона ' + sh.zn)} — целей ${zoneTargets(sh).length}</span><button data-zt="${k}">Таблица</button></div>`).join('')}</div>` : ''); }).join('') : '');
 row.innerHTML = '<button class="primary" id="ftNew">+ Задача (корректировка)</button><button id="prjSave">Сохранить проект</button><button id="prjOpen">Открыть проект</button><button data-close>Закрыть</button>'; $('prjSave').onclick = saveProject; $('prjOpen').onclick = openProject;
 el.querySelectorAll('.arr[data-k]').forEach(r => { const t = state.ftasks[+r.dataset.k];
@@ -256,7 +256,7 @@ const V = mixV(), All = mixTasks(), T0 = V.mode === 'fav' ? All.filter(t => t.fa
 const bar = `<div class="mxbar"><div class="mxseg">${[['all', 'Все'], ['deck', 'Колоды'], ['fav', '★ Избранные']].map(([k, l]) => `<button data-v="${k}" class="${V.mode === k ? 'on' : ''}">${l}</button>`).join('')}</div>
 <select data-vs="grp">${[['reg', 'Группы: по полкам'], ['unit', 'Группы: по подразделениям'], ['own', 'Группы: свои']].map(([k, l]) => `<option value="${k}"${V.grp === k ? ' selected' : ''}>${l}</option>`).join('')}</select>
 <select data-vs="sort">${[['unit', 'Сорт.: подразделение'], ['sys', 'Сорт.: система'], ['ammo', 'Сорт.: остаток БП'], ['cs', 'Сорт.: позывной'], ['ready', 'Сорт.: готовность']].map(([k, l]) => `<option value="${k}"${V.sort === k ? ' selected' : ''}>${l}</option>`).join('')}</select>
-<button data-m="add" class="primary">＋ Орудие</button><button data-sz="peek" title="Свернуть">▾</button><button data-sz="${V.size === 'full' ? 'third' : 'full'}" title="${V.size === 'full' ? 'Уменьшить' : 'Развернуть'}">${V.size === 'full' ? '⤓' : '⤒'}</button><button data-m="hide" title="Скрыть">✕</button></div>`;
+<button data-m="add" class="primary">＋ Орудие</button><button data-m="fal" title="Все огневые средства">ОС</button><button data-m="bp">Ведомость БП</button><button data-m="trk">${faTrkOn ? 'Следы ОП ✓' : 'Следы ОП'}</button><button data-sz="peek" title="Свернуть">▾</button><button data-sz="${V.size === 'full' ? 'third' : 'full'}" title="${V.size === 'full' ? 'Уменьшить' : 'Развернуть'}">${V.size === 'full' ? '⤓' : '⤒'}</button><button data-m="hide" title="Скрыть">✕</button></div>`;
 let body = '';
 el.classList.remove('sz-peek', 'sz-third', 'sz-full'); el.classList.add('sz-' + (V.size || 'third'));
 if (V.size === 'peek'){ mixWheel(el, true); el.innerHTML = `<div class="mxin mxpeek">${T.map(mixTip).join('')}<button class="mxup" data-sz="third">▴ Микшер</button></div>`; el.querySelectorAll('[data-sz]').forEach(b => b.onclick = () => { V.size = b.dataset.sz; mixRaise = null; mixVSave(); renderMix(); }); mixBind(el, T, V); return; }
@@ -278,6 +278,7 @@ if (a === 'xf') xferSend(L1.map(xferText).join('\n\n')); });
 mixBind(el, T, V);
 el.querySelector('[data-m=add]').onclick = () => { const prev = mixTasks().slice(-1)[0]; CT = newTask(); if (prev){ CT.sys = prev.sys; CT.rs = prev.rs; } MIX.push(CT.id); mixSave(); corrEnd = false; corrDraw(); corrPanel(); pickGun(CT); };
 el.querySelector('[data-m=hide]').onclick = () => { mixOn = false; renderMix(); };
+el.querySelector('[data-m=fal]').onclick = () => { renderFa(); openModal('faModal'); }; el.querySelector('[data-m=bp]').onclick = exportAmmo; el.querySelector('[data-m=trk]').onclick = () => { faTrkOn = !faTrkOn; lsSet('skat_trk', faTrkOn); faTracks(); renderMix(); };
 mixTimer(); }
 function mixCard(t){ const sys = SYS[t.sys] || SYS.d30, d = t.gun && t.tgt ? distM(t.gun, t.tgt) : 0, mx = t.maxOv || sys.max, far = d && mx && d > mx, st = shotStats(t), last = (t.bursts || []).slice(-1)[0], nextNo = (t.reuse && t.reuse.length) ? Math.min(...t.reuse) : (t.shotN || 0) + 1, ps = pendShot(t), r = t.faId && faFind(t.faId), fa = r && r.p.fa, k = MIX.indexOf(t.id);
 let dv = ''; if (last && t.gun && t.tgt){ const keep = CT; CT = t; const v = corrDev(last); CT = keep; dv = `${devTxt(v)} (${Math.round(Math.hypot(v.dN, v.dE))} м)`; }
@@ -582,7 +583,7 @@ const lpL = L.layerGroup().addTo(map); let lpMode = null;
 function lpLayer(){ let a = state.arrays.find(x => x.lpL); if (!a){ a = normArr({id:Date.now(), kind:'shapes', lpL:true, name:'Лесополосы', ident:'лп', style:{color:'#2f7a34', name:'Зелёный', glyph:''}, points:[], shapes:[]}); state.arrays.push(a); } return a; }
 function lpStart(){ closeModals(); lpMode = {pts:[]}; lpBar(); toast('Обводите лесополосу касаниями по контуру'); }
 function lpBar(){ if (!lpMode){ floatBar(''); lpL.clearLayers(); return; } lpL.clearLayers(); if (lpMode.pts.length) lpL.addLayer(L.polyline(lpMode.pts.concat(lpMode.pts.length > 2 ? [lpMode.pts[0]] : []), {color:'#2f7a34', weight:3, dashArray:'6 4', interactive:false})); lpMode.pts.forEach(p => lpL.addLayer(L.circleMarker(p, {radius:4, color:'#fff', weight:2, fillColor:'#2f7a34', fillOpacity:1, interactive:false})));
-floatBar(`<b>Лесополоса: точек ${lpMode.pts.length}</b><button id="lpUn" ${lpMode.pts.length ? '' : 'disabled'}>↶</button><button id="lpOk" class="primary" ${lpMode.pts.length > 2 ? '' : 'disabled'}>Замкнуть и назвать</button><button id="lpEnd">Готово</button>`);
+floatBar(`<b>Лесополоса: точек ${lpMode.pts.length}</b><span>Нажмите и ведите пальцем по краю лесополосы — контур замкнётся сам. Или касайтесь углов по очереди и нажмите «Замкнуть»</span><button id="lpUn" ${lpMode.pts.length ? '' : 'disabled'}>↶</button><button id="lpOk" class="primary" ${lpMode.pts.length > 2 ? '' : 'disabled'}>Замкнуть и назвать</button><button id="lpEnd">Готово</button>`);
 $('lpUn').onclick = () => { lpMode.pts.pop(); lpBar(); }; $('lpEnd').onclick = () => { lpMode = null; lpBar(); renderMarkers(); };
 $('lpOk').onclick = () => { const n = prompt('Название лесополосы (например, лп Сизо)', ''); if (n === null) return; const a = lpLayer(); a.shapes.push({type:'poly', pts:lpMode.pts.map(q => [q[0], q[1]]), name:n.trim() || ('лп ' + (a.shapes.length + 1)), color:'#2f7a34', op:30, lp:true}); persist(); lpMode = {pts:[]}; lpBar(); renderMarkers(); toast('Сохранено. Обводите следующую'); }; }
 function lpTap(ll){ lpMode.pts.push([+ll.lat.toFixed(7), +ll.lng.toFixed(7)]); lpBar(); }
@@ -652,5 +653,22 @@ const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.ao
 { const r = $('planAdd').parentNode; r.insertAdjacentHTML('beforeend', '<button id="planNumB">Нумерация целей</button><button id="planLp">Лесополосы</button><button id="planPer">Периоды и налёты</button><button id="planRp">Точки Р101…</button>');
 $('planNumB').onclick = numByDir; $('planLp').onclick = lpStart; $('planPer').onclick = openPer; $('planRp').onclick = () => { closeModals(); rpStart(); }; }
 window.mapTapHook = null; { const sync = () => { window.mapTapHook = lpMode ? lpTap : rpMode ? rpTap : null; }; const lb0 = lpBar, rb0 = rpBar; window.lpBar = () => { lb0(); sync(); }; window.rpBar = () => { rb0(); sync(); }; }
-{ const rp1 = window.renderPlan; window.renderPlan = () => { rp1(); meetSection($('planList')); const pl = $('planList'); if (!$('tgtE')){ const d = document.createElement('label'); d.className = 'f'; d.style.cssText = 'display:flex;gap:8px;align-items:center'; d.innerHTML = `<input type="checkbox" id="tgtE" style="width:22px;min-height:22px;margin:0"${lsGet('skat_tgtE', false) ? ' checked' : ''}> Знаки целей повёрнуты на восток (зеркально)`; pl.parentNode.insertBefore(d, pl); $('tgtE').onchange = e => { lsSet('skat_tgtE', e.target.checked); renderMarkers(); }; } }; }
+{ const rp1 = window.renderPlan; window.renderPlan = () => { rp1(); meetSection($('planList')); }; }
+// ---- свои огневые средства на карте автоматически получают карточку и канал в «Микшере»; удалён знак — канал убирается
+function faAuto(){ let ch = false; faCand().forEach(({a, i, p}) => { p.fa = {id:Date.now() + Math.floor(Math.random() * 1e6), cs:labelOf(a, i), sys:FA_KIND[itKind(a, p)] || 'd30', n:1, ammo:[], pos:[p.lat, p.lng]}; ch = true; });
+const F = faAll(), ids = new Set(F.map(x => x.p.fa.id)), inMix = new Set(mixTasks().map(t => t.faId).filter(Boolean));
+F.forEach(({a, i, p}) => { if (inMix.has(p.fa.id)) return; const t = newTask(); t.gun = {lat:p.lat, lng:p.lng, h:p.h}; t.gname = p.fa.cs || labelOf(a, i); t.sys = p.fa.sys; t.faId = p.fa.id; t.maxOv = +p.fa.max || null; MIX.push(t.id); inMix.add(p.fa.id); ch = true; });
+const gone = mixTasks().filter(t => t.faId && !ids.has(t.faId)); if (gone.length){ MIX = MIX.filter(id => !gone.some(t => t.id === id)); state.ftasks = state.ftasks.filter(t => !(gone.includes(t) && !(t.shots || []).length)); ch = true; }
+if (ch){ lsSet('skat_mix', MIX); if (mixOn) setTimeout(renderMix, 0); } return ch; }
+{ const pr1 = window.persist; let busy = false; window.persist = (...a) => { if (!busy){ busy = true; try { faAuto(); } catch(e){} busy = false; } return pr1(...a); }; }
+setTimeout(() => { try { if (faAuto()) persist(); } catch(e){} }, 300);
+// ---- лесополосы: обводка пальцем (нажать и вести по краю) или касаниями по точкам
+{ const ct = map.getContainer(); let fh = null;
+ct.addEventListener('pointerdown', e => { if (!lpMode || !e.isPrimary || e.target.closest('#fbar,.leaflet-control,button')) return; fh = {x:e.clientX, y:e.clientY, pts:[], on:false}; }, true);
+ct.addEventListener('pointermove', e => { if (!fh || !lpMode || !e.isPrimary) return; const d = Math.hypot(e.clientX - fh.x, e.clientY - fh.y); if (!fh.on && d > 12){ fh.on = true; map.dragging.disable(); }
+if (fh.on){ const r = ct.getBoundingClientRect(), ll = map.containerPointToLatLng([e.clientX - r.left, e.clientY - r.top]), last = fh.pts[fh.pts.length - 1];
+if (!last || map.latLngToContainerPoint(last).distanceTo(map.latLngToContainerPoint(ll)) > 10){ fh.pts.push(ll); lpMode.pts = fh.pts.map(q => [+q.lat.toFixed(7), +q.lng.toFixed(7)]); lpBar(); } } }, true);
+const up = () => { if (!fh) return; const was = fh.on; fh = null; map.dragging.enable(); if (was && lpMode && lpMode.pts.length > 2){ window.lpSkipTap = Date.now(); setTimeout(() => $('lpOk') && $('lpOk').click(), 50); } };
+ct.addEventListener('pointerup', up, true); ct.addEventListener('pointercancel', up, true); }
+{ const lt0 = lpTap; window.lpTap = ll => { if (window.lpSkipTap && Date.now() - window.lpSkipTap < 600) return; lt0(ll); }; }
 window.__mod_tp = 1;

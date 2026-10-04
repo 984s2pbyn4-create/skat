@@ -134,7 +134,7 @@ body:has(#v3d.on) .modal{z-index:2600}
 .boomic{position:relative;transform:translate(-50%,-50%);width:30px;height:30px}.boomic svg{width:30px;height:30px;filter:drop-shadow(0 0 2px #000)}.boomic b{position:absolute;right:-8px;top:-8px;background:#111;color:#fff;border-radius:9px;font:700 11px/16px sans-serif;min-width:16px;text-align:center;padding:0 3px}
 .ctgun,.cttgt{transform:translate(-50%,-50%);font:800 22px/1 sans-serif;color:#ff8a2a;text-shadow:0 0 3px #000;display:inline-block}.cttgt{color:#e2533f;font-size:28px}
 .proj{width:44px;height:14px;display:inline-block}.proj.rocket{width:56px}.proj svg{width:100%;height:100%;filter:drop-shadow(0 0 2px #000)}
-.ptc{position:absolute;left:-19px;top:-19px;width:38px;height:38px;border-radius:50%;border:2px solid #111;box-shadow:0 0 0 1px #fff;display:grid;place-items:center}.ptc .sym2{width:28px;height:28px}.ptc .sym2 svg,.ptc .sym2 .symimg{width:100%;height:100%;display:block}.ptc b{font:800 16px/1 sans-serif;color:#111}
+.ptc{position:absolute;left:calc(var(--sg) * -.6);top:calc(var(--sg) * -.6);width:calc(var(--sg) * 1.2);height:calc(var(--sg) * 1.2);border-radius:50%;border:2px solid #111;box-shadow:0 0 0 1px #fff;display:grid;place-items:center}.ptc .sym2{width:calc(var(--sg) * .86);height:calc(var(--sg) * .86);filter:drop-shadow(0 0 .8px #fff) drop-shadow(0 0 .8px #fff) drop-shadow(0 0 1.5px rgba(255,255,255,.9))}.ptc .sym2 svg,.ptc .sym2 .symimg{width:100%;height:100%;display:block}.ptc b{font:800 16px/1 sans-serif;color:#111}
 .mtp{transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:#ffd400;border:2px solid #111;font:800 12px/24px sans-serif;text-align:center;color:#111;display:inline-block}
 .frac{transform:translate(-50%,-140%);display:inline-flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.92);border:1.5px solid #111;border-radius:6px;padding:2px 8px;font:700 12.5px/1.3 'Roboto Condensed',sans-serif;color:#111;white-space:nowrap}.frac span:first-child{border-bottom:1.5px solid #111;padding-bottom:1px}
 #meetBar{position:fixed;left:10px;top:calc(var(--safe-t) + var(--tg) + 68px);z-index:1100;display:none;align-items:center;gap:10px;padding:8px 12px;color:var(--ink)}#meetBar.on{display:flex}#meetBar button{min-height:36px;padding:4px 12px}
@@ -176,7 +176,8 @@ body.picking #cross i{background:var(--signal)}
 .mxdeck{position:relative;width:190px;height:150px;flex:none;cursor:pointer;margin-right:16px;transition:transform .2s}.mxdeck.firing{transform:translateY(-10px)}.mxdl{position:absolute;left:0;top:0;width:176px;height:136px;border-radius:12px;background-color:rgba(18,24,20,.7);border:2px solid rgba(255,255,255,.18);box-shadow:0 3px 8px rgba(0,0,0,.4)}.mxdeck.firing .mxdl:first-child{border-color:#ffb000}
 .mxdt{position:absolute;left:10px;top:10px;width:156px;color:#fff;font-size:14px;line-height:1.35;z-index:5;text-shadow:0 1px 2px #000}
 .mxgh{display:flex;flex-direction:column;gap:6px;flex:none;align-self:stretch;justify-content:center}.mxgh button{min-height:38px;color:#fff;background:rgba(44,58,49,.85);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:0 10px}.mxgh button.primary{background:#e8782a}.mxgt{font-weight:700}
-#lrail{position:fixed;left:10px;top:calc(var(--safe-t) + var(--tg) + 68px);z-index:1000;display:flex;flex-direction:column;gap:6px}
+:root{--sg:33px;--lf:12.3px}
+#lrail{max-height:calc(100vh - var(--safe-t) - 160px);overflow-y:auto;z-index:1060!important;position:fixed;left:10px;top:calc(var(--safe-t) + var(--tg) + 68px);z-index:1000;display:flex;flex-direction:column;gap:6px}
 #lrail:has(.rb[style*="display: none"]:only-child){display:none}
 #rail{position:fixed;right:10px;top:calc(var(--safe-t) + var(--tg) + 68px);z-index:1000;display:flex;flex-direction:column;gap:6px}
 .rb{width:52px;min-height:50px;padding:6px 0 5px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:600;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
@@ -273,10 +274,10 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 .pt .dot.ex{font-size:14px;font-weight:800}
 .pt.edit .dot{width:22px;height:22px;left:-11px;top:-11px;border-width:3px}
 .pt.edit .dot.g{width:28px;height:28px;left:-14px;top:-14px;font-size:12px}
-.pt .sym{position:absolute;left:-16px;top:-16px;width:32px;height:32px;filter:drop-shadow(0 0 1.2px #fff) drop-shadow(0 0 1.2px #fff) drop-shadow(0 0 2px rgba(255,255,255,.8))}
+.pt .sym{position:absolute;left:calc(var(--sg) / -2);top:calc(var(--sg) / -2);width:var(--sg);height:var(--sg);filter:drop-shadow(0 0 1.2px #fff) drop-shadow(0 0 1.2px #fff) drop-shadow(0 0 2px rgba(255,255,255,.8))}
 .pt .sym svg{width:100%;height:100%;display:block}
 .pt .sym + .lb{left:17px;top:-24px}
-.pt .lb{position:absolute;left:10px;top:-22px;white-space:nowrap;font:700 12.5px/1 "IBM Plex Sans Condensed",sans-serif;color:#111;background:rgba(255,255,255,.88);padding:2px 4px;border-radius:4px}
+.pt .lb{position:absolute;left:10px;top:-22px;white-space:nowrap;font:700 var(--lf)/1 "IBM Plex Sans Condensed",sans-serif;color:#111;background:rgba(255,255,255,.88);padding:2px 4px;border-radius:4px}
 .pt.edit .lb{left:14px}
 .leaflet-marker-icon.pt-wrap,.leaflet-marker-icon.plc-wrap{background:none;border:0}
 .ax{position:relative}
@@ -385,6 +386,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <p class="status">★ — избранное: в круговом меню показываются только эти знаки. Касание строки — изменить название, значок и оформление.</p>
 <label class="f"><input id="symQ" placeholder="Поиск знака по названию или категории" autocomplete="off"></label><div class="colors strip" id="symCats"></div>
 <div id="symList" style="max-height:46vh;overflow:auto"></div>
+<div class="sub-h">Размеры знаков и подписей (нормы военной топографии)</div><label class="f">Масштаб<select id="normK"><option value="1">как на карте: знак 7 мм, подпись 2,5 мм</option><option value="1.25">для планшета ×1,25</option><option value="1.5">крупно ×1,5</option><option value="1.8">очень крупно ×1,8</option></select></label>
 <div class="sub-h">Кластеризация точек</div>
 <label class="f" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="clOn" style="width:22px;min-height:22px;margin:0"> Объединять близкие точки в кружок с числом</label>
 <div class="duo"><label class="f">Объединять до масштаба<select id="clZ"></select></label><label class="f">Радиус объединения, пикс.<select id="clR"><option value="40">40</option><option value="60">60</option><option value="80">80</option><option value="110">110</option></select></label></div>
@@ -621,7 +623,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 6.15';
+const VERSION = 'версия 6.16';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -2776,7 +2778,7 @@ Object.keys(LSPEC).forEach(key => { DECOR[key] = (g, P, c, k) => decorLine(g, P,
 const clCfg = Object.assign({on:false, z:13, r:60}, lsGet('skat_cl', {}));
 let curCl = null;
 function updateCluster(){
-curCl = null; const z = map.getZoom(); if (!clCfg.on || z >= clCfg.z) return;
+curCl = null; const z = map.getZoom(); if (!clCfg.on || z >= clCfg.z || secMode === 'op') return;
 const cells = new Map(), R = clCfg.r, b = map.getBounds().pad(0.3);
 state.arrays.forEach(a => { if (a.hidden || a.kind === 'aux' || a.kind === 'shapes' || (session && session.arrId === a.id) || z < (a.minZ || 0)) return;
 a.points.forEach((p, i) => { if (!b.contains([p.lat, p.lng])) return; const q = map.latLngToContainerPoint([p.lat, p.lng]), key = Math.floor(q.x / R) + ',' + Math.floor(q.y / R);
@@ -3214,7 +3216,7 @@ state.arrays.push(a); pts.slice(0, 300).forEach(p => { fillHeight(p); fillPlace(
 persistNow(); closeModals(); renderMarkers(); map.fitBounds(L.latLngBounds(pts.map(p => [p.lat, p.lng])).pad(0.2), {maxZoom:16});
 toast(`Нанесено точек: ${pts.length}${bad ? `, пропущено строк: ${bad}` : ''}`);
 };
-function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; $('ftBtn').style.display = secMode === 'tp' ? '' : 'none'; $('mixBtn').style.display = secMode === 'tp' ? '' : 'none'; $('faBtn').style.display = secMode === 'tp' ? '' : 'none'; $('usBtn').style.display = secMode === 'tp' ? '' : 'none'; if (secMode !== 'tp' && $('mixer')) $('mixer').classList.remove('on'); $('lrail').style.display = ''; }
+function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; $('ftBtn').style.display = secMode === 'tp' ? '' : 'none'; $('mixBtn').style.display = secMode === 'tp' ? '' : 'none'; $('faBtn').style.display = 'none'; $('usBtn').style.display = secMode === 'tp' ? '' : 'none'; if (secMode !== 'tp' && $('mixer')) $('mixer').classList.remove('on'); $('lrail').style.display = ''; }
 const ENV_N = {trow:'Ряд деревьев', tpoly:'Роща', house:'Дом', flat:'Многоэтажка', wh:'Склад', hangar:'Ангар', tree_n:'Ель', tree_b:'Берёза', grove:'Роща', pw:'Опора ЛЭП', mast:'Мачта связи', wt:'Водонапорная башня', tank:'Цистерна'};
 const ENV_IC = {house:'⌂', flat:'▥', wh:'▭', hangar:'⌓', tree_n:'▲', tree_b:'●', grove:'♣', pw:'ᛉ', mast:'⊥', wt:'♜', tank:'◉'};
 function envMarkers(a, z){ if (!a.env) return;
@@ -3476,7 +3478,7 @@ function symForChar(v){ v = String(v || '').toLowerCase(); const ex = SYMS.find(
 for (const [re, ids, nre] of CH2SYM){ if (!re.test(v)) continue; const id = ids.find(x => SYM_BY[x] && SYM_BY[x].type === 'pt'); if (id) return id; const s0 = SYMS.find(s => s.type === 'pt' && nre.test(s.n.toLowerCase())); if (s0) return s0.id; }
 return null; }
 const FACE_L = /^(bmp|btr|brm|brdm|dozor|auto|tyag|ptrk2|ptrk_s|tank_tr|kp_rm|pick)/;
-function mirB(a, p, sid){ const s = SYM_BY[sid]; return !!(s && FACE_L.test(sid) && !(s.tx && s.tx.length) && sideOf(a, p) === 'b'); }
+function mirB(a, p, sid){ const s = SYM_BY[sid]; return !!(s && (FACE_L.test(sid) || isFlagSym(sid)) && !(s.tx && s.tx.length) && sideOf(a, p) === 'b'); }
 function symTf(a, p, sid){ const t = [p.rot ? `rotate(${p.rot}deg)` : '', p.ssz ? `scale(${p.ssz})` : '', mirB(a, p, sid) ? 'scaleX(-1)' : ''].filter(Boolean).join(' '); return t ? `;transform:${t}` : ''; }
 function symOptM(a, p, sid){ const o = symOpt(p), m = mirB(a, p, sid); return m ? Object.assign({}, o || {}, {mx:true}) : o; }
 state.arrays.forEach(a => { if (a.fplan) a.points.forEach(p => { if (p.ch && !p.sym && !p.osym){ const id = symForChar(p.ch); if (id){ p.sym = id; if (!p.side) p.side = 'b'; } } if (p.tno) planNum(a, p); }); });
@@ -3484,9 +3486,12 @@ state.arrays.forEach(a => { if (a.fplan) a.points.forEach(p => { if (p.ch && !p.
 state.arrays.forEach(a => { if (a.kind !== 'aux') return; let ch = false; a.points.forEach(p => { const m = String(p.name || '').match(/^лп\s+(?:лесополосы|ориентиры)\s+(лп\s+.+?)(?:\s+\d{4}-\d)?$/i); if (m){ p.name = m[1]; ch = true; } else { const m2 = String(p.name || '').match(/^(лп\s+.+?)\s+\d{4}-\d$/); if (m2){ p.name = m2[1]; ch = true; } } }); if (ch) persist(); });
 function planPrep(a, p){ const pr = session && session.plan; if (!pr) return; if (pr.color){ const pal = state.palette.find(x => x.color === pr.color); p.style = pal ? copySt(pal) : {color:pr.color, name:colName(pr.color), glyph:''}; }
 if (pr.ch && !p.osym){ p.ch = pr.ch; const id = symForChar(pr.ch); if (id){ p.sym = id; if (!p.side) p.side = 'b'; } } }
+// ориентация в кругах целей: миномёт ножками на восток, флажки противника на запад (свои — на восток, как нарисованы)
+const isFlagSym = sid => { const s = SYM_BY[sid]; return !!(s && /l1\d(?:\.\d+)? \d+(?:\.\d+)?-1\d/.test((s.d || []).join(' '))); };
+function tgtFlip(a, p, sid){ return /^min/.test(sid || '') || (isFlagSym(sid) && sideOf(a, p) !== 'r'); }
 function hexA(c, al){ const m = String(c).match(/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i); return m ? `rgba(${parseInt(m[1], 16)},${parseInt(m[2], 16)},${parseInt(m[3], 16)},${al})` : c; }
 function planHtml(a, p, i, sid, showLb, editing, op){ const col = styleOf(a, p).color;
-return `<div class="pt${editing ? ' edit' : ''}" style="opacity:${op}"><div class="ptc" style="background:${hexA(col, .45)};border-color:${col}">${sid && SYM_BY[sid] ? `<div class="sym2" style="color:#1f5fe0${lsGet('skat_tgtE', false) ? ';transform:scaleX(-1)' : ''}">${symSvg(sid, null, symOpt(p))}</div>` : '<b>?</b>'}</div>${showLb && !p.nolbl ? `<div class="lb" style="left:22px;top:-26px">${escapeHtml(labelOf(a, i))}</div>` : ''}</div>`; }
+return `<div class="pt${editing ? ' edit' : ''}" style="opacity:${op}"><div class="ptc" style="background:${hexA(col, .45)};border-color:${col}">${sid && SYM_BY[sid] ? `<div class="sym2" style="color:#1f5fe0${tgtFlip(a, p, sid) ? ';transform:scaleX(-1)' : ''}">${symSvg(sid, null, symOpt(p))}</div>` : '<b>?</b>'}</div>${showLb && !p.nolbl ? `<div class="lb" style="left:22px;top:-26px">${escapeHtml(labelOf(a, i))}</div>` : ''}</div>`; }
 const tzList = (a, p) => (p.tzs && p.tzs.length ? p.tzs : [p.tz || a.tz || '']).map(String).filter(Boolean);
 let meetMode = null;
 function meetMarkers(a){ (a.meet || []).forEach(m => { if (m.hid) return; markers.addLayer(L.polyline([m.p1, m.p2], {color:'#d9362c', weight:2.5, dashArray:'5 5', interactive:false}));
@@ -3510,6 +3515,9 @@ state.arrays.forEach(a => { if (a.fplan) a.points.forEach(p => { if (p.tno && p.
 // ---- масштаб по топографическому ряду (экран ≈ 96 точек на дюйм)
 const TOPO_S = [5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000];
 function topoScale(){ try { const c = map.getCenter(), mpp = 156543.03392 * Math.cos(c.lat * Math.PI / 180) / Math.pow(2, map.getZoom()), s0 = mpp / 0.0002646; return TOPO_S.reduce((b, x) => Math.abs(Math.log(x / s0)) < Math.abs(Math.log(b / s0)) ? x : b, TOPO_S[0]); } catch(e){ return 25000; } }
+// ---- ошибки показываются внизу экрана (для скриншота разработчику)
+window.addEventListener('error', e => { try { toast('Ошибка: ' + (e.message || e) + ' (' + String(e.filename || '').split('/').pop().split('?')[0] + ':' + (e.lineno || '') + ')'); } catch(x){} });
+window.addEventListener('unhandledrejection', e => { const r = e.reason; if (r && /^(mk|op|tp)$/.test(r.message)) return; try { toast('Ошибка: ' + ((r && r.message) || r)); } catch(x){} });
 // ======== МОДУЛИ: ЛЕНИВАЯ ЗАГРУЗКА (mk.js — Макет/3D, op.js — Оператор, tp.js — Боевой контур) ========
 const MODV = VERSION.replace(/^\D+/, ''), MODN = {mk:'«Макет»', op:'«Оператор»', tp:'«Боевой контур»'}, modP = {};
 function modLoad(m){ if (window['__mod_' + m]) return Promise.resolve(); if (modP[m]) return modP[m];
@@ -3536,6 +3544,9 @@ const R = [], hit = r => R.some(q => r.left < q.right && r.right > q.left && r.t
 L1.sort((x, y) => (y.closest('.tgt-wrap') ? 1 : 0) - (x.closest('.tgt-wrap') ? 1 : 0)); L1.forEach(e => { const r0 = e.getBoundingClientRect(); if (!r0.width) return; const h = r0.height + 2;
 for (const [dx, dy] of [[0, 0], [0, h], [0, -h], [-(r0.width + 30), 0], [0, 2 * h], [0, -2 * h]]){ const r = {left:r0.left + dx, right:r0.right + dx, top:r0.top + dy, bottom:r0.bottom + dy}; if (!hit(r)){ if (dx || dy) e.style.translate = `${dx}px ${dy}px`; R.push(r); return; } } e.style.opacity = '.45'; R.push(r0); }); }); }
 map.on('zoomend moveend', declutter);
+// ---- размеры по нормам: знак 7 мм, подпись 2,5 мм (1 мм ≈ 3,78 точки экрана), множитель для планшета
+function applyNorm(){ const k = +lsGet('skat_normk', 1.25) || 1.25; document.documentElement.style.setProperty('--sg', Math.round(7 * 3.78 * k) + 'px'); document.documentElement.style.setProperty('--lf', (2.5 * 3.78 * k * 1.3).toFixed(1) + 'px'); if ($('normK')) $('normK').value = String(k); }
+applyNorm(); if ($('normK')) $('normK').onchange = e => { lsSet('skat_normk', +e.target.value); applyNorm(); declutter(); };
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
 const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
