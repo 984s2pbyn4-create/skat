@@ -1,4 +1,4 @@
-const V = 'skat-2.7';
+const V = 'skat-2.8';
 const APP = 'skat-app-' + V, LIB = 'skat-lib', TILES = 'skat-tiles';
 const SHELL = ['./', './index.html'];
 const LIBS = ['https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
@@ -41,9 +41,12 @@ return res;
 async function appFirst(req, e){
 const c = await caches.open(APP);
 const hit = (await c.match('./index.html')) || (await c.match('./'));
-const upd = fetch(req, {cache:'no-cache'}).then(res => { if (res && res.ok) return c.put('./index.html', res.clone()).then(() => res); return res; });
-if (hit){ e.waitUntil(upd.catch(() => {})); return hit; }
-try { return await upd; } catch(err){ return Response.error(); }
+// сначала сеть (до 4 с), чтобы новая версия открывалась сразу; без сети — сохранённая копия
+const upd = fetch(req, {cache:'no-store'}).then(res => { if (res && res.ok) return c.put('./index.html', res.clone()).then(() => res); return res; });
+if (!hit){ try { return await upd; } catch(err){ return Response.error(); } }
+const to = new Promise(r => setTimeout(() => r(null), 4000));
+try { const res = await Promise.race([upd, to]); if (res && res.ok) return res; } catch(err){}
+e.waitUntil(upd.catch(() => {})); return hit;
 }
 self.addEventListener('fetch', e => {
 const req = e.request;

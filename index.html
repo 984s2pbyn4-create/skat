@@ -623,7 +623,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 6.16.1';
+const VERSION = 'версия 6.17';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -3216,7 +3216,7 @@ state.arrays.push(a); pts.slice(0, 300).forEach(p => { fillHeight(p); fillPlace(
 persistNow(); closeModals(); renderMarkers(); map.fitBounds(L.latLngBounds(pts.map(p => [p.lat, p.lng])).pad(0.2), {maxZoom:16});
 toast(`Нанесено точек: ${pts.length}${bad ? `, пропущено строк: ${bad}` : ''}`);
 };
-function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; $('ftBtn').style.display = secMode === 'tp' ? '' : 'none'; $('mixBtn').style.display = secMode === 'tp' ? '' : 'none'; $('faBtn').style.display = 'none'; $('usBtn').style.display = secMode === 'tp' ? '' : 'none'; if (secMode !== 'tp' && $('mixer')) $('mixer').classList.remove('on'); $('lrail').style.display = ''; }
+function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; $('ftBtn').style.display = secMode === 'tp' ? '' : 'none'; $('mixBtn').style.display = secMode === 'tp' ? '' : 'none'; $('faBtn').style.display = 'none'; $('usBtn').style.display = secMode === 'tp' ? '' : 'none'; if (secMode === 'tp') setTimeout(() => modLoad('tp').catch(() => {}), 500); if (secMode !== 'tp' && $('mixer')) $('mixer').classList.remove('on'); $('lrail').style.display = ''; }
 const ENV_N = {trow:'Ряд деревьев', tpoly:'Роща', house:'Дом', flat:'Многоэтажка', wh:'Склад', hangar:'Ангар', tree_n:'Ель', tree_b:'Берёза', grove:'Роща', pw:'Опора ЛЭП', mast:'Мачта связи', wt:'Водонапорная башня', tank:'Цистерна'};
 const ENV_IC = {house:'⌂', flat:'▥', wh:'▭', hangar:'⌓', tree_n:'▲', tree_b:'●', grove:'♣', pw:'ᛉ', mast:'⊥', wt:'♜', tank:'◉'};
 function envMarkers(a, z){ if (!a.env) return;

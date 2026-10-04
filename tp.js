@@ -1,4 +1,4 @@
-// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.16.1
+// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.17
 // ======== БОЕВОЙ КОНТУР: КОРРЕКТИРОВКА ОГНЯ ========
 const corrL = L.layerGroup().addTo(map);
 function sysTof(sys, d){ const k = SYS[sys] || SYS.d30; return Math.max(2, d / k.v * (k.hi ? 2 : 1.25)); }
@@ -671,4 +671,31 @@ if (!last || map.latLngToContainerPoint(last).distanceTo(map.latLngToContainerPo
 const up = () => { if (!fh) return; const was = fh.on; fh = null; map.dragging.enable(); if (was && lpMode && lpMode.pts.length > 2){ window.lpSkipTap = Date.now(); setTimeout(() => $('lpOk') && $('lpOk').click(), 50); } };
 ct.addEventListener('pointerup', up, true); ct.addEventListener('pointercancel', up, true); }
 { const lt0 = lpTap; window.lpTap = ll => { if (window.lpSkipTap && Date.now() - window.lpSkipTap < 600) return; lt0(ll); }; }
+// ======== ФОРМУЛЯРЫ ОБЪЕКТОВ: ПОЛЯ ПО ТИПУ, ИСТОРИЯ ИЗМЕНЕНИЙ, ПЕРЕМЕЩЕНИЯ ========
+const FORM_T = {enemy:['Объект противника', [['det', 'Обнаружен (дата, время)', 'dt'], ['by', 'Кем обнаружен', 'text'], ['how', 'Способ обнаружения', 'sel', ['БПЛА', 'наблюдение', 'радиоразведка', 'звукометрия', 'опрос', 'другое']], ['rel', 'Достоверность', 'sel', ['достоверно', 'предположительно']], ['st', 'Состояние', 'sel', ['действует', 'подавлен', 'уничтожен', 'не подтверждён', 'убыл']], ['cmp', 'Состав / количество', 'text'], ['note', 'Примечание', 'area']]],
+false:['Ложная позиция', [['made', 'Создана (дата, время)', 'dt'], ['team', 'Команда (кто создал)', 'text'], ['imit', 'Мероприятия имитации', 'area'], ['hit', 'Воздействие противника', 'area'], ['st', 'Состояние', 'sel', ['действует', 'повреждена', 'уничтожена', 'снята']], ['end', 'Уничтожена / снята (дата)', 'dt'], ['note', 'Примечание', 'area']]],
+own:['Свой объект', [['occ', 'Позиция занята (дата, время)', 'dt'], ['crew', 'Расчёт / личный состав', 'text'], ['dmg', 'Повреждения', 'area'], ['st', 'Состояние', 'sel', ['готов', 'на марше', 'повреждён', 'выведен']], ['note', 'Примечание', 'area']]]};
+const fType = (a, p) => (p.f && p.f.type) || (p.fa ? 'own' : sideOf(a, p) === 'b' ? 'enemy' : 'own');
+function fAuto(p){ if (!p.fa) return ''; const T = state.ftasks.filter(t => t.faId === p.fa.id), n = T.reduce((q, t) => q + shotStats(t).n, 0), J = state.ftlog.filter(r => r.fa && r.fa === p.fa.cs);
+return `<div class="cdv">Настрел: <b>${n}</b> сн. · задач: <b>${T.filter(t => (t.shots || []).length).length}</b> · поражено целей: <b>${J.filter(r => r.res === 'Уничтожена' || r.res === 'Подавлена').length}</b> · БП: ${faLeft(p.fa)} · смен ОП: ${(p.fa.moves || []).length}</div>`; }
+function openForm(a, i){ const p = a.points[i]; p.f = p.f || {type:fType(a, p), hist:[]}; const f = p.f; let m = $('fmModal');
+if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'fmModal'; m.innerHTML = '<div class="card big"><h3 id="fmH"></h3><div id="fmB"></div><div class="row"><button class="ghost" data-close>Закрыть</button><button class="primary" id="fmOk">Сохранить</button></div></div>'; m.addEventListener('click', e => { if (e.target === m || e.target.hasAttribute('data-close')) m.classList.remove('open'); }); }
+document.body.appendChild(m); const [tn, F] = FORM_T[f.type] || FORM_T.own, s0 = GEO.toSK(p.lat, p.lng);
+$('fmH').textContent = `Формуляр: ${labelOf(a, i)}`;
+$('fmB').innerHTML = `<div class="cdv">X ${pad5(s0.x)} Y ${pad5(s0.y)} · кв. ${sqOf(s0)} · ${escapeHtml(a.name)}</div><label class="f">Тип формуляра<select id="fm_type">${Object.entries(FORM_T).map(([k, v]) => `<option value="${k}"${k === f.type ? ' selected' : ''}>${v[0]}</option>`).join('')}</select></label>${fAuto(p)}`
++ F.map(([k, l, ty, opts]) => `<label class="f">${l}${ty === 'sel' ? `<select id="fm_${k}"><option value=""></option>${opts.map(o => `<option${o === f[k] ? ' selected' : ''}>${o}</option>`).join('')}</select>` : ty === 'area' ? `<textarea id="fm_${k}" rows="2">${escapeHtml(f[k] || '')}</textarea>` : `<input id="fm_${k}" type="${ty === 'dt' ? 'datetime-local' : 'text'}" value="${escapeHtml(ty === 'dt' ? (f[k] ? toLocDT(f[k]) : '') : (f[k] || ''))}">`}</label>`).join('')
++ `<div class="crow"><button id="fm_now">Отметить: обнаружен/занят сейчас</button></div><div class="sub-h">История (${(f.hist || []).length})</div>` + ((f.hist || []).slice().reverse().map(h => `<div class="kid"><span class="kn"><b>${fmtDT(h.t)}</b> — ${escapeHtml(h.x)}</span></div>`).join('') || '<div class="empty">Изменений пока нет</div>');
+$('fm_type').onchange = e => { f.type = e.target.value; (f.hist = f.hist || []).push({t:Date.now(), x:'тип: ' + FORM_T[f.type][0]}); persist(); openForm(a, i); };
+$('fm_now').onclick = () => { const k = F.find(x => x[2] === 'dt'); if (k) $('fm_' + k[0]).value = toLocDT(Date.now()); };
+$('fmOk').onclick = () => { const ch = []; F.forEach(([k, l, ty]) => { let v = $('fm_' + k).value.trim(); if (ty === 'dt') v = v ? new Date(v).toISOString() : ''; if ((f[k] || '') !== v){ ch.push(`${l}: ${ty === 'dt' ? (v ? fmtDT(v) : '—') : (v || '—')}`); f[k] = v; } });
+if (ch.length) (f.hist = f.hist || []).push({t:Date.now(), x:ch.join('; ')}); persist(); renderMarkers(); m.classList.remove('open'); toast(ch.length ? 'Формуляр сохранён' : 'Без изменений'); };
+openModal('fmModal'); }
+// перемещения любых объектов с формуляром — в историю и следами на карте
+{ const tm0 = faTrackMoves; window.faTrackMoves = () => { let ch = tm0(); state.arrays.forEach(a => a.points.forEach(p => { if (!p.f || p.fa) return; if (!p.f.pos){ p.f.pos = [p.lat, p.lng]; return; } const d = distM({lat:p.f.pos[0], lng:p.f.pos[1]}, p);
+if (d > 20){ (p.f.moves = p.f.moves || []).push({t:Date.now(), from:p.f.pos, to:[p.lat, p.lng], d:Math.round(d)}); (p.f.hist = p.f.hist || []).push({t:Date.now(), x:`перемещение на ${Math.round(d)} м`}); p.f.pos = [p.lat, p.lng]; ch = true; } })); return ch; }; }
+{ const ft0 = faTracks; window.faTracks = () => { ft0(); if (!faTrkOn) return; state.arrays.forEach(a => a.points.forEach(p => { if (!p.f || p.fa) return; const col = fType(a, p) === 'enemy' ? '#1f4fb0' : '#4a3a28';
+(p.f.moves || []).forEach(mv => faTrkL.addLayer(L.polyline([mv.from, mv.to], {color:col, weight:2.5, opacity:.8, dashArray:'6 4', interactive:false}))); })); }; }
+// кнопка «Формуляр» в карточке точки
+{ const op0 = openPoint; window.openPoint = (a, i) => { op0(a, i); const info = $('ptInfo'); if (!info || isMk(a) || a.kind === 'aux') return; let b = $('ptForm'); if (!b){ b = document.createElement('button'); b.id = 'ptForm'; b.className = 'primary'; b.style.margin = '6px 0'; info.after(b); }
+const p = a.points[i]; b.textContent = p.f ? `Формуляр (${FORM_T[fType(a, p)][0].toLowerCase()}, записей ${(p.f.hist || []).length})` : 'Формуляр'; b.onclick = () => openForm(a, i); }; }
 window.__mod_tp = 1;
