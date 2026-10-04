@@ -1,4 +1,4 @@
-// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.16
+// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.16.1
 // ======== БОЕВОЙ КОНТУР: КОРРЕКТИРОВКА ОГНЯ ========
 const corrL = L.layerGroup().addTo(map);
 function sysTof(sys, d){ const k = SYS[sys] || SYS.d30; return Math.max(2, d / k.v * (k.hi ? 2 : 1.25)); }
@@ -511,7 +511,7 @@ function saveProject(){ const d = {skatProject:1, ver:VERSION, date:new Date().t
 deliverFile(new Blob([JSON.stringify(d)], {type:'application/json'}), `СКАТ_проект_${stamp()}.json`, 'Файл проекта готов'); }
 function openProject(){ const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json,application/json'; inp.onchange = async () => { const f = inp.files[0]; if (!f) return; try { const d = JSON.parse(await f.text()); if (!d.skatProject) throw 0;
 askConfirm(`Открыть проект от ${fmtDT(d.date)}? Текущие слои, задачи и журнал будут заменены (сделайте «Сохранить проект», если они нужны).`, 'Открыть', () => { ['ftlog', 'ftasks', 'arrays', 'scenes', 'palette'].forEach(k => { if (Array.isArray(d[k])) state[k] = d[k]; }); if (d.mix) lsSet('skat_mix', d.mix); if (d.amsys) lsSet('skat_amsys', d.amsys); if (d.sig) lsSet('skat_sig', d.sig); persistNow(); toast('Проект открыт'); setTimeout(() => location.reload(), 600); }); } catch(e){ toast('Это не файл проекта СКАТ'); } }; inp.click(); }
-$('faXls').onclick = exportAmmo; $('faTrk').textContent = faTrkOn ? 'Следы ОП: вкл' : 'Следы ОП: выкл'; $('faTrk').onclick = () => { faTrkOn = !faTrkOn; lsSet('skat_trk', faTrkOn); $('faTrk').textContent = faTrkOn ? 'Следы ОП: вкл' : 'Следы ОП: выкл'; faTracks(); };
+setTimeout(() => { $('faXls').onclick = exportAmmo; $('faTrk').textContent = faTrkOn ? 'Следы ОП: вкл' : 'Следы ОП: выкл'; $('faTrk').onclick = () => { faTrkOn = !faTrkOn; lsSet('skat_trk', faTrkOn); $('faTrk').textContent = faTrkOn ? 'Следы ОП: вкл' : 'Следы ОП: выкл'; faTracks(); }; }, 0);
 // ======== СМЕНА ОП: ЖУРНАЛ ПЕРЕМЕЩЕНИЙ И СЛЕДЫ КОЛЁС; СОСТОЯНИЕ ОГНЕВЫХ СРЕДСТВ ========
 const FA_ST = {ready:['Готово', '#2f9e44'], march:['На марше', '#1f7ae0'], reload:['Пополнение БП', '#e8a33a'], broken:['Неисправно', '#d9362c']};
 const faStOf = fa => FA_ST[fa.st] ? fa.st : 'ready', faStDot = fa => `<span class="fadot" style="background:${FA_ST[faStOf(fa)][1]}" title="${FA_ST[faStOf(fa)][0]}"></span>`;

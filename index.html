@@ -623,7 +623,7 @@ table.t td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowra
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const VERSION = 'версия 6.16';
+const VERSION = 'версия 6.16.1';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -3053,7 +3053,7 @@ function setSection(m){ secMode = m; favCache = null; lsSet('skat_mode', m); $('
 function applySection(){
 $('modeBtn').querySelector('span').textContent = SEC_SH[secMode] || 'Раздел';
 $('v3Btn').style.display = secMode === 'mk' ? '' : 'none'; applySectionOp();
-if (secMode === 'mk'){ if (!window.__mod_mk) toast('Загружаю 3D…'); if (!$('v3d').classList.contains('on')) mkLoad().then(open3D).catch(() => {}); } else if ($('v3d').classList.contains('on')) close3D();
+if (secMode === 'mk'){ if (!window.__mod_mk) toast('Загружаю 3D…'); if (!$('v3d').classList.contains('on')) mkLoad().then(() => open3D()).catch(() => {}); } else if ($('v3d').classList.contains('on')) close3D();
 }
 $('modeBtn').onclick = showLaunch;
 // ---- отмена / повтор
@@ -3530,7 +3530,7 @@ const modStub = (m, ...ns) => ns.forEach(n => { const f = (...a) => modLoad(m).t
 const modBtn = (m, ...ids) => ids.forEach(id => { const el = $(id); if (!el) return; const f = e => modLoad(m).then(() => { if (el.onclick && el.onclick !== f) el.onclick(e); }).catch(() => {}); el.onclick = f; });
 modStub('op', 'openTextEd', 'openProp'); modBtn('op', 'prnBtn');
 modStub('tp', 'corrTap', 'exportPlanXlsx', 'openShapeEd', 'meetTap', 'corrDraw', 'corrPanel', 'askChar', 'applyChar'); modBtn('tp', 'corrBtn', 'planBtn', 'ftBtn', 'mixBtn', 'faBtn', 'geoBtn', 'usBtn');
-$('v3Btn').onclick = () => mkLoad().then(open3D).catch(() => {});
+$('v3Btn').onclick = () => mkLoad().then(() => open3D()).catch(() => {});
 setTimeout(() => ['mk', 'op', 'tp'].forEach(m => { try { fetch(m + '.js?v=' + MODV).catch(() => {}); } catch(e){} }), 8000);
 
 // ---- ПК: клавиши (Esc — закрыть окна, пробел — выстрел активной задачи, Ctrl+F — поиск)
