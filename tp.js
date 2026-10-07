@@ -1,4 +1,4 @@
-// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.17
+// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.18
 // ======== БОЕВОЙ КОНТУР: КОРРЕКТИРОВКА ОГНЯ ========
 const corrL = L.layerGroup().addTo(map);
 function sysTof(sys, d){ const k = SYS[sys] || SYS.d30; return Math.max(2, d / k.v * (k.hi ? 2 : 1.25)); }
@@ -507,10 +507,11 @@ document.body.appendChild(m); const st = T.reduce((q, t) => { const s = shotStat
 $('thH').textContent = `История цели ${name}`; $('thB').innerHTML = `<div class="cdv">Статус: <b>${escapeHtml(last ? last.res : (T.find(t => t.res) || {}).res || 'не поражена')}</b> · задач ${T.length} · ${statTxt(st)}</div>` + T.map(t => { const s = shotStats(t); return `<div class="arr"><div class="nm"><div>${escapeHtml(t.gname || 'орудие')} · ${escapeHtml((SYS[t.sys] || SYS.d30).n)}${t.res ? ' · <b>' + escapeHtml(t.res) + '</b>' : ''}</div><div>${fmtDT(t.id)} · выстрелов ${s.shots}, снарядов ${s.n}: в цель ${s.hit}, откл. ${s.dev}</div></div></div>`; }).join('') + (J.length ? '<div class="sub-h">Журнал</div>' + J.map(r => `<div class="arr"><div class="nm"><div>${fmtDT(r.date)} — <b>${escapeHtml(r.res || '')}</b></div><div>${escapeHtml(r.fa || '')} · снарядов ${r.n || 0}${r.note ? ' · ' + escapeHtml(r.note) : ''}</div></div></div>`).join('') : '');
 openModal('thModal'); }
 // ---- файл проекта: все слои, задачи, журнал, сцены — для переноса между ПК и Android и резервной копии
-function saveProject(){ const d = {skatProject:1, ver:VERSION, date:new Date().toISOString(), ftlog:state.ftlog, ftasks:state.ftasks, arrays:state.arrays, scenes:state.scenes, palette:state.palette, mix:MIX, amsys:lsGet('skat_amsys', {}), sig:lsGet('skat_sig', [])};
-deliverFile(new Blob([JSON.stringify(d)], {type:'application/json'}), `СКАТ_проект_${stamp()}.json`, 'Файл проекта готов'); }
+function saveProject(){ fmProjAsk(saveProject0); }
+function saveProject0(wm){ const d = {skatProject:1, ver:VERSION, date:new Date().toISOString(), ftlog:state.ftlog, ftasks:state.ftasks, arrays:state.arrays, scenes:state.scenes, palette:state.palette, mix:MIX, amsys:lsGet('skat_amsys', {}), sig:lsGet('skat_sig', [])};
+(wm ? mediaPack(d) : Promise.resolve()).then(() => deliverFile(new Blob([JSON.stringify(d)], {type:'application/json'}), `СКАТ_проект_${stamp()}.json`, 'Файл проекта готов')).catch(e => toast('Ошибка: ' + (e.message || e))); }
 function openProject(){ const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json,application/json'; inp.onchange = async () => { const f = inp.files[0]; if (!f) return; try { const d = JSON.parse(await f.text()); if (!d.skatProject) throw 0;
-askConfirm(`Открыть проект от ${fmtDT(d.date)}? Текущие слои, задачи и журнал будут заменены (сделайте «Сохранить проект», если они нужны).`, 'Открыть', () => { ['ftlog', 'ftasks', 'arrays', 'scenes', 'palette'].forEach(k => { if (Array.isArray(d[k])) state[k] = d[k]; }); if (d.mix) lsSet('skat_mix', d.mix); if (d.amsys) lsSet('skat_amsys', d.amsys); if (d.sig) lsSet('skat_sig', d.sig); persistNow(); toast('Проект открыт'); setTimeout(() => location.reload(), 600); }); } catch(e){ toast('Это не файл проекта СКАТ'); } }; inp.click(); }
+askConfirm(`Открыть проект от ${fmtDT(d.date)}? Текущие слои, задачи и журнал будут заменены (сделайте «Сохранить проект», если они нужны).`, 'Открыть', () => { ['ftlog', 'ftasks', 'arrays', 'scenes', 'palette'].forEach(k => { if (Array.isArray(d[k])) state[k] = d[k]; }); if (d.mix) lsSet('skat_mix', d.mix); if (d.amsys) lsSet('skat_amsys', d.amsys); if (d.sig) lsSet('skat_sig', d.sig); persistNow(); toast('Проект открыт'); mediaUnpack(d.media).then(() => window.SEC && SEC.last).then(() => setTimeout(() => location.reload(), 600)); }); } catch(e){ toast('Это не файл проекта СКАТ'); } }; inp.click(); }
 setTimeout(() => { $('faXls').onclick = exportAmmo; $('faTrk').textContent = faTrkOn ? 'Следы ОП: вкл' : 'Следы ОП: выкл'; $('faTrk').onclick = () => { faTrkOn = !faTrkOn; lsSet('skat_trk', faTrkOn); $('faTrk').textContent = faTrkOn ? 'Следы ОП: вкл' : 'Следы ОП: выкл'; faTracks(); }; }, 0);
 // ======== СМЕНА ОП: ЖУРНАЛ ПЕРЕМЕЩЕНИЙ И СЛЕДЫ КОЛЁС; СОСТОЯНИЕ ОГНЕВЫХ СРЕДСТВ ========
 const FA_ST = {ready:['Готово', '#2f9e44'], march:['На марше', '#1f7ae0'], reload:['Пополнение БП', '#e8a33a'], broken:['Неисправно', '#d9362c']};
@@ -684,12 +685,12 @@ document.body.appendChild(m); const [tn, F] = FORM_T[f.type] || FORM_T.own, s0 =
 $('fmH').textContent = `Формуляр: ${labelOf(a, i)}`;
 $('fmB').innerHTML = `<div class="cdv">X ${pad5(s0.x)} Y ${pad5(s0.y)} · кв. ${sqOf(s0)} · ${escapeHtml(a.name)}</div><label class="f">Тип формуляра<select id="fm_type">${Object.entries(FORM_T).map(([k, v]) => `<option value="${k}"${k === f.type ? ' selected' : ''}>${v[0]}</option>`).join('')}</select></label>${fAuto(p)}`
 + F.map(([k, l, ty, opts]) => `<label class="f">${l}${ty === 'sel' ? `<select id="fm_${k}"><option value=""></option>${opts.map(o => `<option${o === f[k] ? ' selected' : ''}>${o}</option>`).join('')}</select>` : ty === 'area' ? `<textarea id="fm_${k}" rows="2">${escapeHtml(f[k] || '')}</textarea>` : `<input id="fm_${k}" type="${ty === 'dt' ? 'datetime-local' : 'text'}" value="${escapeHtml(ty === 'dt' ? (f[k] ? toLocDT(f[k]) : '') : (f[k] || ''))}">`}</label>`).join('')
-+ `<div class="crow"><button id="fm_now">Отметить: обнаружен/занят сейчас</button></div><div class="sub-h">История (${(f.hist || []).length})</div>` + ((f.hist || []).slice().reverse().map(h => `<div class="kid"><span class="kn"><b>${fmtDT(h.t)}</b> — ${escapeHtml(h.x)}</span></div>`).join('') || '<div class="empty">Изменений пока нет</div>');
++ `<div id="fmMed">${fmMediaHtml(f)}</div>` + `<div class="crow"><button id="fm_now">Отметить: обнаружен/занят сейчас</button></div><div class="sub-h">История (${(f.hist || []).length})</div>` + ((f.hist || []).slice().reverse().map(h => `<div class="kid"><span class="kn"><b>${fmtDT(h.t)}</b> — ${escapeHtml(h.x)}</span></div>`).join('') || '<div class="empty">Изменений пока нет</div>');
 $('fm_type').onchange = e => { f.type = e.target.value; (f.hist = f.hist || []).push({t:Date.now(), x:'тип: ' + FORM_T[f.type][0]}); persist(); openForm(a, i); };
 $('fm_now').onclick = () => { const k = F.find(x => x[2] === 'dt'); if (k) $('fm_' + k[0]).value = toLocDT(Date.now()); };
 $('fmOk').onclick = () => { const ch = []; F.forEach(([k, l, ty]) => { let v = $('fm_' + k).value.trim(); if (ty === 'dt') v = v ? new Date(v).toISOString() : ''; if ((f[k] || '') !== v){ ch.push(`${l}: ${ty === 'dt' ? (v ? fmtDT(v) : '—') : (v || '—')}`); f[k] = v; } });
 if (ch.length) (f.hist = f.hist || []).push({t:Date.now(), x:ch.join('; ')}); persist(); renderMarkers(); m.classList.remove('open'); toast(ch.length ? 'Формуляр сохранён' : 'Без изменений'); };
-openModal('fmModal'); }
+fmMediaBind(a, i); openModal('fmModal'); }
 // перемещения любых объектов с формуляром — в историю и следами на карте
 { const tm0 = faTrackMoves; window.faTrackMoves = () => { let ch = tm0(); state.arrays.forEach(a => a.points.forEach(p => { if (!p.f || p.fa) return; if (!p.f.pos){ p.f.pos = [p.lat, p.lng]; return; } const d = distM({lat:p.f.pos[0], lng:p.f.pos[1]}, p);
 if (d > 20){ (p.f.moves = p.f.moves || []).push({t:Date.now(), from:p.f.pos, to:[p.lat, p.lng], d:Math.round(d)}); (p.f.hist = p.f.hist || []).push({t:Date.now(), x:`перемещение на ${Math.round(d)} м`}); p.f.pos = [p.lat, p.lng]; ch = true; } })); return ch; }; }
@@ -698,4 +699,80 @@ if (d > 20){ (p.f.moves = p.f.moves || []).push({t:Date.now(), from:p.f.pos, to:
 // кнопка «Формуляр» в карточке точки
 { const op0 = openPoint; window.openPoint = (a, i) => { op0(a, i); const info = $('ptInfo'); if (!info || isMk(a) || a.kind === 'aux') return; let b = $('ptForm'); if (!b){ b = document.createElement('button'); b.id = 'ptForm'; b.className = 'primary'; b.style.margin = '6px 0'; info.after(b); }
 const p = a.points[i]; b.textContent = p.f ? `Формуляр (${FORM_T[fType(a, p)][0].toLowerCase()}, записей ${(p.f.hist || []).length})` : 'Формуляр'; b.onclick = () => openForm(a, i); }; }
+// ======== СРЕЗ НА ВРЕМЯ: ПОЛОЖЕНИЕ ОБЪЕКТОВ С ФОРМУЛЯРОМ И ОГНЕВЫХ СРЕДСТВ НА ВЫБРАННЫЙ МОМЕНТ ========
+const tlL = L.layerGroup(); let tlOn = false, tlT = 0, tlPlay = 0; if (!map.getPane('tlPane')){ map.createPane('tlPane').style.zIndex = 680; }
+function tlObjs(){ const R = []; state.arrays.forEach(a => a.points.forEach((p, i) => { const f = p.f, mv = (p.fa && p.fa.moves) || (f && f.moves) || []; if (!f && !p.fa) return;
+const t0 = Math.min(...[f && f.det, f && f.made, f && f.occ].filter(Boolean).map(x => new Date(x).getTime()).concat((f && f.hist || []).map(h => h.t), mv.map(m => m.t), [Date.now()]));
+const dead = (f && f.hist || []).find(h => /уничтожен|снята|убыл/.test(h.x)), t1 = f && f.end ? new Date(f.end).getTime() : dead ? dead.t : Infinity; R.push({a, p, i, mv, t0, t1}); })); return R; }
+function tlPos(o, T){ let pos = o.mv.length ? o.mv[0].from : [o.p.lat, o.p.lng]; o.mv.forEach(m => { if (m.t <= T) pos = m.to; }); return pos; }
+function tlRange(){ const O = tlObjs(), ts = O.map(o => o.t0).concat(state.ftasks.flatMap(t => (t.shots || []).map(s => s.t))).filter(x => isFinite(x)); return [Math.min(...ts, Date.now() - 864e5), Date.now()]; }
+function tlDraw(){ tlL.clearLayers(); const T = tlT, O = tlObjs();
+O.forEach(o => { const alive = T >= o.t0 && T < o.t1, en = fType(o.a, o.p) === 'enemy', col = en ? '#1f5fe0' : '#d9362c', pos = tlPos(o, T), path = [o.mv.length ? o.mv[0].from : pos].concat(o.mv.filter(m => m.t <= T).map(m => m.to));
+if (path.length > 1) tlL.addLayer(L.polyline(path, {color:col, weight:3, opacity:.85, dashArray:'6 4', interactive:false}));
+tlL.addLayer(L.marker(pos, {pane:'tlPane', interactive:false, keyboard:false, zIndexOffset:3000, icon:L.divIcon({className:'plc-wrap', iconSize:[0, 0], html:`<div class="tlm${alive ? '' : ' off'}" style="border-color:${col}">${escapeHtml(o.p.fa ? o.p.fa.cs || labelOf(o.a, o.i) : labelOf(o.a, o.i))}${alive ? '' : (T < o.t0 ? ' · ещё нет' : ' · уничтожен')}</div>`})})); });
+state.ftasks.forEach(t => (t.bursts || []).forEach(b => { if (b.t && b.t <= T && b.t > T - 36e5) tlL.addLayer(L.circleMarker([b.lat, b.lng], {radius:6, color:'#ff8a00', weight:2, fillOpacity:.5, interactive:false})); }));
+const el = $('tlLbl'); if (el) el.textContent = new Date(T).toLocaleString('ru-RU', {day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit'}); }
+function tlStart(){ if (tlOn){ tlStop(); return; } tlOn = true; const [a, b] = tlRange(); tlT = b; tlL.addTo(map); map.getContainer().classList.add('tl-on');
+floatBar(`<b>Срез на время</b><span id="tlLbl"></span><input type="range" id="tmR" min="${a}" max="${b}" step="60000" value="${b}" style="width:min(46vw,420px)"><button id="tmP">▶</button><button id="tmX" class="primary">Выйти</button>`);
+$('tmR').oninput = e => { tlT = +e.target.value; tlDraw(); }; $('tmX').onclick = tlStop;
+$('tmP').onclick = () => { if (tlPlay){ clearInterval(tlPlay); tlPlay = 0; $('tmP').textContent = '▶'; return; } const st = (b - a) / 200; if (tlT >= b) tlT = a; $('tmP').textContent = '❚❚'; tlPlay = setInterval(() => { tlT = Math.min(b, tlT + st); $('tmR').value = tlT; tlDraw(); if (tlT >= b){ clearInterval(tlPlay); tlPlay = 0; $('tmP').textContent = '▶'; } }, 100); };
+tlDraw(); toast('Двигайте ползунок: показаны объекты с формуляром и огневые средства на выбранный момент'); }
+function tlStop(){ tlOn = false; clearInterval(tlPlay); tlPlay = 0; tlL.clearLayers(); map.removeLayer(tlL); map.getContainer().classList.remove('tl-on'); floatBar(''); }
+$('tlBtn').onclick = tlStart;
+// ======== ФОРМУЛЯРЫ: ФОТО И ВИДЕО (IndexedDB 'skat_media', в формуляре только ссылки p.f.media[{id,t,k,cap,dur,mb}]) ========
+let mdb = null; const MTH = {};
+function mdbOpen(){ return mdb ? Promise.resolve(mdb) : new Promise(res => { try { const r = indexedDB.open('skat_media', 1); r.onupgradeneeded = () => r.result.createObjectStore('m', {keyPath:'id'}); r.onsuccess = () => res(mdb = r.result); r.onerror = () => res(null); } catch(e){ res(null); } }); }
+async function mdbOp(mode, fn){ const d = await mdbOpen(); if (!d) throw new Error('хранилище недоступно'); return new Promise((res, rej) => { const tx = d.transaction('m', mode); let out; const q = fn(tx.objectStore('m')); if (q) q.onsuccess = () => { out = q.result; }; tx.oncomplete = () => res(out); tx.onerror = tx.onabort = () => rej(tx.error || new Error('запись не удалась')); }); }
+const mPutRaw = o => mdbOp('readwrite', st => st.put(o)), mRaw = id => mdbOp('readonly', st => st.get(id)),
+mEncOn = () => !!(window.SEC && SEC.key), te = new TextEncoder(), td = new TextDecoder();
+async function mPut(o){ if (!mEncOn()) return mPutRaw(o); return mPutRaw({id:o.id, t:o.t, type:o.type, e:1, b:new Blob([await SEC.enc(await o.blob.arrayBuffer())]), th:o.th ? await SEC.enc(te.encode(o.th)) : ''}); }
+async function mDecode(r){ if (!r || !r.e) return r; if (!mEncOn()) throw new Error('файл зашифрован'); return {id:r.id, t:r.t, type:r.type, blob:new Blob([await SEC.dec(await r.b.arrayBuffer())], {type:r.type}), th:r.th ? td.decode(await SEC.dec(r.th)) : ''}; }
+const mGet = async id => mDecode(await mRaw(id)), mTh = async id => { const r = await mRaw(id); if (!r) return null; return r.e ? (r.th && mEncOn() ? td.decode(await SEC.dec(r.th)) : '') : (r.th || ''); };
+async function mediaCrypt(on){ const ks = await mKeys() || []; let n = 0; for (const id of ks){ try { const r = await mRaw(id); if (!r || !!r.e === on) continue; await (on ? mPut(r) : mPutRaw(await mDecode(r))); n++; } catch(e){} } if (n) toast((on ? 'Зашифровано' : 'Расшифровано') + ` вложений: ${n}`); }
+setTimeout(() => { if (mEncOn()) mediaCrypt(true).catch(() => {}); }, 9000);
+const mDel = id => mdbOp('readwrite', st => st.delete(id)), mKeys = () => mdbOp('readonly', st => st.getAllKeys());
+const fmtDur = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+function imgLoad(u){ return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('изображение не читается')); im.src = u; }); }
+function mCvs(src, w, h, max){ const k = Math.min(1, max / Math.max(w, h)), c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k)); c.getContext('2d').drawImage(src, 0, 0, c.width, c.height); return c; }
+const cBlob = (c, q) => new Promise(res => c.toBlob(res, 'image/jpeg', q));
+function vidThumb(blob){ return new Promise(res => { const v = document.createElement('video'), u = URL.createObjectURL(blob); let done = false; const fin = r => { if (done) return; done = true; URL.revokeObjectURL(u); res(r); };
+v.muted = true; v.playsInline = true; v.preload = 'auto'; v.onloadeddata = () => { try { v.currentTime = Math.min(0.5, (v.duration || 1) / 2); } catch(e){ fin(null); } };
+v.onseeked = () => { try { fin({th:mCvs(v, v.videoWidth, v.videoHeight, 200).toDataURL('image/jpeg', .7), dur:v.duration}); } catch(e){ fin(null); } };
+v.onerror = () => fin(null); setTimeout(() => fin(null), 5000); v.src = u; }); }
+async function mediaAdd(file){ const id = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), t = Date.now();
+if (/^image/.test(file.type) || /\.(jpe?g|png|heic|webp)$/i.test(file.name)){ const u = URL.createObjectURL(file); try { const im = await imgLoad(u), w = im.naturalWidth, h = im.naturalHeight, big = await cBlob(mCvs(im, w, h, 1600), .8), th = mCvs(im, w, h, 200).toDataURL('image/jpeg', .7);
+await mPut({id, blob:big, th, type:'image/jpeg', t}); return {id, t, k:'img', th, mb:+(big.size / 1048576).toFixed(1)}; } finally { URL.revokeObjectURL(u); } }
+if (file.size > 100 * 1048576) throw new Error(`видео ${Math.round(file.size / 1048576)} МБ — больше 100 МБ`);
+const v = await vidThumb(file) || {}; await mPut({id, blob:file, th:v.th || '', type:file.type || 'video/mp4', t}); return {id, t, k:'vid', th:v.th || '', dur:v.dur && isFinite(v.dur) ? Math.round(v.dur) : 0, mb:+(file.size / 1048576).toFixed(1)}; }
+function fmMediaHtml(f){ const M = f.media || []; return `<div class="sub-h">Фото и видео (${M.length})</div><div class="fmM">${M.map((x, k) => `<div class="fmTh" data-mk="${k}"><img data-mid="${x.id}" alt="">${x.k === 'vid' ? `<span>▶ ${x.dur ? fmtDur(x.dur) : ''}</span>` : ''}${x.cap ? `<i>${escapeHtml(x.cap)}</i>` : ''}</div>`).join('')}<label class="fmTh fmAdd">📷<br>Фото / видео<input type="file" id="fm_med" accept="image/*,video/*" multiple style="display:none"></label></div>`; }
+function fmMedRef(a, i){ if (!$('fmMed')) return; $('fmMed').innerHTML = fmMediaHtml(a.points[i].f); fmMediaBind(a, i); }
+function fmMediaBind(a, i){ const f = a.points[i].f; f.media = f.media || [];
+document.querySelectorAll('#fmB img[data-mid]').forEach(async im => { const id = im.dataset.mid; if (!MTH[id]){ try { const r = await mTh(id); MTH[id] = r == null ? 'x' : (r || '-'); } catch(e){ MTH[id] = 'x'; } } if (MTH[id].length > 2) im.src = MTH[id]; else im.parentNode.classList.add(MTH[id] === 'x' ? 'miss' : 'nth'); });
+document.querySelectorAll('#fmB .fmTh[data-mk]').forEach(el => el.onclick = () => mediaView(a, i, +el.dataset.mk));
+$('fm_med').onchange = async e => { const fs = [...e.target.files]; e.target.value = ''; if (!fs.length) return; toast(`Сохраняю (${fs.length})…`); let n = 0;
+for (const fl of fs){ try { const x = await mediaAdd(fl); MTH[x.id] = x.th || '-'; delete x.th; f.media.push(x); n++; } catch(err){ toast('Не сохранено: ' + (err.message || err)); } }
+if (n){ (f.hist = f.hist || []).push({t:Date.now(), x:`добавлено вложений: ${n}`}); persist(); toast(`Добавлено: ${n}`); } fmMedRef(a, i); }; }
+async function mediaView(a, i, k){ const f = a.points[i].f, x = f.media[k]; if (!x) return; let r = null; try { r = await mGet(x.id); } catch(e){}
+if (!r){ askConfirm('Файл этого вложения не найден на устройстве. Убрать ссылку из формуляра?', 'Убрать', () => { f.media.splice(k, 1); persist(); fmMedRef(a, i); openModal('fmModal'); }); return; }
+let m = $('mvModal'); if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'mvModal'; m.innerHTML = '<div class="card big"><div id="mvB"></div><div class="cdv" id="mvI"></div><label class="f">Подпись<input id="mvCap"></label><div class="row"><button class="ghost" id="mvDel">Удалить</button><button class="ghost" id="mvSh">Поделиться</button><button class="primary" id="mvOk">Готово</button></div></div>'; m.addEventListener('click', e => { if (e.target === m) mvClose(); }); }
+document.body.appendChild(m); const u = URL.createObjectURL(r.blob); m.dataset.u = u;
+$('mvB').innerHTML = x.k === 'vid' ? `<video src="${u}" controls playsinline></video>` : `<img src="${u}" alt="">`;
+$('mvI').textContent = `${fmtDT(x.t)}${x.mb ? ' · ' + x.mb + ' МБ' : ''} · ${k + 1} из ${f.media.length}`; $('mvCap').value = x.cap || '';
+$('mvOk').onclick = () => { const c = $('mvCap').value.trim(); if (c !== (x.cap || '')){ x.cap = c; persist(); } mvClose(); fmMedRef(a, i); };
+$('mvSh').onclick = () => { const ext = x.k === 'vid' ? ((r.type || '').split('/')[1] || 'mp4').replace('quicktime', 'mov') : 'jpg'; deliverFile(r.blob, `СКАТ_${String(labelOf(a, i)).replace(/[\\/:*?"<>|]/g, '_')}_${k + 1}.${ext}`, 'Файл готов'); };
+$('mvDel').onclick = () => askConfirm('Удалить это вложение?', 'Удалить', async () => { f.media.splice(k, 1); (f.hist = f.hist || []).push({t:Date.now(), x:'удалено вложение'}); persist(); try { await mDel(x.id); } catch(e){} mvClose(); fmMedRef(a, i); openModal('fmModal'); });
+openModal('mvModal'); }
+function mvClose(){ const m = $('mvModal'); if (!m) return; const v = m.querySelector('video'); if (v) v.pause(); if (m.dataset.u) URL.revokeObjectURL(m.dataset.u); m.dataset.u = ''; $('mvB').innerHTML = ''; m.classList.remove('open'); }
+// файл проекта: с вложениями или без
+const mRefs = () => { const n = []; state.arrays.forEach(a => a.points.forEach(p => p.f && (p.f.media || []).forEach(x => n.push(x)))); return n; };
+function fmProjAsk(go){ const R = mRefs(); if (!R.length){ go(false); return; } const mb = R.reduce((q, x) => q + (x.mb || 0), 0);
+let m = $('spModal'); if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'spModal'; m.innerHTML = '<div class="card"><h3>Файл проекта</h3><div class="cdv" id="spT"></div><div class="row"><button class="ghost" data-close>Отмена</button><button class="ghost" id="spNo">Без вложений</button><button class="primary" id="spYes">С вложениями</button></div></div>'; m.addEventListener('click', e => { if (e.target === m || e.target.hasAttribute('data-close')) m.classList.remove('open'); }); }
+document.body.appendChild(m); $('spT').textContent = `В формулярах ${R.length} фото/видео (~${Math.round(mb * 1.35)} МБ в файле). Включить их?`;
+$('spNo').onclick = () => { m.classList.remove('open'); go(false); }; $('spYes').onclick = () => { m.classList.remove('open'); toast('Собираю вложения…'); go(true); }; openModal('spModal'); }
+const b2u = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(b); });
+async function mediaPack(d){ d.media = []; for (const x of mRefs()){ try { const r = await mGet(x.id); if (r) d.media.push({id:r.id, t:r.t, type:r.type, th:r.th || '', u:await b2u(r.blob)}); } catch(e){} } }
+async function mediaUnpack(M){ if (!Array.isArray(M) || !M.length) return; let n = 0; for (const o of M){ try { const blob = await (await fetch(o.u)).blob(); await mPut({id:o.id, t:o.t, type:o.type, th:o.th, blob}); n++; } catch(e){} } toast(`Вложений восстановлено: ${n}`); }
+// уборка: файлы, на которые нет ссылок ни в слоях, ни в корзине
+setTimeout(async () => { try { const ks = await mKeys(); if (!ks || !ks.length) return; const s = JSON.stringify(state.arrays) + JSON.stringify(state.trash || []); for (const id of ks) if (!s.includes('"' + id + '"')) await mDel(id); } catch(e){} }, 8000);
+{ const st = document.createElement('style'); st.textContent = '.fmM{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}.fmTh{position:relative;width:76px;height:76px;border-radius:8px;overflow:hidden;background:rgba(128,128,128,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;line-height:1.3}.fmTh img{width:100%;height:100%;object-fit:cover}.fmTh span{position:absolute;left:3px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;border-radius:4px;padding:0 4px;font-size:11px}.fmTh i{position:absolute;left:0;right:0;top:0;background:rgba(0,0,0,.5);color:#fff;font-style:normal;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:1px 3px}.fmTh.nth img,.fmTh.miss img{display:none}.fmTh.nth::after{content:"🎬";font-size:26px}.fmTh.miss::after{content:"нет файла";color:#c33}.fmAdd{border:1.5px dashed rgba(128,128,128,.6);background:none}#mvB img,#mvB video{display:block;max-width:100%;max-height:62vh;margin:0 auto;border-radius:6px;background:#000}'; document.head.appendChild(st); }
 window.__mod_tp = 1;
