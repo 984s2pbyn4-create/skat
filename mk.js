@@ -40,7 +40,7 @@ const ex = +$('v3ex').value, c = map.getCenter();
 v3center = c;
 if (v3){ try { v3.remove(); } catch(e){} v3 = null; }
 try {
-v3 = new ml.Map({container:'v3map', fadeDuration:0, center:[c.lng, c.lat], zoom:Math.max(1, map.getZoom() - 1), pitch:60, maxPitch:85, attributionControl:false,
+v3 = new ml.Map({container:'v3map', fadeDuration:0, preserveDrawingBuffer:true, center:[c.lng, c.lat], zoom:Math.max(1, map.getZoom() - 1), pitch:60, maxPitch:85, attributionControl:false,
 style:{version:8, sources:{base:v3baseSrc(cur),
 dem:{type:'raster-dem', tiles:['skat://dem/{z}/{x}/{y}'], tileSize:256, encoding:'terrarium', maxzoom:14},
 dem2:{type:'raster-dem', tiles:['skat://dem/{z}/{x}/{y}'], tileSize:256, encoding:'terrarium', maxzoom:14},
@@ -625,4 +625,22 @@ function fireTap(e){ const {a, p} = fireMode, key = itKind(a, p) || 'gun', k = F
 (p.fires = p.fires || []).push({tx:+e.lngLat.lng.toFixed(6), ty:+e.lngLat.lat.toFixed(6), t0:Math.round((SC.cur ? SC.t : 0) * 2) / 2, k:key, n:key === 'rszo' ? (p.rs || 12) : k.n, ev:k.ev, tof:k.tof});
 persist(); v3bar(); if (SC.cur){ SC.T = scnDur(SC.cur); $('tlR').max = SC.T; tlRender(); } toast(`Огневое поражение: ${k.n} выстр., подлёт ${k.tof} с. Сдвиньте начало на шкале сценария`); }
 
+// ======== ЗАПИСЬ СЦЕНАРИЯ В ВИДЕО (MediaRecorder: кадр 3D + подпись сцены и времени Ч+) ========
+const REC = {r:null, raf:0, t0:0};
+function recMime(){ if (!window.MediaRecorder) return null; return ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].find(t => { try { return MediaRecorder.isTypeSupported(t); } catch(e){ return false; } }) || ''; }
+function recBtn(){ const b = $('tlRec'); if (!b) return; const s = REC.r ? Math.floor((Date.now() - REC.t0) / 1000) : 0, t = REC.r ? `⏹ ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : '⏺'; if (b.textContent !== t) b.textContent = t; b.style.color = REC.r ? '#e33' : ''; }
+function recBox(vis){ ['scnbox', 'scnpt'].forEach(id => { try { if (v3 && v3.getLayer(id)) v3.setLayoutProperty(id, 'visibility', vis ? 'visible' : 'none'); } catch(e){} }); }
+function recStop(){ if (REC.r && REC.r.state !== 'inactive') try { REC.r.stop(); } catch(e){} }
+function recStart(){ if (!SC.cur || !v3){ toast('Откройте сцену'); return; } const mime = recMime(), src = v3.getCanvas();
+if (mime === null || !HTMLCanvasElement.prototype.captureStream){ toast('Запись видео не поддерживается на этом устройстве'); return; }
+const k = Math.min(1, 1920 / Math.max(src.width, src.height)), c = document.createElement('canvas'); c.width = Math.round(src.width * k) & ~1; c.height = Math.round(src.height * k) & ~1; const g = c.getContext('2d');
+let rec; try { const o = {videoBitsPerSecond:8e6}; if (mime) o.mimeType = mime; rec = new MediaRecorder(c.captureStream(30), o); } catch(e){ toast('Запись не запустилась: ' + (e.message || e)); return; }
+if (SC.raf) scnPause(); const ch = [], name = SC.cur.name, fs = Math.max(14, Math.round(c.height / 28));
+rec.ondataavailable = e => { if (e.data && e.data.size) ch.push(e.data); };
+rec.onstop = () => { cancelAnimationFrame(REC.raf); REC.r = null; recBox(true); recBtn(); const type = rec.mimeType || mime || 'video/webm', blob = new Blob(ch, {type}); if (!blob.size){ toast('Видео пустое'); return; }
+deliverFile(blob, `СКАТ_сцена_${String(name).replace(/[\\/:*?"<>|]/g, '_')}_${stamp()}.${/mp4/.test(type) ? 'mp4' : 'webm'}`, `Видео готово: ${(blob.size / 1048576).toFixed(1)} МБ`); };
+const draw = () => { try { g.drawImage(src, 0, 0, c.width, c.height); const tx = `${name} · ${fmtT(SC.t)}`; g.font = `700 ${fs}px "Roboto Condensed", sans-serif`; g.textBaseline = 'top'; g.lineJoin = 'round'; g.lineWidth = Math.max(3, fs / 5); g.strokeStyle = 'rgba(0,0,0,.75)'; g.fillStyle = '#fff'; g.strokeText(tx, fs * .6, fs * .6); g.fillText(tx, fs * .6, fs * .6); } catch(e){} recBtn(); REC.raf = requestAnimationFrame(draw); };
+recBox(false); REC.r = rec; REC.t0 = Date.now(); scnSet(0, true); draw(); rec.start(1000); scnPlay(); toast('Запись: сцена с начала. ⏹ — остановить'); }
+{ const p0 = scnPause; window.scnPause = () => { p0(); recStop(); }; const c0 = close3D; window.close3D = () => { recStop(); c0(); };
+const b = document.createElement('button'); b.id = 'tlRec'; b.title = 'Записать сцену в видео'; b.textContent = '⏺'; $('tlP').after(b); b.onclick = () => REC.r ? scnPause() : recStart(); }
 window.__mod_mk = 1;
