@@ -73,7 +73,10 @@ g.beginPath(); pts.forEach((q, i) => { const [px, py] = toC(q); i ? g.lineTo(px,
 if (sh.type !== 'line'){ const fc = sh.fill || col; if (sh.hatch && SH_HATCH[sh.hatch]){ const n = Math.max(6, Math.round(10 * sc)), cv = document.createElement('canvas'); cv.width = cv.height = n; const q = cv.getContext('2d'); q.scale(n / 10, n / 10); q.strokeStyle = fc; q.fillStyle = fc; q.lineWidth = 1.6; const pa = new Path2D(SH_HATCH[sh.hatch]); sh.hatch === '.' ? q.fill(pa) : q.stroke(pa); g.globalAlpha = 1; g.fillStyle = g.createPattern(cv, 'repeat'); } else { g.globalAlpha = (sh.op ?? 35) / 100; g.fillStyle = fc; } g.fill(); g.globalAlpha = 1; }
 const w = (sh.sw || 2.5) * sc, D = SH_DASH[sh.dash]; g.setLineDash(D ? D.map(v => v * w) : []); g.lineCap = D && sh.dash !== 'dash' && sh.dash !== 'long' ? 'round' : 'butt'; g.globalAlpha = sh.so != null ? sh.so / 100 : .95; g.strokeStyle = col; g.lineWidth = w; g.stroke(); g.setLineDash([]); g.lineCap = 'butt';
 if (sh.type === 'line' && sh.arr && pts.length > 1){ const C = pts.map(toC), sw0 = sh.sw || 2.5, hd = (a, b) => { const d = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, ux = (b[0] - a[0]) / d, uy = (b[1] - a[1]) / d, L0 = (6 + 3.2 * sw0) * sc, W0 = (3 + 1.6 * sw0) * sc, bx = b[0] - ux * L0, by = b[1] - uy * L0; g.beginPath(); g.moveTo(b[0], b[1]); g.lineTo(bx - uy * W0, by + ux * W0); g.lineTo(bx + uy * W0, by - ux * W0); g.closePath(); g.fillStyle = col; g.fill(); };
-if (sh.arr !== 'start') hd(C[C.length - 2], C[C.length - 1]); if (sh.arr !== 'end') hd(C[1], C[0]); } g.globalAlpha = 1; });
+if (sh.arr !== 'start') hd(C[C.length - 2], C[C.length - 1]); if (sh.arr !== 'end') hd(C[1], C[0]); } g.globalAlpha = 1;
+if (sh.tp && sh.type !== 'circle' && pts.length > 1){ const C = pts.map(toC), fs = sh.tp.s * sc; g.save(); g.font = `700 ${fs}px "Roboto Condensed", sans-serif`; g.fillStyle = sh.tp.c; g.strokeStyle = '#fff'; g.lineWidth = 3 * sc; g.lineJoin = 'round'; const sg = []; let tot = 0; for (let i = 1; i < C.length; i++){ const l = Math.hypot(C[i][0] - C[i - 1][0], C[i][1] - C[i - 1][1]); sg.push(l); tot += l; }
+let d = Math.max(0, (tot - g.measureText(sh.tp.t).width) / 2); const at = s => { let i = 0; while (i < sg.length - 1 && s > sg[i]){ s -= sg[i]; i++; } const A = C[i], B = C[i + 1], t = sg[i] ? Math.min(1, s / sg[i]) : 0; return [A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t, Math.atan2(B[1] - A[1], B[0] - A[0])]; };
+for (const ch of sh.tp.t){ const w = g.measureText(ch).width, [x, y, an] = at(d + w / 2); g.save(); g.translate(x, y); g.rotate(an); g.translate(0, -fs * .35); g.strokeText(ch, -w / 2, 0); g.fillText(ch, -w / 2, 0); g.restore(); d += w; } g.restore(); } });
 if (a.kind === 'route' && a.points.length > 1){ g.beginPath(); a.points.forEach((p, i) => { const [px, py] = toC([p.lat, p.lng]); i ? g.lineTo(px, py) : g.moveTo(px, py); }); g.strokeStyle = a.style.color; g.lineWidth = 3 * sc; g.stroke(); }
 a.points.forEach((p, i) => { const [px, py] = toC([p.lat, p.lng]); if (px < ix0 || py < iy0 || px > ix0 + iw || py > iy0 + ih) return;
 const st = styleOf(a, p), sid = p.sym === '_none' ? null : (p.sym || a.sym), lb = labelOf(a, i);
@@ -170,7 +173,7 @@ const veT = ['p', 's', 'x', 'tb'], veLL = q => [q[0] ?? q.lat, q[1] ?? q.lng], v
 const veBack = q => { const l = map.containerPointToLatLng(L.point(q.x, q.y)); return [+l.lat.toFixed(7), +l.lng.toFixed(7)]; };
 const veNorm = d => { d = Math.round(((d % 360) + 540) % 360 - 180); return d; }, veCl = o => JSON.parse(JSON.stringify(o));
 const veHas = it => VE.sel.some(s => s.o === it.o);
-function veAll(){ const out = [], z = map.getZoom(); state.arrays.forEach(a => { if (a.hidden) return; veT.forEach(t => (a[ARRK[t]] || []).forEach(o => { if (!o || o.hid || !tagOk(a, o)) return; if ((t === 'p' || t === 's') && z < (a.minZ || 0)) return; out.push({a, t, o}); })); }); return out; }
+function veAll(lk){ const out = [], z = map.getZoom(); state.arrays.forEach(a => { if (a.hidden) return; veT.forEach(t => (a[ARRK[t]] || []).forEach(o => { if (!o || o.hid || (o.lk && !lk) || !tagOk(a, o)) return; if ((t === 'p' || t === 's') && z < (a.minZ || 0)) return; out.push({a, t, o}); })); }); return out; }
 function veRpx(sh){ const c = veLL(sh.pts[0]), p = veCp(c), q = veCp([c[0] + (sh.r || 0) / 111320, c[1]]); return Math.hypot(p.x - q.x, p.y - q.y); }
 function veBox(it){ const {t, o} = it;
 if (t === 'x' || t === 'tb'){ const arr = it.a[ARRK[t]] || [], el = document.querySelector(`[data-ve="${it.a.id}|${t}|${arr.indexOf(o)}"]`), m = VE.mr;
@@ -202,7 +205,7 @@ if ((s.t === 'x' || s.t === 'tb') && k !== 1 && O.s) o.s = Math.max(4, Math.roun
 if (deg && s.t === 'x'){ const r = veNorm((O.r || 0) + deg); if (r) o.r = r; else delete o.r; }
 if (deg && s.t === 'p'){ const r = veNorm((O.rot || 0) + deg); if (r) o.rot = r; else delete o.rot; } }); veFrame(); }
 function veFrame(){ if (!VE.raf) VE.raf = requestAnimationFrame(() => { VE.raf = 0; renderMarkers(); }); }
-function veEnd(){ VE.orig = null; VE.inf = ''; if (VE.sel.some(s => s.t === 's' && s.o.zn) && typeof planNum === 'function') state.arrays.forEach(L1 => { if (L1.fplan) L1.points.forEach(q => planNum(L1, q)); }); persist(); renderMarkers(); }
+function veEnd(){ VE.orig = null; VE.inf = ''; VE.snapMk = null; if (VE.sel.some(s => s.t === 's' && s.o.zn) && typeof planNum === 'function') state.arrays.forEach(L1 => { if (L1.fplan) L1.points.forEach(q => planNum(L1, q)); }); persist(); renderMarkers(); }
 function veCancel(){ if (VE.orig) VE.sel.forEach((s, j) => { const O = VE.orig[j]; if (!O) return; Object.keys(s.o).forEach(k => { if (!(k in O)) delete s.o[k]; }); Object.assign(s.o, O); }); const had = !!VE.orig; VE.orig = null; VE.g = null; VE.band = null; VE.stroke = null; VE.inf = ''; if (had) renderMarkers(); else veDraw(); }
 function veMoveBy(dx, dy){ if (!VE.sel.length) return; veBegin(); veApply(q => ({x:q.x + dx, y:q.y + dy}), 1, 0); VE.orig = null; persist(); }
 // ---- рамка, маркеры, панель
@@ -218,17 +221,17 @@ const H = [['nw', x1, y1], ['n', cx, y1], ['ne', x2, y1], ['e', x2, cy], ['se', 
 if (!VE.g || VE.g.mode !== 'move') H.forEach(([k, x, y]) => { h += `<g data-h="${k}" class="hd"><circle cx="${x}" cy="${y}" r="16" fill="transparent"/><rect x="${x - 5}" y="${y - 5}" width="10" height="10" class="hv"/></g>`; });
 h += `<g data-h="rot" class="hd"><circle cx="${cx}" cy="${y1 - 30}" r="18" fill="transparent"/><circle cx="${cx}" cy="${y1 - 30}" r="7" class="hv hr"/></g>`; }
 if (VE.band){ const b = VE.band; h += `<rect class="vband" x="${b.x1}" y="${b.y1}" width="${b.x2 - b.x1}" height="${b.y2 - b.y1}"/>`; }
-VE.svg.innerHTML = h; $('veN').textContent = VE.inf || `Выбрано: ${VE.sel.length}`; const nb = VE.bar.querySelector('#veNdB b'); if (nb && (VE.nd || VE.pen) && VE.ndi >= 0) nb.textContent = `${VE.pen ? 'Перо' : 'Узлы'}: ${VE.ndi + 1} из ${(VE.nd || VE.pen).o.bz.n.length}`; VE.bar.querySelector('[data-v="add"]').classList.toggle('on', VE.add); }
+VE.svg.innerHTML = veGuidesSvg() + h; $('veN').textContent = VE.inf || `Выбрано: ${VE.sel.length}`; const nb = VE.bar.querySelector('#veNdB b'); if (nb && (VE.nd || VE.pen) && VE.ndi >= 0) nb.textContent = `${VE.pen ? 'Перо' : 'Узлы'}: ${VE.ndi + 1} из ${(VE.nd || VE.pen).o.bz.n.length}`; VE.bar.querySelector('[data-v="add"]').classList.toggle('on', VE.add); }
 function veUI(){ if (VE.ov) return;
 VE.ov = document.createElement('div'); VE.ov.id = 'veOv'; VE.ov.innerHTML = '<svg></svg>'; document.body.appendChild(VE.ov); VE.svg = VE.ov.firstChild;
 VE.bar = document.createElement('div'); VE.bar.id = 'veBar'; VE.bar.className = 'glass';
-VE.bar.innerHTML = '<b id="veN"></b><button data-v="all">Все</button><button data-v="add">＋ К выбору</button><button data-v="nd">Узлы</button><button data-v="st">Стиль</button><button data-v="pen">Перо</button><button data-v="pcl">Карандаш</button><button data-v="dup">Дубль</button><button data-v="copy">Копир.</button><button data-v="paste">Вставить</button><button data-v="grp">Группа</button><button data-v="ugrp">Разгруп.</button><button data-v="up">Выше</button><button data-v="dn">Ниже</button><button data-v="al">Выровнять ▾</button><button data-v="del" class="danger">Удалить</button><button data-v="x">✕</button>'
+VE.bar.innerHTML = '<b id="veN"></b><button data-v="all">Все</button><button data-v="add">＋ К выбору</button><button data-v="nd">Узлы</button><button data-v="st">Стиль</button><button data-v="pen">Перо</button><button data-v="pcl">Карандаш</button><button data-v="ex">Точность</button><button data-v="ob">Объекты</button><button data-v="tp">Текст по линии</button><button data-v="xch">SVG / PDF</button><button data-v="dup">Дубль</button><button data-v="copy">Копир.</button><button data-v="paste">Вставить</button><button data-v="grp">Группа</button><button data-v="ugrp">Разгруп.</button><button data-v="up">Выше</button><button data-v="dn">Ниже</button><button data-v="al">Выровнять ▾</button><button data-v="del" class="danger">Удалить</button><button data-v="x">✕</button>'
 + '<div id="veAl"><button data-v="al:l">⇤ Лево</button><button data-v="al:ch">⇹ Центр</button><button data-v="al:r">⇥ Право</button><button data-v="al:t">⤒ Верх</button><button data-v="al:cv">⇕ Середина</button><button data-v="al:b">⤓ Низ</button><button data-v="al:dh">↔ Распределить</button><button data-v="al:dv">↕ Распределить</button></div><div id="veNdB"></div>';
 document.body.appendChild(VE.bar);
 VE.bar.addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; const v = b.dataset.v;
 if (v.startsWith('al:')) return veAlign(v.slice(3));
 ({all:() => { VE.sel = veAll(); veDraw(); }, add:() => { VE.add = !VE.add; veDraw(); }, dup:veDup, copy:veCopy, paste:vePaste, grp:veGroup, ugrp:veUngroup, up:() => veOrder(true), dn:() => veOrder(false), del:veDel, x:veOff,
-al:() => $('veAl').classList.toggle('on'), nd:veNodes, st:veStyle,
+al:() => $('veAl').classList.toggle('on'), nd:veNodes, st:veStyle, ex:veExact, ob:veObjs, tp:veTextPath, xch:veXch,
 pen:() => { veModeEnd(); VE.pen = {a:null, t:'s', o:null}; VE.sel = []; veBarMode(); veDraw(); toast('Перо: касание — угловой узел, касание с протяжкой — гладкий; касание первого узла замыкает'); },
 pcl:() => { veModeEnd(); VE.pcl = true; VE.sel = []; veBarMode(); veDraw(); toast('Карандаш: рисуйте пальцем; конец у начала — замкнутая фигура'); }})[v](); });
 VE.bar.addEventListener('click', e => { const b = e.target.closest('[data-w]'); if (b) veNdAct(b.dataset.w); });
@@ -245,8 +248,8 @@ if (document.querySelector('.modal.open')) return; e.stopPropagation();
 VE.mr = map.getContainer().getBoundingClientRect(); if (VE.pen || VE.pcl || VE.nd) return veDown2(e); const p = vePt(e);
 VE.g = {id:e.pointerId, p0:p, it:veHit(p.x, p.y), add:VE.add || e.shiftKey || e.ctrlKey || e.metaKey, mode:null}; try { map.getContainer().setPointerCapture(e.pointerId); } catch(_){} }
 function veMove(e){ const g = VE.g; if (!g || e.pointerId !== g.id) return; e.stopPropagation(); if (g.x2) return veMove2(e, g); const p = vePt(e), dx = p.x - g.p0.x, dy = p.y - g.p0.y;
-if (!g.mode){ if (Math.hypot(dx, dy) < 6) return; if (g.it){ if (!veHas(g.it)){ if (!g.add) VE.sel = []; veAddSel(veExpand(g.it)); } g.mode = 'move'; veBegin(); } else g.mode = 'band'; }
-if (g.mode === 'move'){ VE.inf = `Сдвиг ${Math.round(dx)}, ${Math.round(dy)} пикс.`; veApply(q => ({x:q.x + dx, y:q.y + dy}), 1, 0); }
+if (!g.mode){ if (Math.hypot(dx, dy) < 6) return; if (g.it){ if (!veHas(g.it)){ if (!g.add) VE.sel = []; veAddSel(veExpand(g.it)); } g.mode = 'move'; veBegin(); veSnapBegin(); } else g.mode = 'band'; }
+if (g.mode === 'move'){ const [sx, sy] = veSnapMove(dx, dy); VE.inf = `Сдвиг ${Math.round(sx)}, ${Math.round(sy)} пикс.`; veApply(q => ({x:q.x + sx, y:q.y + sy}), 1, 0); }
 else if (g.mode === 'band'){ VE.band = {x1:Math.min(p.x, g.p0.x), y1:Math.min(p.y, g.p0.y), x2:Math.max(p.x, g.p0.x), y2:Math.max(p.y, g.p0.y)}; veDraw(); }
 else if (g.mode === 'rot'){ const c = g.c; let deg = (Math.atan2(p.y - c.y, p.x - c.x) - Math.atan2(g.p0.y - c.y, g.p0.x - c.x)) * 180 / Math.PI; deg = veNorm(deg);
 const sn = Math.round(deg / 15) * 15; if (e.shiftKey || Math.abs(deg - sn) < 2) deg = sn; const a = deg * Math.PI / 180, cs = Math.cos(a), sn2 = Math.sin(a); VE.inf = `Поворот ${deg}°`;
@@ -257,7 +260,7 @@ if (k.length === 2){ const d0 = Math.hypot(g.p0.x - ax, g.p0.y - ay), d1 = Math.
 else if (k === 'e' || k === 'w') sx = lim((p.x - ax) / ((g.p0.x - ax) || 1)); else sy = lim((p.y - ay) / ((g.p0.y - ay) || 1));
 VE.inf = `Масштаб ×${(k.length === 2 ? sx : k === 'e' || k === 'w' ? sx : sy).toFixed(2).replace('.', ',')}`; veApply(q => ({x:ax + (q.x - ax) * sx, y:ay + (q.y - ay) * sy}), Math.sqrt(Math.abs(sx * sy)), 0); } }
 function veUp(e){ const g = VE.g; if (!g || e.pointerId !== g.id) return; e.stopPropagation(); if (g.x2) return veUp2(e, g); VE.g = null;
-if (!g.mode){ if (g.it){ const ex = veExpand(g.it); if (g.add){ if (veHas(g.it)) VE.sel = VE.sel.filter(s => !ex.some(x => x.o === s.o)); else veAddSel(ex); } else VE.sel = ex; } else if (!g.add) VE.sel = []; veDraw(); return; }
+if (!g.mode){ if (VE.pip && g.it){ vePipette(g.it); veDraw(); return; } if (g.it){ const ex = veExpand(g.it); if (g.add){ if (veHas(g.it)) VE.sel = VE.sel.filter(s => !ex.some(x => x.o === s.o)); else veAddSel(ex); } else VE.sel = ex; } else if (!g.add) VE.sel = []; veDraw(); return; }
 if (g.mode === 'band'){ const b = VE.band; VE.band = null; if (!g.add) VE.sel = []; if (b) veAll().forEach(it => { const q = veBox(it); if (q && q.x1 >= b.x1 && q.x2 <= b.x2 && q.y1 >= b.y1 && q.y2 <= b.y2) veAddSel(veExpand(it)); }); veDraw(); return; }
 veEnd(); }
 { const mc = map.getContainer();
@@ -358,19 +361,19 @@ return {p:veBack(q), a:veBack({x:q.x - tx, y:q.y - ty}), b:veBack({x:q.x + tx, y
 if (!closed){ N[0].a = null; N[n - 1].b = null; } veNewShape({c:closed, n:N}); persist(); renderMarkers(); }
 // жесты режимов узлов, пера, карандаша
 function veNodeDown(e){ const el = e.target.closest('[data-n]'), it = VE.nd || VE.pen; e.stopPropagation(); e.preventDefault(); if (!it || !it.o || VE.g) return; const [i, k] = el.dataset.n.split('|');
-VE.mr = map.getContainer().getBoundingClientRect(); VE.sel = [it]; veBegin(); VE.g = {id:e.pointerId, p0:vePt(e), x2:'node', i:+i, k, mode:null}; try { VE.ov.setPointerCapture(e.pointerId); } catch(_){} }
+VE.mr = map.getContainer().getBoundingClientRect(); VE.sel = [it]; veBegin(); veSnapBegin(it.o); VE.g = {id:e.pointerId, p0:vePt(e), x2:'node', i:+i, k, mode:null}; try { VE.ov.setPointerCapture(e.pointerId); } catch(_){} }
 function veDown2(e){ const p = vePt(e), mc = map.getContainer(); VE.g = {id:e.pointerId, p0:p, x2:VE.pen ? 'pen' : VE.pcl ? 'pcl' : 'ndtap', pts:[p], mode:null}; try { mc.setPointerCapture(e.pointerId); } catch(_){}
-if (VE.pen){ if (!VE.pen.o){ const it = veNewShape({c:false, n:[]}); Object.assign(VE.pen, it); } const sh = VE.pen.o; sh.bz.n.push({p:veBack(p), a:null, b:null, s:0}); VE.ndi = sh.bz.n.length - 1; bzApply(sh); renderMarkers(); } }
+if (VE.pen){ if (!VE.pen.o){ const it = veNewShape({c:false, n:[]}); Object.assign(VE.pen, it); } const sh = VE.pen.o; const ps = vePenSnap(p, sh); VE.g.p0 = {x:ps.x, y:ps.y}; sh.bz.n.push({p:veBack(ps), a:null, b:null, s:0}); VE.ndi = sh.bz.n.length - 1; bzApply(sh); renderMarkers(); } }
 function veMove2(e, g){ const p = vePt(e), dx = p.x - g.p0.x, dy = p.y - g.p0.y; if (g.x2 === 'pcl'){ g.pts.push(p); VE.stroke = g.pts; veDraw(); return; }
 if (!g.mode){ if (Math.hypot(dx, dy) < 5) return; g.mode = 'drag'; }
-if (g.x2 === 'node'){ const it = VE.nd || VE.pen, sh = it.o, O = VE.orig[0].bz.n[g.i], n = sh.bz.n[g.i]; if (!O || !n) return; const off = q => { const c = veCp(q); return veBack({x:c.x + dx, y:c.y + dy}); };
+if (g.x2 === 'node'){ const it = VE.nd || VE.pen, sh = it.o, O = VE.orig[0].bz.n[g.i], n = sh.bz.n[g.i]; if (!O || !n) return; let ddx = dx, ddy = dy; if (g.k === 'p'){ const c0 = veCp(O.p), s = veSnapPt({x:c0.x + dx, y:c0.y + dy}); ddx = s.x - c0.x; ddy = s.y - c0.y; VE.snapMk = s.hit ? s : null; } const off = q => { const c = veCp(q); return veBack({x:c.x + ddx, y:c.y + ddy}); };
 if (g.k === 'p'){ n.p = off(O.p); n.a = O.a && off(O.a); n.b = O.b && off(O.b); }
 else { n[g.k] = off(O[g.k]); const ok = g.k === 'a' ? 'b' : 'a'; if (n.s && O[ok]){ const c = veCp(n.p), hh = veCp(n[g.k]), o0 = veCp(O[ok]), len = Math.hypot(o0.x - c.x, o0.y - c.y), d = Math.hypot(hh.x - c.x, hh.y - c.y) || 1; n[ok] = veBack({x:c.x - (hh.x - c.x) / d * len, y:c.y - (hh.y - c.y) / d * len}); } }
 bzApply(sh); veFrame(); return; }
 if (g.x2 === 'pen' && VE.pen && VE.pen.o){ const sh = VE.pen.o, n = sh.bz.n[sh.bz.n.length - 1], c = veCp(n.p); n.b = veBack(p); n.a = sh.bz.n.length > 1 ? veBack({x:2 * c.x - p.x, y:2 * c.y - p.y}) : null; n.s = 1; bzApply(sh); veFrame(); } }
 function veUp2(e, g){ VE.g = null;
 if (g.x2 === 'node'){ if (!g.mode){ VE.orig = null; const it = VE.nd || VE.pen; if (VE.pen && g.i === 0 && g.k === 'p' && it.o.bz.n.length >= 3){ it.o.bz.c = true; bzApply(it.o); vePenEnd(); veDraw(); toast('Контур замкнут'); return; } VE.ndi = g.i; veDraw(); return; } veEnd(); return; }
-if (g.x2 === 'pen'){ persist(); veDraw(); return; }
+if (g.x2 === 'pen'){ VE.snapMk = null; persist(); veDraw(); return; }
 if (g.x2 === 'pcl'){ VE.stroke = null; vePclMake(g.pts); veDraw(); return; }
 if (g.x2 === 'ndtap' && !g.mode) veNdTap(g.p0); }
 // ======== ВЕКТОРНЫЙ РЕДАКТОР 4.3: СТИЛЬ ФИГУР, КОПИРОВАНИЕ СТИЛЯ, ИЗБРАННЫЕ СТИЛИ ========
@@ -403,4 +406,199 @@ $('vsPs').onclick = () => { const c = VE.stClip; if (!c){ toast('Сначала 
 T.forEach(s => veSetSt(s.o, c.st, VST[c.t])); persist(); renderMarkers(); veStyle(); toast(`Стиль вставлен: ${T.length}`); };
 lab(); favR(); openModal('veStM'); }
 { const st = document.createElement('style'); st.textContent = '#veBar.nd>button,#veBar.nd>#veN,#veBar.nd #veAl{display:none!important}#veNdB{display:none;width:100%;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}#veBar.nd #veNdB{display:flex}#veOv .vh{stroke:#1e90ff;stroke-width:1}#veOv .hs{fill:#1e90ff}#veOv .vstk{fill:none;stroke:#e2533f;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.vfav{display:flex;flex-wrap:wrap;gap:6px}.vfc{display:inline-flex}.vfc button{padding:5px 8px}.vfc button+button{padding:5px 7px;opacity:.7}'; document.head.appendChild(st); }
+// ======== ВЕКТОРНЫЙ РЕДАКТОР 4.4: ТОЧНОСТЬ (привязки, направляющие, размеры и координаты, окно «Объекты», текст по линии) ========
+const veLS = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch(e){ return d; } }, veLSs = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
+VE.snap = Object.assign({nd:true, gr:false, an:true}, veLS('skat_vsnap', {})); VE.guides = veLS('skat_vguides', []);
+function veKeyLL(t, o){ if (t === 's'){ if (o.bz) return o.bz.n.map(n => n.p); if (o.type === 'circle') return [veLL(o.pts[0])]; return (o.pts || []).map(veLL); } return [[o.lat, o.lng]]; }
+function veSnapBegin(skipO){ const H = new Map(), K = [], sz = map.getSize(), ins = q => q.x > -40 && q.y > -40 && q.x < sz.x + 40 && q.y < sz.y + 40; let n = 0;
+state.arrays.forEach(a => { if (a.hidden) return; veT.forEach(t => (a[ARRK[t]] || []).forEach(o => { if (!o || o.hid) return; const mine = o === skipO || VE.sel.some(s => s.o === o);
+veKeyLL(t, o).forEach(ll => { const q = veCp(ll); if (!ins(q)) return; if (mine){ if (K.length < 60) K.push({x:q.x, y:q.y}); return; } if (n++ > 6000) return; const k = Math.floor(q.x / 16) + ',' + Math.floor(q.y / 16); if (!H.has(k)) H.set(k, []); H.get(k).push({x:q.x, y:q.y}); }); })); });
+VE.snH = H; VE.snK = K; }
+function veGridStep(){ const c = map.getCenter(), r = GEO.toSK(c.lat, c.lng), p0 = map.latLngToContainerPoint(c), p1 = veCp(GEO.fromSK(r.x, r.y + 1000, r.zone)), pxm = Math.hypot(p1.x - p0.x, p1.y - p0.y) / 1000; return [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000].find(s => s * pxm >= 24) || 10000; }
+function veGuideSeg(g){ const c = map.getCenter(), r = GEO.toSK(c.lat, c.lng, g.z); return g.k === 'x' ? [veCp(GEO.fromSK(g.v, r.y - 60000, g.z)), veCp(GEO.fromSK(g.v, r.y + 60000, g.z))] : [veCp(GEO.fromSK(r.x - 60000, g.v, g.z)), veCp(GEO.fromSK(r.x + 60000, g.v, g.z))]; }
+function veSnapPt(q){ if (VE.snap.nd && VE.snH){ let best = null, bd = 11; const cx = Math.floor(q.x / 16), cy = Math.floor(q.y / 16);
+for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) (VE.snH.get((cx + i) + ',' + (cy + j)) || []).forEach(t => { const d = Math.hypot(t.x - q.x, t.y - q.y); if (d < bd){ bd = d; best = t; } }); if (best) return {x:best.x, y:best.y, hit:1}; }
+for (const g of VE.guides){ const [A, B] = veGuideSeg(g), dx = B.x - A.x, dy = B.y - A.y, L2 = dx * dx + dy * dy; if (!L2) continue; const t = ((q.x - A.x) * dx + (q.y - A.y) * dy) / L2, P = {x:A.x + t * dx, y:A.y + t * dy}; if (Math.hypot(P.x - q.x, P.y - q.y) < 9) return Object.assign(P, {hit:1}); }
+if (VE.snap.gr){ const ll = map.containerPointToLatLng(L.point(q.x, q.y)), s = GEO.toSK(ll.lat, ll.lng), st = veGridStep(), P = veCp(GEO.fromSK(Math.round(s.x / st) * st, Math.round(s.y / st) * st, s.zone)); if (Math.hypot(P.x - q.x, P.y - q.y) < 14) return {x:P.x, y:P.y, hit:1}; }
+return {x:q.x, y:q.y, hit:0}; }
+function veSnapMove(dx, dy){ VE.snapMk = null; if (!VE.snK || !VE.snK.length) return [dx, dy]; let best = null, bd = 1e9;
+for (const k of VE.snK){ const q = {x:k.x + dx, y:k.y + dy}, s = veSnapPt(q); if (s.hit){ const d = Math.hypot(s.x - q.x, s.y - q.y); if (d < bd){ bd = d; best = [s.x - q.x, s.y - q.y, s]; } } }
+if (!best) return [dx, dy]; VE.snapMk = best[2]; return [dx + best[0], dy + best[1]]; }
+function vePenSnap(p, sh){ veSnapBegin(sh); let s = veSnapPt(p); VE.snapMk = s.hit ? s : null; const N = sh.bz.n;
+if (!s.hit && VE.snap.an && N.length){ const c = veCp(N[N.length - 1].p), dx = s.x - c.x, dy = s.y - c.y, r = Math.hypot(dx, dy), a = Math.round(Math.atan2(dy, dx) / (Math.PI / 12)) * (Math.PI / 12); s = {x:c.x + r * Math.cos(a), y:c.y + r * Math.sin(a)}; } return s; }
+function veGuidesSvg(){ let h = ''; VE.guides.forEach(g => { const [A, B] = veGuideSeg(g); h += `<line class="vgd" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>`; }); if (VE.snapMk) h += `<path class="vsm" d="M${VE.snapMk.x - 7} ${VE.snapMk.y}h14M${VE.snapMk.x} ${VE.snapMk.y - 7}v14"/>`; return h; }
+// ---- размеры и координаты выделенного (СК-42), привязки, направляющие
+function veMet(){ let z = null, X0 = Infinity, X1 = -Infinity, Y0 = Infinity, Y1 = -Infinity;
+VE.sel.forEach(s => { const L1 = s.t === 's' && s.o.type !== 'circle' ? (s.o.pts || []).map(veLL) : veKeyLL(s.t, s.o); L1.forEach(ll => { const k = GEO.toSK(ll[0], ll[1], z ?? undefined); if (z == null) z = k.zone; X0 = Math.min(X0, k.x); X1 = Math.max(X1, k.x); Y0 = Math.min(Y0, k.y); Y1 = Math.max(Y1, k.y); });
+if (s.t === 's' && s.o.type === 'circle'){ const r = s.o.r || 0; X0 -= r; X1 += r; Y0 -= r; Y1 += r; } });
+return z == null ? null : {z, X0, X1, Y0, Y1, Xc:(X0 + X1) / 2, Yc:(Y0 + Y1) / 2, W:Y1 - Y0, H:X1 - X0}; }
+function veExact(){ let m = $('veExM'); if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'veExM'; m.innerHTML = '<div class="card big"><h3>Точность</h3><div id="veExB"></div><div class="row"><button class="primary" data-close>Готово</button></div></div>'; m.addEventListener('click', e => { if (e.target === m || e.target.hasAttribute('data-close')) m.classList.remove('open'); }); }
+document.body.appendChild(m); const M = VE.sel.length ? veMet() : null, n0 = v => Math.round(v), cb = (k, t) => `<label class="f" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" data-sn="${k}" ${VE.snap[k] ? 'checked' : ''} style="width:20px;height:20px">${t}</label>`;
+let g1 = ''; if (VE.sel.length === 1 && VE.sel[0].t === 's'){ const sh = VE.sel[0].o, G = shapeGeo(sh); g1 = sh.type === 'line' ? `Длина ${fmtDist(G.len)}` : `Площадь ${fmtArea(G.area)} · ${sh.type === 'circle' ? 'окружность' : 'периметр'} ${fmtDist(G.per)}`; }
+$('veExB').innerHTML = `<div class="sub-h">Привязки</div>${cb('nd', 'к узлам фигур и знакам')}${cb('gr', `к сетке СК-42 (сейчас шаг ${veGridStep()} м)`)}${cb('an', 'углы через 15° у пера')}
+<div class="sub-h">Направляющие (${VE.guides.length})</div><div class="row"><button id="veGx">＋ Горизонталь</button><button id="veGy">＋ Вертикаль</button><button class="ghost" id="veG0">Убрать все</button></div><small>Проходят через центр выделения (или экрана) по линиям X / Y СК-42; к ним работает привязка.</small>
+${M ? `<div class="sub-h">Выделено: ${VE.sel.length}${g1 ? ' · ' + g1 : ''}</div><div class="row"><label class="f">Центр X, м<input id="veEX" inputmode="numeric" value="${n0(M.Xc)}"></label><label class="f">Центр Y, м<input id="veEY" inputmode="numeric" value="${n0(M.Yc)}"></label></div>
+<div class="row"><label class="f">Ширина (по Y), м<input id="veEW" inputmode="decimal" value="${n0(M.W)}"></label><label class="f">Высота (по X), м<input id="veEH" inputmode="decimal" value="${n0(M.H)}"></label></div>
+<label class="f" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="veEP" checked style="width:20px;height:20px">пропорционально</label><label class="f">Повернуть на, °<input id="veER" inputmode="decimal" value="0"></label><div class="row"><button class="primary" id="veEA">Применить</button></div>` : '<div class="cdv">Выберите объекты, чтобы задать точные координаты, размеры и поворот.</div>'}`;
+$('veExB').querySelectorAll('[data-sn]').forEach(c => c.onchange = () => { VE.snap[c.dataset.sn] = c.checked; veLSs('skat_vsnap', VE.snap); });
+const gAdd = k => { const c = M ? [M.Xc, M.Yc, M.z] : (() => { const q = map.getCenter(), s = GEO.toSK(q.lat, q.lng); return [s.x, s.y, s.zone]; })(); VE.guides.push({k, v:Math.round(k === 'x' ? c[0] : c[1]), z:c[2]}); veLSs('skat_vguides', VE.guides); veDraw(); veExact(); };
+$('veGx').onclick = () => gAdd('x'); $('veGy').onclick = () => gAdd('y'); $('veG0').onclick = () => { VE.guides = []; veLSs('skat_vguides', VE.guides); veDraw(); veExact(); };
+if (!M) { openModal('veExM'); return; }
+const sync = src => { if (!$('veEP').checked) return; const k = src === 'W' ? (+$('veEW').value.replace(',', '.') / M.W) : (+$('veEH').value.replace(',', '.') / M.H); if (!isFinite(k) || k <= 0) return; if (src === 'W' && M.H) $('veEH').value = n0(M.H * k); if (src === 'H' && M.W) $('veEW').value = n0(M.W * k); };
+$('veEW').oninput = () => sync('W'); $('veEH').oninput = () => sync('H');
+$('veEA').onclick = () => { const num = id => +String($(id).value).replace(',', '.').replace(/\s/g, ''), Xc = num('veEX'), Yc = num('veEY'), W = num('veEW'), H = num('veEH'), deg = num('veER') || 0;
+if (![Xc, Yc, W, H].every(isFinite)){ toast('Проверьте числа'); return; } const sy = M.W > .5 ? W / M.W : 1, sx = M.H > .5 ? H / M.H : 1; if (sx <= 0 || sy <= 0){ toast('Размеры должны быть больше нуля'); return; }
+const a = deg * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a);
+veBegin(); veApply(q => { const ll = map.containerPointToLatLng(L.point(q.x, q.y)), s = GEO.toSK(ll.lat, ll.lng, M.z); let u = (s.y - M.Yc) * sy, v = -(s.x - M.Xc) * sx; const u2 = u * cs - v * sn, v2 = u * sn + v * cs; return veCp(GEO.fromSK(Xc - v2, Yc + u2, M.z)); }, Math.sqrt(sx * sy), veNorm(deg));
+veEnd(); toast('Применено'); veExact(); };
+openModal('veExM'); }
+// ---- окно «Объекты»: выбор, видимость, блокировка (заблокированные не выделяются на карте)
+function veObjs(){ let m = $('veObM'); if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'veObM'; m.innerHTML = '<div class="card big"><h3>Объекты</h3><div id="veObB" style="max-height:60vh;overflow:auto"></div><div class="row"><button class="primary" data-close>Готово</button></div></div>'; m.addEventListener('click', e => { if (e.target === m || e.target.hasAttribute('data-close')) m.classList.remove('open'); }); }
+document.body.appendChild(m); let h = '';
+state.arrays.forEach(a => { const its = layItems(a).filter(x => veT.includes(x.t)); if (!its.length) return; h += `<div class="sub-h">${escapeHtml(a.name)}${a.hidden ? ' (скрыт)' : ''} · ${its.length}</div>` + its.slice(0, 400).map(x => `<div class="kid${x.o.hid ? ' off' : ''}" data-k="${a.id}|${x.t}|${x.i}"><span class="kn" data-a="sel">${x.o.g ? '▣ ' : ''}${escapeHtml(x.n)}</span><button class="eye" data-a="lk" title="Блокировка">${x.o.lk ? '🔒' : '🔓'}</button><button class="eye" data-a="hid">${x.o.hid ? EYE_OFF : EYE_ON}</button></div>`).join(''); });
+$('veObB').innerHTML = h || '<div class="empty">Объектов нет</div>';
+$('veObB').querySelectorAll('.kid').forEach(r => r.onclick = e => { const b = e.target.closest('[data-a]'); if (!b) return; const [aid, t, i] = r.dataset.k.split('|'), a = arrById(+aid), o = a && a[ARRK[t]][+i]; if (!o) return;
+if (b.dataset.a === 'lk'){ if (o.lk) delete o.lk; else o.lk = 1; VE.sel = VE.sel.filter(s => s.o !== o); persist(); veObjs(); veDraw(); return; }
+if (b.dataset.a === 'hid'){ if (o.hid) delete o.hid; else o.hid = true; persist(); renderMarkers(); veObjs(); return; }
+if (o.hid || o.lk || a.hidden){ toast('Объект скрыт или заблокирован'); return; } const ll = veKeyLL(t, o)[0]; if (ll) map.panTo(ll); VE.sel = [{a, t, o}]; m.classList.remove('open'); if (!VE.on) veOn(); setTimeout(veDraw, 300); });
+openModal('veObM'); }
+function veTextPath(){ const s = VE.sel.length === 1 && VE.sel[0].t === 's' ? VE.sel[0].o : null; if (!s || s.type === 'circle'){ toast('Выберите одну линию или контур'); return; }
+const v = prompt('Текст вдоль линии (пусто — убрать). Текст идёт от первой точки линии к последней', s.tp ? s.tp.t : ''); if (v === null) return;
+if (!v.trim()) delete s.tp; else { const z = prompt('Размер шрифта, пикс.', s.tp ? s.tp.s : 14); if (z === null) return; s.tp = {t:v.trim(), s:Math.max(6, Math.min(60, +z || 14)), c:(s.tp && s.tp.c) || s.color || '#111111'}; }
+persist(); renderMarkers(); }
+// ======== ВЕКТОРНЫЙ РЕДАКТОР 4.5: ОБМЕН — ЭКСПОРТ SVG, ПЕЧАТЬ / PDF, ИМПОРТ SVG ========
+const veX = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function veMpp(){ const s = map.getSize(); return map.distance(map.containerPointToLatLng([s.x / 2, s.y / 2]), map.containerPointToLatLng([s.x / 2 + 100, s.y / 2])) / 100 || 1; }
+function veSvgBuild(items){ if (!items.length) return null; const l0 = veKeyLL(items[0].t, items[0].o)[0], z = GEO.toSK(l0[0], l0[1]).zone, S = ll => GEO.toSK(ll[0], ll[1], z), mpp = veMpp(), f = v => +(+v).toFixed(2);
+let X0 = Infinity, X1 = -Infinity, Y0 = Infinity, Y1 = -Infinity; const ext = (s, r) => { X0 = Math.min(X0, s.x - r); X1 = Math.max(X1, s.x + r); Y0 = Math.min(Y0, s.y - r); Y1 = Math.max(Y1, s.y + r); };
+items.forEach(it => { if (it.t === 's' && it.o.type === 'circle') ext(S(veLL(it.o.pts[0])), it.o.r || 0); else (it.t === 's' ? (it.o.pts || []).map(veLL) : veKeyLL(it.t, it.o)).forEach(ll => ext(S(ll), 0)); });
+const pad = 80 * mpp; X0 -= pad; X1 += pad; Y0 -= pad; Y1 += pad; const W = Y1 - Y0, H = X1 - X0, P = ll => { const s = S(ll); return [f(s.y - Y0), f(X1 - s.x)]; };
+const css = getComputedStyle(document.documentElement), sg = parseFloat(css.getPropertyValue('--sg')) || 33, lf = parseFloat(css.getPropertyValue('--lf')) || 12; const defs = []; let body = '', pid = 0;
+items.forEach(it => { const {a, t, o} = it;
+if (t === 's'){ const col = o.color || a.style.color, sw = (o.sw || 2.5) * mpp, D = SH_DASH[o.dash], fc = o.fill || col, ln = o.type === 'line'; let fill = ln ? 'none' : fc, fop = ln ? 0 : (o.op ?? 35) / 100;
+if (!ln && o.hatch && SH_HATCH[o.hatch]){ const id = 'h' + defs.length; defs.push(`<pattern id="${id}" patternUnits="userSpaceOnUse" width="${f(10 * mpp)}" height="${f(10 * mpp)}"><path d="${SH_HATCH[o.hatch]}" transform="scale(${f(mpp)})" ${o.hatch === '.' ? `fill="${fc}"` : `stroke="${fc}" stroke-width="1.6" fill="none"`}/></pattern>`); fill = `url(#${id})`; fop = 1; }
+const st = `stroke="${col}" stroke-width="${f(sw)}" stroke-opacity="${o.so != null ? o.so / 100 : .95}" fill="${fill}" fill-opacity="${fop}"${D ? ` stroke-dasharray="${D.map(v => f(v * sw)).join(' ')}"` : ''}${D && o.dash !== 'dash' && o.dash !== 'long' ? ' stroke-linecap="round"' : ''} stroke-linejoin="round"`;
+if (o.type === 'circle'){ const c = P(veLL(o.pts[0])); body += `<circle cx="${c[0]}" cy="${c[1]}" r="${f(o.r || 0)}" ${st}/>`; return; }
+const Q = (o.pts || []).map(q => P(veLL(q))); if (Q.length < 2) return; const id = 'p' + (++pid); body += `<path id="${id}" d="M${Q.map(q => q.join(' ')).join('L')}${ln ? '' : 'Z'}" ${st}/>`;
+if (ln && o.arr){ const L0 = (6 + 3.2 * (o.sw || 2.5)) * mpp, W0 = (3 + 1.6 * (o.sw || 2.5)) * mpp, hd = (A, B) => { const d = Math.hypot(B[0] - A[0], B[1] - A[1]) || 1, ux = (B[0] - A[0]) / d, uy = (B[1] - A[1]) / d, bx = B[0] - ux * L0, by = B[1] - uy * L0; body += `<path d="M${B[0]} ${B[1]}L${f(bx - uy * W0)} ${f(by + ux * W0)}L${f(bx + uy * W0)} ${f(by - ux * W0)}Z" fill="${col}"/>`; };
+if (o.arr !== 'start') hd(Q[Q.length - 2], Q[Q.length - 1]); if (o.arr !== 'end') hd(Q[1], Q[0]); }
+if (o.tp) body += `<text font-family="Roboto Condensed, sans-serif" font-weight="700" font-size="${f(o.tp.s * mpp)}" fill="${o.tp.c}" stroke="#fff" stroke-width="${f(3 * mpp)}" paint-order="stroke" dy="${f(-o.tp.s * .35 * mpp)}"><textPath href="#${id}" xlink:href="#${id}" startOffset="50%" text-anchor="middle">${veX(o.tp.t)}</textPath></text>`; return; }
+if (t === 'x'){ const [x, y] = P([o.lat, o.lng]), fs = (o.s || 14) * mpp, ls = String(o.t).split('\n'), lh = (o.lh || 1.15) * fs, an = {left:'start', right:'end'}[o.al] || 'middle';
+body += `<text x="${x}" y="${y}" font-family="${veX(o.f || 'Roboto Condensed')}, sans-serif" font-size="${f(fs)}" font-weight="${o.b ? 700 : 500}"${o.i ? ' font-style="italic"' : ''} fill="${o.c || '#111'}" text-anchor="${an}"${o.r ? ` transform="rotate(${o.r} ${x} ${y})"` : ''}${o.sw && o.sc ? ` stroke="${o.sc}" stroke-width="${f(2 * o.sw * mpp)}" paint-order="stroke" stroke-linejoin="round"` : ''}>${ls.map((l, i) => `<tspan x="${x}" dy="${f(i ? lh : -(ls.length - 1) * lh / 2 + fs * .35)}">${veX(l)}</tspan>`).join('')}</text>`; return; }
+if (t === 'tb'){ const [x, y] = P([o.lat, o.lng]), fs = (o.s || 12) * mpp, pd = (o.pd ?? 2) * mpp, rows = (o.rows || []).slice(0, 40), nc = Math.max(1, ...rows.map(r => r.length)), cw = Array.from({length:nc}, (_, j) => Math.max(...rows.map(r => String(r[j] ?? '').length), 1) * fs * .56 + pd * 6), rh = fs * 1.35 + pd * 2, TW = cw.reduce((p, v) => p + v, 0), TH = rh * rows.length, x0 = x - TW / 2, y0 = y - TH / 2, bd = o.bd || '';
+body += `<g font-family="${veX(o.f || 'Roboto Condensed')}, sans-serif" font-size="${f(fs)}" fill="${o.c || '#111'}">${o.bg ? `<rect x="${f(x0)}" y="${f(y0)}" width="${f(TW)}" height="${f(TH)}" fill="${o.bg}" fill-opacity="${o.op ?? 1}"/>` : ''}`;
+rows.forEach((r, ri) => { let cx = x0; for (let j = 0; j < nc; j++){ if (bd) body += `<rect x="${f(cx)}" y="${f(y0 + ri * rh)}" width="${f(cw[j])}" height="${f(rh)}" fill="none" stroke="${bd}" stroke-width="${f(mpp)}"/>`; body += `<text x="${f(cx + pd * 3)}" y="${f(y0 + ri * rh + rh / 2 + fs * .35)}"${ri === 0 && o.hdr ? ' font-weight="700"' : ''}>${veX(r[j] ?? '')}</text>`; cx += cw[j]; } }); body += '</g>'; return; }
+if (t === 'p'){ const [x, y] = P([o.lat, o.lng]), col = styleOf(a, o).color, sid = o.sym || a.sym, sz = sg * mpp, sv = sid && sid !== '_none' ? symSvg(sid) : '', i = a.points.indexOf(o);
+body += `<g color="${col}" style="color:${col}"${o.rot ? ` transform="rotate(${o.rot} ${x} ${y})"` : ''}>${sv.startsWith('<svg') ? sv.replace('<svg', `<svg x="${f(x - sz / 2)}" y="${f(y - sz / 2)}" width="${f(sz)}" height="${f(sz)}"`) : `<circle cx="${x}" cy="${y}" r="${f(sz * .22)}" fill="${col}" stroke="#fff" stroke-width="${f(mpp * 1.5)}"/>`}</g>`;
+if (i >= 0) body += `<text x="${x}" y="${f(y + sz * .5 + lf * mpp * 1.1)}" font-family="Roboto Condensed, sans-serif" font-size="${f(lf * mpp)}" font-weight="700" text-anchor="middle" fill="${col}" stroke="#fff" stroke-width="${f(2.5 * mpp)}" paint-order="stroke">${veX(labelOf(a, i))}</text>`; } });
+return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${f(W)} ${f(H)}" width="${Math.round(W / mpp)}" height="${Math.round(H / mpp)}">\n<metadata id="skat-geo">${JSON.stringify({v:1, z, X1:f(X1), Y0:f(Y0), unit:'м СК-42'})}</metadata>\n<defs>${defs.join('')}</defs>\n${body}\n</svg>`; }
+function veXItems(all){ const L1 = all ? veAll(true) : VE.sel.slice(); if (!L1.length) toast(all ? 'Нет видимых объектов' : 'Ничего не выбрано'); return L1; }
+function veSvgSave(all){ const L1 = veXItems(all); if (!L1.length) return; const s = veSvgBuild(L1); deliverFile(new Blob([s], {type:'image/svg+xml'}), `СКАТ_${all ? 'обстановка' : 'выделенное'}_${stamp()}.svg`, `SVG готов: объектов ${L1.length}`); }
+function veSvgPrint(all){ const L1 = veXItems(all); if (!L1.length) return; if (typeof window.print !== 'function'){ toast('Печать недоступна — сохраните SVG'); return; }
+const d = document.createElement('div'); d.id = 'vePrint'; d.innerHTML = veSvgBuild(L1).replace(/^<\?xml[^>]*>\s*/, ''); const sv = d.querySelector('svg'); sv.removeAttribute('width'); sv.removeAttribute('height'); sv.style.cssText = 'width:100%;height:auto;max-height:100%';
+const st = document.createElement('style'); st.id = 'vePrintCss'; st.textContent = '#vePrint{display:none}@media print{body>*:not(#vePrint){display:none!important}#vePrint{display:block!important}@page{margin:10mm}}'; document.head.appendChild(st); document.body.appendChild(d);
+const done = () => { d.remove(); st.remove(); removeEventListener('afterprint', done); }; addEventListener('afterprint', done); document.querySelectorAll('.modal.open').forEach(x => x.classList.remove('open'));
+setTimeout(() => { try { window.print(); } catch(e){ toast('Печать недоступна — сохраните SVG'); } setTimeout(done, 60000); }, 300); }
+const veHex = c => { if (!c || c === 'none' || c === 'transparent') return null; const m = c.match(/rgba?\(([^)]+)\)/); if (!m) return /^#/.test(c) ? c : null; const v = m[1].split(/[\s,\/]+/).filter(Boolean).map(Number); if (v.length > 3 && v[3] === 0) return null; return '#' + v.slice(0, 3).map(x => Math.round(x).toString(16).padStart(2, '0')).join(''); };
+async function veSvgImport(file){ let txt; try { txt = await file.text(); } catch(e){ toast('Файл не читается'); return; }
+const doc = new DOMParser().parseFromString(txt, 'image/svg+xml'), root = doc.documentElement; if (!root || root.nodeName.toLowerCase() !== 'svg' || doc.querySelector('parsererror')){ toast('Это не SVG'); return; }
+const host = document.createElement('div'); host.style.cssText = 'position:fixed;left:-30000px;top:0;width:1200px;height:1200px;visibility:hidden;pointer-events:none'; const sv = document.importNode(root, true); host.appendChild(sv); document.body.appendChild(host);
+const raw = []; let meta = null; try { const md = sv.querySelector('metadata#skat-geo'); if (md) meta = JSON.parse(md.textContent); } catch(e){}
+try { const bb = sv.getBBox(), diag = Math.hypot(bb.width, bb.height) || 100, R = sv.getScreenCTM().inverse();
+const els = [...sv.querySelectorAll('path,line,polyline,polygon,rect,circle,ellipse,text')].filter(el => el.closest('svg') === sv && !el.closest('defs,pattern,marker,clipPath,mask,symbol,metadata') && !el.querySelector('textPath')).slice(0, 3000);
+for (const el of els){ const M = R.multiply(el.getScreenCTM()), k = Math.sqrt(Math.abs(M.a * M.d - M.b * M.c)) || 1, cs = getComputedStyle(el), tg = el.nodeName.toLowerCase();
+if (tg === 'text'){ const tx = el.textContent.trim(); if (!tx) continue; const b = el.getBBox(), q = new DOMPoint(b.x + b.width / 2, b.y + b.height / 2).matrixTransform(M); raw.push({k:'x', t:tx, q, fs:(parseFloat(cs.fontSize) || 12) * k, c:veHex(cs.fill) || '#111111', b:+cs.fontWeight >= 600}); continue; }
+let len = 0; try { len = el.getTotalLength(); } catch(e){} if (!len) continue; const step = Math.max(len / 500, diag / 400), N = Math.min(800, Math.ceil(len / step)), parts = []; let cur = [], prev = null;
+for (let j = 0; j <= N; j++){ const p0 = el.getPointAtLength(Math.min(len, j * len / N)), q = new DOMPoint(p0.x, p0.y).matrixTransform(M); if (prev && Math.hypot(q.x - prev.x, q.y - prev.y) > step * k * 3){ if (cur.length > 1) parts.push(cur); cur = []; } cur.push({x:q.x, y:q.y}); prev = q; }
+if (cur.length > 1) parts.push(cur); const st = veHex(cs.stroke), fl = veHex(cs.fill), cl0 = /^(polygon|rect|circle|ellipse)$/.test(tg) || (tg === 'path' && /z\s*$/i.test((el.getAttribute('d') || '').trim()));
+if (!st && !fl) continue; parts.forEach(P => { const cl = cl0 && Math.hypot(P[0].x - P[P.length - 1].x, P[0].y - P[P.length - 1].y) < step * k * 2; let Q = veRdp(P, diag / 1500); if (cl && Q.length > 3) Q.pop(); if (Q.length < 2) return;
+raw.push({k:'s', Q, cl:cl && Q.length > 2, st, fl, sw:(st ? parseFloat(cs.strokeWidth) || 1 : 1) * k, fo:+cs.fillOpacity * (+cs.opacity || 1)}); }); } }
+catch(e){ toast('Ошибка чтения SVG: ' + (e.message || e)); } finally { host.remove(); }
+if (!raw.length){ toast('В SVG не найдено линий и текстов'); return; }
+let toLL, px; const mpp = veMpp();
+if (meta && meta.z){ toLL = q => { const g = GEO.fromSK(meta.X1 - q.y, meta.Y0 + q.x, meta.z); return [+(+g[0]).toFixed(7), +(+g[1]).toFixed(7)]; }; px = v => v / mpp; }
+else { let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; raw.forEach(r => (r.k === 's' ? r.Q : [r.q]).forEach(q => { x0 = Math.min(x0, q.x); y0 = Math.min(y0, q.y); x1 = Math.max(x1, q.x); y1 = Math.max(y1, q.y); }));
+const s = map.getSize(), kk = Math.min(.6 * s.x / Math.max(1e-6, x1 - x0), .6 * s.y / Math.max(1e-6, y1 - y0)), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2; toLL = q => veBack({x:s.x / 2 + (q.x - cx) * kk, y:s.y / 2 + (q.y - cy) * kk}); px = v => v * kk; }
+const a = normArr({id:Date.now(), kind:'shapes', name:'Импорт SVG ' + String(file.name || '').replace(/\.svg$/i, '').slice(0, 30), ident:'Импорт SVG', style:{color:'#111111', name:'Чёрный', glyph:''}, points:[], shapes:[], texts:[]}); state.arrays.push(a); const nw = [];
+raw.forEach(r => { if (r.k === 'x'){ const q = toLL(r.q), o = {t:r.t, lat:q[0], lng:q[1], s:Math.max(6, Math.min(80, Math.round(px(r.fs)))), c:r.c, f:'Roboto Condensed', b:r.b, al:'center'}; a.texts.push(o); nw.push({a, t:'x', o}); return; }
+const o = {type:r.cl ? 'poly' : 'line', pts:r.Q.map(toLL), color:r.st || r.fl, sw:Math.max(.5, Math.min(16, Math.round(px(r.sw) * 2) / 2)), op:r.cl && r.fl ? Math.round(Math.min(1, r.fo || 1) * 100) : 0, t:Date.now()}; if (r.fl && r.st && r.fl !== r.st) o.fill = r.fl; if (!r.st) o.sw = 1;
+a.shapes.push(o); nw.push({a, t:'s', o}); });
+persist(); renderMarkers(); if (!VE.on) veOn(); VE.sel = nw; veDraw(); toast(`Импортировано: ${nw.length}${meta ? ' (на исходные координаты)' : ' — размещено в центре экрана, подгоните рамкой'}`); }
+function veXch(){ let m = $('veXM'); if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'veXM'; m.innerHTML = '<div class="card"><h3>SVG / PDF</h3><div id="veXB"></div><div class="row"><button class="primary" data-close>Готово</button></div><input type="file" id="veXIn" accept=".svg,image/svg+xml" style="display:none"></div>'; m.addEventListener('click', e => { if (e.target === m || e.target.hasAttribute('data-close')) m.classList.remove('open'); }); }
+document.body.appendChild(m); const n = VE.sel.length;
+$('veXB').innerHTML = `<div class="sub-h">Экспорт SVG (векторный, координаты в метрах СК-42)</div><div class="row"><button data-x="sv1"${n ? '' : ' disabled'}>Выделенное (${n})</button><button data-x="sv2">Всё видимое</button></div>
+<div class="sub-h">Печать / PDF</div><div class="row"><button data-x="pr1"${n ? '' : ' disabled'}>Выделенное</button><button data-x="pr2">Всё видимое</button></div><small>Откроется печать: выберите «Сохранить как PDF» (на iPhone — «Поделиться» в окне печати). В APK печати нет — сохраните SVG.</small>
+<div class="sub-h">Импорт SVG</div><div class="row"><button data-x="imp">Открыть файл SVG</button></div><small>Линии, фигуры и тексты станут объектами нового слоя. SVG, выгруженный из СКАТ, встанет на свои координаты.</small>`;
+$('veXB').querySelectorAll('[data-x]').forEach(b => b.onclick = () => { const x = b.dataset.x; if (x === 'imp'){ $('veXIn').click(); return; } m.classList.remove('open'); if (x === 'sv1') veSvgSave(false); else if (x === 'sv2') veSvgSave(true); else if (x === 'pr1') veSvgPrint(false); else veSvgPrint(true); });
+$('veXIn').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f){ m.classList.remove('open'); veSvgImport(f); } };
+openModal('veXM'); }
+{ const st = document.createElement('style'); st.textContent = '#veOv .vgd{stroke:#00b3c7;stroke-width:1;stroke-dasharray:8 5}#veOv .vsm{stroke:#e0287d;stroke-width:2.5;fill:none}'; document.head.appendChild(st); }
+// ======== РАБОЧЕЕ МЕСТО ОПЕРАТОРА (6.31): инструменты слева (#lrail), свойства сверху (#veBar), палитра снизу (#opPal) ========
+const OPW = {on:false, t:'hand', mode:'f', ids:new WeakMap(), n:0, key:''};
+const OPW_T = [['sel', 'Выбор', '<path d="M5 3l14 8-6 2-3 6z"/>'], ['nd', 'Узлы', '<path d="M4 18C8 6 16 18 20 6"/><rect x="2.5" y="16.5" width="3" height="3"/><rect x="18.5" y="4.5" width="3" height="3"/>'], ['hand', 'Карта', '<path d="M8 13V5a1.5 1.5 0 013 0v6M11 11V4a1.5 1.5 0 013 0v7M14 11V5.5a1.5 1.5 0 013 0V14c0 4-3 7-7 7s-6-3-7-6l-1-3a1.5 1.5 0 012.6-1.4L8 14"/>'],
+['line', 'Линия', '<path d="M4 20L20 4"/>'], ['rect', 'Прямоуг.', '<rect x="4" y="6" width="16" height="12"/>'], ['circle', 'Круг', '<circle cx="12" cy="12" r="8"/>'], ['poly', 'Многоуг.', '<path d="M12 3l8 6-3 10H7L4 9z"/>'],
+['pen', 'Перо', '<path d="M12 3l5 9-5 9-5-9z"/><circle cx="12" cy="12" r="1.5"/>'], ['pcl', 'Карандаш', '<path d="M4 20l1-5L16 4l4 4L9 19z"/>'], ['text', 'Текст', '<path d="M5 6V4h14v2M12 4v16M9 20h6"/>'], ['tbl', 'Таблица', '<rect x="3" y="5" width="18" height="14"/><path d="M3 10h18M3 14h18M9 5v14M15 5v14"/>'],
+['sym', 'Знак', '<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.8 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>'], ['pip', 'Пипетка', '<path d="M14 4l6 6-2 2-6-6zM12 8l-7 7v4h4l7-7"/>']];
+const OPW_C = ['#000000', '#ffffff', '#7f7f7f', '#d62020', '#e2533f', '#ff8a2a', '#ffd400', '#8b5a2b', '#2e8b57', '#58c472', '#1e5bd8', '#3a7bd5', '#00a0b0', '#7b3fa0'];
+function opwSync(){ const on = secMode === 'op'; document.body.classList.toggle('opws', on); OPW.on = on; if (!$('opTb')) opwUI(); $('opTb').style.display = on ? '' : 'none'; $('opPal').style.display = on ? 'flex' : 'none'; if ($('veBtn')) $('veBtn').style.display = on ? 'none' : (secMode === 'op' ? '' : 'none'); if (!on) return; opwMark(); }
+function opwUI(){ const tb = document.createElement('div'); tb.id = 'opTb'; tb.innerHTML = OPW_T.map(([k, n, ic]) => `<button class="rb ot" data-ot="${k}" title="${n}"><svg viewBox="0 0 24 24">${ic}</svg>${n}</button>`).join(''); $('lrail').prepend(tb);
+tb.onclick = e => { const b = e.target.closest('[data-ot]'); if (b) opwTool(b.dataset.ot); };
+const p = document.createElement('div'); p.id = 'opPal'; p.className = 'glass'; document.body.appendChild(p); opwPal();
+p.addEventListener('click', e => { if (OPW.lp){ OPW.lp = 0; return; } const b = e.target.closest('[data-pc]'); if (b){ opwColor(b.dataset.pc, OPW.mode); return; } const m = e.target.closest('[data-pm]'); if (m){ OPW.mode = m.dataset.pm; opwPal(); } });
+p.addEventListener('contextmenu', e => { const b = e.target.closest('[data-pc]'); if (b){ e.preventDefault(); opwColor(b.dataset.pc, 's'); } });
+p.addEventListener('pointerdown', e => { const b = e.target.closest('[data-pc]'); if (!b) return; clearTimeout(OPW.lt); OPW.lt = setTimeout(() => { OPW.lp = 1; opwColor(b.dataset.pc, OPW.mode === 'f' ? 's' : 'f'); }, 480); });
+['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => p.addEventListener(ev, () => clearTimeout(OPW.lt)));
+p.addEventListener('input', e => { if (e.target.id === 'opPc'){ OPW.cust = e.target.value; } });
+p.addEventListener('change', e => { if (e.target.id === 'opPc'){ const L1 = veLS('skat_opcol', []); if (!L1.includes(e.target.value)){ L1.unshift(e.target.value); veLSs('skat_opcol', L1.slice(0, 8)); } opwPal(); opwColor(e.target.value, OPW.mode); } });
+const st = document.createElement('style'); st.textContent = '#opTb{display:flex;flex-direction:column;gap:6px}#opTb .rb.on{color:var(--signal);background:var(--acc-soft);border-color:var(--signal)}'
++ '#opPal{position:fixed;left:0;right:0;bottom:var(--sheet-h,0px);z-index:1040;display:none;align-items:center;gap:6px;padding:7px 10px calc(var(--safe-b) + 7px);border-radius:16px 16px 0 0;overflow-x:auto;-webkit-overflow-scrolling:touch}body.picking #opPal{display:none!important}'
++ '#opPal .pm{display:flex;flex:none;gap:0}#opPal .pm button{min-height:34px;padding:0 10px;border-radius:0;font-size:13px}#opPal .pm button:first-child{border-radius:999px 0 0 999px}#opPal .pm button:last-child{border-radius:0 999px 999px 0}#opPal .pm button.on{background:var(--ink);color:var(--panel)}'
++ '#opPal [data-pc]{flex:none;width:32px;height:32px;min-height:0;padding:0;border-radius:50%;border:2px solid var(--line2)}#opPal [data-pc="none"]{background:linear-gradient(135deg,transparent 45%,#d62020 45% 55%,transparent 55%),var(--panel)}#opPal .sep{flex:none;width:1px;height:26px;background:var(--line)}#opPal input[type=color]{flex:none;width:34px;height:34px;padding:0;border:0;background:none}'
++ 'body.opws #veBar{top:calc(var(--safe-t) + var(--tg) + 66px);bottom:auto;left:74px;right:74px;transform:none;max-width:none;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;border-radius:14px;padding:6px 8px}body.opws #veBar>*{flex:none}body.opws #veBar [data-v="nd"],body.opws #veBar [data-v="pen"],body.opws #veBar [data-v="pcl"],body.opws #veBar [data-v="x"]{display:none}body.opws #veAl,body.opws #veNdB{position:fixed;left:74px;right:74px;top:calc(var(--safe-t) + var(--tg) + 118px);width:auto;padding:6px;background:var(--glass);border:1px solid var(--line);border-radius:14px}'
++ '#veCtx{display:flex;gap:4px;align-items:center;flex:none;padding-right:6px;margin-right:4px;border-right:1px solid var(--line)}#veCtx:empty{display:none}#veCtx button{min-height:34px;padding:0 9px}#veCtx button.on{background:var(--acc-soft);color:var(--signal);border-color:var(--signal)}#veCtx select{min-height:34px;border-radius:10px;border:1px solid var(--line2);background:var(--panel);color:var(--ink);padding:0 6px;font-size:13px}#veCtx b{min-width:26px;text-align:center}';
+document.head.appendChild(st); }
+function opwPal(){ const my = veLS('skat_opcol', []); $('opPal').innerHTML = `<div class="pm"><button data-pm="f" class="${OPW.mode === 'f' ? 'on' : ''}">■ Заливка</button><button data-pm="s" class="${OPW.mode === 's' ? 'on' : ''}">□ Обводка</button></div><button data-pc="none" title="Без цвета"></button>`
++ OPW_C.concat(my).map(c => `<button data-pc="${c}" style="background:${c}" title="${c}"></button>`).join('') + `<span class="sep"></span><input type="color" id="opPc" value="${OPW.cust || '#ff8a2a'}" title="Свой цвет"><small style="flex:none;color:var(--mute)">удержание — ${OPW.mode === 'f' ? 'обводка' : 'заливка'}</small>`; }
+function opwColor(c, m){ const none = c === 'none', S = (VE.sel || []).filter(s => s.t !== 'p'); let n = 0;
+if (!S.length){ if (VE.sel && VE.sel.length){ toast('Цвет знака задаёт сторона — меняйте в свойствах знака'); return; } if (m === 'f'){ if (none) VE.st.op = 0; else { VE.st.fill = c; if (!(VE.st.op > 0)) VE.st.op = 35; } } else { if (none) VE.st.so = 0; else { VE.st.color = c; delete VE.st.so; } } toast('Цвет для новых линий'); return; }
+S.forEach(s => { const o = s.o; n++;
+if (s.t === 's'){ if (m === 'f'){ if (none){ o.op = 0; delete o.fill; delete o.hatch; } else { o.fill = c; if (!(o.op > 0)) o.op = 35; } } else { if (none) o.so = 0; else { o.color = c; if (o.so === 0) delete o.so; } } }
+else if (s.t === 'x'){ if (m === 'f'){ if (!none) o.c = c; } else { if (none) o.sw = 0; else { o.sc = c; o.sw = +o.sw || 2; } } }
+else if (s.t === 'tb'){ if (m === 'f'){ if (none) delete o.bg; else o.bg = c; } else { if (none) delete o.bd; else o.bd = c; } } });
+persist(); renderMarkers(); toast(`${m === 'f' ? 'Заливка' : 'Обводка'}: ${n}`); }
+function opwMark(){ document.querySelectorAll('#opTb [data-ot]').forEach(b => b.classList.toggle('on', b.dataset.ot === OPW.t)); }
+function opwTool(k){ const prev = OPW.t; OPW.t = k; VE.pip = false; if (typeof tool !== 'undefined' && tool.on && !['line', 'rect', 'circle', 'poly'].includes(k)) closeTools();
+if (VE.on && (VE.pen || VE.pcl || VE.nd) && k !== 'nd') veModeEnd();
+if (k === 'sel'){ veOn(); }
+else if (k === 'nd'){ veOn(); if (VE.sel.length === 1 && VE.sel[0].t === 's') veNodes(); else { toast('Выберите фигуру, затем «Узлы»'); OPW.t = 'sel'; } }
+else if (k === 'hand'){ veOff(); }
+else if (['line', 'rect', 'circle', 'poly'].includes(k)){ veOff(); if (!tool.on) openTools(null); tool.mode = k; drawTool(); renderTool(); toast('Касайтесь карты, чтобы ставить точки'); }
+else if (k === 'pen' || k === 'pcl'){ veOn(); VE.bar.querySelector(`[data-v="${k}"]`).click(); }
+else if (k === 'text'){ veOff(); textPending = {target:null}; toast('Коснитесь карты там, где поставить надпись'); OPW.t = 'hand'; }
+else if (k === 'tbl'){ veOff(); tblPending = {target:null}; $('tbAddIn').click(); OPW.t = 'hand'; }
+else if (k === 'sym'){ veOff(); addTarget = null; addPick('obj'); OPW.t = 'hand'; }
+else if (k === 'pip'){ veOn(); VE.pip = true; VE.pipSel = VE.sel.slice(); toast(VE.pipSel.length ? 'Коснитесь объекта-образца — его стиль получит выделенное' : 'Коснитесь объекта — стиль будет скопирован'); }
+opwMark(); }
+function vePipette(src){ const K = VST[src.t]; VE.pip = false; OPW.t = 'sel'; opwMark(); if (!K){ toast('У знаков нет стиля для копирования'); return; } const st = vePick(src.o, K); VE.stClip = {t:src.t, st};
+const T = (VE.pipSel || []).filter(s => s.t === src.t && s.o !== src.o); if (!T.length){ VE.sel = [src]; veDraw(); toast('Стиль скопирован (вставка — «Стиль» → «Вставить стиль»)'); return; }
+T.forEach(s => veSetSt(s.o, st, K)); VE.sel = T; persist(); renderMarkers(); toast(`Стиль применён: ${T.length}`); }
+// ---- контекстные свойства в верхней панели
+function opwCtx(){ if (!VE.bar) return; let c = $('veCtx'); if (!c){ c = document.createElement('span'); c.id = 'veCtx'; VE.bar.insertBefore(c, VE.bar.children[1] || null); c.addEventListener('click', opwCtxAct); c.addEventListener('change', opwCtxAct); }
+const id = o => { if (!OPW.ids.has(o)) OPW.ids.set(o, ++OPW.n); return OPW.ids.get(o); }, S = VE.sel, ty = [...new Set(S.map(s => s.t))], key = S.map(s => id(s.o)).join(',') + '|' + (VE.nd || VE.pen || VE.pcl ? 'm' : '');
+if (key === OPW.key && !OPW.dirty) return; OPW.key = key; OPW.dirty = 0; if (!S.length || VE.nd || VE.pen || VE.pcl || ty.length !== 1){ c.innerHTML = ''; return; }
+const o = S[0].o, O = (L1, v) => L1.map(([k, t]) => `<option value="${k}"${(v || '') === k ? ' selected' : ''}>${t}</option>`).join(''), on = v => v ? ' class="on"' : '';
+if (ty[0] === 'x') c.innerHTML = `<select data-c="f">${O(FONTS.map(f => [f[0], f[1]]), o.f)}</select><button data-c="s-">−</button><b>${o.s || 14}</b><button data-c="s+">＋</button><button data-c="b"${on(o.b)}><b>Ж</b></button><button data-c="i"${on(o.i)}><i>К</i></button><button data-c="u"${on(o.u)}><u>Ч</u></button><button data-c="al:left"${on(o.al === 'left')}>⇤</button><button data-c="al:center"${on(!o.al || o.al === 'center')}>≡</button><button data-c="al:right"${on(o.al === 'right')}>⇥</button><button data-c="ed">✎ Текст</button>`;
+else if (ty[0] === 's') c.innerHTML = `<span style="color:var(--mute);font-size:13px">Толщина</span><button data-c="w-">−</button><b>${String(o.sw || 2.5).replace('.', ',')}</b><button data-c="w+">＋</button><select data-c="dash">${O([['', 'сплошная'], ['dash', 'штрих'], ['long', 'длинный'], ['dot', 'точки'], ['dashdot', 'штрих-пункт.']], o.dash)}</select>${o.type === 'line' ? `<select data-c="arr">${O([['', 'без стрелок'], ['end', 'стрелка →'], ['start', '← стрелка'], ['both', '↔']], o.arr)}</select>` : `<select data-c="hatch">${O([['', 'без штриховки'], ['/', '/ косая'], ['\\', '\\ косая'], ['x', 'сетка ×'], ['-', '— гориз.'], ['|', '| верт.'], ['+', '+ сетка'], ['.', '· точки']], o.hatch)}</select>`}`;
+else if (ty[0] === 'tb') c.innerHTML = `<span style="color:var(--mute);font-size:13px">Шрифт</span><button data-c="s-">−</button><b>${o.s || 12}</b><button data-c="s+">＋</button>`;
+else c.innerHTML = ''; }
+function opwCtxAct(e){ const b = e.target.closest('[data-c]'); if (!b || (e.type === 'click' && b.tagName === 'SELECT')) return; const k = b.dataset.c, S = VE.sel;
+if (k === 'ed'){ const s = S[0]; if (s) openTextEd(s.a, s.a.texts.indexOf(s.o)); return; }
+S.forEach(({t, o}) => { if (k === 's-' || k === 's+') o.s = Math.max(6, Math.min(120, (o.s || (t === 'tb' ? 12 : 14)) + (k === 's+' ? 1 : -1)));
+else if (k === 'w-' || k === 'w+') o.sw = Math.max(.5, Math.min(16, (o.sw || 2.5) + (k === 'w+' ? .5 : -.5)));
+else if (k === 'b' || k === 'i' || k === 'u'){ if (S[0].o[k]) delete o[k]; else o[k] = true; }
+else if (k.startsWith('al:')) o.al = k.slice(3);
+else if (['f', 'dash', 'arr', 'hatch'].includes(k)){ if (b.value) o[k] = b.value; else delete o[k]; } });
+OPW.dirty = 1; persist(); renderMarkers(); }
+{ const d0 = veDraw; window.veDraw = function(){ d0(); if (OPW.on) opwCtx(); }; }
+opwSync();
 window.__mod_op = 1;
