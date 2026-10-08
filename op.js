@@ -225,13 +225,13 @@ VE.svg.innerHTML = veGuidesSvg() + h; $('veN').textContent = VE.inf || `Выбр
 function veUI(){ if (VE.ov) return;
 VE.ov = document.createElement('div'); VE.ov.id = 'veOv'; VE.ov.innerHTML = '<svg></svg>'; document.body.appendChild(VE.ov); VE.svg = VE.ov.firstChild;
 VE.bar = document.createElement('div'); VE.bar.id = 'veBar'; VE.bar.className = 'glass';
-VE.bar.innerHTML = '<b id="veN"></b><button data-v="all">Все</button><button data-v="add">＋ К выбору</button><button data-v="nd">Узлы</button><button data-v="st">Стиль</button><button data-v="pen">Перо</button><button data-v="pcl">Карандаш</button><button data-v="ex">Точность</button><button data-v="ob">Объекты</button><button data-v="tp">Текст по линии</button><button data-v="xch">SVG / PDF</button><button data-v="dup">Дубль</button><button data-v="copy">Копир.</button><button data-v="paste">Вставить</button><button data-v="grp">Группа</button><button data-v="ugrp">Разгруп.</button><button data-v="up">Выше</button><button data-v="dn">Ниже</button><button data-v="al">Выровнять ▾</button><button data-v="del" class="danger">Удалить</button><button data-v="x">✕</button>'
+VE.bar.innerHTML = '<b id="veN"></b><button data-v="all">Все</button><button data-v="add">＋ К выбору</button><button data-v="nd">Узлы</button><button data-v="st">Стиль</button><button data-v="pen">Перо</button><button data-v="pcl">Карандаш</button><button data-v="ex">Точность</button><button data-v="ob">Объекты</button><button data-v="tp">Текст по линии</button><button data-v="xch">SVG / PDF</button><button data-v="dup">Дубль</button><button data-v="copy">Копир.</button><button data-v="paste">Вставить</button><button data-v="grp">Группа</button><button data-v="ugrp">Разгруп.</button><button data-v="up">Выше</button><button data-v="dn">Ниже</button><button data-v="bu" title="Объединить">⊕ Объед.</button><button data-v="bd" title="Вычесть из первой выбранной">⊖ Вычесть</button><button data-v="bi" title="Пересечение">⊗ Пересеч.</button><button data-v="bx" title="Исключить общую часть">◫ Исключ.</button><button data-v="al">Выровнять ▾</button><button data-v="del" class="danger">Удалить</button><button data-v="x">✕</button>'
 + '<div id="veAl"><button data-v="al:l">⇤ Лево</button><button data-v="al:ch">⇹ Центр</button><button data-v="al:r">⇥ Право</button><button data-v="al:t">⤒ Верх</button><button data-v="al:cv">⇕ Середина</button><button data-v="al:b">⤓ Низ</button><button data-v="al:dh">↔ Распределить</button><button data-v="al:dv">↕ Распределить</button></div><div id="veNdB"></div>';
 document.body.appendChild(VE.bar);
 VE.bar.addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; const v = b.dataset.v;
 if (v.startsWith('al:')) return veAlign(v.slice(3));
 ({all:() => { VE.sel = veAll(); veDraw(); }, add:() => { VE.add = !VE.add; veDraw(); }, dup:veDup, copy:veCopy, paste:vePaste, grp:veGroup, ugrp:veUngroup, up:() => veOrder(true), dn:() => veOrder(false), del:veDel, x:veOff,
-al:() => $('veAl').classList.toggle('on'), nd:veNodes, st:veStyle, ex:veExact, ob:veObjs, tp:veTextPath, xch:veXch,
+al:() => $('veAl').classList.toggle('on'), nd:veNodes, st:veStyle, ex:veExact, bu:() => veBool('u'), bd:() => veBool('d'), bi:() => veBool('i'), bx:() => veBool('x'), ob:veObjs, tp:veTextPath, xch:veXch,
 pen:() => { veModeEnd(); VE.pen = {a:null, t:'s', o:null}; VE.sel = []; veBarMode(); veDraw(); toast('Перо: касание — угловой узел, касание с протяжкой — гладкий; касание первого узла замыкает'); },
 pcl:() => { veModeEnd(); VE.pcl = true; VE.sel = []; veBarMode(); veDraw(); toast('Карандаш: рисуйте пальцем; конец у начала — замкнутая фигура'); }})[v](); });
 VE.bar.addEventListener('click', e => { const b = e.target.closest('[data-w]'); if (b) veNdAct(b.dataset.w); });
@@ -601,4 +601,50 @@ else if (['f', 'dash', 'arr', 'hatch'].includes(k)){ if (b.value) o[k] = b.value
 OPW.dirty = 1; persist(); renderMarkers(); }
 { const d0 = veDraw; window.veDraw = function(){ d0(); if (OPW.on) opwCtx(); }; }
 opwSync();
+// ======== ВЕКТОРНЫЙ РЕДАКТОР: БУЛЕВЫ ОПЕРАЦИИ (6.32) — Грайнер–Хорманн в плоских метрах, дырки — «замочной скважиной» ========
+function bPip(p, R){ let ins = false; for (let i = 0, j = R.length - 1; i < R.length; j = i++){ const a = R[i], b = R[j]; if ((a[1] > p[1]) !== (b[1] > p[1]) && p[0] < (b[0] - a[0]) * (p[1] - a[1]) / (b[1] - a[1]) + a[0]) ins = !ins; } return ins; }
+function bArea(R){ let s = 0; for (let i = 0, j = R.length - 1; i < R.length; j = i++) s += (R[j][0] + R[i][0]) * (R[j][1] - R[i][1]); return s / 2; }
+function bList(R){ const N = R.map(p => ({x:p[0], y:p[1], it:false})); N.forEach((n, i) => { n.next = N[(i + 1) % N.length]; n.prev = N[(i - 1 + N.length) % N.length]; }); return N; }
+function bIns(a, b, n){ let c = a; while (c.next !== b && c.next.it && c.next.al < n.al) c = c.next; n.next = c.next; n.prev = c; c.next.prev = n; c.next = n; }
+// op: 'i' пересечение, 'u' объединение, 'd' A − B. Возвращает массив колец или null, если границы не пересекаются
+function ghClip(A, B, op){ const SA = bList(A), SB = bList(B); let cnt = 0;
+for (const a of SA) for (const b of SB){ const a2 = a.next.it ? (() => { let c = a.next; while (c.it) c = c.next; return c; })() : a.next, b2 = (() => { let c = b.next; while (c.it) c = c.next; return c; })();
+const d = (b2.y - b.y) * (a2.x - a.x) - (b2.x - b.x) * (a2.y - a.y); if (Math.abs(d) < 1e-12) continue;
+const ua = ((b2.x - b.x) * (a.y - b.y) - (b2.y - b.y) * (a.x - b.x)) / d, ub = ((a2.x - a.x) * (a.y - b.y) - (a2.y - a.y) * (a.x - b.x)) / d;
+if (ua <= 0 || ua >= 1 || ub <= 0 || ub >= 1) continue; const x = a.x + ua * (a2.x - a.x), y = a.y + ua * (a2.y - a.y);
+const n1 = {x, y, it:true, al:ua}, n2 = {x, y, it:true, al:ub}; n1.nb = n2; n2.nb = n1; bIns(a, a2, n1); bIns(b, b2, n2); cnt++; }
+if (!cnt) return null;
+const mark = (L0, R, e0) => { let e = e0, c = L0; do { if (c.it){ c.en = e; e = !e; } c = c.next; } while (c !== L0); };
+const a0 = SA[0], b0 = SB[0], inA = bPip([a0.x, a0.y], B), inB = bPip([b0.x, b0.y], A);
+mark(a0, B, op === 'i' ? !inA : op === 'u' ? inA : inA); mark(b0, A, op === 'i' ? !inB : op === 'u' ? inB : !inB);
+const out = [], all = []; { let c = a0; do { if (c.it) all.push(c); c = c.next; } while (c !== a0); }
+for (const st of all){ if (st.vis) continue; const R = []; let c = st, guard = 0;
+do { c.vis = true; c.nb.vis = true; R.push([c.x, c.y]); const fw = c.en;
+do { c = fw ? c.next : c.prev; if (!c.it) R.push([c.x, c.y]); } while (!c.it && guard++ < 1e5); c = c.nb; } while (!c.vis && guard++ < 1e5);
+if (R.length > 2) out.push(R); } return out; }
+function bKey(outer, hole){ if (Math.sign(bArea(outer)) === Math.sign(bArea(hole))) hole = hole.slice().reverse(); let bi = 0, bj = 0, bd = Infinity; outer.forEach((p, i) => hole.forEach((q, j) => { const d = (p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2; if (d < bd){ bd = d; bi = i; bj = j; } }));
+return outer.slice(0, bi + 1).concat(hole.slice(bj), hole.slice(0, bj + 1), outer.slice(bi)); }
+function bNest(R){ R = R.filter(r => r.length > 2 && Math.abs(bArea(r)) > 1e-6); const outer = R.filter(r => !R.some(o => o !== r && Math.abs(bArea(o)) > Math.abs(bArea(r)) && bPip(r[0], o)));
+return outer.map(o => R.filter(h => h !== o && !outer.includes(h) && bPip(h[0], o)).reduce((acc, h) => bKey(acc, h), o)); }
+function bOp(A, B, op){ // A, B — кольца; результат — список внешних колец (дырки вшиты)
+const r = ghClip(A, B, op); if (r) return bNest(r);
+const aInB = bPip(A[0], B), bInA = bPip(B[0], A);
+if (op === 'i') return aInB ? [A] : bInA ? [B] : [];
+if (op === 'u') return aInB ? [B] : bInA ? [A] : [A, B];
+return aInB ? [] : bInA ? [bKey(A, B)] : [A]; }
+function veBool(op){ const S = VE.sel.filter(s => s.t === 's' && s.o.type !== 'line'); if (S.length < 2){ toast('Выберите две и более замкнутые фигуры'); return; }
+const o0 = S[0].o, c0 = veLL(o0.pts[0]), k = Math.cos(c0[0] * Math.PI / 180) * 111320, P = ll => [(ll[1] - c0[1]) * k, (ll[0] - c0[0]) * 110574], Q = p => [+(c0[0] + p[1] / 110574).toFixed(7), +(c0[1] + p[0] / k).toFixed(7)];
+const ring = o => { if (o.type === 'circle'){ const c = P(veLL(o.pts[0])), r = o.r || 1; return Array.from({length:72}, (_, i) => [c[0] + r * Math.cos(i * Math.PI / 36), c[1] + r * Math.sin(i * Math.PI / 36)]); } return (o.pts || []).map(q => P(veLL(q))); };
+const jit = R => R.map(p => [p[0] + (Math.random() - .5) * 1e-4, p[1] + (Math.random() - .5) * 1e-4]);
+let res;
+try { if (op === 'x'){ if (S.length !== 2){ toast('«Исключить» — ровно для двух фигур'); return; } const A = ring(S[0].o), B = jit(ring(S[1].o)); res = bOp(A, B, 'd').concat(bOp(B, A, 'd')); }
+else { res = [ring(S[0].o)]; for (const s of S.slice(1)){ const B = jit(ring(s.o)); if (op === 'u'){ let acc = B; const rest = []; res.forEach(R => { const u = bOp(R, acc, 'u'); if (u.length === 1) acc = u[0]; else rest.push(R); }); res = rest.concat([acc]); }
+else res = res.flatMap(R => bOp(R, B, op)); } } } catch(e){ toast('Не удалось: ' + (e.message || e)); return; }
+res = res.filter(R => R.length > 2 && Math.abs(bArea(R)) > 0.5);
+if (!res.length){ toast(op === 'i' ? 'Фигуры не пересекаются — результат пуст' : 'Результат пуст'); return; }
+const a = S[0].a, base = veCl(o0); ['pts', 'bz', 'r', 'tp', 'zn', 'id'].forEach(x => delete base[x]); base.type = 'poly';
+const idx = a.shapes.indexOf(o0); S.forEach(s => { const arr = s.a.shapes, i = arr.indexOf(s.o); if (i >= 0) arr.splice(i, 1); });
+const nw = res.map(R => Object.assign(veCl(base), {pts:R.map(Q), t:Date.now()})); a.shapes.splice(Math.max(0, Math.min(idx, a.shapes.length)), 0, ...nw);
+VE.sel = nw.map(o => ({a, t:'s', o})); persist(); renderMarkers();
+toast({u:'Объединено', d:'Вычтено из первой выбранной', i:'Пересечение', x:'Исключено (общая часть убрана)'}[op] + (nw.length > 1 ? `: фигур ${nw.length}` : '') + '. ↶ — отменить'); }
 window.__mod_op = 1;

@@ -335,6 +335,19 @@ label.f input::placeholder,label.f textarea::placeholder{color:var(--mute2)}
 #readout,.rb,#layLbl,#fbar,#corr,#meetBar,#dlbar,#v3tl,#v3act,.minibar,#veBar,#tpanel .segs{font-family:"IBM Plex Sans Condensed","Roboto Condensed",var(--font)}
 @media (min-width:700px){.modal.side{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;pointer-events:none}.modal.side .card{pointer-events:auto;position:fixed;top:calc(var(--safe-t) + var(--tg) + 66px);bottom:calc(var(--safe-b) + 12px);width:min(410px,calc(100vw - 170px));max-height:none;height:auto!important;border-radius:16px;padding-bottom:12px;box-shadow:var(--shadow),0 10px 40px rgba(0,0,0,.3);animation:skSideR .18s ease-out}.modal.side-r .card{right:74px}.modal.side-l .card{left:74px;animation-name:skSideL}.modal.side .grab{display:none}}
 @keyframes skSideR{from{transform:translateX(30px);opacity:0}}@keyframes skSideL{from{transform:translateX(-30px);opacity:0}}
+/* ---- 6.41: выдвижные панели по краям (body.dk-l/-r/-b/-t — свёрнуто, dk-pan — временно при движении карты) */
+#lrail,#rail,#top,#mixer,#opPal,#veBar,#v3act,#v3tl,#simCards,#simP{transition:transform .25s ease,opacity .25s ease}
+body.dk-l #lrail,body.dk-pan #lrail{transform:translateX(calc(-100% - 16px));opacity:0;pointer-events:none}
+body.dk-r #rail,body.dk-pan #rail{transform:translateX(calc(100% + 16px));opacity:0;pointer-events:none}
+body.dk-b #mixer,body.dk-b #opPal,body.dk-pan #mixer,body.dk-pan #opPal{transform:translateY(calc(100% + 24px));opacity:0;pointer-events:none}
+body.dk-b #v3tl,body.dk-b #simCards,body.dk-pan #v3tl,body.dk-pan #simCards{transform:translateY(calc(100% + 120px));opacity:0;pointer-events:none}
+body.dk-b #v3act,body.dk-pan #v3act{transform:translate(-50%,calc(100% + 40px));opacity:0;pointer-events:none}
+body.dk-l #simP,body.dk-pan #simP{transform:translateX(calc(-100% - 20px));opacity:0;pointer-events:none}
+body.dk-t #readout .meta,body.dk-t #top .laybtn{display:none}body.dk-t #readout{padding:4px 10px}body.dk-t #readout .xy{font-size:15px}
+body.dk-pan #top{opacity:.35}body.dk-t.opws #veBar,body.dk-pan.opws #veBar{transform:translateY(calc(-100% - 90px));opacity:0;pointer-events:none}
+.dkt{position:fixed;z-index:1070;display:flex;align-items:center;justify-content:center;min-height:0;padding:0;border:1px solid var(--line);background:var(--glass);color:var(--mute);font-size:14px;opacity:.75;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.dkt:active{opacity:1}#dkL{left:0;top:50%;width:18px;height:64px;margin-top:-32px;border-radius:0 10px 10px 0;border-left:0}#dkR{right:0;top:50%;width:18px;height:64px;margin-top:-32px;border-radius:10px 0 0 10px;border-right:0}
+#dkB{left:50%;bottom:calc(var(--safe-b) + 2px);width:64px;height:16px;margin-left:-32px;border-radius:10px 10px 0 0;font-size:11px}#dkT{left:50%;top:calc(var(--safe-t) + var(--tg) + 58px);width:48px;height:14px;margin-left:-24px;border-radius:0 0 10px 10px;font-size:10px}
 .skseal{width:72px;height:72px;border-radius:17px;display:block;box-shadow:var(--shadow)}
 </style>
 </head>
@@ -425,6 +438,7 @@ label.f input::placeholder,label.f textarea::placeholder{color:var(--mute2)}
 <h3>Настройки <small id="ver2"></small></h3>
 <div class="sub-h">Данные</div>
 <div class="row"><button id="expBtn">Excel: все слои</button><button id="impBtn">Импорт ориентиров CSV</button></div>
+<div class="sub-h">Панели</div><label class="f" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="dkAuto" style="width:20px;height:20px">Прятать панели при движении карты</label>
 <div class="sub-h">Оформление</div><div class="seg" id="themeSeg"><button data-t="dark">Тёмная</button><button data-t="light">Светлая</button><button data-t="auto">Как в системе</button></div>
 <div class="row"><button id="secBtn">🔒 PIN и шифрование</button></div>
 <div class="sub-h">Тактические знаки</div>
@@ -669,7 +683,7 @@ label.f input::placeholder,label.f textarea::placeholder{color:var(--mute2)}
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 
 <script id="skatMain" type="text/plain">
-const VERSION = 'версия 6.31';
+const VERSION = 'версия 6.41';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -3279,7 +3293,7 @@ state.arrays.push(a); pts.slice(0, 300).forEach(p => { fillHeight(p); fillPlace(
 persistNow(); closeModals(); renderMarkers(); map.fitBounds(L.latLngBounds(pts.map(p => [p.lat, p.lng])).pad(0.2), {maxZoom:16});
 toast(`Нанесено точек: ${pts.length}${bad ? `, пропущено строк: ${bad}` : ''}`);
 };
-function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('veBtn').style.display = secMode === 'op' ? '' : 'none'; if (secMode !== 'op' && window.veOff) veOff(); $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; $('ftBtn').style.display = secMode === 'tp' ? '' : 'none'; $('mixBtn').style.display = secMode === 'tp' ? '' : 'none'; $('faBtn').style.display = 'none'; $('usBtn').style.display = secMode === 'tp' ? '' : 'none'; $('tlBtn').style.display = secMode === 'tp' ? '' : 'none'; if (secMode === 'tp') setTimeout(() => modLoad('tp').catch(() => {}), 500); if (secMode !== 'tp' && $('mixer')) $('mixer').classList.remove('on'); $('lrail').style.display = ''; if (secMode !== 'tp' && typeof tlOn !== 'undefined' && tlOn && window.tlStop) tlStop(); if (secMode === 'op') setTimeout(() => modLoad('op').then(() => window.opwSync && opwSync()).catch(() => {}), 300); else if (window.opwSync) opwSync(); }
+function applySectionOp(){ $('prnBtn').style.display = secMode === 'op' ? '' : 'none'; $('veBtn').style.display = secMode === 'op' ? '' : 'none'; if (secMode !== 'op' && window.veOff) veOff(); $('corrBtn').style.display = secMode === 'tp' ? '' : 'none'; $('planBtn').style.display = secMode === 'tp' ? '' : 'none'; $('ftBtn').style.display = secMode === 'tp' ? '' : 'none'; $('mixBtn').style.display = secMode === 'tp' ? '' : 'none'; $('faBtn').style.display = 'none'; $('usBtn').style.display = secMode === 'tp' ? '' : 'none'; $('tlBtn').style.display = secMode === 'tp' ? '' : 'none'; if (secMode === 'tp') setTimeout(() => modLoad('tp').catch(() => {}), 500); if (secMode !== 'tp' && $('mixer')) $('mixer').classList.remove('on'); $('lrail').style.display = ''; if (secMode !== 'tp' && typeof tlOn !== 'undefined' && tlOn && window.tlStop) tlStop(); if (secMode === 'op') setTimeout(() => modLoad('op').then(() => window.opwSync && opwSync()).catch(() => {}), 300); else if (window.opwSync) opwSync(); if (window.dockSync) setTimeout(dockSync, 350); }
 const ENV_N = {trow:'Ряд деревьев', tpoly:'Роща', house:'Дом', flat:'Многоэтажка', wh:'Склад', hangar:'Ангар', tree_n:'Ель', tree_b:'Берёза', grove:'Роща', pw:'Опора ЛЭП', mast:'Мачта связи', wt:'Водонапорная башня', tank:'Цистерна'};
 const ENV_IC = {house:'⌂', flat:'▥', wh:'▭', hangar:'⌓', tree_n:'▲', tree_b:'●', grove:'♣', pw:'ᛉ', mast:'⊥', wt:'♜', tank:'◉'};
 function envMarkers(a, z){ if (!a.env) return;
@@ -3647,6 +3661,17 @@ const SIDE_R = ['layModal', 'setModal', 'srchModal', 'addModal', 'arrModal', 'tr
 { const om = openModal; window.openModal = function(id){ const m = $(id); if (m){ const side = SIDE_R.includes(id) ? 'side-r' : SIDE_L.includes(id) ? 'side-l' : ''; if (side){ m.classList.add('side', side); if (matchMedia('(min-width:700px)').matches) document.querySelectorAll('.modal.side.' + side + '.open').forEach(x => { if (x !== m) x.classList.remove('open'); }); } } return om.apply(this, arguments); }; }
 [['layBtn', 'layModal'], ['setBtn', 'setModal'], ['searchBtn', 'srchModal'], ['newArrBtn', 'addModal'], ['geoBtn', 'geoModal'], ['faBtn', 'faModal'], ['ftBtn', 'ftModal'], ['planBtn', 'planModal'], ['usBtn', 'usModal']].forEach(([b, m]) => { const el = $(b); if (el) el.addEventListener('click', e => { const M = $(m); if (M && M.classList.contains('open')){ M.classList.remove('open'); e.stopImmediatePropagation(); e.preventDefault(); } }, true); });
 setTimeout(() => { if (!window.XLSX){ const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; document.head.appendChild(s); } }, 2500);
+// ---- 6.41: выдвижные панели (язычки по краям, автоскрытие при движении карты, Tab — все панели)
+const DK = Object.assign({l:false, r:false, b:false, t:false, auto:true}, lsGet('skat_dock', {}));
+function dockSync(){ ['l', 'r', 'b', 't'].forEach(k => document.body.classList.toggle('dk-' + k, !!DK[k])); const A = {l:['›', '‹'], r:['‹', '›'], b:['⌃', '⌄'], t:['⌄', '⌃']};
+['l', 'r', 'b', 't'].forEach(k => { const b = $('dk' + k.toUpperCase()); if (b) b.textContent = DK[k] ? A[k][0] : A[k][1]; }); const lr = $('lrail'), vis = lr && getComputedStyle(lr).display !== 'none' && [...lr.querySelectorAll('.rb')].some(x => x.style.display !== 'none'); if ($('dkL')) $('dkL').style.display = vis ? '' : 'none'; if ($('dkAuto')) $('dkAuto').checked = DK.auto; }
+function dockSave(){ lsSet('skat_dock', DK); dockSync(); }
+[['L', 'l', 'Левая панель'], ['R', 'r', 'Правая панель'], ['B', 'b', 'Нижние панели'], ['T', 't', 'Верхняя строка']].forEach(([id, k, t]) => { const b = document.createElement('button'); b.id = 'dk' + id; b.className = 'dkt'; b.title = t + ': спрятать / показать'; b.onclick = () => { DK[k] = !DK[k]; document.body.classList.remove('dk-pan'); dockSave(); }; document.body.appendChild(b); });
+let dkTimer = 0; function dockPan(on){ if (!DK.auto) return; clearTimeout(dkTimer); if (on) document.body.classList.add('dk-pan'); else dkTimer = setTimeout(() => document.body.classList.remove('dk-pan'), 2200); }
+map.on('movestart', e => { if (e.originalEvent) dockPan(true); }); map.on('moveend', () => dockPan(false));
+document.addEventListener('keydown', e => { if (e.key !== 'Tab' || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName || '') || document.querySelector('.modal.open:not(.side)')) return; e.preventDefault(); const any = !(DK.l && DK.r && DK.b && DK.t); ['l', 'r', 'b', 't'].forEach(k => { DK[k] = any; }); dockSave(); });
+$('dkAuto').onchange = e => { DK.auto = e.target.checked; if (!DK.auto) document.body.classList.remove('dk-pan'); dockSave(); }; dockSync();
+window.dockPan = dockPan; window.dockSync = dockSync;
 $('veBtn').onclick = () => modLoad('op').then(() => veToggle()).catch(() => {});
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;

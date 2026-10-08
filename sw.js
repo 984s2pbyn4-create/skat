@@ -6,7 +6,8 @@ const LIBS = ['https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.
 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
 'https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js',
 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js',
-'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css'];
+'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css',
+'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'];
 const TILE_HOSTS = ['maps.yandex.net', 'opentopomap.org', 'arcgisonline.com', 'tile.openstreetmap.org', 'elevation-tiles-prod'];
 const MAX_TILES = 80000;
 self.addEventListener('install', e => {
@@ -41,12 +42,9 @@ return res;
 async function appFirst(req, e){
 const c = await caches.open(APP);
 const hit = (await c.match('./index.html')) || (await c.match('./'));
-// сначала сеть (до 4 с), чтобы новая версия открывалась сразу; без сети — сохранённая копия
-const upd = fetch(req, {cache:'no-store'}).then(res => { if (res && res.ok) return c.put('./index.html', res.clone()).then(() => res); return res; });
-if (!hit){ try { return await upd; } catch(err){ return Response.error(); } }
-const to = new Promise(r => setTimeout(() => r(null), 4000));
-try { const res = await Promise.race([upd, to]); if (res && res.ok) return res; } catch(err){}
-e.waitUntil(upd.catch(() => {})); return hit;
+const upd = fetch(req, {cache:'no-cache'}).then(res => { if (res && res.ok) return c.put('./index.html', res.clone()).then(() => res); return res; });
+if (hit){ e.waitUntil(upd.catch(() => {})); return hit; }
+try { return await upd; } catch(err){ return Response.error(); }
 }
 self.addEventListener('fetch', e => {
 const req = e.request;
