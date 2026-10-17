@@ -349,7 +349,7 @@ body.dk-pan #top{opacity:.35}body.dk-t.opws #veBar,body.dk-pan.opws #veBar{trans
 .dkt:active{opacity:1}#dkL{left:0;top:50%;width:18px;height:64px;margin-top:-32px;border-radius:0 10px 10px 0;border-left:0}#dkR{right:0;top:50%;width:18px;height:64px;margin-top:-32px;border-radius:10px 0 0 10px;border-right:0}
 #dkB{left:50%;bottom:calc(var(--safe-b) + 2px);width:64px;height:16px;margin-left:-32px;border-radius:10px 10px 0 0;font-size:11px}#dkT{left:50%;top:calc(var(--safe-t) + var(--tg) + 58px);width:48px;height:14px;margin-left:-24px;border-radius:0 0 10px 10px;font-size:10px}
 /* ===== 6.42: «Ночное видение» — графит + фосфорный зелёный; одна экосистема с СКиПП (структура токенов та же). Свечение — только как признак активного/важного, не декор ===== */
-:root{--bg:#0A0E0C;--panel:#111714;--panel2:#172019;--glass:rgba(13,18,15,.9);--line:rgba(120,255,175,.11);--line2:rgba(120,255,175,.2);--ink:#E2EFE6;--mute:#93A99B;--mute2:#647A6C;
+:root{--bg:#0A0E0C;--panel:#111714;--panel2:#172019;--glass:rgba(12,16,14,.97);--line:rgba(120,255,175,.18);--line2:rgba(120,255,175,.2);--ink:#E2EFE6;--mute:#93A99B;--mute2:#647A6C;
 --signal:#5CFF9D;--acc-ink:#03140A;--acc-soft:rgba(92,255,157,.12);--glow:0 0 0 1px rgba(92,255,157,.55),0 0 14px rgba(92,255,157,.28);--ok:#5CFF9D;--warn:#FF5E52;--amber:#FFB547;--red-soft:rgba(255,94,82,.14);
 --shadow:0 1px 0 rgba(255,255,255,.03) inset,0 8px 24px rgba(0,0,0,.45);--bd-bg:rgba(2,6,4,.55);--ease-out:cubic-bezier(.23,1,.32,1);--ease-drawer:cubic-bezier(.32,.72,0,1);
 --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;color-scheme:dark}
@@ -363,7 +363,7 @@ button:active:not(:disabled){transform:scale(.97)}button:disabled{opacity:.4}
 button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:none;box-shadow:var(--glow)}
 button.primary{background:var(--signal);color:var(--acc-ink);border-color:transparent;font-weight:700}
 @media (hover:hover){button:hover:not(:disabled){border-color:var(--line2)}button.primary:hover:not(:disabled){filter:brightness(1.08)}}
-.rb{border-radius:14px;color:var(--mute);gap:3px}.rb svg{stroke-width:1.7}
+.rb{border-radius:14px;color:var(--ink);gap:3px;text-shadow:none}.glass,.rb{box-shadow:0 0 0 1px rgba(0,0,0,.45),0 6px 18px rgba(0,0,0,.5)}:root[data-theme="light"]{--glass:rgba(255,255,255,.97)}.rb svg{stroke-width:1.7}
 .rb.on,.rb.accent,#opTb .rb.on{color:var(--signal);background:var(--acc-soft);border-color:rgba(92,255,157,.45);box-shadow:var(--shadow),0 0 12px rgba(92,255,157,.18)}
 .seg button.on{background:var(--signal);color:var(--acc-ink);border-color:var(--signal)}
 #readout .xy{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--ink)}#readout .xy span{font-family:var(--font)}
@@ -387,6 +387,7 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{border-color:var
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;transition-duration:1ms!important}button:active:not(:disabled){transform:none}}
 
 .ico{width:1.2em;height:1.2em;vertical-align:-.22em;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}.ico .f{fill:currentColor;stroke:none}.icw{display:inline-flex;align-items:center}
+#v3play,#v3scnBtn,#camSel,#v3tl{display:none!important}
 .skseal{width:72px;height:72px;border-radius:17px;display:block;box-shadow:var(--shadow)}
 </style>
 </head>
@@ -723,7 +724,7 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{border-color:var
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 
 <script id="skatMain" type="text/plain">
-const VERSION = 'версия 6.47';
+const VERSION = 'версия 6.48';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -3677,11 +3678,11 @@ $('secB').innerHTML = on ? `<div class="cdv">🔒 Защита включена.
 : `<div class="cdv">При включении слои, задачи, журнал, формуляры и их фото/видео будут храниться на устройстве зашифрованными; при запуске потребуется PIN. <b>Если PIN забыть — данные не восстановить.</b> Не шифруются: подложки карт, настройки, а также выгружаемые файлы (Excel, проект JSON).</div>${pinF}${lkF}<div class="row"><button class="primary" id="secEn">Включить шифрование</button></div>`;
 $('secLk').onchange = e => { if (!secOn()) return; SEC.meta.lock = +e.target.value; localStorage.setItem('skat_enc', JSON.stringify(SEC.meta)); toast('Сохранено'); };
 if (on){ $('secLock').onclick = secLockNow;
-$('secChg').onclick = async () => { const pin = secPin(); if (!pin) return; try { const raw = new Uint8Array(await crypto.subtle.exportKey('raw', SEC.key)), meta = await SEC.wrap(pin, raw, SEC.meta.lock); localStorage.setItem('skat_enc', JSON.stringify(meta)); SEC.meta = meta; toast('PIN изменён'); openSec(); } catch(e){ toast('Не удалось: ' + (e.message || e)); } };
+$('secChg').onclick = async () => { const pin = secPin(); if (!pin) return; try { const raw = new Uint8Array(await crypto.subtle.exportKey('raw', SEC.key)), meta = await SEC.wrap(pin, raw, SEC.meta.lock); meta.pl = pin.length; localStorage.setItem('skat_enc', JSON.stringify(meta)); SEC.meta = meta; toast('PIN изменён'); openSec(); } catch(e){ toast('Не удалось: ' + (e.message || e)); } };
 $('secOff').onclick = () => askConfirm('Отключить шифрование? Данные будут храниться на устройстве открыто.', 'Отключить', async () => { const k = SEC.key; try { toast('Расшифровываю…'); await modLoad('tp'); await mediaCrypt(false); SEC.key = null; persistNow(); if (!localStorage.getItem(LS)) throw new Error('не хватило места в хранилище');
 localStorage.removeItem('skat_enc'); SEC.meta = null; await SEC.idb('readwrite', st => st.delete('state')); toast('Шифрование отключено'); openSec(); } catch(e){ SEC.key = k; toast('Ошибка: ' + (e.message || e)); } }); }
 else $('secEn').onclick = async () => { const pin = secPin(); if (!pin) return; if (!(window.crypto && crypto.subtle)){ toast('Шифрование недоступно: откройте приложение по https'); return; }
-toast('Шифрую…'); try { const raw = crypto.getRandomValues(new Uint8Array(32)), meta = await SEC.wrap(pin, raw, +$('secLk').value); SEC.key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', true, ['encrypt', 'decrypt']);
+toast('Шифрую…'); try { const raw = crypto.getRandomValues(new Uint8Array(32)), meta = await SEC.wrap(pin, raw, +$('secLk').value); meta.pl = pin.length; SEC.key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', true, ['encrypt', 'decrypt']);
 persistNow(); await SEC.last; if (!(await SEC.load())) throw new Error('проверка записи не прошла');
 localStorage.setItem('skat_enc', JSON.stringify(meta)); SEC.meta = meta; localStorage.removeItem(LS); await modLoad('tp'); await mediaCrypt(true); toast('Шифрование включено'); openSec(); }
 catch(e){ if (!SEC.meta) SEC.key = null; toast('Не удалось: ' + (e.message || e)); } };
@@ -3708,7 +3709,7 @@ function dockSync(){ ['l', 'r', 'b', 't'].forEach(k => document.body.classList.t
 function dockSave(){ lsSet('skat_dock', DK); dockSync(); }
 [['L', 'l', 'Левая панель'], ['R', 'r', 'Правая панель'], ['B', 'b', 'Нижние панели'], ['T', 't', 'Верхняя строка']].forEach(([id, k, t]) => { const b = document.createElement('button'); b.id = 'dk' + id; b.className = 'dkt'; b.title = t + ': спрятать / показать'; b.onclick = () => { DK[k] = !DK[k]; document.body.classList.remove('dk-pan'); dockSave(); }; document.body.appendChild(b); });
 let dkTimer = 0; function dockPan(on){ if (!DK.auto) return; clearTimeout(dkTimer); if (on) document.body.classList.add('dk-pan'); else dkTimer = setTimeout(() => document.body.classList.remove('dk-pan'), 2200); }
-map.on('movestart', e => { if (e.originalEvent) dockPan(true); }); map.on('moveend', () => dockPan(false));
+map.on('dragstart', () => dockPan(true)); map.on('zoomstart', () => { if (map._dkTouch) dockPan(true); }); map.on('moveend zoomend', () => dockPan(false)); map.getContainer().addEventListener('touchstart', e => { map._dkTouch = e.touches.length > 1; if (map._dkTouch) dockPan(true); }, {passive:true}); map.getContainer().addEventListener('touchend', () => { map._dkTouch = false; }, {passive:true}); map.getContainer().addEventListener('wheel', () => dockPan(true), {passive:true});
 document.addEventListener('keydown', e => { if (e.key !== 'Tab' || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName || '') || document.querySelector('.modal.open:not(.side)')) return; e.preventDefault(); const any = !(DK.l && DK.r && DK.b && DK.t); ['l', 'r', 'b', 't'].forEach(k => { DK[k] = any; }); dockSave(); });
 try { $('splashChk').checked = localStorage.getItem('skat_splash') !== '0'; } catch(e){} $('splashChk').onchange = e => { try { localStorage.setItem('skat_splash', e.target.checked ? '1' : '0'); } catch(_){} toast(e.target.checked ? 'Заставка включена' : 'Заставка выключена'); };
 $('dkAuto').onchange = e => { DK.auto = e.target.checked; if (!DK.auto) document.body.classList.remove('dk-pan'); dockSave(); }; dockSync();
@@ -3856,17 +3857,18 @@ const box = document.createElement('div'); box.id = 'skatLock';
 box.innerHTML = '<style>#skatLock{position:fixed;inset:0;z-index:100000;background:var(--bg,#101412);color:var(--ink,#E6EBE7);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font,system-ui,sans-serif);user-select:none;-webkit-user-select:none}#skatLock .skseal{margin-bottom:14px}#skatLock h1{font-size:28px;font-weight:800;margin:0 0 6px}#skatLock .st{color:var(--mute,#A9B3AC);font-size:16px}#skatLock .d{display:flex;gap:16px;height:16px;margin:22px 0 6px}#skatLock .d i{width:13px;height:13px;border-radius:50%;border:2px solid var(--mute2,#77827B)}#skatLock .d i.f{background:var(--ink,#E6EBE7);border-color:var(--ink,#E6EBE7)}#skatLock .m{min-height:22px;color:var(--warn,#E2766A);font-size:14px;text-align:center;padding:0 20px}#skatLock .k{display:grid;grid-template-columns:repeat(3,76px);gap:16px 22px;margin-top:10px;justify-items:center;align-items:center}#skatLock .k button{width:76px;height:76px;border-radius:50%;border:0;background:var(--panel,#191E1B);color:inherit;font-size:28px;font-weight:600;touch-action:manipulation;padding:0;min-height:0}#skatLock .k button:active{background:var(--line2,#3A433E)}#skatLock .k button.tx{background:none;font-size:15px;font-weight:500;color:var(--mute,#A9B3AC)}#skatLock .ok{margin-top:22px;min-width:200px;min-height:46px;border-radius:999px;border:0;background:var(--signal,#86BC9C);color:var(--acc-ink,#0D1811);font-size:16px;font-weight:700}#skatLock .ok:disabled{opacity:.35}#skatLock.sh .d{animation:skSh .35s}@keyframes skSh{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}</style>' + window.SKSEAL + '<h1>СКАТ</h1><div class="st">Введите код-пароль</div><div class="d"></div><div class="m"></div><div class="k">' + [1, 2, 3, 4, 5, 6, 7, 8, 9].map(x => '<button data-k="' + x + '">' + x + '</button>').join('') + '<button class="tx fg">Забыли?</button><button data-k="0">0</button><button class="tx" data-k="⌫" aria-label="Стереть"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"/></svg></button></div><button class="ok" data-k="✓" disabled>Войти</button>';
 document.body.appendChild(box);
 let pin = '', busy = false;
-const dots = () => { box.querySelector('.d').innerHTML = Array.from({length:Math.max(4, pin.length)}, (_, i) => '<i class="' + (i < pin.length ? 'f' : '') + '"></i>').join(''); box.querySelector('.ok').disabled = pin.length < 4; };
+const dots = () => { box.querySelector('.d').innerHTML = Array.from({length:Math.max(4, pin.length)}, (_, i) => '<i class="' + (i < pin.length ? 'f' : '') + '"></i>').join(''); box.querySelector('.ok').disabled = pin.length < 4; box.querySelector('.ok').style.display = meta.pl ? 'none' : ''; };
 const msg = t => { box.querySelector('.m').textContent = t || ''; };
 const F = () => { try { return JSON.parse(localStorage.getItem('skat_enc_f')) || {n:0, u:0}; } catch(e){ return {n:0, u:0}; } };
 if (!(window.crypto && crypto.subtle)){ msg('Шифрование недоступно в этом браузере — откройте приложение по https'); }
-async function go(){ if (busy || pin.length < 4) return; const f = F(); if (Date.now() < f.u){ msg('Подождите ' + Math.ceil((f.u - Date.now()) / 1000) + ' с'); return; } busy = true; msg('Проверка…');
+async function go(silent){ if (busy || pin.length < 4) return; const f = F(); if (Date.now() < f.u){ msg('Подождите ' + Math.ceil((f.u - Date.now()) / 1000) + ' с'); return; } busy = true; msg('Проверка…');
 try { SEC.key = await SEC.unwrap(pin, meta); } catch(e){ SEC.key = null; }
+if (!SEC.key && silent){ busy = false; msg(''); if (pin.length >= 8){ pin = ''; dots(); msg('Неверный PIN'); box.classList.add('sh'); setTimeout(() => box.classList.remove('sh'), 400); } return; }
 if (!SEC.key){ f.n++; if (f.n >= 5) f.u = Date.now() + Math.min(900, 30 * 2 ** (f.n - 5)) * 1000; localStorage.setItem('skat_enc_f', JSON.stringify(f)); pin = ''; dots(); msg('Неверный PIN' + (f.u > Date.now() ? ' — пауза ' + Math.round((f.u - Date.now()) / 1000) + ' с' : '')); box.classList.add('sh'); setTimeout(() => box.classList.remove('sh'), 400); busy = false; return; }
-localStorage.removeItem('skat_enc_f');
+localStorage.removeItem('skat_enc_f'); if (!meta.pl){ meta.pl = pin.length; try { localStorage.setItem('skat_enc', JSON.stringify(meta)); } catch(e){} }
 try { const j = await SEC.load(); if (j != null) window.__skatPlain = j; } catch(e){ SEC.key = null; busy = false; msg('Ошибка чтения данных: ' + (e.message || e)); return; }
 document.removeEventListener('keydown', kd, true); box.remove(); run(); }
-const press = k => { if (k === '⌫') pin = pin.slice(0, -1); else if (k === '✓') return go(); else if (pin.length < 8) pin += k; dots(); if (!busy) msg(''); };
+const press = k => { if (k === '⌫') pin = pin.slice(0, -1); else if (k === '✓') return go(); else if (pin.length < 8){ pin += k; if (meta.pl ? pin.length === meta.pl : pin.length >= 4){ dots(); return go(!meta.pl); } } dots(); if (!busy) msg(''); };
 box.addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b) press(b.dataset.k); });
 const kd = e => { if (/^\d$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') press('⌫'); else if (e.key === 'Enter') press('✓'); else return; e.preventDefault(); };
 document.addEventListener('keydown', kd, true);
