@@ -8,7 +8,7 @@ function corrDraw1(CT){
 if (CT.gun) corrL.addLayer(L.marker([CT.gun.lat, CT.gun.lng], {interactive:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:'<div class="ctgun">▲</div>'})}));
 if (CT.tgt) corrL.addLayer(L.marker([CT.tgt.lat, CT.tgt.lng], {interactive:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:'<div class="cttgt">⊕</div>'})}));
 if (CT.gun && CT.tgt) corrL.addLayer(L.polyline([[CT.gun.lat, CT.gun.lng], [CT.tgt.lat, CT.tgt.lng]], {color:'#ff8a2a', weight:2, dashArray:'6 6', interactive:false}));
-(CT.bursts || []).forEach(b => corrL.addLayer(L.marker([b.lat, b.lng], {interactive:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:BOOM(b.n)})})));
+(() => { const B = CT.bursts || [], n = +lsGet('skat_nburst', 0) || 0; return n > 0 ? B.slice(-n) : B; })().forEach(b => corrL.addLayer(L.marker([b.lat, b.lng], {interactive:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:BOOM(b.n)})})));
 corrFly.forEach(f => { if (f.task !== CT) return; if (f.pts) corrL.addLayer(L.polyline(f.pts, {color:'#ffd400', weight:2, opacity:.8, interactive:false})); if (f.pos){ const q1 = map.latLngToContainerPoint(f.pos), q2 = map.latLngToContainerPoint(f.pts[Math.min(30, (f.idx || 0) + 1)]), ang = Math.atan2(q2.y - q1.y, q2.x - q1.x) * 180 / Math.PI, pk = projOf(f.sys || 'd30');
 corrL.addLayer(L.marker(f.pos, {interactive:false, icon:L.divIcon({className:'plc-wrap', iconSize:[0,0], html:`<div class="proj ${pk}" style="transform:translate(-50%,-50%) rotate(${ang.toFixed(0)}deg)">${PROJ[pk]}</div>`})})); } if (false && f.pos) corrL.addLayer(L.circleMarker(f.pos, {radius:4, color:'#111', weight:1, fillColor:'#ffd400', fillOpacity:1, interactive:false})); }); }
 // ---- учёт выстрелов задачи: номер по порядку (отменённый номер отдаётся следующему выстрелу), итог по боеприпасам
@@ -754,11 +754,12 @@ for (const fl of fs){ try { const x = await mediaAdd(fl); MTH[x.id] = x.th || '-
 if (n){ (f.hist = f.hist || []).push({t:Date.now(), x:`добавлено вложений: ${n}`}); persist(); toast(`Добавлено: ${n}`); } fmMedRef(a, i); }; }
 async function mediaView(a, i, k){ const f = a.points[i].f, x = f.media[k]; if (!x) return; let r = null; try { r = await mGet(x.id); } catch(e){}
 if (!r){ askConfirm('Файл этого вложения не найден на устройстве. Убрать ссылку из формуляра?', 'Убрать', () => { f.media.splice(k, 1); persist(); fmMedRef(a, i); openModal('fmModal'); }); return; }
-let m = $('mvModal'); if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'mvModal'; m.innerHTML = '<div class="card big"><div id="mvB"></div><div class="cdv" id="mvI"></div><label class="f">Подпись<input id="mvCap"></label><div class="row"><button class="ghost" id="mvDel">Удалить</button><button class="ghost" id="mvSh">Поделиться</button><button class="primary" id="mvOk">Готово</button></div></div>'; m.addEventListener('click', e => { if (e.target === m) mvClose(); }); }
+let m = $('mvModal'); if (!m){ m = document.createElement('div'); m.className = 'modal'; m.id = 'mvModal'; m.innerHTML = '<div class="card big"><div id="mvB"></div><div class="cdv" id="mvI"></div><label class="f">Подпись<input id="mvCap"></label><div class="row"><button class="ghost" id="mvDel">Удалить</button><button class="ghost" id="mvSh">Поделиться</button><button class="ghost" id="mvAn">✎ Пометки</button><button class="primary" id="mvOk">Готово</button></div></div>'; m.addEventListener('click', e => { if (e.target === m) mvClose(); }); }
 document.body.appendChild(m); const u = URL.createObjectURL(r.blob); m.dataset.u = u;
 $('mvB').innerHTML = x.k === 'vid' ? `<video src="${u}" controls playsinline></video>` : `<img src="${u}" alt="">`;
 $('mvI').textContent = `${fmtDT(x.t)}${x.mb ? ' · ' + x.mb + ' МБ' : ''} · ${k + 1} из ${f.media.length}`; $('mvCap').value = x.cap || '';
 $('mvOk').onclick = () => { const c = $('mvCap').value.trim(); if (c !== (x.cap || '')){ x.cap = c; persist(); } mvClose(); fmMedRef(a, i); };
+$('mvAn').style.display = x.k === 'vid' ? 'none' : ''; $('mvAn').onclick = () => mvAnnot(a, i, k, x, r);
 $('mvSh').onclick = () => { const ext = x.k === 'vid' ? ((r.type || '').split('/')[1] || 'mp4').replace('quicktime', 'mov') : 'jpg'; deliverFile(r.blob, `СКАТ_${String(labelOf(a, i)).replace(/[\\/:*?"<>|]/g, '_')}_${k + 1}.${ext}`, 'Файл готов'); };
 $('mvDel').onclick = () => askConfirm('Удалить это вложение?', 'Удалить', async () => { f.media.splice(k, 1); (f.hist = f.hist || []).push({t:Date.now(), x:'удалено вложение'}); persist(); try { await mDel(x.id); } catch(e){} mvClose(); fmMedRef(a, i); openModal('fmModal'); });
 openModal('mvModal'); }
@@ -786,4 +787,46 @@ const bar = document.createElement('div'); bar.className = 'seg ptabs'; bar.styl
 T.forEach(([k, , L1]) => L1.forEach(d => { d.style.display = k === planTab ? '' : 'none'; }));
 bar.onclick = e => { const b = e.target.closest('[data-pt]'); if (!b) return; planTab = b.dataset.pt; planTabs(); }; }
 { const rp2 = window.renderPlan; window.renderPlan = () => { rp2(); planTabs(); }; }
+
+// ======== 6.53: «ОГНЕВЫЕ СРЕДСТВА» — ВКЛАДКА ОКНА «ОГНЕВЫЕ ЗАДАЧИ»; ПУСТЫЕ СОСТОЯНИЯ ========
+{ const tabs = $('ftTabs'); if (tabs && !tabs.querySelector('[data-t="fa"]')){ tabs.insertAdjacentHTML('beforeend', '<button data-t="fa">Огн. средства</button>'); tabs.querySelector('[data-t="fa"]').onclick = () => { ftTab = 'fa'; renderFt(); }; } }
+{ const r0 = renderFt0; window.renderFt0 = function(){ const fl = $('faList'), home = $('faModal').querySelector('.card'); if (fl && fl.parentNode !== home) home.insertBefore(fl, home.querySelector('.row'));
+if (ftTab !== 'fa'){ const r = r0.apply(this, arguments); try { if (window.emptyCta) emptyCta($('ftList'), '＋ Первая огневая задача', () => $('ftNew') && $('ftNew').click()); } catch(e){} return r; }
+$('ftTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === 'fa')); const el = $('ftList'); el.innerHTML = ''; el.appendChild(fl); renderFa();
+const row = $('ftRow'); row.innerHTML = `<button class="ghost" data-close>Закрыть</button><button id="faXls2">Ведомость БП (Excel)</button><button id="faTrk2">${faTrkOn ? 'Следы ОП: вкл' : 'Следы ОП: выкл'}</button>`;
+$('faXls2').onclick = exportAmmo; $('faTrk2').onclick = () => { faTrkOn = !faTrkOn; lsSet('skat_trk', faTrkOn); faTracks(); renderFt(); }; row.querySelector('[data-close]').onclick = () => $('ftModal').classList.remove('open'); }; }
+$('faBtn').onclick = () => { ftTab = 'fa'; renderFt(); openModal('ftModal'); };
+{ const rf0 = renderFa; window.renderFa = function(){ const r = rf0.apply(this, arguments); try { if (window.emptyCta && !faAll().length && !faCand().length) emptyCta($('faList'), 'Как завести огневое средство?', () => toast('Поставьте на карту знак своего орудия (миномёт, гаубица, РСЗО) — карточка и канал в «Микшере» появятся сами')); } catch(e){} return r; }; }
+{ const rp3 = window.renderPlan; window.renderPlan = () => { rp3(); try { if (window.emptyCta) emptyCta($('planList'), '＋ Добавить первую ТЗ', () => $('planAdd').click()); } catch(e){} }; }
+
+// ======== 6.54: ОТКЛОНЕНИЕ РАЗРЫВА НА КАРТЕ (дальше/ближе, правее/левее в д.у.; касание — скопировать) ========
+function devStrip(){ let el = $('devStrip'); const last = CT && CT.gun && CT.tgt && (CT.bursts || []).slice(-1)[0];
+if (!last){ if (el) el.classList.remove('on'); return; }
+if (!el){ el = document.createElement('button'); el.id = 'devStrip'; el.className = 'glass'; el.setAttribute('data-noico', ''); document.body.appendChild(el); el.onclick = () => { const t = el.dataset.t; try { navigator.clipboard.writeText(t); toast('Скопировано: ' + t); } catch(e){ toast(t); } }; }
+const v = corrDev(last), mil = v.mil, du = `${Math.floor(Math.abs(mil) / 100)}-${String(Math.abs(mil) % 100).padStart(2, '0')}`, fw = v.along >= 0 ? 'Дальше' : 'Ближе', sd = mil >= 0 ? 'Правее' : 'Левее';
+el.dataset.t = `Цель ${CT.name || ''}, разрыв ${last.n}: ${fw.toLowerCase()} ${Math.abs(Math.round(v.along))} м, ${sd.toLowerCase()} ${du}; ${devTxt(v)} м`;
+el.innerHTML = `<span>Разрыв ${last.n}: ${fw} <b>${Math.abs(Math.round(v.along))} м</b> · ${sd} <b>${du}</b></span><small>${escapeHtml(devTxt(v))} м · коснитесь — скопировать</small>`; el.classList.add('on'); }
+{ const cp1 = window.corrPanel; window.corrPanel = () => { cp1(); try { devStrip(); } catch(e){} }; }
 window.__mod_tp = 1;
+
+// 6.55: пометки на фото
+function mvAnnot(a, i, k, x, r){ const B = $('mvB'), im = B.querySelector('img'); if (!im) return; const W = im.naturalWidth, H = im.naturalHeight; if (!W) return;
+const cv = document.createElement('canvas'); cv.width = W; cv.height = H; cv.className = 'mvCv'; const g = cv.getContext('2d'); g.drawImage(im, 0, 0);
+B.innerHTML = ''; B.appendChild(cv); const tb = document.createElement('div'); tb.className = 'mvTb';
+const COL = ['#e2533f', '#ffd400', '#2f7cf6', '#22c55e', '#ffffff', '#000000']; let col = COL[0], wd = Math.max(3, Math.round(W / 250)), hist = [g.getImageData(0, 0, W, H)], hi = 0, mk = 0;
+tb.innerHTML = COL.map(c => `<button class="mvC" data-c="${c}" style="background:${c}"></button>`).join('') + '<button class="ghost" data-w>Толщина</button><button class="ghost" data-m>Маркер</button><button class="ghost" data-u>↶</button><button class="ghost" data-r>↷</button><button class="ghost" data-x>Отмена</button><button class="primary" data-s>Сохранить</button>';
+B.appendChild(tb); const mark = () => tb.querySelectorAll('.mvC').forEach(b => b.classList.toggle('on', b.dataset.c === col)); mark();
+const put = () => g.putImageData(hist[hi], 0, 0);
+tb.onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.c){ col = b.dataset.c; mark(); }
+else if (b.hasAttribute('data-w')){ wd = wd >= W / 60 ? Math.max(3, Math.round(W / 250)) : Math.round(wd * 1.8); toast('Толщина ' + wd); }
+else if (b.hasAttribute('data-m')){ mk = !mk; b.classList.toggle('on', !!mk); }
+else if (b.hasAttribute('data-u')){ if (hi > 0){ hi--; put(); } } else if (b.hasAttribute('data-r')){ if (hi < hist.length - 1){ hi++; put(); } }
+else if (b.hasAttribute('data-x')) mediaView(a, i, k);
+else if (b.hasAttribute('data-s')) cv.toBlob(async bl => { try { const t = document.createElement('canvas'), sc = 160 / Math.max(W, H); t.width = Math.round(W * sc); t.height = Math.round(H * sc); t.getContext('2d').drawImage(cv, 0, 0, t.width, t.height); const th = t.toDataURL('image/jpeg', .7);
+await mPut({id:x.id, t:x.t, type:'image/jpeg', blob:bl, th}); MTH[x.id] = th; x.mb = Math.round(bl.size / 1048576 * 10) / 10; x.an = Date.now(); const f = a.points[i].f; (f.hist = f.hist || []).push({t:Date.now(), x:'пометки на фото'}); persist(); toast('Пометки сохранены'); mediaView(a, i, k); } catch(err){ toast('Не сохранено: ' + (err.message || err)); } }, 'image/jpeg', .9); };
+let dn = null; const pt = e => { const rc = cv.getBoundingClientRect(); return [(e.clientX - rc.left) * W / rc.width, (e.clientY - rc.top) * H / rc.height]; };
+cv.style.touchAction = 'none';
+cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); dn = pt(e); g.lineCap = g.lineJoin = 'round'; g.strokeStyle = col; g.globalAlpha = mk ? .4 : 1; g.lineWidth = mk ? wd * 4 : wd; g.beginPath(); g.moveTo(dn[0], dn[1]); g.lineTo(dn[0] + .1, dn[1]); g.stroke(); });
+cv.addEventListener('pointermove', e => { if (!dn) return; const q = pt(e); g.lineTo(q[0], q[1]); g.stroke(); dn = q; });
+const up = () => { if (!dn) return; dn = null; g.globalAlpha = 1; hist = hist.slice(0, hi + 1); hist.push(g.getImageData(0, 0, W, H)); if (hist.length > 20) hist.shift(); hi = hist.length - 1; };
+cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up); }

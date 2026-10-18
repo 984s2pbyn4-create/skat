@@ -325,7 +325,7 @@ function veRdp(P, eps){ if (P.length < 3) return P.slice(); const a = P[0], b = 
 for (let i = 1; i < P.length - 1; i++){ const d = L0 > 1e-6 ? Math.abs(dy * P[i].x - dx * P[i].y + b.x * a.y - b.y * a.x) / L0 : Math.hypot(P[i].x - a.x, P[i].y - a.y); if (d > md){ md = d; mi = i; } }
 if (md > eps){ const l = veRdp(P.slice(0, mi + 1), eps), r = veRdp(P.slice(mi), eps); return l.slice(0, -1).concat(r); } return [a, b]; }
 VE.st = {color:'#e2533f', sw:3}; VE.sm = 1; VE.ndi = -1;
-function veDrawLayer(){ const s0 = VE.sel.find(s => s.a.kind === 'shapes'); if (s0) return s0.a; let a = state.arrays.find(x => x.kind === 'shapes' && x.name === 'Рисунок');
+function veDrawLayer(){ const s0 = VE.sel.find(s => s.a.kind === 'shapes'); if (s0) return s0.a; if (window.actLayer){ try { const q = actLayer(); if (q && !q.locked && (q.kind === 'shapes' || q.kind === 'aux' || q.kind === 'desc')){ if (!q.shapes) q.shapes = []; q.hidden = false; return q; } } catch(e){} } let a = state.arrays.find(x => x.kind === 'shapes' && x.name === 'Рисунок');
 if (!a){ a = normArr({id:Date.now(), kind:'shapes', name:'Рисунок', ident:'Рисунок', style:{color:'#e2533f', name:'Красный', glyph:''}, points:[], shapes:[], texts:[]}); state.arrays.push(a); }
 if (!a.shapes) a.shapes = []; a.hidden = false; return a; }
 function veNewShape(bz){ const a = veDrawLayer(), sh = Object.assign({type:'line', pts:[], bz, t:Date.now()}, veCl(VE.st)); bzApply(sh); a.shapes.push(sh); return {a, t:'s', o:sh}; }
@@ -662,4 +662,11 @@ document.addEventListener('pointerdown', e => { if (!e.target.closest('.vgm,.vgb
 const st = document.createElement('style'); st.textContent = '.vgm{position:fixed;z-index:1600;display:none;flex-direction:column;gap:5px;padding:6px;border-radius:12px;min-width:160px}.vgm.on{display:flex}.vgm button{text-align:left;justify-content:flex-start;min-height:40px;padding:6px 12px}#veBar.nd>.vgb{display:none!important}#veBar .vgb{white-space:nowrap}'; document.head.appendChild(st); }
 { const u0 = veUI; window.veUI = function(){ const r = u0.apply(this, arguments); veGroupBar(); return r; }; }
 { const f0 = veOff; window.veOff = function(){ if (VE.vgClose) VE.vgClose(); return f0.apply(this, arguments); }; }
+
+// ======== 6.53: «ПОВТОР» ПОСЛЕДНЕГО ИНСТРУМЕНТА, КЛАВИШИ ИНСТРУМЕНТОВ ========
+{ const tb = $('opTb'), rp = document.createElement('button'); rp.className = 'rb'; rp.id = 'otRep'; rp.style.display = 'none'; const tx = tb && tb.querySelector('[data-ot="text"]'); if (tb) tb.insertBefore(rp, tx || null);
+rp.onclick = e => { e.stopPropagation(); if (OPW.last) opwTool(OPW.last); };
+const t0 = opwTool; window.opwTool = function(k){ const r = t0.apply(this, arguments); if (!['sel', 'hand', 'nd', 'pip'].includes(k)){ OPW.last = k; const src = document.querySelector(`[data-ot="${k}"]`), sv = src && src.querySelector('svg'); if (sv){ rp.innerHTML = sv.outerHTML + 'Повтор'; rp.title = 'Повторить: ' + (src.title || ''); rp.style.display = ''; } } return r; }; }
+document.addEventListener('keydown', e => { if (secMode !== 'op' || e.ctrlKey || e.metaKey || e.altKey || document.querySelector('.modal.open:not(.side)') || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName || '')) return;
+const k = {KeyV:'sel', KeyH:'hand', KeyN:'nd', KeyL:'line', KeyR:'rect', KeyC:'circle', KeyG:'poly', KeyP:'pen', KeyB:'pcl', KeyT:'text', KeyS:'sym', KeyI:'pip'}[e.code]; if (!k) return; e.preventDefault(); opwTool(k); });
 window.__mod_op = 1;
