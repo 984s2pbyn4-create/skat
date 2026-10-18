@@ -74,7 +74,7 @@ body:has(#v3d.on) .modal{z-index:2600}
 #radial.on{display:block}
 .rad-it{position:absolute;width:62px;height:62px;margin:-31px 0 0 -31px;border-radius:50%;background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:10px;font-weight:600;line-height:1.05;text-align:center;box-shadow:var(--shadow);padding:2px;min-height:0;animation:radIn .14s ease-out}
 .rad-it.sm{width:56px;height:56px;margin:-28px 0 0 -28px;font-size:9px}
-.rad-it svg{width:26px;height:26px;flex:none}
+.rad-it svg{width:26px;height:26px;flex:none;filter:drop-shadow(0 0 1px rgba(255,255,255,.95)) drop-shadow(0 0 2px rgba(255,255,255,.7))}
 .rad-it.sm svg{width:24px;height:24px}
 .rad-c{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--signal);color:#1d1206;font-size:18px;font-weight:800;padding:0;min-height:0;box-shadow:var(--shadow)}
 .rad-t{position:absolute;transform:translate(-50%,0);color:#fff;font-size:13px;font-weight:700;text-shadow:0 0 3px #000,0 0 3px #000;white-space:nowrap;pointer-events:none}
@@ -538,6 +538,7 @@ body.frame #devStrip{top:calc(var(--ft) + 8px)}
 #dlOv .dlrect{position:fixed;display:none;border:2px dashed var(--signal);background:rgba(92,255,157,.12)}
 #dlOvX{position:fixed;right:12px;top:calc(var(--safe-t) + 12px);min-height:42px;padding:6px 14px}
 
+#symModal svg,.symb svg,.symico svg{filter:drop-shadow(0 0 1px rgba(255,255,255,.95)) drop-shadow(0 0 2px rgba(255,255,255,.6))}
 /* 6.55: стопка карт, подслои, меню, зоны, навигация */
 .mvCv{max-width:100%;max-height:60vh;display:block;margin:0 auto;border-radius:8px;cursor:crosshair}.mvTb{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;justify-content:center}.mvC{width:30px;height:30px;min-height:30px;padding:0;border-radius:50%;border:2px solid var(--line2)}.mvC.on{outline:2px solid var(--signal);outline-offset:2px}
 #popMenu{position:fixed;z-index:2950;display:none;flex-direction:column;gap:5px;padding:6px;border-radius:12px;min-width:220px;max-height:70vh;overflow:auto}
@@ -893,7 +894,7 @@ body.frame #fbarX{top:calc(var(--ft) + 8px)}#fbarX.on{display:flex}#fbarX span{c
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 
 <script id="skatMain" type="text/plain">
-const VERSION = 'версия 6.55';
+const VERSION = 'версия 6.56';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -4401,6 +4402,17 @@ DEMG.busy = true; let k = 0, bad = 0; const p = $('demP'), go = async () => { wh
 await Promise.all([go(), go(), go(), go(), go(), go()]); if (DEMG){ DEMG.busy = false; if (p) p.textContent = bad ? `Готово, не скачано: ${bad}` : 'Квадрат сохранён'; setTimeout(demDraw, 800); } }
 // обучение и советы
 TIPS.push('«Слои» → «Карты»: подложка и наложения стопкой — порядок ▲▼, прозрачность, показ на зумах; сюда же KML (ЛБС) и привязанные снимки.', 'Активный слой (◉ в меню «⋯» слоя): новые надписи, фигуры и знаки ложатся в него.', 'Раскройте слой ▸ — внизу подслои по видам: противник, свои, орудия, фигуры, надписи; у каждого глаз и меню.', 'Карточка цели: «◎ Зоны» — круги обнаружения и поражения ПВО, РЭБ, РЛС; «⌛ Удалить через…» — временная цель.', '«Найти» → «Вставить координаты из буфера» — точка сразу на карте.', '«Вид» → «Высоты без сети» — скачать высоты квадратами по карте.');
+// ---- 6.56: одно окно за раз; касание карты закрывает окна
+{ const DLG = new Set(['cfModal', 'askModal', 'spModal', 'symModal', 'palModal', 'pkModal', 'perModal', 'faEdModal', 'ftEdModal', 'shEdModal', 'mvModal', 'rotModal', 'prnPvModal', 'thModal', 'ztModal', 'propModal']), KEEP = new Set(['secModal']);
+const POP = '#qvPop.on, #gpsMenu.on, .rbfly.on, #popMenu.on, #layMenu.on', CTX = new Set(['popMenu', 'layMenu']);
+const popsOff = ex => document.querySelectorAll(POP).forEach(e => { if (e !== ex) e.classList.remove('on'); });
+const modsOff = ex => document.querySelectorAll('.modal.open').forEach(m => { if (m !== ex && !KEEP.has(m.id)) m.classList.remove('open'); });
+let busy = 0; const seen = new WeakSet();
+new MutationObserver(R => { if (busy) return; busy = 1; try { R.forEach(r => { const e = r.target; if (!e.classList) return;
+if (e.classList.contains('modal')){ const o = e.classList.contains('open'); if (o && !seen.has(e)){ seen.add(e); if (!KEEP.has(e.id)){ popsOff(); if (!DLG.has(e.id)) modsOff(e); } } else if (!o) seen.delete(e); return; }
+if (e.matches && e.matches(POP)){ if (seen.has(e)) return; seen.add(e); popsOff(e); if (!CTX.has(e.id)) modsOff(); } else if (seen.has(e) && !e.classList.contains('modal')) seen.delete(e); }); } finally { busy = 0; } }).observe(document.body, {subtree:true, attributes:true, attributeFilter:['class']});
+let hook = 0; map.on('mousedown touchstart', () => { hook = !!(window.geoPickCb || window.mapTapHook); });
+map.on('preclick', () => { if (hook || window.geoPickCb || window.mapTapHook) return; popsOff(); modsOff(); const r = $('radial'); if (r && r.classList.contains('on') && typeof radClose === 'function') radClose(); }); }
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
 const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
