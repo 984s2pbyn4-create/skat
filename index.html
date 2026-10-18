@@ -110,16 +110,16 @@ body:has(#v3d.on) .modal{z-index:2600}
 #v3my{position:absolute;right:10px;top:calc(var(--safe-t) + var(--tg) + 56px);z-index:6;padding:10px 14px;display:none;flex-direction:column;gap:6px;max-height:65vh;overflow:auto;min-width:280px;color:var(--ink)}
 #v3my.on{display:flex}
 .envic{font:700 18px/1 sans-serif;color:#2b3a2b;text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 4px #fff;display:inline-block}
-#v3scn{position:absolute;right:10px;top:calc(var(--safe-t) + var(--tg) + 56px);z-index:6;padding:10px 14px;display:none;flex-direction:column;gap:8px;max-height:60vh;overflow:auto;min-width:260px;color:var(--ink)}
-#v3scn.on{display:flex}
-#v3tl{position:absolute;left:10px;right:70px;bottom:calc(var(--safe-b) + 74px);z-index:6;display:none;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;color:var(--ink);flex-wrap:wrap}
-#v3tl.on{display:flex}
-#tlTracks{flex-basis:100%;max-height:28vh;overflow:auto;background:rgba(0,0,0,.25);border-radius:10px}
-.tlin{position:relative;min-height:30px;padding:4px 0}.tlph{position:absolute;top:0;bottom:0;width:2px;background:#ffd400;z-index:3;pointer-events:none}
-.tlrow{position:relative;height:30px}.tln{position:absolute;left:6px;top:7px;width:100px;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mute)}
-.tlclip{position:absolute;top:3px;height:24px;border-radius:6px;background:#3a7bd5;color:#fff;font-size:11px;line-height:24px;padding-left:6px;overflow:hidden;white-space:nowrap;touch-action:none}.tlclip.fire{background:#d9532c}
-.tlclip .rh{position:absolute;right:0;top:0;bottom:0;width:14px;background:rgba(255,255,255,.35)}
-#v3act select{min-height:36px;border-radius:10px;background:var(--panel2);color:var(--ink);border:0;padding:0 6px}#v3tl input[type=range]{flex:1;min-width:140px}#v3tl button{min-height:36px;padding:4px 10px}
+
+
+
+
+
+
+
+
+
+#v3act select{min-height:36px;border-radius:10px;background:var(--panel2);color:var(--ink);border:0;padding:0 6px}
 .mtb{border-collapse:collapse;white-space:nowrap}.mtb td,.mtb th{padding:2px 6px;text-align:left}.mtbw{transform:translate(-50%,-50%);display:inline-block;pointer-events:none}
 .kids{margin:0 0 6px 30px;border-left:2px solid var(--line);padding-left:8px}
 .kid,.grp{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px}.kid .kn,.grp .kn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -332,17 +332,17 @@ label.f input::placeholder,label.f textarea::placeholder{color:var(--mute2)}
 #banner{background:var(--red-soft);border-color:var(--warn);color:var(--warn)}
 #vbar{background:var(--acc-soft);border-color:var(--signal)}#vbar.wait{background:var(--panel2);border-color:var(--line)}
 .rad-c{color:var(--acc-ink)}
-#readout,.rb,#layLbl,#fbar,#corr,#meetBar,#dlbar,#v3tl,#v3act,.minibar,#veBar,#tpanel .segs{font-family:"IBM Plex Sans Condensed","Roboto Condensed",var(--font)}
+#readout,.rb,#layLbl,#fbar,#corr,#meetBar,#dlbar,#v3act,.minibar,#veBar,#tpanel .segs{font-family:"IBM Plex Sans Condensed","Roboto Condensed",var(--font)}
 @media (min-width:700px){.modal.side{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;pointer-events:none}.modal.side .card{pointer-events:auto;position:fixed;top:calc(var(--safe-t) + var(--tg) + 66px);bottom:calc(var(--safe-b) + 12px);width:min(410px,calc(100vw - 170px));max-height:none;height:auto!important;border-radius:16px;padding-bottom:12px;box-shadow:var(--shadow),0 10px 40px rgba(0,0,0,.3);animation:skSideR .18s ease-out}.modal.side-r .card{right:74px}.modal.side-l .card{left:74px;animation-name:skSideL}.modal.side .grab{display:none}}
 @keyframes skSideR{from{transform:translateX(30px);opacity:0}}@keyframes skSideL{from{transform:translateX(-30px);opacity:0}}
 /* ---- 6.41: выдвижные панели по краям (body.dk-l/-r/-b/-t — свёрнуто, dk-pan — временно при движении карты) */
-#lrail,#rail,#top,#mixer,#opPal,#veBar,#v3act,#v3tl,#simCards,#simP{transition:transform .25s ease,opacity .25s ease}
+#lrail,#rail,#top,#mixer,#opPal,#veBar,#v3act{transition:transform .25s ease,opacity .25s ease}
 body.dk-l #lrail,body.dk-pan #lrail{transform:translateX(calc(-100% - 16px));opacity:0;pointer-events:none}
 body.dk-r #rail,body.dk-pan #rail{transform:translateX(calc(100% + 16px));opacity:0;pointer-events:none}
 body.dk-b #mixer,body.dk-b #opPal,body.dk-pan #mixer,body.dk-pan #opPal{transform:translateY(calc(100% + 24px));opacity:0;pointer-events:none}
-body.dk-b #v3tl,body.dk-b #simCards,body.dk-pan #v3tl,body.dk-pan #simCards{transform:translateY(calc(100% + 120px));opacity:0;pointer-events:none}
+
 body.dk-b #v3act,body.dk-pan #v3act{transform:translate(-50%,calc(100% + 40px));opacity:0;pointer-events:none}
-body.dk-l #simP,body.dk-pan #simP{transform:translateX(calc(-100% - 20px));opacity:0;pointer-events:none}
+
 body.dk-t #readout .meta,body.dk-t #top .laybtn{display:none}body.dk-t #readout{padding:4px 10px}body.dk-t #readout .xy{font-size:15px}
 body.dk-pan #top{opacity:.35}body.dk-t.opws #veBar,body.dk-pan.opws #veBar{transform:translateY(calc(-100% - 90px));opacity:0;pointer-events:none}
 .dkt{position:fixed;z-index:1070;display:flex;align-items:center;justify-content:center;min-height:0;padding:0;border:1px solid var(--line);background:var(--glass);color:var(--mute);font-size:14px;opacity:.75;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
@@ -378,17 +378,58 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{border-color:var
 .modal{background:var(--bd-bg)}
 .modal.open .card{animation:nvIn 220ms var(--ease-out)}@keyframes nvIn{from{opacity:0;transform:translateY(10px) scale(.985)}}
 @media (min-width:700px){.modal.side.open .card{animation:skSideR 220ms var(--ease-out)}.modal.side-l.open .card{animation-name:skSideL}}
-#lrail,#rail,#top,#mixer,#opPal,#veBar,#v3act,#v3tl,#simCards,#simP{transition:transform 260ms var(--ease-drawer),opacity 200ms var(--ease-out)}
+#lrail,#rail,#top,#mixer,#opPal,#veBar,#v3act{transition:transform 260ms var(--ease-drawer),opacity 200ms var(--ease-out)}
 .dkt{border-color:var(--line2);color:var(--signal);opacity:.65}.dkt:active{opacity:1}
 #toast{background:var(--panel2);color:var(--ink);border:1px solid var(--line2);box-shadow:var(--shadow)}
-#simCards .sc{background:rgba(10,14,12,.9);border:1px solid var(--line)}#simCards .sc.on{border-color:var(--signal);box-shadow:0 0 12px rgba(92,255,157,.25)}
-#simEnd .card{border:1px solid var(--line2)}
+
+
 #skatLock .k button{background:var(--panel2);border:1px solid var(--line)}#skatLock .ok{background:var(--signal);color:var(--acc-ink)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;transition-duration:1ms!important}button:active:not(:disabled){transform:none}}
 
 .ico{width:1.2em;height:1.2em;vertical-align:-.22em;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}.ico .f{fill:currentColor;stroke:none}.icw{display:inline-flex;align-items:center}
-#v3play,#v3scnBtn,#camSel,#v3tl{display:none!important}
+
 .skseal{width:72px;height:72px;border-radius:17px;display:block;box-shadow:var(--shadow)}
+
+/* ===== 6.49: видимость «прозрачных» кнопок (ghost/danger/язычки) ===== */
+:root{--line:rgba(120,255,175,.24);--line2:rgba(120,255,175,.4)}
+button.ghost{background:var(--panel2);border:1px solid var(--line2);color:var(--ink)}
+button.ghost:active{background:var(--acc-soft)}
+button.danger{background:var(--red-soft);border:1px solid var(--warn);color:var(--warn)}
+:root[data-theme="light"]{--line2:#AEB8B0}
+.dkt{opacity:.92}
+
+/* ===== 6.50: кнопки панелей 12 px, группы «Ещё», границы панелей, рамка «Оператора», режимы «Солнце» и «Ночь (красный)» ===== */
+.rb{width:56px;font-size:12px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden}
+#lrail,#rail{max-height:calc(100vh - var(--safe-t) - var(--tg) - 80px - var(--pb,0px) - var(--safe-b));overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+#lrail::-webkit-scrollbar,#rail::-webkit-scrollbar{display:none}
+.rbg.open{color:var(--signal);border-color:var(--signal)}
+.rbfly{position:fixed;z-index:1085;display:none;grid-template-columns:repeat(2,56px);gap:6px;padding:8px;border-radius:14px}
+.rbfly.on{display:grid}
+.rbfly .rb{box-shadow:none}
+body.frame{--fl:64px;--fr:64px}
+body.frame #top{left:0;right:0;top:0;padding:calc(var(--safe-t) + 6px) 8px 6px;background:var(--panel);border-bottom:1px solid var(--line2);transform:none!important;opacity:1!important}
+body.frame #top .glass{box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+body.frame #veBar{top:var(--th)!important;left:0!important;right:0!important;bottom:auto!important;border-radius:0!important;background:var(--panel)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:0!important;border-bottom:1px solid var(--line2)!important;box-shadow:none!important;transform:none!important;opacity:1!important;pointer-events:auto!important}
+body.frame #lrail,body.frame #rail{top:var(--ft)!important;bottom:var(--fb);max-height:none;width:var(--fl);padding:6px 4px;gap:5px;background:var(--panel);border-radius:0;align-items:center;transform:none!important;opacity:1!important;pointer-events:auto!important}
+body.frame #lrail{left:0;border-right:1px solid var(--line2)}
+body.frame #rail{right:0;border-left:1px solid var(--line2)}
+body.frame #lrail .rb,body.frame #rail .rb{box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--panel2);border-radius:10px;flex:none}
+body.frame #opPal{border-radius:0!important;background:var(--panel)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important;border:0;border-top:1px solid var(--line2);transform:none!important;opacity:1!important;pointer-events:auto!important}
+body.frame #map{left:var(--fl);top:var(--ft);width:calc(100% - var(--fl) - var(--fr));height:calc(100% - var(--ft) - var(--fb))}
+body.frame #compass{left:calc(var(--fl) + 10px);bottom:calc(var(--fb) + 10px)}
+body.frame .dkt{display:none!important}
+body.frame #veAl,body.frame #veNdB{top:calc(var(--ft) + 6px)!important;left:calc(var(--fl) + 6px)!important;right:calc(var(--fr) + 6px)!important}
+:root[data-tone="sun"]{--bg:#FFFFFF;--panel:#FFFFFF;--panel2:#F1F2EE;--glass:rgba(255,255,255,.99);--line:#7D877F;--line2:#4E5650;--ink:#000000;--mute:#262C28;--mute2:#444C46;--signal:#0A6332;--acc-ink:#FFFFFF;--acc-soft:#CBEAD6;--glow:0 0 0 2px rgba(10,99,50,.5)}
+:root[data-tone="sun"] .rb,:root[data-tone="sun"] button{font-weight:700;border-width:1.5px}
+:root[data-tone="sun"] #readout .xy{font-size:22px;font-weight:800}
+:root[data-tone="sun"] #readout .meta{font-size:14px;color:#111}
+:root[data-tone="sun"] .glass,:root[data-tone="sun"] .rb{box-shadow:0 0 0 1.5px #4E5650,0 4px 10px rgba(0,0,0,.25)}
+:root[data-tone="red"]{--bg:#0A0000;--panel:#140202;--panel2:#1E0505;--glass:rgba(20,2,2,.97);--line:rgba(255,60,40,.22);--line2:rgba(255,60,40,.42);--ink:#FF6A55;--mute:#B5432F;--mute2:#7A2A1F;--signal:#FF3B28;--acc-ink:#140000;--acc-soft:rgba(255,59,40,.16);--glow:0 0 0 1px rgba(255,59,40,.5),0 0 12px rgba(255,59,40,.22);--ok:#FF3B28;--warn:#FFB000;--red-soft:rgba(255,176,0,.14)}
+:root[data-tone="red"] .rb.on,:root[data-tone="red"] .rb.accent,:root[data-tone="red"] #opTb .rb.on{border-color:rgba(255,59,40,.5);box-shadow:var(--shadow)}
+:root[data-tone="red"] #cross i{box-shadow:0 0 0 1px rgba(0,0,0,.7)}
+:root[data-tone="red"] ::selection{background:rgba(255,59,40,.35)}
+:root[data-tone="red"] #map{filter:brightness(.62) contrast(1.08)}
+body:not(.frame) #compass{bottom:calc(max(var(--sheet-h,0px), calc(var(--safe-b) + var(--badge)), var(--pb,0px)) + 12px)}
 </style>
 </head>
 <body>
@@ -480,7 +521,8 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{border-color:var
 <div class="row"><button id="expBtn">Excel: все слои</button><button id="impBtn">Импорт ориентиров CSV</button></div>
 <div class="sub-h">Панели</div><label class="f" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="dkAuto" style="width:20px;height:20px">Прятать панели при движении карты</label>
 <div class="sub-h">Оформление</div><label class="f" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="splashChk" style="width:20px;height:20px">Заставка при запуске</label>
-<div class="seg" id="themeSeg"><button data-t="dark">Тёмная</button><button data-t="light">Светлая</button><button data-t="auto">Как в системе</button></div>
+<div class="seg" id="themeSeg"><button data-t="dark">Тёмная</button><button data-t="light">Светлая</button><button data-t="auto">Как в системе</button><button data-t="sun">Солнце</button><button data-t="red">Ночь (красный)</button></div>
+<div class="sub-h">Рамка в «Операторе» (как в CorelDRAW)</div><div class="seg" id="frameSeg"><button data-f="auto">Авто: планшет и ПК</button><button data-f="on">Всегда</button><button data-f="off">Выключена</button></div>
 <div class="row"><button id="secBtn">🔒 PIN и шифрование</button></div>
 <div class="sub-h">Тактические знаки</div>
 <div class="row" style="margin-bottom:8px"><button id="symAdd">Добавить знак</button><button class="ghost" id="symFavAll">Все в избранное</button></div>
@@ -614,13 +656,9 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{border-color:var
 <div class="row"><button class="ghost" id="cfNo">Отмена</button><button class="primary" id="cfYes" style="background:#e2533f;color:#fff">Удалить</button></div>
 </div></div>
 <div id="v3d"><div id="v3map"></div>
-<div id="v3top"><button id="v3close" class="glass">✕ 2D</button><select id="v3base" class="glass"></select><label class="glass" id="v3exl">Рельеф: <span id="v3exv">Реальный</span><input type="range" id="v3ex" min="1" max="5" step="0.5" value="1"></label><button id="v3lay" class="glass">Слои</button><button id="v3play" class="glass" style="display:none">▶ Все</button><button id="v3scnBtn" class="glass" style="display:none">Сценарий</button><select id="camSel" class="glass"><option value="free">Камера: свободная</option><option value="top">Сверху</option><option value="third">От 3-го лица</option><option value="copter">С коптера</option><option value="plane">С БПЛА-самолёта</option><option value="fpv">От 1-го лица</option></select><button id="v3myBtn" class="glass">Мои слои</button></div>
+<div id="v3top"><button id="v3close" class="glass">✕ 2D</button><select id="v3base" class="glass"></select><label class="glass" id="v3exl">Рельеф: <span id="v3exv">Реальный</span><input type="range" id="v3ex" min="1" max="5" step="0.5" value="1"></label><button id="v3lay" class="glass">Слои</button><button id="v3myBtn" class="glass">Мои слои</button></div>
 <div id="v3panel" class="glass"><label><input type="checkbox" data-k="places"> Населённые пункты</label><label><input type="checkbox" data-k="aux"> Ориентиры с подписями</label><label><input type="checkbox" data-k="shapes"> Фигуры, линии, маршруты</label><label><input type="checkbox" data-k="tac"> Тактические знаки и точки</label><label style="padding-left:26px"><input type="checkbox" data-k="tacLbl"> подписи знаков</label><label><input type="checkbox" data-k="mdl"> 3D-модели знаков</label><label style="flex-direction:column;align-items:stretch;gap:4px">Масштаб моделей: <span id="v3msv"></span><input type="range" id="v3ms" min="1" max="12" step="1" style="width:100%;height:auto"></label><label style="flex-direction:column;align-items:stretch;gap:4px">Высота БПЛА, м: <span id="v3altv"></span><input type="range" id="v3alt" min="10" max="500" step="10" style="width:100%;height:auto"></label><label><input type="checkbox" data-k="bld"> Здания</label><label><input type="checkbox" data-k="towers"> Вышки и мачты</label><label><input type="checkbox" data-k="forest"> Леса и лесополосы</label><label><input type="checkbox" data-k="paths"> Маршруты анимации</label><label><input type="checkbox" data-k="traj"> Траектории огня</label><label style="flex-direction:column;align-items:stretch;gap:4px">Деревья макета: <span id="v3mdenv"></span><input type="range" id="v3mden" min="0.1" max="1.5" step="0.1" style="width:100%;height:auto"></label><label><input type="checkbox" data-k="brg"> Мосты, броды, паромы</label><label style="flex-direction:column;align-items:stretch;gap:4px">Плотность деревьев: <span id="v3denv"></span><input type="range" id="v3den" min="0.2" max="3" step="0.1" style="width:100%;height:auto"></label><small style="color:var(--mute);max-width:220px;line-height:1.3">Объекты грузятся участками ~3×3 км вокруг центра на крупном масштабе и сохраняются для работы без интернета.</small></div>
 <div id="v3my" class="glass"><b>Мои слои и объекты</b><div id="myList"></div></div>
-<div id="v3scn" class="glass"><b>Сценарии</b><div id="scnList"></div><button class="primary" id="scnNew">Новый сценарий</button><small style="color:var(--mute);line-height:1.3">Сцена — участок местности. Объекты в нём проигрываются по общему времени: у каждого маршрут, скорость и время старта «Ч+».</small></div>
-<div id="v3tl" class="glass"><b id="tlN" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></b><button id="tlP">▶</button><input type="range" id="tlR" min="0" max="60" step="0.1" value="0"><span id="tlT" style="white-space:nowrap;font-variant-numeric:tabular-nums"></span>
-<div class="seg" id="tlM" style="margin:0"><button data-m="1" class="on">×1</button><button data-m="5">×5</button><button data-m="20">×20</button></div>
-<label style="display:flex;align-items:center;gap:6px;white-space:nowrap"><input type="checkbox" id="tlO" style="width:20px;height:20px;margin:0"> облёт</label><button id="tlCam" title="Запомнить вид">📷</button><button id="tlZo">−</button><button id="tlZi">＋</button><button id="tlX">✕</button><div id="tlTracks"></div></div>
 <div id="v3msg"></div><div id="v3act" class="glass"></div></div>
 <div id="radial"></div>
 <div id="launch"><div class="lc"><div id="lcSeal"></div><h2>СКАТ</h2><p>Выберите раздел</p>
@@ -724,7 +762,7 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{border-color:var
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 
 <script id="skatMain" type="text/plain">
-const VERSION = 'версия 6.48';
+const VERSION = 'версия 6.50';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -875,7 +913,7 @@ optPane.appendChild(cv2); const ctx2 = cv2.getContext('2d');
 let dpr = 1, W = 0, H = 0;
 function sizeCanvas(){ dpr = window.devicePixelRatio || 1; const sz = map.getSize(); W = sz.x; H = sz.y;
 [cv, cv2].forEach(c => { c.width = W*dpr; c.height = H*dpr; c.style.width = W+'px'; c.style.height = H+'px'; });
-$('cross').style.top = (H/2) + 'px'; }
+{ const mr = map.getContainer().getBoundingClientRect(); $('cross').style.top = (mr.top + H/2) + 'px'; $('cross').style.left = (mr.left + W/2) + 'px'; } }
 const pad2 = n => String(((n%100)+100)%100).padStart(2,'0');
 const pad5 = n => String(((Math.round(n)%100000)+100000)%100000).padStart(5,'0');
 function canvasBox(c, g){
@@ -3694,8 +3732,8 @@ setInterval(() => { const L = lk(); if (L && Date.now() - idle > L * 60000) secL
 document.addEventListener('visibilitychange', () => { if (!secOn()) return; if (document.hidden){ hid = Date.now(); document.body.classList.add('sec-hid'); } else { document.body.classList.remove('sec-hid'); const L = lk(); if (L && hid && Date.now() - hid > L * 60000) secLockNow(); else idle = Date.now(); } });
 const st = document.createElement('style'); st.textContent = 'body.sec-hid::after{content:"";position:fixed;inset:0;background:#14181c;z-index:100000}'; document.head.appendChild(st); }
 $('tlBtn').onclick = () => modLoad('tp').then(() => tlStart()).catch(() => {});
-function applyTheme(t){ document.documentElement.dataset.theme = t; try { localStorage.setItem('skat_theme', t); } catch(e){} const dark = t === 'dark' || (t === 'auto' && !matchMedia('(prefers-color-scheme: light)').matches), m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = dark ? '#0A0E0C' : '#ECEEE8'; document.querySelectorAll('#themeSeg button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); }
-$('themeSeg').onclick = e => { const b = e.target.closest('[data-t]'); if (b) applyTheme(b.dataset.t); }; applyTheme(document.documentElement.dataset.theme || 'dark'); try { matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => applyTheme(document.documentElement.dataset.theme || 'dark')); } catch(e){}
+function applyTheme(t){ window._thm = t; const de = document.documentElement, base = t === 'sun' ? 'light' : t === 'red' ? 'dark' : t; de.dataset.theme = base; if (t === 'sun' || t === 'red') de.dataset.tone = t; else delete de.dataset.tone; try { localStorage.setItem('skat_theme', t); } catch(e){} const dark = base === 'dark' || (base === 'auto' && !matchMedia('(prefers-color-scheme: light)').matches), m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === 'red' ? '#0A0000' : t === 'sun' ? '#FFFFFF' : dark ? '#0A0E0C' : '#ECEEE8'; document.querySelectorAll('#themeSeg button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); }
+$('themeSeg').onclick = e => { const b = e.target.closest('[data-t]'); if (b) applyTheme(b.dataset.t); }; applyTheme((() => { try { return localStorage.getItem('skat_theme') || 'dark'; } catch(e){ return 'dark'; } })()); try { matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => applyTheme(window._thm || 'dark')); } catch(e){}
 if ($('lcSeal')) $('lcSeal').innerHTML = window.SKSEAL || '';
 // ---- 6.31: боковые панели (на планшете/ПК окна разделов выезжают справа/слева, карта остаётся доступной) и отложенная загрузка Excel
 const SIDE_R = ['layModal', 'setModal', 'srchModal', 'addModal', 'arrModal', 'trashModal', 'spModal', 'palModal', 'symModal', 'dlModal', 'impModal', 'veObM', 'veExM', 'veStM', 'veXM'], SIDE_L = ['geoModal', 'faModal', 'ftModal', 'planModal', 'usModal', 'fmModal'];
@@ -3708,7 +3746,7 @@ function dockSync(){ ['l', 'r', 'b', 't'].forEach(k => document.body.classList.t
 ['l', 'r', 'b', 't'].forEach(k => { const b = $('dk' + k.toUpperCase()); if (b) b.textContent = DK[k] ? A[k][0] : A[k][1]; }); const lr = $('lrail'), vis = lr && getComputedStyle(lr).display !== 'none' && [...lr.querySelectorAll('.rb')].some(x => x.style.display !== 'none'); if ($('dkL')) $('dkL').style.display = vis ? '' : 'none'; if ($('dkAuto')) $('dkAuto').checked = DK.auto; }
 function dockSave(){ lsSet('skat_dock', DK); dockSync(); }
 [['L', 'l', 'Левая панель'], ['R', 'r', 'Правая панель'], ['B', 'b', 'Нижние панели'], ['T', 't', 'Верхняя строка']].forEach(([id, k, t]) => { const b = document.createElement('button'); b.id = 'dk' + id; b.className = 'dkt'; b.title = t + ': спрятать / показать'; b.onclick = () => { DK[k] = !DK[k]; document.body.classList.remove('dk-pan'); dockSave(); }; document.body.appendChild(b); });
-let dkTimer = 0; function dockPan(on){ if (!DK.auto) return; clearTimeout(dkTimer); if (on) document.body.classList.add('dk-pan'); else dkTimer = setTimeout(() => document.body.classList.remove('dk-pan'), 2200); }
+let dkTimer = 0; function dockPan(on){ if (!DK.auto || document.body.classList.contains('frame')) return; clearTimeout(dkTimer); if (on) document.body.classList.add('dk-pan'); else dkTimer = setTimeout(() => document.body.classList.remove('dk-pan'), 120); }
 map.on('dragstart', () => dockPan(true)); map.on('zoomstart', () => { if (map._dkTouch) dockPan(true); }); map.on('moveend zoomend', () => dockPan(false)); map.getContainer().addEventListener('touchstart', e => { map._dkTouch = e.touches.length > 1; if (map._dkTouch) dockPan(true); }, {passive:true}); map.getContainer().addEventListener('touchend', () => { map._dkTouch = false; }, {passive:true}); map.getContainer().addEventListener('wheel', () => dockPan(true), {passive:true});
 document.addEventListener('keydown', e => { if (e.key !== 'Tab' || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName || '') || document.querySelector('.modal.open:not(.side)')) return; e.preventDefault(); const any = !(DK.l && DK.r && DK.b && DK.t); ['l', 'r', 'b', 't'].forEach(k => { DK[k] = any; }); dockSave(); });
 try { $('splashChk').checked = localStorage.getItem('skat_splash') !== '0'; } catch(e){} $('splashChk').onchange = e => { try { localStorage.setItem('skat_splash', e.target.checked ? '1' : '0'); } catch(_){} toast(e.target.checked ? 'Заставка включена' : 'Заставка выключена'); };
@@ -3733,6 +3771,45 @@ function icFix(root){ if (!root || root.nodeType !== 1 || root.closest('.leaflet
 L.forEach(n => { const f = document.createDocumentFragment(); n.nodeValue.split(ICRE).forEach((part, k) => { if (k % 2){ const sp = document.createElement('span'); sp.className = 'icw'; sp.innerHTML = icSvg(part); f.appendChild(sp); } else if (part) f.appendChild(document.createTextNode(part)); }); n.replaceWith(f); }); }
 { let q = new Set(), sch = 0; const run = () => { sch = 0; const R = [...q]; q.clear(); R.forEach(icFix); }; new MutationObserver(ms => { ms.forEach(m => m.addedNodes.forEach(n => { const e = n.nodeType === 1 ? n : n.parentElement; if (e && !(e.closest && e.closest('.leaflet-pane'))) q.add(e); })); if (q.size && !sch) sch = requestAnimationFrame(run); }).observe(document.body, {childList:true, subtree:true}); icFix(document.body); }
 $('veBtn').onclick = () => modLoad('op').then(() => veToggle()).catch(() => {});
+
+// ---- 6.50: группы кнопок на панелях («Ещё»), рамка «Оператора», границы панелей, подсказки разделов
+const RBG = [];
+function rbGroup(o){ const g = document.createElement('button'); g.className = 'rb rbg'; g.id = o.id; g.title = o.title || o.label;
+g.innerHTML = (o.icon || '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>') + '<span>' + o.label + '</span>';
+o.host.insertBefore(g, o.before || null); const f = document.createElement('div'); f.className = 'rbfly glass'; f.id = o.id + 'F'; document.body.appendChild(f);
+o.items.filter(Boolean).forEach(el => f.appendChild(el)); const R = {g, f, o, html:g.innerHTML}; RBG.push(R);
+g.onclick = e => { e.stopPropagation(); const open = !f.classList.contains('on'); rbClose(); if (open) rbOpen(R); };
+f.addEventListener('click', e => { if (o.pick){ const b = e.target.closest(o.pickSel || 'button'); if (b) o.pick(b); } if (e.target.closest('button')) setTimeout(rbClose, 0); });
+const mo = new MutationObserver(rbSync); [...f.children].forEach(el => mo.observe(el, {attributes:true, attributeFilter:['style', 'class']})); rbSync(); return R; }
+function rbOpen(R){ const r = R.g.getBoundingClientRect(), f = R.f; f.classList.add('on'); R.g.classList.add('open'); const w = f.offsetWidth, h = f.offsetHeight, x = R.o.side === 'r' ? r.left - w - 8 : r.right + 8;
+f.style.left = Math.max(8, Math.min(x, innerWidth - w - 8)) + 'px'; f.style.top = Math.max(8, Math.min(r.top, innerHeight - h - 8)) + 'px'; }
+function rbClose(){ RBG.forEach(R => { R.f.classList.remove('on'); R.g.classList.remove('open'); }); }
+function rbSync(){ RBG.forEach(R => { const vis = [...R.f.children].filter(el => el.style.display !== 'none'); R.g.style.display = vis.length ? '' : 'none';
+if (R.o.mark){ const act = vis.find(el => el.classList.contains('on')); R.g.classList.toggle('on', !!act); const h = act ? act.innerHTML : R.html; if (R.g.innerHTML !== h) R.g.innerHTML = h; } }); }
+document.addEventListener('pointerdown', e => { if (!e.target.closest('.rbfly,.rbg')) rbClose(); }, true);
+window.rbGroup = rbGroup; window.rbSync = rbSync;
+rbGroup({host:$('lrail'), id:'lMore', label:'Ещё', side:'l', title:'Топо, Огневые средства, Поиск, Время', items:['geoBtn', 'faBtn', 'usBtn', 'tlBtn'].map($)});
+rbGroup({host:$('rail'), id:'rMore', label:'Ещё', side:'r', title:'Поиск по координатам, Печать, Н.п., Сетка', items:['searchBtn', 'prnBtn', 'plcBtn', 'gridBtn'].map($)});
+// рамка: карта — окно между закреплёнными панелями (только «Оператор»)
+const FRAME = {m:lsGet('skat_frame', 'auto')};
+function frameOn(){ return secMode === 'op' && (FRAME.m === 'on' || (FRAME.m === 'auto' && Math.min(innerWidth, innerHeight) >= 600)); }
+let frRaf = 0; function frameLayout(){ if (!frRaf) frRaf = requestAnimationFrame(frameLayout0); }
+function frameLayout0(){ frRaf = 0; const B = document.body, on = frameOn(), rs = document.documentElement.style; B.classList.toggle('frame', on); if (on) B.classList.remove('dk-pan');
+const shown = el => el && el.style.display !== 'none' && getComputedStyle(el).display !== 'none', H = el => shown(el) ? el.getBoundingClientRect().height : 0, pal = $('opPal'), mix = $('mixer');
+rs.setProperty('--pb', Math.round(Math.max(secMode === 'op' ? H(pal) : 0, mix && mix.classList.contains('on') ? H(mix) : 0)) + 'px');
+if (on){ const th = $('top').getBoundingClientRect().bottom; rs.setProperty('--th', Math.round(th) + 'px'); rs.setProperty('--ft', Math.round(th + H($('veBar'))) + 'px'); rs.setProperty('--fb', Math.round(H(pal)) + 'px'); }
+try { map.invalidateSize({pan:false}); sizeCanvas(); } catch(e){} }
+window.frameLayout = frameLayout; addEventListener('resize', frameLayout);
+{ const watch = new WeakSet(), mo = new MutationObserver(frameLayout), hook = () => ['opPal', 'veBar', 'mixer', 'top'].forEach(id => { const el = $(id); if (el && !watch.has(el)){ watch.add(el); mo.observe(el, {attributes:true, attributeFilter:['style', 'class']}); } });
+new MutationObserver(() => { hook(); frameLayout(); }).observe(document.body, {childList:true}); hook(); }
+const frSeg = () => document.querySelectorAll('#frameSeg button').forEach(b => b.classList.toggle('on', b.dataset.f === FRAME.m));
+$('frameSeg').onclick = e => { const b = e.target.closest('[data-f]'); if (!b) return; FRAME.m = b.dataset.f; lsSet('skat_frame', FRAME.m); frSeg(); frameLayout(); }; frSeg();
+// подсказка при первом входе в раздел
+const HINTS = {op:'«Оператор»: инструменты слева (фигуры и рисование собраны в группы), свойства выделенного — сверху, цвета — внизу. Удержание пальца на карте — меню добавления. Редкие кнопки — в «Ещё».',
+tp:'«Боевой контур»: слева «Корр.» — корректировка, «Огн. зад.», «План ОЗ», «Микшер» — орудия внизу. Топо, огневые средства, поиск и «Время» — в «Ещё».',
+mk:'«Макет»: кнопка «3D» справа. В 3D удержание пальца — поставить технику и объекты; касание объекта — правка, маршрут и ▶.'};
+function hintOnce(){ const k = 'skat_hint_' + secMode; if (!HINTS[secMode] || lsGet(k, 0)) return; lsSet(k, 1); setTimeout(() => { toast(HINTS[secMode]); clearTimeout(tt); tt = setTimeout(() => { $('toast').style.display = 'none'; }, 8000); }, 1200); }
+{ const as0 = applySection; applySection = function(){ const r = as0.apply(this, arguments); try { rbClose(); rbSync(); frameLayout(); if (!$('launch').classList.contains('on')) hintOnce(); } catch(e){} return r; }; }
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
 const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
@@ -3797,7 +3874,7 @@ state.arrays.forEach(a => a.points.forEach(p => { if (p.h == null && !p.hManual 
 <script>
 // ======== ЗАМОК: PIN и расшифровка данных до запуска приложения (основной код — в #skatMain) ========
 (function(){
-try { document.documentElement.dataset.theme = localStorage.getItem('skat_theme') || 'dark'; } catch(e){ document.documentElement.dataset.theme = 'dark'; }
+try { const t0 = localStorage.getItem('skat_theme') || 'dark', de0 = document.documentElement; de0.dataset.theme = t0 === 'sun' ? 'light' : t0 === 'red' ? 'dark' : t0; if (t0 === 'sun' || t0 === 'red') de0.dataset.tone = t0; } catch(e){ document.documentElement.dataset.theme = 'dark'; }
 
 // ---- 6.44: заставка — скат проплывает над высотами и встаёт над компасом, хвост указывает на север (вправо-вверх); касание — пропустить
 (function(){ let off = '0'; try { off = localStorage.getItem('skat_splash'); } catch(e){} if (off === '0') return;

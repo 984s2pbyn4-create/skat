@@ -1,4 +1,4 @@
-// СКАТ — модуль «Оператор»: редактор надписей, печать JPEG, свойства знака. Грузится лениво из index.html (modLoad). Версия 6.4
+// СКАТ — модуль «Оператор»: редактор надписей, печать JPEG, свойства знака, векторный редактор. Грузится лениво из index.html (modLoad). Версия 6.50
 // ======== ОПЕРАТОР: НАДПИСИ ========
 function openTextEd(a, ti, ll){
 const t = ti != null ? a.texts[ti] : {t:'', f:'Roboto Condensed', s:18, c:'#111111', sc:'#ffffff', sw:2, b:true, i:false, bg:'', r:0, lat:ll.lat, lng:ll.lng};
@@ -543,6 +543,9 @@ const OPW_C = ['#000000', '#ffffff', '#7f7f7f', '#d62020', '#e2533f', '#ff8a2a',
 function opwSync(){ const on = secMode === 'op'; document.body.classList.toggle('opws', on); OPW.on = on; if (!$('opTb')) opwUI(); $('opTb').style.display = on ? '' : 'none'; $('opPal').style.display = on ? 'flex' : 'none'; if ($('veBtn')) $('veBtn').style.display = on ? 'none' : (secMode === 'op' ? '' : 'none'); if (!on) return; opwMark(); }
 function opwUI(){ const tb = document.createElement('div'); tb.id = 'opTb'; tb.innerHTML = OPW_T.map(([k, n, ic]) => `<button class="rb ot" data-ot="${k}" title="${n}"><svg viewBox="0 0 24 24">${ic}</svg>${n}</button>`).join(''); $('lrail').prepend(tb);
 tb.onclick = e => { const b = e.target.closest('[data-ot]'); if (b) opwTool(b.dataset.ot); };
+if (window.rbGroup){ const q = k => tb.querySelector(`[data-ot="${k}"]`), pk = b => { if (b.dataset.ot) opwTool(b.dataset.ot); };
+rbGroup({host:tb, before:q('line'), id:'otShp', label:'Фигуры', side:'l', mark:true, pick:pk, pickSel:'[data-ot]', icon:'<svg viewBox="0 0 24 24"><rect x="3" y="10" width="10" height="10"/><circle cx="16" cy="8" r="5"/></svg>', items:['line', 'rect', 'circle', 'poly'].map(q)});
+rbGroup({host:tb, before:q('pen'), id:'otDrw', label:'Рисов.', side:'l', mark:true, pick:pk, pickSel:'[data-ot]', icon:'<svg viewBox="0 0 24 24"><path d="M4 20l1-5L16 4l4 4L9 19z"/></svg>', items:['pen', 'pcl'].map(q)}); }
 const p = document.createElement('div'); p.id = 'opPal'; p.className = 'glass'; document.body.appendChild(p); opwPal();
 p.addEventListener('click', e => { if (OPW.lp){ OPW.lp = 0; return; } const b = e.target.closest('[data-pc]'); if (b){ opwColor(b.dataset.pc, OPW.mode); return; } const m = e.target.closest('[data-pm]'); if (m){ OPW.mode = m.dataset.pm; opwPal(); } });
 p.addEventListener('contextmenu', e => { const b = e.target.closest('[data-pc]'); if (b){ e.preventDefault(); opwColor(b.dataset.pc, 's'); } });
@@ -566,7 +569,7 @@ if (s.t === 's'){ if (m === 'f'){ if (none){ o.op = 0; delete o.fill; delete o.h
 else if (s.t === 'x'){ if (m === 'f'){ if (!none) o.c = c; } else { if (none) o.sw = 0; else { o.sc = c; o.sw = +o.sw || 2; } } }
 else if (s.t === 'tb'){ if (m === 'f'){ if (none) delete o.bg; else o.bg = c; } else { if (none) delete o.bd; else o.bd = c; } } });
 persist(); renderMarkers(); toast(`${m === 'f' ? 'Заливка' : 'Обводка'}: ${n}`); }
-function opwMark(){ document.querySelectorAll('#opTb [data-ot]').forEach(b => b.classList.toggle('on', b.dataset.ot === OPW.t)); }
+function opwMark(){ document.querySelectorAll('#opTb [data-ot], .rbfly [data-ot]').forEach(b => b.classList.toggle('on', b.dataset.ot === OPW.t)); }
 function opwTool(k){ const prev = OPW.t; OPW.t = k; VE.pip = false; if (typeof tool !== 'undefined' && tool.on && !['line', 'rect', 'circle', 'poly'].includes(k)) closeTools();
 if (VE.on && (VE.pen || VE.pcl || VE.nd) && k !== 'nd') veModeEnd();
 if (k === 'sel'){ veOn(); }
@@ -647,4 +650,16 @@ const idx = a.shapes.indexOf(o0); S.forEach(s => { const arr = s.a.shapes, i = a
 const nw = res.map(R => Object.assign(veCl(base), {pts:R.map(Q), t:Date.now()})); a.shapes.splice(Math.max(0, Math.min(idx, a.shapes.length)), 0, ...nw);
 VE.sel = nw.map(o => ({a, t:'s', o})); persist(); renderMarkers();
 toast({u:'Объединено', d:'Вычтено из первой выбранной', i:'Пересечение', x:'Исключено (общая часть убрана)'}[op] + (nw.length > 1 ? `: фигур ${nw.length}` : '') + '. ↶ — отменить'); }
+
+// ======== 6.50: ВЕРХНЯЯ ПАНЕЛЬ — КНОПКИ СОБРАНЫ В ГРУППЫ (Правка, Порядок, Контуры, Ещё) ========
+function veGroupBar(){ const B = VE.bar; if (!B || B.dataset.grp) return; B.dataset.grp = '1'; const del = B.querySelector('[data-v="del"]'), menus = [], close = () => menus.forEach(m => m.classList.remove('on'));
+[['Правка', ['dup', 'copy', 'paste']], ['Порядок', ['up', 'dn', 'grp', 'ugrp', 'al']], ['Контуры', ['bu', 'bd', 'bi', 'bx']], ['Ещё', ['ex', 'ob', 'tp', 'xch']]].forEach(([n, ks]) => {
+const gb = document.createElement('button'); gb.className = 'vgb'; gb.textContent = n + ' ▾'; B.insertBefore(gb, del);
+const m = document.createElement('div'); m.className = 'vgm glass'; ks.forEach(k => { const b = B.querySelector(`[data-v="${k}"]`); if (b) m.appendChild(b); }); document.body.appendChild(m); menus.push(m);
+gb.onclick = e => { e.stopPropagation(); const on = !m.classList.contains('on'); close(); if (!on) return; m.classList.add('on'); const r = gb.getBoundingClientRect(); m.style.left = Math.max(8, Math.min(r.left, innerWidth - m.offsetWidth - 8)) + 'px'; m.style.top = Math.min(r.bottom + 6, innerHeight - m.offsetHeight - 8) + 'px'; };
+m.addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; e.stopPropagation(); close(); const px = document.createElement('button'); px.dataset.v = b.dataset.v; px.style.display = 'none'; B.appendChild(px); px.click(); px.remove(); }); });
+document.addEventListener('pointerdown', e => { if (!e.target.closest('.vgm,.vgb')) close(); }, true); VE.vgClose = close;
+const st = document.createElement('style'); st.textContent = '.vgm{position:fixed;z-index:1600;display:none;flex-direction:column;gap:5px;padding:6px;border-radius:12px;min-width:160px}.vgm.on{display:flex}.vgm button{text-align:left;justify-content:flex-start;min-height:40px;padding:6px 12px}#veBar.nd>.vgb{display:none!important}#veBar .vgb{white-space:nowrap}'; document.head.appendChild(st); }
+{ const u0 = veUI; window.veUI = function(){ const r = u0.apply(this, arguments); veGroupBar(); return r; }; }
+{ const f0 = veOff; window.veOff = function(){ if (VE.vgClose) VE.vgClose(); return f0.apply(this, arguments); }; }
 window.__mod_op = 1;

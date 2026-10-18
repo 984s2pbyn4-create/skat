@@ -1,4 +1,4 @@
-// СКАТ — модуль «Макет» (3D, объекты, сценарии, камеры, огонь). Грузится лениво из index.html (modLoad). Версия 6.5.1
+// СКАТ — модуль «Макет» (3D, объекты, анимация по маршруту, модели Three.js). Грузится лениво из index.html (modLoad). Версия 6.50
 // ======== 3D-ПРОСМОТР ========
 const ML = 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/';
 let MLp = null, v3 = null, v3proto = false;
@@ -67,7 +67,7 @@ terrain:{source:'dem', exaggeration:ex}}});
 v3.addControl(new ml.NavigationControl({visualizePitch:true}), 'bottom-right');
 v3.on('styleimagemissing', e => { try { if (!v3.hasImage(e.id)){ const im = v3img(e.id); if (im) v3.addImage(e.id, im, {pixelRatio:2}); } } catch(_){} });
 ['fill', 'outl', 'line'].forEach(id => { try { v3.setLayoutProperty(id, 'visibility', v3cfg.shapes ? 'visible' : 'none'); } catch(_){} });
-v3.on('load', ensureObjs); v3.on('load', envInit); v3.on('load', fxInit); v3.on('moveend', ensureObjs); v3.on('click', v3tap);
+v3.on('load', ensureObjs); v3.on('load', envInit); v3.on('moveend', ensureObjs); v3.on('click', v3tap);
 v3.on('load', () => { $('v3msg').textContent = 'Наклон — двумя пальцами вверх/вниз, поворот — двумя пальцами по кругу. Компас справа — север вверх.'; });
 v3.on('error', () => {});
 } catch(e){ el.classList.remove('on'); toast('Устройство не поддерживает 3D (WebGL)'); }
@@ -363,7 +363,7 @@ let v3sel = null, v3move = false;
 function v3upd(){ envRefresh(); persist(); renderMarkers(); renderSheet(); try { v3.getSource('pts').setData(v3data()); } catch(_){} v3apply(); try { if (!v3cfg.tac) v3.getSource('tac').setData(v3tac(v3.getCenter())); } catch(_){} }
 function v3bar(){ const el = $('v3act'); if (!v3sel){ el.classList.remove('on'); el.innerHTML = ''; return; }
 const a = state.arrays[v3sel.ai], p = a && v3item(a); if (!p){ v3sel = null; return v3bar(); }
-el.innerHTML = `<b>${escapeHtml(v3sel.ei != null ? ENV_N[p.k] || 'Объект' : labelOf(a, v3sel.pi))}${v3move ? ' — коснитесь нового места' : ''}</b><button data-a="card">Карточка</button><button data-a="move" class="${v3move ? 'on' : ''}">Переместить</button><button data-a="l">↺ 15°</button><button data-a="r">↻ 15°</button>${v3route ? `<button data-a="rok" class="on">Готово (${v3route.pts.length})</button><button data-a="rx">Сброс</button>` : `<button data-a="route">Маршрут</button>${p.path ? `<button data-a="play">▶</button><button data-a="t0">Старт ${fmtT(p.t0 || 0)}</button><select data-a="spd">${[5, 10, 20, 40, 60].map(v => `<option value="${v}"${(p.spd || 20) === v ? ' selected' : ''}>${v} км/ч</option>`).join('')}</select>` : ''}`}${extraBar(a, p)}<button data-a="del">Удалить</button><button data-a="x">✕</button>`;
+el.innerHTML = `<b>${escapeHtml(v3sel.ei != null ? ENV_N[p.k] || 'Объект' : labelOf(a, v3sel.pi))}${v3move ? ' — коснитесь нового места' : ''}</b><button data-a="card">Карточка</button><button data-a="move" class="${v3move ? 'on' : ''}">Переместить</button><button data-a="l">↺ 15°</button><button data-a="r">↻ 15°</button>${v3route ? `<button data-a="rok" class="on">Готово (${v3route.pts.length})</button><button data-a="rx">Сброс</button>` : `<button data-a="route">Маршрут</button>${p.path ? `<button data-a="play">▶</button><select data-a="spd">${[5, 10, 20, 40, 60].map(v => `<option value="${v}"${(p.spd || 20) === v ? ' selected' : ''}>${v} км/ч</option>`).join('')}</select>` : ''}`}${extraBar(a, p)}<button data-a="del">Удалить</button><button data-a="x">✕</button>`;
 const sp = el.querySelector('[data-a=spd]'); if (sp) sp.onchange = e => { p.spd = +e.target.value; persist(); };
 el.classList.add('on'); }
 $('v3act').onclick = e => { const b = e.target.closest('button'); if (!b || !v3sel) return; const a = state.arrays[v3sel.ai], p = a && v3item(a); if (!p) return;
@@ -372,7 +372,6 @@ if (A === 'card'){ if (v3sel.ei == null) openPoint(a, v3sel.pi); return; }
 if (A === 'route'){ v3route = {pts:[[p.lng, p.lat]]}; v3bar(); toast('Касайтесь 3D-карты по точкам маршрута, затем «Готово»'); return; }
 if (A === 'rx'){ v3route = null; delete p.path; persist(); envRefresh(); v3bar(); return; }
 if (A === 'rok'){ if (v3route.pts.length > 1){ p.path = v3route.pts; p.spd = p.spd || 20; } v3route = null; persist(); envRefresh(); v3bar(); return; }
-if (A === 't0'){ const v = prompt('Время старта от «Ч» (минуты:секунды)', `${Math.floor((p.t0 || 0) / 60)}:${String((p.t0 || 0) % 60).padStart(2, '0')}`); if (v === null) return; const m2 = v.trim().match(/^(\d+)(?:[:.,](\d+))?$/); if (!m2){ toast('Формат: 5:30 или 5'); return; } p.t0 = (+m2[1]) * 60 + (+(m2[2] || 0)); persist(); if (SC.cur){ SC.T = scnDur(SC.cur); $('tlR').max = SC.T; scnSet(SC.t, true); } v3bar(); return; }
 if (A === 'play'){ playAnim([{key:(v3sel.ei != null ? 'e' : '') + a.id + ':' + (v3sel.ei != null ? v3sel.ei : v3sel.pi), it:p}]); return; }
 if (A === 'spd') return;
 if (A === 'move'){ v3move = !v3move; v3bar(); return; }
@@ -380,9 +379,7 @@ if (A === 'l' || A === 'r'){ p.rot = ((((p.rot ?? a.rot) ?? (v3sel.ei == null &&
 if (A === 'del'){ if (!confirm(`Удалить «${labelOf(a, v3sel.pi)}»?`)) return; if (v3sel.ei != null) a.env.splice(v3sel.ei, 1); else a.points.splice(v3sel.pi, 1); envRefresh(); v3sel = null; v3move = false; v3bar(); v3upd(); return; }
 v3sel = null; v3move = false; v3route = null; envRefresh(); v3bar(); };
 function v3tap(e){
-if (fireMode){ fireTap(e); return; }
 if (v3draw){ v3draw.pts.push([+e.lngLat.lng.toFixed(7), +e.lngLat.lat.toFixed(7)]); envRefresh(); drawBar(); return; }
-if (SC.pick){ scnPickTap(e); return; }
 if (v3route){ v3route.pts.push([+e.lngLat.lng.toFixed(7), +e.lngLat.lat.toFixed(7)]); envRefresh(); v3bar(); return; }
 if (v3move && v3sel){ const a = state.arrays[v3sel.ai], p = a && v3item(a); if (p){ const dla = e.lngLat.lat - p.lat, dlo = e.lngLat.lng - p.lng; ['line', 'ring', 'path'].forEach(k => { if (p[k]) p[k] = p[k].map(q => [+(q[0] + dlo).toFixed(7), +(q[1] + dla).toFixed(7)]); }); p.lat = +e.lngLat.lat.toFixed(7); p.lng = +e.lngLat.lng.toFixed(7); if (!p.hManual) fillHeight(p); if (!p.placeManual) delete p.place; v3upd(); } v3move = false; v3bar(); return; }
 const pt = e.point, L = ['mdl', 'tac'].concat(v3.getStyle().layers.filter(l => l.id.startsWith('e_')).map(l => l.id)).filter(id => v3.getLayer(id));
@@ -432,7 +429,6 @@ if (!v3.getSource('apath')) v3.addSource('apath', {type:'geojson', data:pathData
 v3.getStyle().layers.filter(l => l.source === 'obj').forEach(l => { const id = 'e_' + l.id; if (v3.getLayer(id)) return; const L1 = JSON.parse(JSON.stringify(l)); L1.id = id; L1.source = 'env'; delete L1.minzoom; L1.layout = Object.assign({}, L1.layout || {}, {visibility:'visible'}); v3.addLayer(L1); });
 if (!v3.getLayer('apath')) v3.addLayer({id:'apath', type:'line', source:'apath', paint:{'line-color':'#ff8a2a', 'line-width':3, 'line-dasharray':[2, 1.5]}});
 } catch(e){}
-$('v3play').style.display = secMode === 'mk' ? '' : 'none'; $('v3scnBtn').style.display = secMode === 'mk' ? '' : 'none';
 }
 function placeEnv(k, ll){ const a = envLayer(); a.env.push({k, lat:+ll.lat.toFixed(7), lng:+ll.lng.toFixed(7), rot:0}); persist(); envRefresh(); toast(ENV_N[k] + ' поставлен(а). Коснитесь объекта, чтобы править'); }
 function placeTech(side, sid, ll){ const S = SIDES[side], sy = SYM_BY[sid]; let a = state.arrays.find(x => x.name === `Макет: ${S.name}`);
@@ -463,65 +459,20 @@ if (acc + L0 >= dist){ const f = L0 ? (dist - acc) / L0 : 0; return {lng:x1 + (x
 const n = path.length, [x1, y1] = path[n-2], [x2, y2] = path[n-1], [kx, ky] = mk(y1); return {lng:x2, lat:y2, rot:Math.round(180 - Math.atan2((y2 - y1) * ky, (x2 - x1) * kx) * 180 / Math.PI), end:true}; }
 function playAnim(items){
 stopAnim(); animList = items.filter(x => x.it.path && x.it.path.length > 1); if (!animList.length){ toast('Нет объектов с маршрутом: выберите объект → «Маршрут»'); return; }
-animT0 = performance.now(); $('v3play').textContent = '■ Стоп';
+animT0 = performance.now();
 const step = now => { const t = (now - animT0) / 1000; let alive = false;
 animList.forEach(x => { const q = pathPos(x.it.path, t * (x.it.spd || 20) / 3.6); if (!q.end) alive = true; ANIM.set(x.key, q); });
 if (now - animLast > 60){ animLast = now; try { v3.getSource('mdl').setData(v3mdl(v3.getCenter())); } catch(_){} envRefresh(); }
-animRaf = alive ? requestAnimationFrame(step) : 0; if (!alive){ $('v3play').textContent = '▶ Все'; toast('Анимация завершена'); } };
+animRaf = alive ? requestAnimationFrame(step) : 0; if (!alive) toast('Анимация завершена'); };
 animRaf = requestAnimationFrame(step);
 }
-function stopAnim(){ if (animRaf) cancelAnimationFrame(animRaf); animRaf = 0; ANIM.clear(); $('v3play').textContent = '▶ Все'; try { v3.getSource('mdl').setData(v3mdl(v3.getCenter())); } catch(_){} envRefresh(); }
-function allAnimItems(){ const L1 = []; state.arrays.forEach(a => { if (a.hidden) return; a.points.forEach((p, pi) => L1.push({key:a.id + ':' + pi, it:p})); (a.env || []).forEach((o, ei) => L1.push({key:'e' + a.id + ':' + ei, it:o})); }); return L1; }
-$('v3play').onclick = () => animRaf ? stopAnim() : playAnim(allAnimItems());
+function stopAnim(){ if (animRaf) cancelAnimationFrame(animRaf); animRaf = 0; ANIM.clear(); try { v3.getSource('mdl').setData(v3mdl(v3.getCenter())); } catch(_){} envRefresh(); }
 { const box = $('v3map');
 const clr = () => { if (v3lp){ clearTimeout(v3lp.tm); v3lp = null; } };
 box.addEventListener('touchstart', e => { clr(); if (e.touches.length !== 1 || !v3 || secMode !== 'mk') return; const t = e.touches[0]; v3lp = {x:t.clientX, y:t.clientY};
 v3lp.tm = setTimeout(() => { if (!v3lp) return; const r = box.getBoundingClientRect(), ll = v3.unproject([v3lp.x - r.left, v3lp.y - r.top]), x = v3lp.x, y = v3lp.y; v3lp = null; openRadial3D(x, y, ll); }, 600); }, {passive:true});
 box.addEventListener('touchmove', e => { if (!v3lp) return; const t = e.touches[0]; if (e.touches.length > 1 || Math.hypot(t.clientX - v3lp.x, t.clientY - v3lp.y) > 10) clr(); }, {passive:true});
 box.addEventListener('touchend', clr); box.addEventListener('touchcancel', clr); }
-
-// ======== МАКЕТ: СЦЕНЫ И ВРЕМЕННАЯ ШКАЛА ========
-const SC = {cur:null, t:0, T:0, mul:1, raf:0, last:0, prev:0, orbit:false, pick:null};
-const fmtT = t => `Ч+${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
-function pathLen(P){ let L1 = 0; for (let i = 1; i < P.length; i++){ const [kx, ky] = mk(P[i][1]); L1 += Math.hypot((P[i][0] - P[i-1][0]) * kx, (P[i][1] - P[i-1][1]) * ky); } return L1; }
-function scnItems(sc){ const [w, s0, e, n] = sc.b; return allAnimItems().filter(x => { const q = x.it.path && x.it.path.length ? {lng:x.it.path[0][0], lat:x.it.path[0][1]} : x.it; return q.lng >= w && q.lng <= e && q.lat >= s0 && q.lat <= n; }); }
-function scnDur(sc){ let T = 0; scnItems(sc).forEach(x => { const it = x.it; if (it.path && it.path.length > 1) T = Math.max(T, simDurOf(it)); (it.fires || []).forEach(f => { const k = FIRE_K[f.k] || FIRE_K.gun; T = Math.max(T, (f.t0 || 0) + (f.n || k.n) * (f.ev || k.ev) + (f.tof || k.tof) + 3); }); }); return Math.max(10, Math.ceil(T + 3)); }
-function scnRefresh(force){ const now = performance.now(); if (!force && now - SC.last < 60) return; SC.last = now; try { v3.getSource('mdl').setData(v3mdl(v3.getCenter())); } catch(_){} envRefresh(); }
-function scnSet(t, force){ if (!SC.cur) return; SC.t = Math.max(0, Math.min(SC.T, t));
-scnItems(SC.cur).forEach(x => { const it = x.it; if (!it.path || it.path.length < 2) return; const loc = Math.max(0, SC.t - (it.t0 || 0)); ANIM.set(x.key, simPos(it, loc)); });
-$('tlR').value = SC.t; $('tlT').textContent = `${fmtT(SC.t)} / ${fmtT(SC.T)}`; scnRefresh(force); fireFx(SC.t); const ph = document.querySelector('.tlph'); if (ph) ph.style.left = (SC.t * tlZoom + 110) + 'px'; }
-function scnLoop(now){ const dt = SC.prev ? (now - SC.prev) / 1000 : 0; SC.prev = now;
-if (SC.orbit && camMode === 'free') try { v3.setBearing(v3.getBearing() + dt * 4); } catch(_){}
-applyCam(dt);
-scnSet(SC.t + dt * SC.mul);
-if (SC.t >= SC.T){ scnPause(); toast('Сцена завершена'); return; } SC.raf = requestAnimationFrame(scnLoop); }
-function scnPlay(){ if (!SC.cur) return; if (SC.t >= SC.T) SC.t = 0; SC.prev = 0; $('tlP').textContent = '⏸'; SC.raf = requestAnimationFrame(scnLoop); }
-function scnPause(){ if (SC.raf) cancelAnimationFrame(SC.raf); SC.raf = 0; $('tlP').textContent = '▶'; scnRefresh(true); }
-function scnBox(){ const F = []; const box = b => [[b[0], b[1]], [b[2], b[1]], [b[2], b[3]], [b[0], b[3]], [b[0], b[1]]];
-if (SC.cur) F.push({type:'Feature', properties:{}, geometry:{type:'LineString', coordinates:box(SC.cur.b)}});
-if (SC.pick && SC.pick.pts.length) SC.pick.pts.forEach(q => F.push({type:'Feature', properties:{}, geometry:{type:'Point', coordinates:q}}));
-try { if (!v3.getSource('scnbox')){ v3.addSource('scnbox', {type:'geojson', data:{type:'FeatureCollection', features:F}}); v3.addLayer({id:'scnbox', type:'line', source:'scnbox', paint:{'line-color':'#ffd400', 'line-width':3, 'line-dasharray':[3, 2]}}); v3.addLayer({id:'scnpt', type:'circle', source:'scnbox', filter:['==', '$type', 'Point'], paint:{'circle-color':'#ffd400', 'circle-radius':6, 'circle-stroke-color':'#000', 'circle-stroke-width':1}}); }
-else v3.getSource('scnbox').setData({type:'FeatureCollection', features:F}); } catch(_){} }
-function renderScn(){ const el = $('scnList');
-el.innerHTML = state.scenes.length ? state.scenes.map((sc, i) => `<div class="arr"><div class="nm"><div>${escapeHtml(sc.name)}</div><div>${fmtT(scnDur(sc))} · объектов: ${scnItems(sc).length}</div></div><button data-i="${i}" data-a="open">Открыть</button><button class="eye" data-i="${i}" data-a="del">🗑</button></div>`).join('') : '<div class="empty">Сцен пока нет.</div>';
-el.querySelectorAll('button').forEach(b => b.onclick = () => { const sc = state.scenes[+b.dataset.i];
-if (b.dataset.a === 'open') openScene(sc); else askConfirm(`Удалить сцену «${sc.name}»? Объекты на карте останутся.`, 'Удалить', () => { state.scenes.splice(+b.dataset.i, 1); persist(); if (SC.cur === sc) closeScene(); renderScn(); }); }); }
-function openScene(sc){ $('v3scn').classList.remove('on'); SC.cur = sc; SC.T = scnDur(sc); $('tlR').max = SC.T; $('v3tl').classList.add('on'); $('tlN').textContent = sc.name;
-try { v3.jumpTo({center:sc.cam.c, zoom:sc.cam.z, pitch:sc.cam.p, bearing:sc.cam.br}); } catch(_){} ANIM.clear(); scnBox(); fxInit(); scnSet(0, true); tlRender(); }
-function closeScene(){ scnPause(); SC.cur = null; ANIM.clear(); fireFx(-999); tlRender(); $('v3tl').classList.remove('on'); scnBox(); scnRefresh(true); }
-$('v3scnBtn').onclick = () => { $('v3panel').classList.remove('on'); $('v3my').classList.remove('on'); renderScn(); $('v3scn').classList.toggle('on'); };
-$('scnNew').onclick = () => { $('v3scn').classList.remove('on'); SC.pick = {pts:[]}; scnBox(); toast('Коснитесь 3D-карты в двух противоположных углах сцены'); };
-$('tlP').onclick = () => SC.raf ? scnPause() : scnPlay();
-$('tlR').oninput = e => { scnPause(); scnSet(+e.target.value, true); };
-$('tlM').querySelectorAll('button').forEach(b => b.onclick = () => { SC.mul = +b.dataset.m; $('tlM').querySelectorAll('button').forEach(q => q.classList.toggle('on', q === b)); });
-$('tlO').onchange = e => { SC.orbit = e.target.checked; };
-$('tlCam').onclick = () => { if (!SC.cur) return; SC.cur.cam = {c:v3.getCenter().toArray(), z:v3.getZoom(), p:v3.getPitch(), br:v3.getBearing()}; persist(); toast('Вид камеры сцены сохранён'); };
-$('tlX').onclick = closeScene;
-function scnPickTap(e){ SC.pick.pts.push([+e.lngLat.lng.toFixed(6), +e.lngLat.lat.toFixed(6)]); scnBox();
-if (SC.pick.pts.length < 2) return true;
-const [[x1, y1], [x2, y2]] = SC.pick.pts; SC.pick = null; const name = (prompt('Название сцены', `Сцена ${state.scenes.length + 1}`) || '').trim() || `Сцена ${state.scenes.length + 1}`;
-const sc = {id:Date.now(), name, b:[Math.min(x1, x2), Math.min(y1, y2), Math.max(x1, x2), Math.max(y1, y2)], cam:{c:v3.getCenter().toArray(), z:v3.getZoom(), p:v3.getPitch(), br:v3.getBearing()}};
-state.scenes.push(sc); persist(); openScene(sc); toast('Сцена создана. Объектам в ней задайте маршрут и время старта'); return true; }
 
 // ======== МАКЕТ: РИСОВАНИЕ РЯДОВ И РОЩ, «МОИ СЛОИ», ЗНАЧКИ В 2D ========
 let v3draw = null;
@@ -548,56 +499,13 @@ const it = items[+b.dataset.k], a = state.arrays[it.ai];
 if (b.dataset.a === 'go'){ $('v3my').classList.remove('on'); try { v3.flyTo({center:[it.lng, it.lat], zoom:Math.max(v3.getZoom(), 16.5)}); } catch(_){} v3sel = it.ei != null ? {ai:it.ai, ei:it.ei} : {ai:it.ai, pi:it.pi}; v3move = false; v3bar(); return; }
 if (it.ei != null) a.env.splice(it.ei, 1); else a.points.splice(it.pi, 1); v3sel = null; v3bar(); v3upd(); renderMy(); });
 }
-$('v3myBtn').onclick = () => { $('v3panel').classList.remove('on'); $('v3scn').classList.remove('on'); renderMy(); $('v3my').classList.toggle('on'); };
+$('v3myBtn').onclick = () => { $('v3panel').classList.remove('on'); renderMy(); $('v3my').classList.toggle('on'); };
 
 MDLS.ls3 = [...man(-1.1).map(p => (p[2] += .7, p)), ...man(0), ...man(1.1).map(p => (p[2] -= .7, p))];
 MDLS.mortar = [MB(.35, 0, .55, .55, 0, .08, 'dk'), ...Array.from({length:8}, (_, i) => MB(.3 - i * .15, 0, .22, .14, .1 + i * .15, .32 + i * .15, 'dk')),
 ...[1, -1].flatMap(sg => Array.from({length:5}, (_, i) => { const t = i / 4; return MB(-.95 + t * .4, sg * (.38 - t * .3), .09, .09, t * .8, t * .8 + .22, 'dk'); })), ...man(1.1).map(p => (p[2] += .6, p))];
-// ======== МАКЕТ: СЦЕНАРИЙ (МОНТАЖ), КАМЕРЫ, ОГОНЬ, НАСТРОЙКИ ОБЪЕКТОВ ========
-const FIRE_K = {gun:{tof:28, ev:6, n:6}, sau:{tof:30, ev:6, n:6}, rszo:{tof:25, ev:.5, n:12}, mortar:{tof:18, ev:5, n:8}, tank:{tof:1.5, ev:8, n:5}};
-let fireMode = null, camMode = 'free', camAng = 0, tlZoom = 8;
-const fxSrc = () => { try { return v3.getSource('fx'); } catch(e){ return null; } };
-function fxInit(){ try { if (!v3.getSource('fx')){ v3.addSource('fx', {type:'geojson', data:{type:'FeatureCollection', features:[]}});
-v3.addSource('fxp', {type:'geojson', data:{type:'FeatureCollection', features:[]}}); v3.addLayer({id:'fxp', type:'symbol', source:'fxp', layout:{'icon-image':['get', 'img'], 'icon-size':['get', 'sz'], 'icon-allow-overlap':true, 'icon-ignore-placement':true, 'icon-anchor':'bottom', 'icon-pitch-alignment':'viewport'}});
-v3.addLayer({id:'fx', type:'fill-extrusion', source:'fx', paint:{'fill-extrusion-color':['get', 'c'], 'fill-extrusion-base':['get', 'b'], 'fill-extrusion-height':['get', 'h'], 'fill-extrusion-opacity':.9}}); }
-v3.setLayoutProperty('apath', 'visibility', v3cfg.paths === false ? 'none' : 'visible'); } catch(e){} }
-function fireFx(t){ const F = [], P = [];
-state.arrays.forEach(a => a.points.forEach((p, pi) => { (p.fires || []).forEach(f => { const k = FIRE_K[f.k] || FIRE_K.gun, ov = ANIM.get(a.id + ':' + pi) || p;
-for (let i = 0; i < (f.n || k.n); i++){ const ts = (f.t0 || 0) + i * (f.ev || k.ev), dt = t - ts, tof = f.tof || k.tof, hsx = hsh(i * 3.1, f.t0 + 1), hsy = hsh(i * 7.7, f.t0 + 2);
-const tx = f.tx + (hsx - .5) * 50 / mk(f.ty)[0], ty = f.ty + (hsy - .5) * 50 / 111320;
-if (dt >= 0 && dt < tof){ const u = dt / tof, x = ov.lng + (tx - ov.lng) * u, y = ov.lat + (ty - ov.lat) * u, Hm = f.k === 'tank' ? 3 : Math.max(60, distM({lat:ov.lat, lng:ov.lng}, {lat:ty, lng:tx}) * .25), z = 4 * Hm * u * (1 - u) + 2;
-F.push({type:'Feature', properties:{c:'#ffd27a', b:z, h:z + 1.5}, geometry:{type:'Polygon', coordinates:[ngon([x, y], .8, 6)]}});
-if (v3cfg.traj !== false) for (let q = 1; q < 24; q++){ const w = q / 24; if (w > u) break; const zz = 4 * Hm * w * (1 - w) + 2; F.push({type:'Feature', properties:{c:'#ff8a2a', b:zz, h:zz + .4}, geometry:{type:'Polygon', coordinates:[ngon([ov.lng + (tx - ov.lng) * w, ov.lat + (ty - ov.lat) * w], .35, 4)]}}); } }
-const de = dt - tof; if (de >= 0 && de < 3){ P.push({type:'Feature', properties:{img:de < .8 ? 'boom|' : 'smoke|', sz:de < .8 ? .6 + de : 1 + de * .3}, geometry:{type:'Point', coordinates:[tx, ty]}}); } if (false){ const r = 4 + de * 9, hh = de < .6 ? 14 + de * 20 : 26 - de * 4; F.push({type:'Feature', properties:{c:de < .6 ? '#ffb02e' : '#6d6a64', b:0, h:Math.max(2, hh)}, geometry:{type:'Polygon', coordinates:[ngon([tx, ty], r, 12, i)]}}); }
-} }); }));
-const s0 = fxSrc(); if (s0) s0.setData({type:'FeatureCollection', features:F}); try { v3.getSource('fxp').setData({type:'FeatureCollection', features:P}); } catch(_){} }
-function camTarget(){ let it = null, key = null;
-if (v3sel){ const a = state.arrays[v3sel.ai]; if (a){ it = v3item(a); key = (v3sel.ei != null ? 'e' : '') + a.id + ':' + (v3sel.ei != null ? v3sel.ei : v3sel.pi); } }
-if (!it && SC.cur){ const x = scnItems(SC.cur).find(z => z.it.path); if (x){ it = x.it; key = x.key; } }
-if (!it) return null; const ov = ANIM.get(key); return {lat:(ov || it).lat, lng:(ov || it).lng, hd:(((ov || it).rot ?? 180) - 90 + 360) % 360}; }
-function applyCam(dt){ if (camMode === 'free' || !v3) return; const T = camTarget(); if (!T && camMode !== 'top') return; const c0 = T ? [T.lng, T.lat] : v3.getCenter().toArray();
-try { if (camMode === 'top') v3.jumpTo({center:c0, pitch:0, bearing:0, zoom:Math.max(15, v3.getZoom())});
-else if (camMode === 'third') v3.jumpTo({center:c0, pitch:62, bearing:T.hd, zoom:18});
-else if (camMode === 'copter'){ camAng += (dt || .016) * 6; v3.jumpTo({center:c0, pitch:50, bearing:camAng, zoom:17.2}); }
-else if (camMode === 'plane'){ camAng += (dt || .016) * 9; const [kx, ky] = mk(T.lat), r = 500, q = camAng * Math.PI / 180; v3.jumpTo({center:[T.lng + Math.cos(q) * r * .25 / kx, T.lat + Math.sin(q) * r * .25 / ky], pitch:68, bearing:(90 - camAng + 360) % 360, zoom:15.6}); }
-else if (camMode === 'fpv'){ const [kx, ky] = mk(T.lat), h = T.hd * Math.PI / 180; v3.jumpTo({center:[T.lng + Math.sin(h) * 25 / kx, T.lat + Math.cos(h) * 25 / ky], pitch:84, bearing:T.hd, zoom:19.6}); } } catch(e){} }
-$('camSel').onchange = e => { camMode = e.target.value; camAng = v3 ? v3.getBearing() : 0; applyCam(); toast({free:'Свободная камера', top:'Вид сверху', third:'От третьего лица — за выбранным объектом', copter:'С коптера — облёт объекта', plane:'С самолётного БПЛА — круг над объектом', fpv:'От первого лица'}[camMode]); };
-// ---- монтажные дорожки
-function tlRender(){ const el = $('tlTracks'); if (!SC.cur){ el.innerHTML = ''; return; } const its = scnItems(SC.cur), pxs = tlZoom, W1 = Math.max(300, SC.T * pxs + 40);
-const rows = []; its.forEach(x => { const a = state.arrays.find(q => x.key.replace(/^e/, '').startsWith(q.id + ':')); const nm = x.it.k ? (ENV_N[x.it.k] || 'Объект') : (x.it.lbl || x.it.name || 'Объект');
-if (x.it.path && x.it.path.length > 1){ const dur = pathLen(x.it.path) / ((x.it.spd || 20) / 3.6); rows.push({nm, it:x.it, t0:x.it.t0 || 0, dur, cls:'mv'}); }
-(x.it.fires || []).forEach((f, fi) => { const k = FIRE_K[f.k] || FIRE_K.gun; rows.push({nm:nm + ' · огонь', it:f, t0:f.t0 || 0, dur:(f.n || k.n) * (f.ev || k.ev) + (f.tof || k.tof), cls:'fire'}); }); });
-el.innerHTML = `<div class="tlin" style="width:${W1}px"><div class="tlph" style="left:${SC.t * pxs + 110}px"></div>${rows.map((r, k) => `<div class="tlrow"><span class="tln">${escapeHtml(r.nm)}</span><div class="tlclip ${r.cls}" data-k="${k}" style="left:${r.t0 * pxs + 110}px;width:${Math.max(14, r.dur * pxs)}px">${fmtT(r.t0)}<i class="rh"></i></div></div>`).join('') || '<div class="empty" style="padding:8px">В сцене нет объектов с маршрутом или огнём.</div>'}</div>`;
-el.querySelectorAll('.tlclip').forEach(c => { const r = rows[+c.dataset.k]; let x0 = null, mode = null, b0 = 0, w0 = 0;
-c.addEventListener('touchstart', e => { e.stopPropagation(); x0 = e.touches[0].clientX; mode = e.target.classList.contains('rh') ? 'rs' : 'mv'; b0 = r.t0; w0 = r.dur; }, {passive:true});
-c.addEventListener('touchmove', e => { if (x0 == null) return; e.preventDefault(); const d = (e.touches[0].clientX - x0) / pxs;
-if (mode === 'mv'){ r.it.t0 = Math.max(0, Math.round((b0 + d) * 2) / 2); c.style.left = (r.it.t0 * pxs + 110) + 'px'; c.firstChild.textContent = fmtT(r.it.t0); }
-else if (r.cls === 'mv'){ const nd = Math.max(2, w0 + d); r.it.spd = Math.max(1, Math.round(pathLen(r.it.path) / nd * 3.6)); c.style.width = (nd * pxs) + 'px'; } }, {passive:false});
-c.addEventListener('touchend', () => { if (x0 == null) return; x0 = null; persist(); SC.T = scnDur(SC.cur); $('tlR').max = SC.T; scnSet(SC.t, true); tlRender(); }); });
-el.querySelector('.tlin').onclick = e => { if (e.target.closest('.tlclip')) return; const r0 = el.querySelector('.tlin').getBoundingClientRect(); scnPause(); scnSet((e.clientX - r0.left - 110) / pxs, true); };
-}
-$('tlZi').onclick = () => { tlZoom = Math.min(40, tlZoom * 1.5); tlRender(); }; $('tlZo').onclick = () => { tlZoom = Math.max(1, tlZoom / 1.5); tlRender(); };
-// ---- размер моделей, параметры деревьев, высота БПЛА, огонь
+// ======== МАКЕТ: НАСТРОЙКИ ОБЪЕКТОВ ========
+// ---- размер моделей, параметры деревьев, высота БПЛА
 function treeGen(o, F){ const st = o.step || 7, sp = o.sp ?? .3, kind = (x, y) => o.lf === 'n' || o.lf === 'b' ? o.lf : (hsh(x * 1e5, y * 1e5) < .5 ? 'n' : 'b');
 if (o.k === 'trow' && o.line){ const W2 = o.w || 8, nr = Math.max(1, Math.round(W2 / 4)), offs = Array.from({length:nr}, (_, i) => nr === 1 ? 0 : -W2 / 2 + W2 * i / (nr - 1));
 for (let i = 1; i < o.line.length; i++){ const [x1, y1] = o.line[i-1], [x2, y2] = o.line[i], [kx, ky] = mk(y1), dx = (x2 - x1) * kx, dy = (y2 - y1) * ky, L0 = Math.hypot(dx, dy); if (!L0) continue; const nx = -dy / L0, ny = dx / L0;
@@ -615,19 +523,9 @@ if (v3sel.ei != null && ['trow', 'tpoly', 'grove'].includes(p.k)){ if (p.k !== '
 if (p.k === 'grove'){ h += optSel('n', [5, 10, 14, 25, 40, 80], p.n || 14, v => v + ' деревьев'); h += optSel('r', [8, 12, 18, 30, 50], p.r || 18, v => 'радиус ' + v + ' м'); }
 h += optSel('sp', [0, .2, .4, .7, 1], p.sp ?? .3, v => 'рассеивание ' + v); h += optSel('lf', ['m', 'n', 'b'].map((x, i) => i), ['m', 'n', 'b'].indexOf(p.lf || 'm'), v => ['смешанные', 'ели', 'берёзы'][v]); }
 if (key === 'rszo') h += optSel('rs', [4, 8, 12, 20, 40], p.rs || 12, v => v + ' РС');
-if (false && key && FIRE_K[key]) h += `<button data-x="fire">Огонь${p.fires && p.fires.length ? ' (' + p.fires.length + ')' : ''}</button>${p.fires && p.fires.length ? '<button data-x="fclr">Сброс огня</button>' : ''}`;
 return h; }
 $('v3act').addEventListener('change', e => { const sl = e.target.closest('select[data-o]'); if (!sl || !v3sel) return; const a = state.arrays[v3sel.ai], p = a && v3item(a); if (!p) return; const k = sl.dataset.o, v = +sl.value;
 if (k === 'lf') p.lf = ['m', 'n', 'b'][v]; else if (k === 'msc' && v === 1) delete p.msc; else p[k] = v; persist(); v3upd(); });
-$('v3act').addEventListener('click', e => { const b = e.target.closest('button[data-x]'); if (!b || !v3sel) return; e.stopPropagation(); const a = state.arrays[v3sel.ai], p = a && v3item(a); if (!p) return;
-if (b.dataset.x === 'fire'){ fireMode = {a, p}; toast('Коснитесь цели на 3D-карте'); }
-if (b.dataset.x === 'fclr'){ delete p.fires; persist(); fireFx(SC.t); v3bar(); if (SC.cur) tlRender(); } }, true);
-function fireTap(e){ const {a, p} = fireMode, key = itKind(a, p) || 'gun', k = FIRE_K[key] || FIRE_K.gun; fireMode = null;
-(p.fires = p.fires || []).push({tx:+e.lngLat.lng.toFixed(6), ty:+e.lngLat.lat.toFixed(6), t0:Math.round((SC.cur ? SC.t : 0) * 2) / 2, k:key, n:key === 'rszo' ? (p.rs || 12) : k.n, ev:k.ev, tof:k.tof});
-persist(); v3bar(); if (SC.cur){ SC.T = scnDur(SC.cur); $('tlR').max = SC.T; tlRender(); } toast(`Огневое поражение: ${k.n} выстр., подлёт ${k.tof} с. Сдвиньте начало на шкале сценария`); }
-
-function simPos(it, t){ return pathPos(it.path, t * (it.spd || 20) / 3.6); }
-function simDurOf(it){ return (it.t0 || 0) + pathLen(it.path || []) / ((it.spd || 20) / 3.6); }
 // ======== 6.36: ОБЪЁМНЫЕ МОДЕЛИ НА THREE.JS (слой tj3 внутри 3D-карты) + АНИМАЦИИ ДЕЙСТВИЙ ========
 // Модели собираются в коде (без внешних файлов): вперёд — −Z, вверх — +Y, размеры в метрах, масштаб — v3cfg.ms. Старые блочные модели остаются запасным вариантом.
 const TJK = {tank:[7, 3.4], bmp:[6.7, 3.1], btr:[7.6, 2.9], truck:[7, 2.5], gun:[6.5, 2.6], sau:[7.3, 3.3], rszo:[7.6, 2.6], mortar:[2.6, 2.4], inf:[4, 3.4], uavp:[3, 4.6], uavk:[1.8, 1.8]};

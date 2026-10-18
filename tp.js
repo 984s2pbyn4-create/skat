@@ -1,4 +1,4 @@
-// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.18
+// СКАТ — модуль «Боевой контур»: корректировка огня (панель), План ОЗ (окна, выгрузка Excel), правка зон, точки встречи. Грузится лениво из index.html (modLoad). Версия 6.50
 // ======== БОЕВОЙ КОНТУР: КОРРЕКТИРОВКА ОГНЯ ========
 const corrL = L.layerGroup().addTo(map);
 function sysTof(sys, d){ const k = SYS[sys] || SYS.d30; return Math.max(2, d / k.v * (k.hi ? 2 : 1.25)); }
@@ -775,4 +775,15 @@ async function mediaUnpack(M){ if (!Array.isArray(M) || !M.length) return; let n
 // уборка: файлы, на которые нет ссылок ни в слоях, ни в корзине
 setTimeout(async () => { try { const ks = await mKeys(); if (!ks || !ks.length) return; const s = JSON.stringify(state.arrays) + JSON.stringify(state.trash || []); for (const id of ks) if (!s.includes('"' + id + '"')) await mDel(id); } catch(e){} }, 8000);
 { const st = document.createElement('style'); st.textContent = '.fmM{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}.fmTh{position:relative;width:76px;height:76px;border-radius:8px;overflow:hidden;background:rgba(128,128,128,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;line-height:1.3}.fmTh img{width:100%;height:100%;object-fit:cover}.fmTh span{position:absolute;left:3px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;border-radius:4px;padding:0 4px;font-size:11px}.fmTh i{position:absolute;left:0;right:0;top:0;background:rgba(0,0,0,.5);color:#fff;font-style:normal;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:1px 3px}.fmTh.nth img,.fmTh.miss img{display:none}.fmTh.nth::after{content:"🎬";font-size:26px}.fmTh.miss::after{content:"нет файла";color:#c33}.fmAdd{border:1.5px dashed rgba(128,128,128,.6);background:none}#mvB img,#mvB video{display:block;max-width:100%;max-height:62vh;margin:0 auto;border-radius:6px;background:#000}'; document.head.appendChild(st); }
+
+// ======== 6.50: «ПЛАН ОЗ» — ВКЛАДКИ ТЗ / ЗОНЫ / ТОЧКИ ВСТРЕЧИ ВМЕСТО ДЛИННОЙ ПРОКРУТКИ ========
+let planTab = 'tz';
+function planTabs(){ const el = $('planList'); if (!el) return; el.querySelectorAll(':scope > .ptabs').forEach(x => x.remove()); const kids = [...el.children], hd = d => { const h = d.querySelector && d.querySelector(':scope > .sub-h'); return h ? h.textContent : ''; };
+const zd = kids.find(d => /^Зоны поражения/.test(hd(d))), md = kids.find(d => /^Точки встречи/.test(hd(d))), tz = kids.filter(d => d !== zd && d !== md);
+const T = [['tz', 'ТЗ', tz], ['zn', 'Зоны', zd ? [zd] : []], ['mt', 'Точки встречи', md ? [md] : []]].filter(x => x[0] === 'tz' || x[2].length);
+if (T.length < 2){ tz.forEach(d => { d.style.display = ''; }); return; } if (!T.some(x => x[0] === planTab)) planTab = 'tz';
+const bar = document.createElement('div'); bar.className = 'seg ptabs'; bar.style.margin = '0 0 10px'; bar.innerHTML = T.map(([k, n]) => `<button data-pt="${k}" class="${k === planTab ? 'on' : ''}">${n}</button>`).join(''); el.prepend(bar);
+T.forEach(([k, , L1]) => L1.forEach(d => { d.style.display = k === planTab ? '' : 'none'; }));
+bar.onclick = e => { const b = e.target.closest('[data-pt]'); if (!b) return; planTab = b.dataset.pt; planTabs(); }; }
+{ const rp2 = window.renderPlan; window.renderPlan = () => { rp2(); planTabs(); }; }
 window.__mod_tp = 1;
