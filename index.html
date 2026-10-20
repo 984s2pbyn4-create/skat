@@ -539,6 +539,21 @@ body.frame #devStrip{top:calc(var(--ft) + 8px)}
 #dlOvX{position:fixed;right:12px;top:calc(var(--safe-t) + 12px);min-height:42px;padding:6px 14px}
 
 #symModal svg,.symb svg,.symico svg{filter:drop-shadow(0 0 1px rgba(255,255,255,.95)) drop-shadow(0 0 2px rgba(255,255,255,.6))}
+
+/* 6.57: Штаб */
+.shCard{max-width:760px}.shHd{display:flex;align-items:center;gap:8px;margin-bottom:6px}.shHd h3{flex:1;margin:0}.shBk{min-width:40px;padding:4px 10px}
+.shGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;margin-bottom:10px}.shTile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:76px;padding:8px 6px;font-size:12px;font-weight:600;line-height:1.15;text-align:center;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:12px}.shTile b{font-size:20px;color:var(--signal)}
+.shAl{display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 10px;border-radius:10px;background:var(--acc-soft);margin:6px 0 10px;font-size:13px}.bad{color:#ff5a4a!important}.mid{color:#f5b100!important}.ok{color:#22c55e!important}
+.shList{display:flex;flex-direction:column;gap:6px;margin:6px 0 10px}.shRow{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.shRow>div{flex:1 1 60%;min-width:0;word-break:break-word;white-space:pre-wrap}.shRow>small{flex:1 1 100%;order:-1;color:var(--mute)}.shRow>span{display:flex;gap:4px;flex-wrap:wrap}.shRow.auto{opacity:.72}
+button.sm{min-height:32px;padding:3px 9px;font-size:12px}.shTb{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 10px}.shTb td,.shTb th{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left}.shTb th{color:var(--mute);font-weight:600}.shTb tr.tot td{font-weight:700}
+.shScroll{overflow-x:auto}.shEd input{min-height:34px;padding:4px 6px;min-width:64px;width:100%}.shChk{display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--line);border-radius:10px}.shChk input{width:22px;min-height:22px;margin:0}.shChk span{flex:1}
+.shBdg div{position:absolute;left:-30px;top:16px;width:60px;display:flex;justify-content:center;gap:3px;pointer-events:none}.shBdg b,.shBdg i{font:700 11px sans-serif;font-style:normal;padding:1px 4px;border-radius:6px;background:rgba(0,0,0,.72);color:#fff}
+.shTsk div{position:absolute;transform:translate(-50%,-100%);white-space:nowrap;font:600 12px sans-serif;padding:3px 7px;border-radius:8px;background:#fff;color:#1d4ed8;border:1.5px solid currentColor;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.shSnI div{position:absolute;transform:translate(-50%,-50%);font:700 16px sans-serif;color:var(--c);text-shadow:0 0 3px #000,0 0 2px #000;pointer-events:none}
+.shAtN div,.shCgN div,.shNom div,.shCgU div{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;font-weight:800;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff}.shAtN div{font-size:28px;color:#2f7cf6}.shCgN div{color:#d0158a}.shCgU div{font-size:11px;color:#d0158a;opacity:.85}.shNom div{font-size:13px;color:#0b6e4f}
+#shMap2{position:fixed;z-index:450;border-left:2px solid var(--signal);background:#ddd}#shMap2L{position:fixed;z-index:451;width:2px;pointer-events:none}#shMap2L span{position:absolute;top:70px;white-space:nowrap;font:700 12px sans-serif;padding:2px 8px;border-radius:8px;background:rgba(0,0,0,.65);color:#fff}#shMap2L span:first-child{right:8px}#shMap2L span:last-child{left:8px}
+#shBr{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:3000;padding:8px 10px;border-radius:14px;max-width:calc(100vw - 24px)}#shBr .row{flex-wrap:nowrap;align-items:center;margin:0}#shBr .brT{display:flex;flex-direction:column;min-width:140px;max-width:46vw;padding:0 6px}#shBr .brT small{color:var(--mute);white-space:pre-wrap}
+#shBrOv{position:fixed;inset:0;z-index:2990;cursor:crosshair}.shDot{position:fixed;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#ff2a1a;box-shadow:0 0 14px 6px rgba(255,42,26,.7);opacity:0;transition:opacity .4s;pointer-events:none}.shDot.on{opacity:1;transition:none}
 /* 6.55: стопка карт, подслои, меню, зоны, навигация */
 .mvCv{max-width:100%;max-height:60vh;display:block;margin:0 auto;border-radius:8px;cursor:crosshair}.mvTb{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;justify-content:center}.mvC{width:30px;height:30px;min-height:30px;padding:0;border-radius:50%;border:2px solid var(--line2)}.mvC.on{outline:2px solid var(--signal);outline-offset:2px}
 #popMenu{position:fixed;z-index:2950;display:none;flex-direction:column;gap:5px;padding:6px;border-radius:12px;min-width:220px;max-height:70vh;overflow:auto}
@@ -894,7 +909,7 @@ body.frame #fbarX{top:calc(var(--ft) + 8px)}#fbarX.on{display:flex}#fbarX span{c
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 
 <script id="skatMain" type="text/plain">
-const VERSION = 'версия 6.56';
+const VERSION = 'версия 6.57';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -936,7 +951,7 @@ function toSK(lat,lon,zone){const [bl,ll]=wgsToKrs(lat,lon);const z=zone||zoneOf
 const [n,e]=tmFwd(bl,ll,6*z-3);return {x:n,y:z*1e6+500000+e,zone:z};}
 function fromSK(x,y,zone){const z=zone||Math.floor(y/1e6);const [bl,ll]=tmInv(x,y-z*1e6-500000,6*z-3);
 const [la,lo]=krsToWgs(bl,ll);return [la,lo];}
-return {toSK,fromSK,zoneOf};
+return {toSK,fromSK,zoneOf,wgsToKrs,krsToWgs};
 })();
 const $ = id => document.getElementById(id);
 const YA = 'https://core-renderer-tiles.maps.yandex.net/tiles?l=';
@@ -967,11 +982,11 @@ const DEFAULT_PAL = [
 {color:PINK, name:'Розовый', glyph:'ЗМ'}, {color:PINK, name:'Розовый', glyph:'Вс'},
 {color:'#8a8a8a', name:'Серый', glyph:''}];
 const PAL_VER = 2;
-const state = { ftlog: saved.ftlog || [], ftasks: saved.ftasks || [], scenes: saved.scenes || [], trash: saved.trash || [], arrays: saved.arrays || [], layer: LAYERS[saved.layer] ? saved.layer : 'ya_map', grid: saved.grid !== false, full: saved.full === true, places: saved.places !== false, voice: saved.voice === true,
+const state = { sh: saved.sh || {}, ftlog: saved.ftlog || [], ftasks: saved.ftasks || [], scenes: saved.scenes || [], trash: saved.trash || [], arrays: saved.arrays || [], layer: LAYERS[saved.layer] ? saved.layer : 'ya_map', grid: saved.grid !== false, full: saved.full === true, places: saved.places !== false, voice: saved.voice === true,
 palette: (saved.palVer === PAL_VER && saved.palette) || DEFAULT_PAL.map(x => ({...x})) };
 let persistT = 0;
 function persistNow(){ clearTimeout(persistT);
-try{ const j__ = JSON.stringify({ftlog:state.ftlog, ftasks:state.ftasks, scenes:state.scenes, trash:state.trash, arrays:state.arrays, palette:state.palette, palVer:PAL_VER, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice}); if (window.SEC && SEC.key) SEC.save(j__); else localStorage.setItem(LS, j__); }catch(e){} histSnap(); }
+try{ const j__ = JSON.stringify({ftlog:state.ftlog, ftasks:state.ftasks, scenes:state.scenes, trash:state.trash, arrays:state.arrays, palette:state.palette, palVer:PAL_VER, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice, sh:state.sh}); if (window.SEC && SEC.key) SEC.save(j__); else localStorage.setItem(LS, j__); }catch(e){} histSnap(); }
 function persist(){ clearTimeout(persistT); persistT = setTimeout(persistNow, 400); }
 document.addEventListener('visibilitychange', () => { if (document.hidden) persistNow(); });
 addEventListener('pagehide', persistNow);
@@ -1923,7 +1938,7 @@ a.points.forEach(p => { const s = GEO.toSK(p.lat, p.lng); lines.push(`${String(p
 deliverFile(new Blob(['\uFEFF' + lines.join('\r\n')], {type:'text/csv'}), `${safeName(a.name)}.csv`, 'CSV с ориентирами готов');
 }
 function exportSession(){
-const data = {app:'skat', ver:1, saved:new Date().toISOString(), palette:state.palette, palVer:PAL_VER, arrays:state.arrays, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice, syms:SYMS, scenes:state.scenes};
+const data = {app:'skat', ver:1, saved:new Date().toISOString(), palette:state.palette, palVer:PAL_VER, arrays:state.arrays, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice, syms:SYMS, scenes:state.scenes, sh:state.sh};
 deliverFile(new Blob([JSON.stringify(data)], {type:'application/json'}), `СКАТ_сессия_${stamp()}.json`, 'Сессия готова — сохраните её в «Файлы»');
 }
 function importSession(text){
@@ -1932,7 +1947,7 @@ try { d = JSON.parse(text); } catch(e){ toast('Это не файл сессии
 if (!d || !Array.isArray(d.arrays)){ toast('В файле нет данных сессии'); return; }
 askConfirm(`Загрузить сессию (${d.arrays.length} слоёв)? Текущие данные будут заменены.`, 'Загрузить', () => {
 state.arrays = d.arrays.map(normArr);
-if (Array.isArray(d.scenes)) state.scenes = d.scenes;
+if (Array.isArray(d.scenes)) state.scenes = d.scenes; if (d.sh && typeof d.sh === 'object') state.sh = d.sh;
 if (Array.isArray(d.syms) && d.syms.length){ SYMS = d.syms; saveSyms(); }
 if (Array.isArray(d.palette) && d.palette.length) state.palette = d.palette;
 if (typeof d.grid === 'boolean'){ state.grid = d.grid; $('gridBtn').classList.toggle('on', state.grid); }
@@ -3807,7 +3822,7 @@ function topoScale(){ try { const c = map.getCenter(), mpp = 156543.03392 * Math
 window.addEventListener('error', e => { try { toast('Ошибка: ' + (e.message || e) + ' (' + String(e.filename || '').split('/').pop().split('?')[0] + ':' + (e.lineno || '') + ')'); } catch(x){} });
 window.addEventListener('unhandledrejection', e => { const r = e.reason; if (r && /^(mk|op|tp)$/.test(r.message)) return; try { toast('Ошибка: ' + ((r && r.message) || r)); } catch(x){} });
 // ======== МОДУЛИ: ЛЕНИВАЯ ЗАГРУЗКА (mk.js — Макет/3D, op.js — Оператор, tp.js — Боевой контур) ========
-const MODV = VERSION.replace(/^\D+/, ''), MODN = {mk:'«Макет»', op:'«Оператор»', tp:'«Боевой контур»'}, modP = {};
+const MODV = VERSION.replace(/^\D+/, ''), MODN = {mk:'«Макет»', op:'«Оператор»', tp:'«Боевой контур»', sh:'«Штаб»'}, modP = {};
 function modLoad(m){ if (window['__mod_' + m]) return Promise.resolve(); if (modP[m]) return modP[m];
 modP[m] = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = m + '.js?v=' + MODV; sc.onload = () => window['__mod_' + m] ? res() : rej(new Error(m));
 sc.onerror = () => { modP[m] = null; sc.remove(); toast(`Модуль ${MODN[m]} не загрузился — проверьте файл ${m}.js или интернет`); rej(new Error(m)); }; document.head.appendChild(sc); });
@@ -4413,6 +4428,10 @@ if (e.classList.contains('modal')){ const o = e.classList.contains('open'); if (
 if (e.matches && e.matches(POP)){ if (seen.has(e)) return; seen.add(e); popsOff(e); if (!CTX.has(e.id)) modsOff(); } else if (seen.has(e) && !e.classList.contains('modal')) seen.delete(e); }); } finally { busy = 0; } }).observe(document.body, {subtree:true, attributes:true, attributeFilter:['class']});
 let hook = 0; map.on('mousedown touchstart', () => { hook = !!(window.geoPickCb || window.mapTapHook); });
 map.on('preclick', () => { if (hook || window.geoPickCb || window.mapTapHook) return; popsOff(); modsOff(); const r = $('radial'); if (r && r.classList.contains('on') && typeof radClose === 'function') radClose(); }); }
+// ---- 6.57: модуль «Штаб» (sh.js) — кнопка в «Ещё» и фоновая загрузка (журнал, автокопии, напоминания)
+{ const b = document.createElement('button'); b.className = 'rb'; b.id = 'shBtn'; b.title = 'Штаб: документы, обстановка, расчёты'; b.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 21V4h11l-1 4h6v9h-9l1-4H4"/></svg>Штаб';
+b.onclick = () => modLoad('sh').then(() => window.shOpen && shOpen()).catch(() => {}); const R = RBG.find(r => r.o.id === 'rMore'); if (R) R.f.prepend(b); else $('rail').appendChild(b);
+setTimeout(() => modLoad('sh').catch(() => {}), 2500); }
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
 const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
