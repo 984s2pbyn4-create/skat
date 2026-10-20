@@ -540,6 +540,24 @@ body.frame #devStrip{top:calc(var(--ft) + 8px)}
 
 #symModal svg,.symb svg,.symico svg{filter:drop-shadow(0 0 1px rgba(255,255,255,.95)) drop-shadow(0 0 2px rgba(255,255,255,.6))}
 
+/* 6.59: роли, «Мой экран», чат */
+.rlLead{font-size:16px;font-weight:600;margin:4px 0 12px}.rlGrp,.rlHome{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.rlBig{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:104px;padding:12px 8px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:14px;font-weight:600;line-height:1.2;text-align:center}.rlBig b{font-size:28px;color:var(--signal);line-height:1}.rlBig:active{transform:scale(.97)}
+.rlList{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}.rlRow{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 14px;min-height:52px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:15px}.rlRow small{color:var(--mute);font-size:12px}
+.rlMe{display:flex;align-items:center;gap:10px;margin-bottom:10px}.rlMe>div{flex:1;display:flex;flex-direction:column}.rlMe b{font-size:17px}.rlMe small{color:var(--mute)}.rlFoot{justify-content:center}.rlFirst{flex-direction:column}
+.rlCols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:8px 0}.rlCard{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--panel2)}.rlCard h4{margin:0 0 6px;color:var(--mute);text-transform:uppercase;font-size:13px}.rlCard p{margin:4px 0}
+.rlLrn{text-align:center;padding:26px 18px;min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center}.rlIc{font-size:46px;color:var(--signal)}.rlLrn h3{margin:12px 0 6px}.rlLrn p{max-width:460px;line-height:1.45;color:var(--ink)}.rlDots{display:flex;gap:6px;margin-top:12px}.rlDots i{width:8px;height:8px;border-radius:50%;background:var(--line2)}.rlDots i.on{background:var(--signal)}.rlNav{justify-content:space-between}
+.rlTabs{flex-wrap:wrap;gap:6px}.rlTabs select{min-height:32px}.rlBdg{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:#e2533f;color:#fff;font:700 11px/18px sans-serif;text-align:center}#chatBtn{position:relative}#chatBtn .rlBdg{position:absolute;top:2px;right:2px;display:none}
+.rlChat{display:flex;flex-direction:column;gap:8px;max-height:46vh;min-height:160px;overflow:auto;padding:6px;border:1px solid var(--line);border-radius:12px;margin:6px 0}.rlMsg{align-self:flex-start;max-width:86%;padding:7px 10px;border-radius:12px 12px 12px 4px;background:var(--panel2);border:1px solid var(--line)}.rlMsg.me{align-self:flex-end;border-radius:12px 12px 4px 12px;background:var(--acc-soft)}.rlMsg small{display:block;color:var(--mute);font-size:11px}.rlMsg div{white-space:pre-wrap;word-break:break-word}.rlMsg span{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.rlSend textarea{width:100%}.rlSend .row{justify-content:flex-end}.rlQt{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.rlEvI div{position:absolute;transform:translate(-50%,-50%);font-size:20px;filter:drop-shadow(0 0 2px #000) drop-shadow(0 0 2px #000);pointer-events:auto}
+/* 6.58: Штаб — табло, роли, голос, подсветка */
+#shOd{position:fixed;inset:0;z-index:3500;display:none;background:var(--bg);color:var(--ink);padding:calc(20px + env(safe-area-inset-top)) 24px 24px;overflow:auto}#shOd.on{display:block}#shOd #odX{position:absolute;right:16px;top:calc(14px + env(safe-area-inset-top))}
+.odClk{font:800 clamp(56px,13vw,150px)/1 'Roboto Condensed',sans-serif;text-align:center;letter-spacing:2px;color:var(--signal)}.odDt{text-align:center;color:var(--mute);font-size:20px;margin:4px 0 10px}.odH{text-align:center;font:700 clamp(28px,6vw,56px)/1.2 sans-serif;margin:6px 0 16px}.odH small{font-size:16px;color:var(--mute)}
+.odG{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.odG>div{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--panel)}.odG h4{margin:0 0 8px;color:var(--mute);font-size:14px;text-transform:uppercase}.odG p{margin:5px 0;font-size:18px}.odG .mute{color:var(--mute)}
+body.shRO #newArrBtn,body.shRO #toolBtn,body.shRO #veBtn,body.shRO .rbpair,body.shRO #undoBtn,body.shRO #redoBtn,body.shRO #mixBtn,body.shRO #corrBtn,body.shRO #planBtn,body.shRO #ftBtn,body.shRO #faBtn,body.shRO .lmore,body.shRO #ptX,body.shRO #emptyCta{display:none!important}
+#shRoTag{position:fixed;left:50%;top:calc(4px + env(safe-area-inset-top));transform:translateX(-50%);z-index:1500;font:700 12px sans-serif;padding:3px 10px;border-radius:10px;background:#f5b100;color:#111;cursor:pointer}
+.shMic{margin:4px 0 8px}.shMic.on{background:#e2533f;color:#fff}.shRing{animation:shRing 1.6s ease-in-out infinite}@keyframes shRing{50%{stroke-opacity:.25}}.shFr{text-align:left;width:100%;color:var(--ink)}.shHelp{background:var(--acc-soft);padding:8px 10px;border-radius:10px}
 /* 6.57: Штаб */
 .shCard{max-width:760px}.shHd{display:flex;align-items:center;gap:8px;margin-bottom:6px}.shHd h3{flex:1;margin:0}.shBk{min-width:40px;padding:4px 10px}
 .shGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;margin-bottom:10px}.shTile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:76px;padding:8px 6px;font-size:12px;font-weight:600;line-height:1.15;text-align:center;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:12px}.shTile b{font-size:20px;color:var(--signal)}
@@ -909,7 +927,7 @@ body.frame #fbarX{top:calc(var(--ft) + 8px)}#fbarX.on{display:flex}#fbarX span{c
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 
 <script id="skatMain" type="text/plain">
-const VERSION = 'версия 6.57';
+const VERSION = 'версия 6.59';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -4431,7 +4449,7 @@ map.on('preclick', () => { if (hook || window.geoPickCb || window.mapTapHook) re
 // ---- 6.57: модуль «Штаб» (sh.js) — кнопка в «Ещё» и фоновая загрузка (журнал, автокопии, напоминания)
 { const b = document.createElement('button'); b.className = 'rb'; b.id = 'shBtn'; b.title = 'Штаб: документы, обстановка, расчёты'; b.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 21V4h11l-1 4h6v9h-9l1-4H4"/></svg>Штаб';
 b.onclick = () => modLoad('sh').then(() => window.shOpen && shOpen()).catch(() => {}); const R = RBG.find(r => r.o.id === 'rMore'); if (R) R.f.prepend(b); else $('rail').appendChild(b);
-setTimeout(() => modLoad('sh').catch(() => {}), 2500); }
+setTimeout(() => modLoad('sh').catch(() => {}), 300); }
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
 const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
