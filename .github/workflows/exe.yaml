@@ -1,0 +1,58 @@
+name: Build EXE
+on:
+  workflow_dispatch: {}
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Prepare web files (all libraries inside)
+        shell: bash
+        run: |
+          mkdir -p exe/app/lib
+          cp index.html mk.js op.js tp.js sh.js exe/app/
+          cp manifest.json icon-192.png icon-512.png exe/app/ 2>/dev/null || true
+          cd exe/app
+          curl -sfL -o lib/leaflet.min.css https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css
+          curl -sfL -o lib/leaflet.min.js https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js
+          curl -sfL -o lib/xlsx.full.min.js https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js
+          curl -sfL -o lib/leaflet-rotate-src.js https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js
+          curl -sfL -o lib/maplibre-gl.js https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js
+          curl -sfL -o lib/maplibre-gl.css https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css
+          curl -sfL -o lib/sql-wasm.js https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js
+          curl -sfL -o lib/sql-wasm.wasm https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.wasm
+          sed -i 's#https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/#lib/#g; s#https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/#lib/#g; s#https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/#lib/#g' index.html mk.js
+          grep -c 'lib/leaflet.min.js' index.html
+      - name: Electron shell
+        shell: bash
+        working-directory: exe
+        run: |
+          cat > main.js <<'JS'
+          const { app, BrowserWindow, protocol, net, shell, Menu } = require('electron');
+          const path = require('path'), { pathToFileURL } = require('url');
+          protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true } }]);
+          app.whenReady().then(() => {
+            protocol.handle('app', req => { let p = decodeURIComponent(new URL(req.url).pathname); if (p === '/' || p === '') p = '/index.html'; return net.fetch(pathToFileURL(path.join(__dirname, 'app', p)).toString()); });
+            Menu.setApplicationMenu(null);
+            const w = new BrowserWindow({ width: 1440, height: 900, show: false, backgroundColor: '#1b221d', title: 'СКАТ', icon: path.join(__dirname, 'app', 'icon-512.png'), webPreferences: { contextIsolation: true, spellcheck: false } });
+            w.maximize(); w.show(); w.loadURL('app://skat/index.html');
+            w.webContents.setWindowOpenHandler(({ url }) => { shell.openExternal(url); return { action: 'deny' }; });
+            w.webContents.on('before-input-event', (e, i) => { if (i.type === 'keyDown' && i.key === 'F11') { w.setFullScreen(!w.isFullScreen()); e.preventDefault(); } if (i.type === 'keyDown' && i.control && i.shift && i.key.toLowerCase() === 'i') w.webContents.toggleDevTools(); });
+          });
+          app.on('window-all-closed', () => app.quit());
+          JS
+          cat > package.json <<'PJ'
+          {"name":"skat","version":"1.0.0","description":"SKAT","author":"SKAT","main":"main.js",
+           "build":{"appId":"ru.skat.planshet","productName":"SKAT","files":["main.js","app/**/*"],
+           "win":{"target":"portable","icon":"app/icon-512.png"},"portable":{"artifactName":"SKAT.exe"},"directories":{"output":"dist"}}}
+          PJ
+          npm i -D electron@31 electron-builder@24 --no-audit --no-fund
+          npx electron-builder --win portable --x64 --publish never
+          ls dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SKAT-exe
+          path: exe/dist/SKAT.exe
