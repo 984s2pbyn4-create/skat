@@ -540,6 +540,8 @@ body.frame #devStrip{top:calc(var(--ft) + 8px)}
 
 #symModal svg,.symb svg,.symico svg{filter:drop-shadow(0 0 1px rgba(255,255,255,.95)) drop-shadow(0 0 2px rgba(255,255,255,.6))}
 
+/* 6.60: связь */
+.rlQr{background:#fff;padding:10px;border-radius:12px;max-width:440px;margin:0 auto}.rlQr svg{width:100%;height:auto;display:block}#chatBtn.netOn::after,#chatBtn.netLora::before{content:'';position:absolute;left:5px;top:5px;width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 2px var(--panel)}#chatBtn.netLora::before{left:15px;background:#2f7cf6}
 /* 6.59: роли, «Мой экран», чат */
 .rlLead{font-size:16px;font-weight:600;margin:4px 0 12px}.rlGrp,.rlHome{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:12px}
 .rlBig{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:104px;padding:12px 8px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:14px;font-weight:600;line-height:1.2;text-align:center}.rlBig b{font-size:28px;color:var(--signal);line-height:1}.rlBig:active{transform:scale(.97)}
@@ -927,7 +929,7 @@ body.frame #fbarX{top:calc(var(--ft) + 8px)}#fbarX.on{display:flex}#fbarX span{c
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 
 <script id="skatMain" type="text/plain">
-const VERSION = 'версия 6.59';
+const VERSION = 'версия 6.61';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
