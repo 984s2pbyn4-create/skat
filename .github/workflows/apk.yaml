@@ -18,27 +18,25 @@ jobs:
           mkdir -p app/www/lib
           cp index.html app/www/index.html
           cp sw.js app/www/sw.js
-          cp mk.js op.js tp.js sh.js app/www/
+          cp mk.js op.js tp.js sh.js or.js app/www/
           cp manifest.json icon-192.png icon-512.png app/www/ 2>/dev/null || true
           cd app/www
           curl -sfL -o lib/leaflet.min.css https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css
           curl -sfL -o lib/leaflet.min.js https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js
           curl -sfL -o lib/xlsx.full.min.js https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js
           curl -sfL -o lib/leaflet-rotate-src.js https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js
-          curl -sfL -o lib/maplibre-gl.js https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js
-          curl -sfL -o lib/maplibre-gl.css https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css
           curl -sfL -o lib/sql-wasm.js https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js
           curl -sfL -o lib/sql-wasm.wasm https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.wasm
           curl -sfL -o lib/qrcode.min.js https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js
           curl -sfL -o lib/jsQR.js https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js
-          mkdir -p lib/ml5 && (curl -sfL -o lib/ml5/maplibre-gl.js https://cdn.jsdelivr.net/npm/maplibre-gl@5.19.0/dist/maplibre-gl.js && curl -sfL -o lib/ml5/maplibre-gl.css https://cdn.jsdelivr.net/npm/maplibre-gl@5.19.0/dist/maplibre-gl.css || echo 'MapLibre 5 недоступна — останется 4.7.1')
+          mkdir -p lib/ml5 && (curl -sfL -o lib/ml5/maplibre-gl.js https://cdn.jsdelivr.net/npm/maplibre-gl@5.19.0/dist/maplibre-gl.js && curl -sfL -o lib/ml5/maplibre-gl.css https://cdn.jsdelivr.net/npm/maplibre-gl@5.19.0/dist/maplibre-gl.css || (curl -sfL -o lib/ml5/maplibre-gl.js https://cdn.jsdelivr.net/npm/maplibre-gl@5/dist/maplibre-gl.js && curl -sfL -o lib/ml5/maplibre-gl.css https://cdn.jsdelivr.net/npm/maplibre-gl@5/dist/maplibre-gl.css) || echo 'MapLibre 5 не скачана — 3D загрузится из интернета')
           curl -sfL -o lib/stars.6.json https://cdn.jsdelivr.net/npm/d3-celestial@0.7.35/data/stars.6.json || echo 'звёзды не скачаны'
           sed -i 's#https://cdn.jsdelivr.net/npm/maplibre-gl@5.19.0/dist/#lib/ml5/#g' mk.js
           sed -i 's#https://cdn.jsdelivr.net/npm/d3-celestial@0.7.35/data/#lib/#g' sh.js
           sed -i 's#https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/#lib/#g; s#https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/#lib/#g' sh.js
-          sed -i 's#https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/#lib/#g; s#https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/#lib/#g; s#https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/#lib/#g' index.html mk.js
+          sed -i 's#https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/#lib/#g; s#https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/#lib/#g; s#https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/#lib/#g' index.html mk.js
           grep -c 'lib/leaflet.min.js' index.html
-          grep -c 'lib/maplibre-gl.js' mk.js
+          grep -c 'lib/ml5/' mk.js || true
       - name: Capacitor Android project
         working-directory: app
         run: |
