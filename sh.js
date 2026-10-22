@@ -1,6 +1,6 @@
 // СКАТ — модуль «Штаб»: штамп и атлас при печати, журнал, сводка, донесения, строевая записка, снимки обстановки, график от «Ч», режим доклада, подразделения, задачи, заметки, история правок,
 // рубежи и полосы, ориентиры, кодированная сетка, разграфка листов, две карты, шаблоны карт, расчёт марша, калькулятор, солнце и луна, позывные, пакет изменений, автокопии, чек-листы.
-// Грузится лениво из index.html (modLoad('sh')). Версия 6.62
+// Грузится лениво из index.html (modLoad('sh')). Версия 6.63
 window.__mod_sh = 1;
 (() => {
 const E = escapeHtml, now = () => Date.now();
@@ -1298,4 +1298,18 @@ if (typeof TIPS !== 'undefined' && Array.isArray(TIPS)) TIPS.push('Штаб → 
 P.sbx = b => { if (devCalc().q === 0){ b.innerHTML = '<p class="status">«Макет» выключен для этого устройства. Включить: Штаб → Устройство и качество.</p>'; return; } b.innerHTML = '<p class="status">Выделите на карте участок от 0,3 до 20 км — построится объёмный макет с подставкой, снимком, тенями, сеткой СК-42, горизонталями, знаками, зоной видимости и звёздным небом. Данные участка сохраняются в кэше и потом работают без сети.</p><div class="row"><button class="primary" id="sbxG">Выделить участок</button><button class="ghost" id="sbxD">Демонстрация без сети</button></div>';
 $('sbxG').onclick = () => { closeModals(); modLoad('mk').then(() => window.sbStart && sbStart()).catch(() => toast('Модуль «Макет» не загрузился')); }; $('sbxD').onclick = () => { closeModals(); modLoad('mk').then(() => window.sbDemo && sbDemo()).catch(() => {}); }; };
 HUB[2][1].unshift(['sbx', 'Макет участка (3D)', '🧱']); TTL.sbx = 'Макет участка'; COMMON.push('sbx'); HELP.sbx = 'Один палец — вращение, два — масштаб и сдвиг, двойное касание — центр. Провести вверх у земли или «⤒ В небо» — звёзды; касание светила — азимут и д.у.';
+// ======== 6.63: ориентирование — привязка ОП по светилам, ориентиры, AR ========
+P.orn = b => { const L1 = []; state.arrays.forEach(a => a.points.forEach((p, i) => { if (p.orient) L1.push({a, i, p}); })); L1.sort((x, y) => y.p.orient.t - x.p.orient.t);
+const fu = u => { u = Math.round(u * 10) / 10; const bg = Math.floor(u / 100), sm = u - bg * 100; return bg + '-' + sm.toFixed(sm % 1 ? 1 : 0).replace('.', ',').padStart(sm % 1 ? 4 : 2, '0'); };
+b.innerHTML = `<p class="rlLead">Привязка огневой позиции по небесным телам, ориентиры для точки наводки, AR-небо в камере и место по светилам без GPS.</p><div class="rlHome"><button class="rlBig" id="ornP"><b>🧭</b><span>Привязать ОП — знак или точка на карте</span></button><button class="rlBig" id="ornG"><b>⌖</b><span>С моего места (GPS)</span></button><button class="rlBig" id="ornC"><b>✛</b><span>Из центра карты</span></button><button class="rlBig" id="ornS"><b>🧱</b><span>Вид с точки на «Макете участка»</span></button></div>
+<p class="status">Быстрее всего: удержите палец на знаке орудия, САУ, миномёта, РСЗО или батареи на ОП → «Привязать ОП». В окне привязки: 📷 AR — небо в камере, 📍 «Где я» — место по 3–5 светилам, 🏠 «Ориентиры» — вышки, трубы, церкви, отдельные деревья и дома, видимые с ОП.</p>
+${L1.length ? `<div class="flabel">Последние привязки</div><div class="shList">${L1.slice(0, 20).map((x, k) => `<div class="shRow" data-k="${k}"><small>${dt(x.p.orient.t)} · ${E(x.p.orient.by || '')}</small><div><b>${E(labelOf(x.a, x.i))}</b> — α ОН ${fu(x.p.orient.a)}, приёмов ${x.p.orient.n}, расхождение ${fu(x.p.orient.sp || 0)}</div></div>`).join('')}</div>` : ''}`;
+$('ornP').onclick = () => { closeModals(); toast('Коснитесь знака ОП или точки на карте'); window.geoPickCb = ll => { const q = map.latLngToContainerPoint(ll); let best = null, bd = 50; state.arrays.forEach(a => { if (a.hidden) return; a.points.forEach((p, i) => { if (!orIsOP(a, p)) return; const r = map.latLngToContainerPoint([p.lat, p.lng]), d = Math.hypot(r.x - q.x, r.y - q.y); if (d < bd){ bd = d; best = {a, i}; } }); }); orGo(best || {lat:ll.lat, lng:ll.lng, name:'точка на карте', fresh:1}); }; };
+$('ornG').onclick = () => { if (typeof GPS === 'undefined' || !GPS.pos){ toast('Нет GPS — включите GPS на карте'); return; } closeModals(); orGo({lat:GPS.pos[0], lng:GPS.pos[1], name:'моё место (GPS)', fresh:1}); };
+$('ornC').onclick = () => { const c = map.getCenter(); closeModals(); orGo({lat:c.lat, lng:c.lng, name:'центр карты', fresh:1}); }; $('ornS').onclick = () => go('sbx');
+b.querySelectorAll('.shRow[data-k]').forEach(r => r.onclick = () => { const x = L1[+r.dataset.k]; closeModals(); orGo({a:x.a, i:x.i}); }); };
+HUB[3][1].unshift(['orn', 'Ориентирование: привязка ОП, AR', '🧭']); TTL.orn = 'Ориентирование'; COMMON.push('orn');
+HELP.orn = 'Привязка: выберите подсвеченное светило — программа покажет дирекционный угол на момент «ноль» (через 30 с) и начнёт отсчёт. В «ноль» снимите отсчёт прибором, введите отсчёты — получите α ОН. «Повторить» — новый момент. Сверьте часы по сигналу точного времени (⚙).';
+if (POSX.art && POSX.art.home){ const i = POSX.art.home.findIndex(h => h[0] === 'code'); if (i >= 0) POSX.art.home[i] = ['orn', 'Привязка ОП', '🧭']; else POSX.art.home.push(['orn', 'Привязка ОП', '🧭']); }
+if (POSX.opp && POSX.opp.home) POSX.opp.home.push(['orn', 'Привязка ОП', '🧭']);
 })();

@@ -929,7 +929,7 @@ body.frame #fbarX{top:calc(var(--ft) + 8px)}#fbarX.on{display:flex}#fbarX span{c
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 
 <script id="skatMain" type="text/plain">
-const VERSION = 'версия 6.62';
+const VERSION = 'версия 6.63';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -3842,7 +3842,7 @@ function topoScale(){ try { const c = map.getCenter(), mpp = 156543.03392 * Math
 window.addEventListener('error', e => { try { toast('Ошибка: ' + (e.message || e) + ' (' + String(e.filename || '').split('/').pop().split('?')[0] + ':' + (e.lineno || '') + ')'); } catch(x){} });
 window.addEventListener('unhandledrejection', e => { const r = e.reason; if (r && /^(mk|op|tp)$/.test(r.message)) return; try { toast('Ошибка: ' + ((r && r.message) || r)); } catch(x){} });
 // ======== МОДУЛИ: ЛЕНИВАЯ ЗАГРУЗКА (mk.js — Макет/3D, op.js — Оператор, tp.js — Боевой контур) ========
-const MODV = VERSION.replace(/^\D+/, ''), MODN = {mk:'«Макет»', op:'«Оператор»', tp:'«Боевой контур»', sh:'«Штаб»'}, modP = {};
+const MODV = VERSION.replace(/^\D+/, ''), MODN = {mk:'«Макет»', op:'«Оператор»', tp:'«Боевой контур»', sh:'«Штаб»', or:'«Ориентирование»'}, modP = {};
 function modLoad(m){ if (window['__mod_' + m]) return Promise.resolve(); if (modP[m]) return modP[m];
 modP[m] = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = m + '.js?v=' + MODV; sc.onload = () => window['__mod_' + m] ? res() : rej(new Error(m));
 sc.onerror = () => { modP[m] = null; sc.remove(); toast(`Модуль ${MODN[m]} не загрузился — проверьте файл ${m}.js или интернет`); rej(new Error(m)); }; document.head.appendChild(sc); });
@@ -4452,6 +4452,15 @@ map.on('preclick', () => { if (hook || window.geoPickCb || window.mapTapHook) re
 { const b = document.createElement('button'); b.className = 'rb'; b.id = 'shBtn'; b.title = 'Штаб: документы, обстановка, расчёты'; b.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 21V4h11l-1 4h6v9h-9l1-4H4"/></svg>Штаб';
 b.onclick = () => modLoad('sh').then(() => window.shOpen && shOpen()).catch(() => {}); const R = RBG.find(r => r.o.id === 'rMore'); if (R) R.f.prepend(b); else $('rail').appendChild(b);
 setTimeout(() => modLoad('sh').catch(() => {}), 300); }
+// ======== 6.63: ориентирование — «Привязать ОП» у знаков огневых позиций (удержание пальца, карточка, правая кнопка мыши) ========
+function orIsOP(a, p){ if (!a || !p || a.kind === 'aux' || a.fplan || a.zones || a.meetL) return false; if (p.fa) return true; const k = itKind(a, p); if (['gun', 'sau', 'rszo', 'mortar'].includes(k)) return true; const sid = p.sym || a.sym, s0 = sid && SYM_BY[sid]; return !!(s0 && /(^|[^А-Яа-яЁё])ОП([^А-Яа-яЁё]|$)|огнев[а-я]* позиц|батаре|орудие|гаубиц|миномёт|БМ /i.test(s0.n || '')); }
+function orGo(o){ modLoad('or').then(() => window.orOpen && orOpen(o)).catch(() => toast('Модуль «Ориентирование» не загрузился — проверьте файл or.js или интернет')); }
+const OR_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><path d="M15 9l-4.5 1.5L9 15l4.5-1.5z"/></svg>';
+{ const f0 = openObjMenu; openObjMenu = function(h, x, y){ const p = h && h.a && h.a.points[h.i]; if (!p || !orIsOP(h.a, p)) return f0.apply(this, arguments); const r0 = radPush;
+radPush = function(t, items){ radPush = r0; items.splice(Math.max(0, items.length - 1), 0, {t:'Привязать ОП', ic:OR_IC, go:() => { closeRadial(); orGo({a:h.a, i:h.i}); }}); return r0.call(this, t, items); }; try { return f0.apply(this, arguments); } finally { radPush = r0; } }; }
+{ const f0 = openRadial; openRadial = function(x, y, ll){ if (!('ontouchstart' in window) && !session && !tool.on && !document.querySelector('.modal.open')){ const h = hitPoint(x, y); if (h && h.i != null && orIsOP(h.a, h.a.points[h.i])) return openObjMenu(h, x, y); } return f0.apply(this, arguments); }; }
+setTimeout(() => { try { if (navigator.onLine !== false) fetch('or.js?v=' + MODV).catch(() => {}); } catch(e){} }, 9000);
+{ const f0 = ptExtra; ptExtra = function(a, i){ const r = f0.apply(this, arguments), p = a && a.points[i], w = $('ptX'); if (p && w && orIsOP(a, p) && !w.querySelector('.orPB')){ const b = document.createElement('button'); b.className = 'ghost orPB'; const u = p.orient ? Math.round(p.orient.a) : null; b.textContent = '🧭 Привязать ОП' + (u != null ? ` · α ОН ${Math.floor(u / 100)}-${String(u % 100).padStart(2, '0')}` : ''); b.onclick = () => { closeModals(); orGo({a, i}); }; w.appendChild(b); } return r; }; }
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
 const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
