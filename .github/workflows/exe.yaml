@@ -13,7 +13,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p exe/app/lib
-          cp index.html mk.js op.js tp.js sh.js or.js exe/app/
+          cp index.html mk.js op.js tp.js sh.js or.js ed.js exe/app/
           cp manifest.json icon-192.png icon-512.png exe/app/ 2>/dev/null || true
           cd exe/app
           curl -sfL -o lib/leaflet.min.css https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css

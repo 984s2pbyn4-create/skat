@@ -18,7 +18,7 @@ jobs:
           mkdir -p app/www/lib
           cp index.html app/www/index.html
           cp sw.js app/www/sw.js
-          cp mk.js op.js tp.js sh.js or.js app/www/
+          cp mk.js op.js tp.js sh.js or.js ed.js app/www/
           cp manifest.json icon-192.png icon-512.png app/www/ 2>/dev/null || true
           cd app/www
           curl -sfL -o lib/leaflet.min.css https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css
