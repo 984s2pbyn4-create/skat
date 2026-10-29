@@ -42,8 +42,9 @@ try {
 const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
 const mg = mm(8), th = title ? mm(11) : 0, fh = mm(7), ox0 = mg, oy0 = mg + th, ow = W - 2 * mg, oh = H - 2 * mg - th - fh, fb = grid ? mm(9) : 0, ix0 = ox0 + fb, iy0 = oy0 + fb, iw = ow - 2 * fb, ih = oh - 2 * fb;
 let FRAME = null;
-const Ws = map.getSize().x, Hs = map.getSize().y, c = map.getCenter(), a0 = map.containerPointToLatLng([Ws / 2 - 50, Hs / 2]), a1 = map.containerPointToLatLng([Ws / 2 + 50, Hs / 2]), mpp = distM(a0, a1) / 100;
+const Ws = map.getSize().x, Hs = map.getSize().y, PS = window.edPrnArea ? window.edPrnArea() : null, c = PS ? L.latLng(PS.c[0], PS.c[1]) : map.getCenter(), a0 = map.containerPointToLatLng([Ws / 2 - 50, Hs / 2]), a1 = map.containerPointToLatLng([Ws / 2 + 50, Hs / 2]), mpp = distM(a0, a1) / 100;
 let wm = Ws * mpp, hm = Hs * mpp; if (iw / ih > wm / hm) hm = wm * ih / iw; else wm = hm * iw / ih;
+const SC0 = +(($('prnScale') || {}).value || 0) || (PS ? PS.scale : 0); if (SC0 > 0){ wm = iw / mm(1) * SC0 / 1000; hm = ih / mm(1) * SC0 / 1000; }
 const bk = LAYERS[$('prnBase').value] ? $('prnBase').value : state.layer, def = LAYERS[bk], crs = crsOf(bk), z0 = map.getZoom();
 const pq = +$('prnQ').value; let zt = Math.min(def.max, pq + Math.max(Math.floor(z0), Math.round(z0 + Math.log2((wm / iw) > 0 ? mpp / (wm / iw) : 1))));
 const pc = crs.latLngToPoint(c, zt); let mz = mpp * Math.pow(2, z0 - zt);
@@ -52,14 +53,15 @@ const pc2 = crs.latLngToPoint(c, zt), hw = wm / mz / 2, hh = hm / mz / 2, bx0 = 
 const toC = ll => { const p = crs.latLngToPoint(L.latLng(ll), zt); return [ix0 + (p.x - bx0) * f, iy0 + (p.y - by0) * f]; };
 g.save(); g.beginPath(); g.rect(ix0, iy0, iw, ih); g.clip(); g.fillStyle = '#e9ece6'; g.fillRect(ix0, iy0, iw, ih);
 let miss = 0; const tx0 = Math.floor(bx0 / 256), tx1 = Math.floor((bx0 + 2 * hw) / 256), ty0 = Math.floor(by0 / 256), ty1 = Math.floor((by0 + 2 * hh) / 256), jobs = [];
-for (const tpl of def.urls) for (let tx = tx0; tx <= tx1; tx++) for (let ty = ty0; ty <= ty1; ty++) jobs.push([tpl, tx, ty]);
+if (!(PS && PS.img)) for (const tpl of def.urls) for (let tx = tx0; tx <= tx1; tx++) for (let ty = ty0; ty <= ty1; ty++) jobs.push([tpl, tx, ty]);
 for (let q = 0; q < jobs.length; q += 8){ netMsg(`Готовлю лист: подложка ${Math.min(q + 8, jobs.length)} из ${jobs.length}…`);
 const part = await Promise.all(jobs.slice(q, q + 8).map(async ([tpl, tx, ty]) => [tx, ty, await (async () => { try { const b = await tileFb(tpl, zt, tx, ty); return b ? await createImageBitmap(b) : null; } catch(e){ return null; } })()]));
 part.forEach(([tx, ty, bm]) => { if (bm){ g.drawImage(bm, ix0 + (tx * 256 - bx0) * f, iy0 + (ty * 256 - by0) * f, 256 * f + 1, 256 * f + 1); try { bm.close(); } catch(e){} } else miss++; }); }
+if (PS && PS.draw) try { await PS.draw(g, toC); } catch(e){ console.warn('ed prn', e); }
 const sc = dpi / 110;
 if (grid){
 const corners = [[0, 0], [1, 0], [0, 1], [1, 1]].map(([u, v]) => crs.pointToLatLng(L.point(bx0 + u * 2 * hw, by0 + v * 2 * hh), zt)), zone = GEO.toSK(c.lat, c.lng).zone;
-const S1 = corners.map(q => GEO.toSK(q.lat, q.lng, zone)), X0 = Math.min(...S1.map(q => q.x)), X1 = Math.max(...S1.map(q => q.x)), Y0 = Math.min(...S1.map(q => q.y)), Y1 = Math.max(...S1.map(q => q.y)), st = (X1 - X0) > 20000 ? 5000 : (X1 - X0) > 9000 ? 2000 : 1000;
+const S1 = corners.map(q => GEO.toSK(q.lat, q.lng, zone)), X0 = Math.min(...S1.map(q => q.x)), X1 = Math.max(...S1.map(q => q.x)), Y0 = Math.min(...S1.map(q => q.y)), Y1 = Math.max(...S1.map(q => q.y)), st = PS && PS.st ? PS.st : (X1 - X0) > 20000 ? 5000 : (X1 - X0) > 9000 ? 2000 : 1000;
 g.strokeStyle = 'rgba(20,20,20,.8)'; g.lineWidth = Math.max(1, sc * .8);
 const xs = [], ys = [];
 for (let y = Math.ceil(Y0 / st) * st; y <= Y1; y += st){ const a1 = toC(GEO.fromSK(X0, y, zone)), b1 = toC(GEO.fromSK(X1, y, zone)); g.beginPath(); g.moveTo(...a1); g.lineTo(...b1); g.stroke(); ys.push([y, a1, b1]); }

@@ -58,7 +58,7 @@ const on = (b, sel, ev, fn) => b.querySelectorAll(sel).forEach(x => x.addEventLi
 const IT = new Map(); let itInit = false, inDiff = 0, dT = 0;
 const strip = o => JSON.stringify(o, (k, v) => (k === 'uid' || k === 'ed' || k === 'hv' || k === 'notes' || k === 'hid') ? undefined : v);
 const uidN = () => Math.random().toString(36).slice(2, 10);
-function diff(){ const t = now(), au = me(), seen = new Set(), ev = {}, msgs = []; let ch = 0;
+function diff(){ if (window.SKAT_ED) return 0; const t = now(), au = me(), seen = new Set(), ev = {}, msgs = []; let ch = 0;
 const bump = (a, k) => { const c = ev[a.name] = ev[a.name] || [0, 0, 0]; c[k]++; };
 state.arrays.forEach(a => { if (isMk(a)) return; ['points', 'shapes', 'texts'].forEach(f => (a[f] || []).forEach(o => {
 if (!o || typeof o !== 'object') return; if (!o.uid || seen.has(o.uid)){ o.uid = uidN(); ch = 1; } seen.add(o.uid);
@@ -111,7 +111,7 @@ const stJson = () => JSON.stringify({ftlog:state.ftlog, ftasks:state.ftasks, sce
 const nObj = arrs => arrs.reduce((s, a) => s + (a.points || []).length + (a.shapes || []).length + (a.texts || []).length, 0);
 let bakH = '', bakT = lsGet('skat_bak_t', 0);
 const hsh = s => { let h = 5381; for (let i = 0; i < s.length; i++) h = (h * 33 ^ s.charCodeAt(i)) >>> 0; return h.toString(36) + ':' + s.length; };
-async function bakNow(force){ const j = stJson(), h = hsh(j); if (!force && h === bakH) return false; const t = now();
+async function bakNow(force){ if (window.SKAT_ED) return false; const j = stJson(), h = hsh(j); if (!force && h === bakH) return false; const t = now();
 await bput('b', t, {t, n:nObj(state.arrays), sz:j.length}, j); bakH = h; bakT = t; lsSet('skat_bak_t', t);
 const L1 = (await blist('b')).sort((p, q) => p.k - q.k); for (const x of L1.slice(0, Math.max(0, L1.length - 20))) await bdel('b', x.k); return true; }
 setInterval(() => { if (S.bakMin > 0 && now() - bakT >= S.bakMin * 60000) bakNow().catch(e => console.warn('bak', e)); }, 60000);
@@ -480,7 +480,7 @@ draw(); $('asD').onchange = draw; };
 
 // ===== пакет изменений =====
 const lHash = a => hsh(JSON.stringify(a, (k, v) => (k === 'ed' || k === 'hv') ? undefined : v));
-function pkgDiff(){ const cur = state.arrays.filter(a => !isMk(a)), ch = cur.filter(a => S.xh[a.id] !== lHash(a)), del = Object.keys(S.xh).filter(id => !cur.some(a => String(a.id) === id)); return {ch, del}; }
+function pkgDiff(){ if (window.SKAT_ED) return {ch:[], del:[]}; const cur = state.arrays.filter(a => !isMk(a)), ch = cur.filter(a => S.xh[a.id] !== lHash(a)), del = Object.keys(S.xh).filter(id => !cur.some(a => String(a.id) === id)); return {ch, del}; }
 const pkgBase = () => { S.xh = Object.fromEntries(state.arrays.filter(a => !isMk(a)).map(a => [a.id, lHash(a)])); S.xt = now(); save(); };
 function pkgMake(){ const {ch, del} = pkgDiff(); if (!ch.length && !del.length){ toast('Изменений с прошлого обмена нет'); return; }
 const d = {app:'skat', pkg:1, from:me(), t:now(), since:S.xt || 0, layers:ch, del}; deliverFile(new Blob([JSON.stringify(d)], {type:'application/json'}), `СКАТ_пакет_${stamp()}.json`, `Пакет: слоёв ${ch.length}${del.length ? ', удалено ' + del.length : ''}`);
@@ -711,7 +711,7 @@ if ($('rlE')) $('rlE').onclick = () => { if (pin){ const p = prompt('PIN ред�
 const devId = lsGet('skat_dev', '') || (() => { const d = uidN() + uidN(); lsSet('skat_dev', d); return d; })();
 const syD = () => S.sy || (S.sy = {url:'', ch:'skat', auto:0, seq:0, xh:{}, last:0, err:''});
 let syT = 0, syBusy = 0;
-async function syncNow(quiet){ const Y = syD(); if (!Y.url || syBusy) return; syBusy = 1; const base = Y.url.replace(/\/+$/, ''); try {
+async function syncNow(quiet){ if (window.SKAT_ED) return; const Y = syD(); if (!Y.url || syBusy) return; syBusy = 1; const base = Y.url.replace(/\/+$/, ''); try {
 const cur = state.arrays.filter(a => !isMk(a)), ch = cur.filter(a => Y.xh[a.id] !== lHash(a)), del = Object.keys(Y.xh).filter(id => !cur.some(a => String(a.id) === id));
 if (ch.length || del.length){ const r = await fetch(base + '/push', {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({ch:Y.ch, from:devId, au:me(), t:now(), layers:ch, del})}); if (!r.ok) throw new Error('сервер ответил ' + r.status); ch.forEach(a => { Y.xh[a.id] = lHash(a); }); del.forEach(id => delete Y.xh[id]); }
 const r2 = await fetch(`${base}/pull?ch=${encodeURIComponent(Y.ch)}&after=${Y.seq || 0}`); if (!r2.ok) throw new Error('сервер ответил ' + r2.status); const d = await r2.json(); let nw = 0, up = 0, rm = 0;
@@ -994,7 +994,7 @@ if (Y.alive && L1.includes(Y.alive)){ L1.splice(L1.indexOf(Y.alive), 1); L1.unsh
 for (const u of L1){ try { const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 8000); const r = await fetch(u.replace(/\/+$/, '') + path, Object.assign({signal:ac.signal}, opt || {})); clearTimeout(tm); if (!r.ok) throw new Error('сервер ответил ' + r.status); Y.alive = u; Y.aliveT = now(); return r; } catch(e){ err = e.name === 'AbortError' ? new Error('нет ответа') : e; } } Y.aliveT = 0; throw err; }
 const srvOn = () => { const Y = syD(), N = NET(); return (Y.url && !N.off.lan) || (Y.url2 && !N.off.inet); };
 const srvAlive = () => syD().aliveT && now() - syD().aliveT < 60000;
-syncNow = async function(quiet){ const Y = syD(); if (!srvOn() || syBusy) return; syBusy = 1; try {
+syncNow = async function(quiet){ if (window.SKAT_ED) return; const Y = syD(); if (!srvOn() || syBusy) return; syBusy = 1; try {
 const cur = state.arrays.filter(a => !isMk(a)), ch = cur.filter(a => Y.xh[a.id] !== lHash(a)), del = Object.keys(Y.xh).filter(id => !cur.some(a => String(a.id) === id));
 if (ch.length || del.length){ const body = {ch:Y.ch, from:devId, au:me(), t:now()}; if (CK) body.e = await encS(JSON.stringify({layers:ch, del, au:me()})); else Object.assign(body, {layers:ch, del}); await srv('/push', {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(body)}); ch.forEach(a => { Y.xh[a.id] = lHash(a); }); del.forEach(id => delete Y.xh[id]); }
 const d = await (await srv(`/pull?ch=${encodeURIComponent(Y.ch)}&after=${Y.seq || 0}`)).json(); let nw = 0, up = 0, rm = 0, bad = 0;

@@ -611,6 +611,7 @@ body.frame #fbarX{top:calc(var(--ft) + 8px)}#fbarX.on{display:flex}#fbarX span{c
 <div id="dlbar"><span id="dlbarT"></span><button class="danger" id="dlbarStop">Стоп</button></div>
 <div id="rail">
 <button class="rb" id="modeBtn" title="Раздел"><svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg><span>Раздел</span></button>
+<button class="rb" id="edBtn" title="Проект" style="display:none"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg>Проект</button>
 <div class="rbpair"><button class="rb" id="undoBtn" title="Отменить">↶</button><button class="rb" id="redoBtn" title="Повторить">↷</button></div>
 <button class="rb accent" id="newArrBtn" title="Добавить"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Добавить</button>
 <button class="rb" id="layBtn" title="Слои"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>Слои</button>
@@ -831,7 +832,8 @@ body.frame #fbarX{top:calc(var(--ft) + 8px)}#fbarX.on{display:flex}#fbarX span{c
 <div id="launch"><div class="lc"><div id="lcSeal"></div><h2>СКАТ</h2><p>Выберите раздел</p>
 <button data-m="op"><b>Оператор</b><small>Нанесение обстановки, тактические знаки, надписи, оформление и печать, импорт и экспорт</small></button>
 <button data-m="tp"><b>Боевой контур</b><small>Точки, массивы, маршруты, инструменты, таблицы Excel</small></button>
-<button data-m="mk"><b>Макет</b><small>3D-рельеф местности, модели, анимация</small></button></div></div>
+<button data-m="mk"><b>Макет</b><small>3D-рельеф местности, модели, анимация</small></button>
+<button data-m="ed"><b>Редактор</b><small>Проекты карт для печати: подложка — участок карты или свой файл, формат листа, масштаб, рамка с сеткой</small></button></div></div>
 <div class="modal" id="addModal"><div class="card"><h3 id="addTitle">Добавить</h3><div class="addgrid" id="addGrid"></div><div class="row" style="margin-top:10px"><button class="ghost" data-close>Отмена</button></div></div></div>
 <div class="modal" id="spModal"><div class="card big"><h3>Знаки</h3><label class="f"><input id="spQ" placeholder="Поиск по названию или категории" autocomplete="off"></label><div class="colors strip" id="spCats"></div><div class="spgrid" id="spGrid"></div><div class="row" style="margin-top:10px"><button class="ghost" data-close>Отмена</button></div></div></div>
 <div class="modal" id="trashModal"><div class="card big"><h3>Корзина</h3><div id="trashList"></div><div class="row" style="margin-top:10px"><button class="danger" id="trashClr">Очистить корзину</button><button class="ghost" data-close>Закрыть</button></div></div></div>
@@ -929,7 +931,7 @@ body.frame #fbarX{top:calc(var(--ft) + 8px)}#fbarX.on{display:flex}#fbarX span{c
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 
 <script id="skatMain" type="text/plain">
-const VERSION = 'версия 6.64';
+const VERSION = 'версия 6.65';
 const hist = {stack:[], i:-1, mute:false};
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 let framed = false; try { framed = window.self !== window.top; } catch(e){ framed = true; }
@@ -1006,7 +1008,7 @@ const state = { sh: saved.sh || {}, ftlog: saved.ftlog || [], ftasks: saved.ftas
 palette: (saved.palVer === PAL_VER && saved.palette) || DEFAULT_PAL.map(x => ({...x})) };
 let persistT = 0;
 function persistNow(){ clearTimeout(persistT);
-try{ const j__ = JSON.stringify({ftlog:state.ftlog, ftasks:state.ftasks, scenes:state.scenes, trash:state.trash, arrays:state.arrays, palette:state.palette, palVer:PAL_VER, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice, sh:state.sh}); if (window.SEC && SEC.key) SEC.save(j__); else localStorage.setItem(LS, j__); }catch(e){} histSnap(); }
+try{ const j__ = JSON.stringify({ftlog:state.ftlog, ftasks:state.ftasks, scenes:state.scenes, trash:state.trash, arrays:(window.SKAT_ED ? SKAT_ED.main : state.arrays), palette:state.palette, palVer:PAL_VER, layer:state.layer, grid:state.grid, full:state.full, places:state.places, voice:state.voice, sh:state.sh}); if (window.SEC && SEC.key) SEC.save(j__); else localStorage.setItem(LS, j__); }catch(e){} if (window.SKAT_ED) try { SKAT_ED.save(); } catch(e){ console.warn('ed', e); } histSnap(); }
 function persist(){ clearTimeout(persistT); persistT = setTimeout(persistNow, 400); }
 document.addEventListener('visibilitychange', () => { if (document.hidden) persistNow(); });
 addEventListener('pagehide', persistNow);
@@ -3370,11 +3372,11 @@ let secMode = lsGet('skat_mode', null), favCache = null;
 function favList(){ if (favCache) return favCache; const f = lsGet('skat_fav_' + (secMode || 'tp'), null); favCache = new Set(f || SYMS.filter(s => s.fav !== false).map(s => s.id)); return favCache; }
 function isFav(s){ return favList().has(s.id); }
 function toggleFav(s){ const f = favList(); f.has(s.id) ? f.delete(s.id) : f.add(s.id); lsSet('skat_fav_' + (secMode || 'tp'), [...f]); }
-function showLaunch(){ $('launch').querySelectorAll('button[data-m]').forEach(b => b.classList.toggle('on', b.dataset.m === secMode)); $('launch').classList.add('on'); }
-$('launch').querySelectorAll('button[data-m]').forEach(b => b.onclick = () => setSection(b.dataset.m));
-function setSection(m){ secMode = m; favCache = null; lsSet('skat_mode', m); $('launch').classList.remove('on'); applySection(); toast('Раздел: ' + SECTIONS[m]); }
+function showLaunch(){ $('launch').querySelectorAll('button[data-m]').forEach(b => b.classList.toggle('on', b.dataset.m === (document.body.classList.contains('edm') ? 'ed' : secMode))); $('launch').classList.add('on'); }
+$('launch').querySelectorAll('button[data-m]').forEach(b => b.onclick = () => b.dataset.m === 'ed' ? edEnter() : setSection(b.dataset.m));
+function setSection(m){ if (window.edLeave) window.edLeave(); secMode = m; favCache = null; lsSet('skat_mode', m); $('launch').classList.remove('on'); applySection(); toast('Раздел: ' + SECTIONS[m]); }
 function applySection(){
-$('modeBtn').querySelector('span').textContent = SEC_SH[secMode] || 'Раздел';
+$('modeBtn').querySelector('span').textContent = document.body.classList.contains('edm') ? 'Редакт.' : SEC_SH[secMode] || 'Раздел';
 $('v3Btn').style.display = secMode === 'mk' ? '' : 'none'; applySectionOp();
 if (secMode === 'mk'){ if (!window.__mod_mk) toast('Загружаю 3D…'); if (!$('v3d').classList.contains('on')) mkLoad().then(() => open3D()).catch(() => {}); } else if ($('v3d').classList.contains('on')) close3D();
 }
@@ -3842,7 +3844,7 @@ function topoScale(){ try { const c = map.getCenter(), mpp = 156543.03392 * Math
 window.addEventListener('error', e => { try { toast('Ошибка: ' + (e.message || e) + ' (' + String(e.filename || '').split('/').pop().split('?')[0] + ':' + (e.lineno || '') + ')'); } catch(x){} });
 window.addEventListener('unhandledrejection', e => { const r = e.reason; if (r && /^(mk|op|tp)$/.test(r.message)) return; try { toast('Ошибка: ' + ((r && r.message) || r)); } catch(x){} });
 // ======== МОДУЛИ: ЛЕНИВАЯ ЗАГРУЗКА (mk.js — Макет/3D, op.js — Оператор, tp.js — Боевой контур) ========
-const MODV = VERSION.replace(/^\D+/, ''), MODN = {mk:'«Макет»', op:'«Оператор»', tp:'«Боевой контур»', sh:'«Штаб»', or:'«Ориентирование»'}, modP = {};
+const MODV = VERSION.replace(/^\D+/, ''), MODN = {mk:'«Макет»', op:'«Оператор»', tp:'«Боевой контур»', sh:'«Штаб»', or:'«Ориентирование»', ed:'«Редактор»'}, modP = {};
 function modLoad(m){ if (window['__mod_' + m]) return Promise.resolve(); if (modP[m]) return modP[m];
 modP[m] = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = m + '.js?v=' + MODV; sc.onload = () => window['__mod_' + m] ? res() : rej(new Error(m));
 sc.onerror = () => { modP[m] = null; sc.remove(); toast(`Модуль ${MODN[m]} не загрузился — проверьте файл ${m}.js или интернет`); rej(new Error(m)); }; document.head.appendChild(sc); });
@@ -3884,12 +3886,12 @@ $('secB').innerHTML = on ? `<div class="cdv">🔒 Защита включена.
 $('secLk').onchange = e => { if (!secOn()) return; SEC.meta.lock = +e.target.value; localStorage.setItem('skat_enc', JSON.stringify(SEC.meta)); toast('Сохранено'); };
 if (on){ $('secLock').onclick = secLockNow;
 $('secChg').onclick = async () => { const pin = secPin(); if (!pin) return; try { const raw = new Uint8Array(await crypto.subtle.exportKey('raw', SEC.key)), meta = await SEC.wrap(pin, raw, SEC.meta.lock); meta.pl = pin.length; localStorage.setItem('skat_enc', JSON.stringify(meta)); SEC.meta = meta; toast('PIN изменён'); openSec(); } catch(e){ toast('Не удалось: ' + (e.message || e)); } };
-$('secOff').onclick = () => askConfirm('Отключить шифрование? Данные будут храниться на устройстве открыто.', 'Отключить', async () => { const k = SEC.key; try { toast('Расшифровываю…'); await modLoad('tp'); await mediaCrypt(false); SEC.key = null; persistNow(); if (!localStorage.getItem(LS)) throw new Error('не хватило места в хранилище');
+$('secOff').onclick = () => askConfirm('Отключить шифрование? Данные будут храниться на устройстве открыто.', 'Отключить', async () => { const k = SEC.key; try { toast('Расшифровываю…'); await modLoad('tp'); await mediaCrypt(false); await edCryptAll(false); SEC.key = null; persistNow(); if (!localStorage.getItem(LS)) throw new Error('не хватило места в хранилище');
 localStorage.removeItem('skat_enc'); SEC.meta = null; await SEC.idb('readwrite', st => st.delete('state')); toast('Шифрование отключено'); openSec(); } catch(e){ SEC.key = k; toast('Ошибка: ' + (e.message || e)); } }); }
 else $('secEn').onclick = async () => { const pin = secPin(); if (!pin) return; if (!(window.crypto && crypto.subtle)){ toast('Шифрование недоступно: откройте приложение по https'); return; }
 toast('Шифрую…'); try { const raw = crypto.getRandomValues(new Uint8Array(32)), meta = await SEC.wrap(pin, raw, +$('secLk').value); meta.pl = pin.length; SEC.key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', true, ['encrypt', 'decrypt']);
 persistNow(); await SEC.last; if (!(await SEC.load())) throw new Error('проверка записи не прошла');
-localStorage.setItem('skat_enc', JSON.stringify(meta)); SEC.meta = meta; localStorage.removeItem(LS); await modLoad('tp'); await mediaCrypt(true); toast('Шифрование включено'); openSec(); }
+localStorage.setItem('skat_enc', JSON.stringify(meta)); SEC.meta = meta; localStorage.removeItem(LS); await modLoad('tp'); await mediaCrypt(true); await edCryptAll(true); toast('Шифрование включено'); openSec(); }
 catch(e){ if (!SEC.meta) SEC.key = null; toast('Не удалось: ' + (e.message || e)); } };
 openModal('secModal'); }
 $('secBtn').onclick = openSec;
@@ -4461,6 +4463,11 @@ radPush = function(t, items){ radPush = r0; items.splice(Math.max(0, items.lengt
 { const f0 = openRadial; openRadial = function(x, y, ll){ if (!('ontouchstart' in window) && !session && !tool.on && !document.querySelector('.modal.open')){ const h = hitPoint(x, y); if (h && h.i != null && orIsOP(h.a, h.a.points[h.i])) return openObjMenu(h, x, y); } return f0.apply(this, arguments); }; }
 setTimeout(() => { try { if (navigator.onLine !== false) fetch('or.js?v=' + MODV).catch(() => {}); } catch(e){} }, 9000);
 { const f0 = ptExtra; ptExtra = function(a, i){ const r = f0.apply(this, arguments), p = a && a.points[i], w = $('ptX'); if (p && w && orIsOP(a, p) && !w.querySelector('.orPB')){ const b = document.createElement('button'); b.className = 'ghost orPB'; const u = p.orient ? Math.round(p.orient.a) : null; b.textContent = '🧭 Привязать ОП' + (u != null ? ` · α ОН ${Math.floor(u / 100)}-${String(u % 100).padStart(2, '0')}` : ''); b.onclick = () => { closeModals(); orGo({a, i}); }; w.appendChild(b); } return r; }; }
+// ---- 6.65: режим «Редактор» (модуль ed.js): проекты карт для печати
+function edEnter(){ $('launch').classList.remove('on'); modLoad('ed').then(() => window.edStart()).catch(() => {}); }
+async function edCryptAll(on){ try { if (!window.__mod_ed && !lsGet('skat_edany', 0)) return; await modLoad('ed'); await window.edCrypt(on); } catch(e){ console.warn('ed crypt', e); } }
+$('edBtn').onclick = () => modLoad('ed').then(() => window.edPanel()).catch(() => {});
+if (lsGet('skat_edm', 0)) setTimeout(() => modLoad('ed').then(() => window.edStart(true)).catch(() => {}), 900);
 // ---- удержание пальца
 { const mc = map.getContainer(); let lp = null;
 const clearLP = () => { if (lp){ clearTimeout(lp.tm); lp = null; } };
